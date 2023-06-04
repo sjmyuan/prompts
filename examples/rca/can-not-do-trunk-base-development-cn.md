@@ -1,118 +1,106 @@
-> Problem: "We can't change our branching policy from GitHub Flow to Trunk-Based Development".
+> 问题：“我们的分支管理策略无法从GitHub Flow切换到Trunk-Based Development“。
 
-To better understand the problem, I have a few questions:
+为了更好地理解问题，我有以下几个问题：
 
-1. What is the current branching policy you are using?
-2. What are the reasons for wanting to change the branching policy from GitHub Flow to Trunk-Based Development?
-3. Have you encountered any specific issues or obstacles that prevent you from making the change?
+1. 为什么你们想要从GitHub Flow切换到Trunk-Based Development？
+2. 在切换过程中遇到了哪些具体的困难？
+3. 你们尝试过哪些解决方案？
+4. 这个问题是谁发现的，何时发现的？
 
-> 1. GitHub Flow
-> 2. Improve the frequency of integration and deployment, decrease the effort of resolving conflicts, make the deployment process easier and avoid to block deployment.
-> 3. Our QA don't agree with merging untested code to master branch and deploying uncompleted feature to production. And we can't automated our devices test.
+> 1. 我们希望能更频繁的集成和部署，避免花大量的时间来解决冲突，同时也想要避免阻塞部署和降低部署难度。
+> 2. QA不同意将未经测试的代码合入到主干分支，也不同意将未完成的功能部署到生产环境。我们的设备测试无法自动化。
+> 3. 提升测试覆盖率，引入Feature Toggle，实现其中一种设备的测试自动化。
+> 4. 团队长期的痛点
 
-Based on your answers, the problem definition is as follows:
+根据您的回答，我有更多问题：
 
-**Problem Definition**: You want to change your branching policy from GitHub Flow to Trunk-Based Development to improve integration and deployment frequency, decrease conflict resolution effort, simplify the deployment process, and avoid blocking deployments. However, the change is not possible because the QA team disagrees with merging untested code to the master branch and deploying uncompleted features to production, and device tests cannot be automated.
+1. 为什么QA不同意将未经测试的代码合入到主干分支和将未完成的功能部署到生产环境？
+2. 您提到的设备测试无法自动化，是哪种设备？设备测试受到了什么限制？
+3. 当前的测试覆盖率是多少？您希望提高到多少？
+4. Feature Toggle是否已经成功实现？如果没有，请说明原因。
 
-Please confirm if this problem definition accurately reflects the situation.
+> 1. 希望保证主干分支是可部署状态，避免未完成功能影响生产环境的正常功能
+> 2. 硬件设备，没有成熟的技术支持该设备的自动化测试
+> 3. 70%， 提升到95%以上
+> 4. 已经实现了
 
-> Confirm
+根据您提供的信息，问题定义和数据如下：
 
-Great, now let's proceed with collecting data. I have some questions to collect more information about the situation:
+**问题定义**：在尝试从GitHub Flow切换到Trunk-Based Development的过程中，团队遇到了QA不同意将未经测试的代码合入到主干分支和将未完成的功能部署到生产环境的问题。此外，团队面临着设备测试无法自动化的挑战。
 
-1. What is the size of your development team?
-2. What is the size of your QA team?
-3. What tools and technologies are being used for development, testing, and deployment?
-4. Are there any specific reasons why device tests cannot be automated?
+**数据**：
+1. 团队希望通过切换到Trunk-Based Development来实现更频繁的集成、部署和降低部署难度。
+2. 当前测试覆盖率为70%，目标是提升到95%以上。
+3. 团队已经引入了Feature Toggle。
+4. 设备测试涉及硬件设备，由于缺乏成熟技术，无法实现自动化测试。
 
-> 1. 5 Dev
-> 2. 2 QA
-> 3. Java, Cypress, GitHub Actions
-> 4. There is no off-the-shelf techniques to automated device test, and we don't have time to develop the techniques by ourself.
+请确认问题定义和数据是否准确。
 
-Based on your answers, I have more questions:
+> 确认
 
-1. How often do you currently deploy to production?
-2. How long does it typically take for a feature to go from development to production under the current branching policy?
-3. What kind of devices are involved in the device tests that you can't automate?
+既然问题定义和数据已经得到确认，接下来我将问一些为什么的问题以找出问题的根本原因：
 
-Please provide your answers to these questions.
+1. 为什么QA无法接受在Trunk-Based Development中将未经测试的代码合入到主干分支和部署未完成的功能？
+2. 在Trunk-Based Development策略中，有没有其他方法可以确保主干分支始终处于可部署状态？
+3. 为什么设备测试无法自动化？有没有其他方法可以解决这个问题？
+4. 目前测试覆盖率为70%，为什么还需要提高到95%以上？这个目标实现起来困难吗？
+5. Feature Toggle是否在实际应用中有效？有没有其他方法可以替代它？
 
-> 1. 1-2 months
-> 2. more than 1 month
-> 3. sensitive data, a kind of hardware
+> 1. 希望保证主干分支是可部署状态，不希望未完成功能影响生产环境的正常功能。
+> 2. 使用Feature Toggle隐藏未测试的功能。
+> 3. 没有现有的技术可供使用，团队也没有投入时间研究。
+> 4. 增加团队的信心，实现需要一定的工作量，但可以办到。
+> 5. 开发团队认为是有效的，目前没有其他方法替代它。
 
-Based on the information you provided, here's the problem definition and data:
+根据您的回答，我们可以得出以下根本原因和建议的行动：
 
-**Problem Definition**: You want to change your branching policy from GitHub Flow to Trunk-Based Development to improve integration and deployment frequency, decrease conflict resolution effort, simplify the deployment process, and avoid blocking deployments. However, the change is not possible because the QA team disagrees with merging untested code to the master branch and deploying uncompleted features to production, and device tests cannot be automated.
+**根本原因**：
+1. QA希望保证主干分支始终处于可部署状态，避免未完成功能影响生产环境的正常功能。
+2. 设备测试无法自动化，因为没有现有的技术可用，同时团队没有投入时间进行研究。
+3. 团队希望通过提高测试覆盖率增加信心。
 
-**Data**:
-- Development team size: 5 developers
-- QA team size: 2 QA engineers
-- Tools and technologies: Java, Cypress, GitHub Actions
-- Device tests automation is not possible due to the lack of off-the-shelf techniques, and the team doesn't have the time to develop custom techniques.
-- Deployment frequency: 1-2 months
-- Time from development to production: more than 1 month
-- Devices involved in tests: sensitive data hardware
+**建议的行动**：
+1. 在Trunk-Based Development策略中，使用Feature Toggle来隐藏未测试或未完成的功能，确保主干分支始终处于可部署状态。
+2. 考虑投入时间和资源研究设备测试自动化的可能性，以降低测试工作量并提高效率。
+3. 制定计划提高测试覆盖率至95%以上，以增加团队对代码质量的信心。
+4. 持续监控Feature Toggle的实际效果，确保它在实际应用中能够有效地控制功能的发布。
 
-Please confirm if the problem definition and data are accurate.
+请确认这些根本原因和建议的行动是否符合您的要求。
 
-> Confirm
+> 确认。列出问题定义，问题数据，根因，建议和所有问题和回答。
 
-Now that the problem definition and data are confirmed, I will proceed with asking "why" questions to identify the root causes of the problem:
+**问题定义**：在尝试从GitHub Flow切换到Trunk-Based Development的过程中，团队遇到了QA不同意将未经测试的代码合入到主干分支和将未完成的功能部署到生产环境的问题。此外，团队面临着设备测试无法自动化的挑战。
 
-1. Why does the QA team disagree with merging untested code to the master branch and deploying uncompleted features to production?
-2. Why is there no time to develop custom techniques for automating device tests?
-3. Why haven't alternative branching strategies, such as feature toggles or environment-specific branches, been considered to address the QA team's concerns?
+**问题数据**：
+1. 团队希望通过切换到Trunk-Based Development来实现更频繁的集成、部署和降低部署难度。
+2. 当前测试覆盖率为70%，目标是提升到95%以上。
+3. 团队已经引入了Feature Toggle。
+4. 设备测试涉及硬件设备，由于缺乏成熟技术，无法实现自动化测试。
 
-> 1. they want to keep master branch to be deployable and don't want the uncompleted feature to affect the feature on production.
-> 2. it need huge effort, and we don't know how to do it right now.
-> 3. We want to use feature toggles, but we don't have enough confidence to say it can ensure the stability of production
+**根本原因**：
+1. QA希望保证主干分支始终处于可部署状态，避免未完成功能影响生产环境的正常功能。
+2. 设备测试无法自动化，因为没有现有的技术可用，同时团队没有投入时间进行研究。
+3. 团队希望通过提高测试覆盖率增加信心。
 
-Based on your answers, I have identified the following root causes and suggested actions:
+**建议的行动**：
+1. 在Trunk-Based Development策略中，使用Feature Toggle来隐藏未测试或未完成的功能，确保主干分支始终处于可部署状态。
+2. 考虑投入时间和资源研究设备测试自动化的可能性，以降低测试工作量并提高效率。
+3. 制定计划提高测试覆盖率至95%以上，以增加团队对代码质量的信心。
+4. 持续监控Feature Toggle的实际效果，确保它在实际应用中能够有效地控制功能的发布。
 
-Root Causes:
-1. The QA team's concerns about merging untested code and deploying uncompleted features to production are preventing the change to Trunk-Based Development.
-2. Lack of time and knowledge to develop custom techniques for automating device tests.
-3. Lack of confidence in using feature toggles to ensure the stability of production.
+**问题与回答**：
 
-Suggested Actions:
-1. Educate the team about the benefits of Trunk-Based Development and address their concerns by implementing best practices, such as using feature flags and maintaining a stable master branch through continuous integration and testing.
-2. Allocate time and resources to research and develop custom techniques for automating device tests or explore third-party solutions that could help automate these tests.
-3. Investigate and learn from successful implementations of feature toggles in similar projects or industries to build confidence in using them to ensure production stability.
+Q1: 为什么QA无法接受在Trunk-Based Development中将未经测试的代码合入到主干分支和部署未完成的功能？
+A1: 希望保证主干分支是可部署状态，不希望未完成功能影响生产环境的正常功能。
 
-Please confirm if these root causes and suggested actions are accurate and acceptable.
+Q2: 在Trunk-Based Development策略中，有没有其他方法可以确保主干分支始终处于可部署状态？
+A2: 使用Feature Toggle隐藏未测试的功能。
 
-> Confirm. Please list the problem definition, problem data, root causes, suggested actions and all the questions and answers.
+Q3: 为什么设备测试无法自动化？有没有其他方法可以解决这个问题？
+A3: 没有现有的技术可供使用，团队也没有投入时间研究。
 
-**Problem Definition**: You want to change your branching policy from GitHub Flow to Trunk-Based Development to improve integration and deployment frequency, decrease conflict resolution effort, simplify the deployment process, and avoid blocking deployments. However, the change is not possible because the QA team disagrees with merging untested code to the master branch and deploying uncompleted features to production, and device tests cannot be automated.
+Q4: 目前测试覆盖率为70%，为什么还需要提高到95%以上？这个目标实现起来困难吗？
+A4: 增加团队的信心，实现需要一定的工作量，但可以办到。
 
-**Data**:
-- Development team size: 5 developers
-- QA team size: 2 QA engineers
-- Tools and technologies: Java, Cypress, GitHub Actions
-- Device tests automation is not possible due to the lack of off-the-shelf techniques, and the team doesn't have the time to develop custom techniques.
-- Deployment frequency: 1-2 months
-- Time from development to production: more than 1 month
-- Devices involved in tests: sensitive data hardware
-
-**Root Causes**:
-1. The QA team's concerns about merging untested code and deploying uncompleted features to production are preventing the change to Trunk-Based Development.
-2. Lack of time and knowledge to develop custom techniques for automating device tests.
-3. Lack of confidence in using feature toggles to ensure the stability of production.
-
-**Suggested Actions**:
-1. Educate the team about the benefits of Trunk-Based Development and address their concerns by implementing best practices, such as using feature flags and maintaining a stable master branch through continuous integration and testing.
-2. Allocate time and resources to research and develop custom techniques for automating device tests or explore third-party solutions that could help automate these tests.
-3. Investigate and learn from successful implementations of feature toggles in similar projects or industries to build confidence in using them to ensure production stability.
-
-**Questions and Answers**:
-
-1. Q: Why does the QA team disagree with merging untested code to the master branch and deploying uncompleted features to production?
-   A: They want to keep the master branch deployable and don't want the uncompleted feature to affect the features on production.
-
-2. Q: Why is there no time to develop custom techniques for automating device tests?
-   A: It needs a huge effort, and the team doesn't know how to do it right now.
-
-3. Q: Why haven't alternative branching strategies, such as feature toggles or environment-specific branches, been considered to address the QA team's concerns?
-   A: The team wants to use feature toggles but doesn't have enough confidence to say it can ensure the stability of production.
+Q5: Feature Toggle是否在实际应用中有效？有没有其他方法可以替代它？
+A5: 开发团队认为是有效的，目前没有其他方法替代它。
