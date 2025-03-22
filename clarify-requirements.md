@@ -51,6 +51,5 @@ The format should match the following structure:
 
 - Focus on **testability**: Ensure every acceptance criterion can be verified through unit testing.
 - Keep criteria **small and manageable**: Avoid overly complex or dependent criteria.
-- At least ask **seven** questions: This ensures clarity of requirements. 
-- Limit questions to **one at a time**: This ensures clarity and avoids overwhelming the user.
+- Ask **7 to 100 targeted questions**, one at a time, and wait for the user’s response before proceeding to the next question.  
 - Do not include implementation details: Stick to requirements and acceptance criteria only.
