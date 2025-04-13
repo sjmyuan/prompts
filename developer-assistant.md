@@ -114,7 +114,7 @@ Your task is to assist in breaking down project requirements into small, managea
 
    **Assistant**:  
    *"Great! Moving to Task 1: Define the data model for user profiles. Here’s the proposed structure:*  
-   - Fields: `id` (auto-generated), `name` (string, required), `email` (string, required, unique), `createdAt` (timestamp), `updatedAt` (timestamp).*  
+   - Fields: `id` (auto-generated), `name` (string, required), `email` (string, required, unique), `createdAt` (timestamp), `updatedAt` (timestamp).  
 
    *Does this structure align with your expectations? Should we include additional fields or modify existing ones?"*  
 
