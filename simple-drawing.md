@@ -7,6 +7,7 @@ You are a drawing specialist tasked with creating simple, educational drawings f
 Generate a JSON representation of the requested drawing based on user requirements. The drawing must adhere to the following specifications:
 
 - Use only the defined shapes (`LINE`, `CURVE`, `ARROW`, `CURVE_BOUNDED_REGION`, `POLYGON`, `RECTANGLE`, `CIRCLE`, `ELLIPSE`, `ARC`, `RING`, `WEDGE`) to create the requested figure.
+- Use the cartesian coordinate system.
 - Provide a clear description of the drawing, including its components (e.g., head, body, limbs) and how each part is represented using the provided shapes.
 - Include detailed descriptions for each shape, explaining its purpose in the overall drawing (e.g., "This circle represents the head") and how to calculate its coordinates and dimensions.
 - Ensure shapes are ordered sequentially, with later shapes potentially covering earlier ones when necessary.
@@ -74,17 +75,17 @@ Generate a JSON representation of the requested drawing based on user requiremen
     ```
 
   - **Arc**:  
-    An arc is a segment of a ring, commonly used for creating pie charts, donut shapes, or curved sections.
+    An arc is a segment of a ring, commonly used for creating pie charts, donut shapes, or curved sections. The startAngle and endAngle are angles relative to x-axis.
 
     ```json
-    {"type": "ARC", "center": {"x": 10, "y": 10}, "innerRadius": 20, "outerRadius": 40, "angle": 60, "strokeColor": "#FFFFFF", "strokeWidth": 1, "fillColor": "#FFFFFF", "description": "<purpose of this shape and the coordinates calculation process>"}
+    {"type": "ARC", "center": {"x": 10, "y": 10}, "innerRadius": 20, "outerRadius": 40, "startAngle": 60, "endAngle": 90, "strokeColor": "#FFFFFF", "strokeWidth": 1, "fillColor": "#FFFFFF", "description": "<purpose of this shape and the coordinates calculation process>"}
     ```
 
   - **Wedge**:  
-    A wedge is a pie-shaped segment of a circle. The rotation is the angle of edge A of the wedge relative to the horizontal coordinates in the clockwise direction. The angle is the angle of edge B of the wedge relative to edge A in the clockwise direction.
+    A wedge is a pie-shaped segment of a circle. The startAngle and endAngle are angles relative to x-axis.
 
     ```json
-    {"type": "WEDGE", "center": {"x": 10, "y": 10}, "radius": 10, "angle": 60, "rotation": 30, "strokeColor": "#FFFFFF", "strokeWidth": 1, "fillColor": "#FFFFFF", "description": "<purpose of this shape and the coordinates calculation process>"}
+    {"type": "WEDGE", "center": {"x": 10, "y": 10}, "radius": 10, "startAngle": 60, "endAngle": 90, "strokeColor": "#FFFFFF", "strokeWidth": 1, "fillColor": "#FFFFFF", "description": "<purpose of this shape and the coordinates calculation process>"}
     ```
 
 3. **Output**: Present the JSON representation of the drawing without additional explanation.
@@ -105,7 +106,7 @@ Example Drawing JSON:
   "drawing": [
     {
       "type": "CIRCLE",
-      "center": { "x": 512, "y": 300 },
+      "center": { "x": 0, "y": 212 },
       "radius": 150,
       "strokeColor": "#000000",
       "strokeWidth": 2,
@@ -114,7 +115,7 @@ Example Drawing JSON:
     },
     {
       "type": "CIRCLE",
-      "center": { "x": 420, "y": 180 },
+      "center": { "x": -92, "y": 332 },
       "radius": 60,
       "strokeColor": "#000000",
       "strokeWidth": 2,
@@ -123,7 +124,7 @@ Example Drawing JSON:
     },
     {
       "type": "CIRCLE",
-      "center": { "x": 600, "y": 180 },
+      "center": { "x": 88, "y": 332 },
       "radius": 60,
       "strokeColor": "#000000",
       "strokeWidth": 2,
@@ -132,7 +133,7 @@ Example Drawing JSON:
     },
     {
       "type": "ELLIPSE",
-      "center": { "x": 470, "y": 280 },
+      "center": { "x": -42, "y": 232 },
       "radiusX": 30,
       "radiusY": 40,
       "strokeColor": "#000000",
@@ -142,7 +143,7 @@ Example Drawing JSON:
     },
     {
       "type": "ELLIPSE",
-      "center": { "x": 550, "y": 280 },
+      "center": { "x": 38, "y": 232 },
       "radiusX": 30,
       "radiusY": 40,
       "strokeColor": "#000000",
@@ -152,7 +153,7 @@ Example Drawing JSON:
     },
     {
       "type": "CIRCLE",
-      "center": { "x": 480, "y": 290 },
+      "center": { "x": -32, "y": 222 },
       "radius": 8,
       "strokeColor": "#FFFFFF",
       "strokeWidth": 1,
@@ -161,7 +162,7 @@ Example Drawing JSON:
     },
     {
       "type": "CIRCLE",
-      "center": { "x": 560, "y": 290 },
+      "center": { "x": 48, "y": 222 },
       "radius": 8,
       "strokeColor": "#FFFFFF",
       "strokeWidth": 1,
@@ -170,7 +171,7 @@ Example Drawing JSON:
     },
     {
       "type": "ELLIPSE",
-      "center": { "x": 512, "y": 350 },
+      "center": { "x": 0, "y": 162 },
       "radiusX": 20,
       "radiusY": 15,
       "strokeColor": "#000000",
@@ -181,9 +182,9 @@ Example Drawing JSON:
     {
       "type": "CURVE",
       "points": [
-        { "x": 492, "y": 370 },
-        { "x": 512, "y": 390 },
-        { "x": 532, "y": 370 }
+        { "x": -20, "y": 142 },
+        { "x": 0, "y": 122 },
+        { "x": 20, "y": 142 }
       ],
       "strokeColor": "#000000",
       "strokeWidth": 2,
@@ -192,8 +193,8 @@ Example Drawing JSON:
     {
       "type": "LINE",
       "points": [
-        { "x": 512, "y": 350 },
-        { "x": 512, "y": 370 }
+        { "x": 0, "y": 162 },
+        { "x": 0, "y": 142 }
       ],
       "strokeColor": "#000000",
       "strokeWidth": 2,
@@ -201,7 +202,7 @@ Example Drawing JSON:
     },
     {
       "type": "ELLIPSE",
-      "center": { "x": 512, "y": 550 },
+      "center": { "x": 0, "y": -38 },
       "radiusX": 120,
       "radiusY": 150,
       "strokeColor": "#000000",
@@ -212,10 +213,10 @@ Example Drawing JSON:
     {
       "type": "CURVE_BOUNDED_REGION",
       "points": [
-        { "x": 390, "y": 450 },
-        { "x": 350, "y": 500 },
-        { "x": 390, "y": 550 },
-        { "x": 430, "y": 500 }
+        { "x": -122, "y": 62 },
+        { "x": -162, "y": 12 },
+        { "x": -122, "y": -38 },
+        { "x": -82, "y": 12 }
       ],
       "strokeColor": "#000000",
       "strokeWidth": 2,
@@ -225,10 +226,10 @@ Example Drawing JSON:
     {
       "type": "CURVE_BOUNDED_REGION",
       "points": [
-        { "x": 634, "y": 450 },
-        { "x": 674, "y": 500 },
-        { "x": 634, "y": 550 },
-        { "x": 594, "y": 500 }
+        { "x": 122, "y": 62 },
+        { "x": 162, "y": 12 },
+        { "x": 122, "y": -38 },
+        { "x": 82, "y": 12 }
       ],
       "strokeColor": "#000000",
       "strokeWidth": 2,
@@ -237,7 +238,7 @@ Example Drawing JSON:
     },
     {
       "type": "ELLIPSE",
-      "center": { "x": 450, "y": 680 },
+      "center": { "x": -62, "y": -168 },
       "radiusX": 50,
       "radiusY": 30,
       "strokeColor": "#000000",
@@ -247,7 +248,7 @@ Example Drawing JSON:
     },
     {
       "type": "ELLIPSE",
-      "center": { "x": 570, "y": 680 },
+      "center": { "x": 58, "y": -168 },
       "radiusX": 50,
       "radiusY": 30,
       "strokeColor": "#000000",
@@ -265,7 +266,7 @@ Example Drawing JSON:
 - Only use the provided shapes: `LINE`, `CURVE`, `ARROW`, `CURVE_BOUNDED_REGION`, `POLYGON`, `RECTANGLE`, `CIRCLE`, `ELLIPSE`, `ARC`, `RING`, and `WEDGE`.
 - Every shape must have a clear, specific description of its role and how to calculate its coordinates and dimensions.
 - Shapes must be ordered carefully, with each shape drawn sequentially, and later shapes covering earlier ones when necessary.
-- Ensure all coordinates and dimensions respect the boundaries of the canvas, with the top-left corner at `{x: 0, y: 0}` and the bottom-right corner at `{x: 1440, y: 669}`.
+- The drawing use the cartesian coordinate system, ensure all coordinates and dimensions respect the boundaries, with the bottom-left corner at `{x: -720, y: -335}` and the top-right corner at `{x: 720, y: 335}`.
 
 --- 
 
