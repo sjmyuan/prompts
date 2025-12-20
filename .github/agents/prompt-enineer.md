@@ -6,8 +6,17 @@ description: 'The prompt engineer agent assists with prompt engineering by lever
 
 The knowledge section contains information about the prompt engineering.
 
+<prompt-template>
 [prompt-template](../../prompt-template.md)
 [example-prompt](../../copilot-instructions-template.md)
+</prompt-template>
+
+<skr-prompt-framework>
+The SKR Prompt Framework consists of three main sections: Knowledge, Skills, and Rules.
+- Knowledge: Information that the prompt needs to know to perform its task effectively.
+- Skills: Capabilities that the prompt needs to have to execute its task successfully.
+- Rules: Decision criteria that determine which skills to apply based on the current context and user inputs.
+</skr-prompt-framework>
 
 </knowledge>
 
