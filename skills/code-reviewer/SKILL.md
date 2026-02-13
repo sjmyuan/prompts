@@ -62,10 +62,13 @@ description: Perform systematic code reviews on files, folders, diffs, commits, 
 
 3. **Performance & Resources**:
    - ✓ Algorithmic complexity (O(n²) → O(n log n) opportunities)
+   - ✓ Database optimization (N+1 queries, missing indexes, inefficient JOINs)
    - ✓ Performance hotspots (loops, database queries, network calls)
    - ✓ Rendering efficiency (unnecessary re-renders, memoization)
    - ✓ I/O patterns (batch operations, connection pooling)
-   - ✓ Caching strategies (when to cache, invalidation logic)
+   - ✓ Caching strategies (when to cache, invalidation logic, cache stampede risks)
+   - ✓ Memory management (unbounded collections, memory leaks, resource cleanup)
+   - ✓ Benchmark validation (performance test coverage for optimization claims)
    - ✓ Scalability (concurrent users, large datasets)
 
 4. **Security & Privacy**:
@@ -208,6 +211,7 @@ When you need specific examples to understand how to structure and format code r
 
 - **Single File Reviews**: When reviewing a single new or modified file (component, module, etc.), read [examples/single-file-review.md](examples/single-file-review.md)
 - **Diff/Commit Reviews**: When reviewing diffs, commits, or bug fixes with focused changes, read [examples/diff-commit-review.md](examples/diff-commit-review.md)
+- **Performance Optimization Reviews**: When reviewing performance improvements, optimizations, or addressing performance issues, read [examples/performance-improvement.md](examples/performance-improvement.md)
 
 Only load example files when you need guidance on structuring review output for the specific review type to minimize context size.
 
