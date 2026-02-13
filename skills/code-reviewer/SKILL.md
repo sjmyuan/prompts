@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Review submitted files, folders, diffs, or commits and provide clear, actionable, and prioritized feedback. Use this skill whenever a user requests a code review.
+description: Perform systematic code reviews on files, folders, diffs, commits, or pull requests. Evaluates correctness, security, performance, maintainability, and test coverage. Provides prioritized, actionable feedback without making code changes. Use when users request reviews, feedback, or quality assessments.
 ---
 
 <when-to-use-this-skill>

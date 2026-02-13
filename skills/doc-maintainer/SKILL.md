@@ -1,6 +1,6 @@
 ---
 name: doc-maintainer
-description: Update project documentation to reflect code changes (bug fixes, refactors, or new features). Provide concise, actionable edits to requirements, architecture, README, and related docs. Use this skill when code changes occur.
+description: Synchronize documentation with code changes across README, architecture docs, API docs, and requirements. Assesses documentation impact and provides focused updates, migration guides, and examples. Use after implementing bug fixes, features, or refactors that affect documented behavior, APIs, or workflows.
 ---
 
 <when-to-use-this-skill>

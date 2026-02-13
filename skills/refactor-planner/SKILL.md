@@ -1,6 +1,6 @@
 ---
 name: refactor-planner
-description: Clarify the scope, objectives, and constraints of the refactor request first, then generate a refactoring plan for the refactor request. Use this skill when the user submits a refactor request to refactor existing functionality, code issue fix request or code improvement request.
+description: Analyze refactoring needs and generate detailed, step-by-step TDD-based refactoring plans. Handles code cleanup, architecture improvements, technical debt, and code quality enhancements. Use when users request refactoring, code improvements, structural changes, or cleanup tasks. This skill produces a plan but does not execute changes—pair with plan-executor for implementation.
 ---
 
 <when-to-use-this-skill>

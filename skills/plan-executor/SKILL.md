@@ -1,6 +1,6 @@
 ---
 name: plan-executor
-description: Execute an outlined plan step by step, tracking progress and updating the status of each step as you go. Use this skill whenever you need to execute an outlined plan.
+description: Execute structured plans step-by-step with progress tracking, validation checkpoints, and error recovery. Works with plans from bug-fix-planner, feature-implementation-planner, or refactor-planner. Runs tests, validates changes, and handles failures systematically. Use after generating an implementation, refactor, or bug-fix plan that needs execution.
 ---
 
 <when-to-use-this-skill>

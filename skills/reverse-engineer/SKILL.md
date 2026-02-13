@@ -1,6 +1,6 @@
 ---
 name: reverse-engineer
-description: reverse engineering the codebase to answer user's question. Use this skill whenever a user submits a question.
+description: Investigate codebases to answer questions about functionality, implementation, design decisions, and architecture. Analyzes code structure, traces control/data flow, and examines dependencies to provide comprehensive answers. Use when users ask "what", "how", "why", "where", or "when" questions about existing code. Does not modify code.
 ---
 
 <when-to-use-this-skill>

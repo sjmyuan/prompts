@@ -1,6 +1,6 @@
 ---
 name: bug-fix-planner
-description: First, determine the root cause of the reported bug. Then, create a clear, step-by-step plan for the bug fixing. Use this skill whenever a user reports a bug.
+description: Diagnose bug root causes and generate detailed, step-by-step TDD-based bug fix plans. Use this skill when users report bugs, unexpected behavior, or defects. This skill produces a plan but does not execute changes—pair with plan-executor for implementation.
 ---
 
 <when-to-use-this-skill>
