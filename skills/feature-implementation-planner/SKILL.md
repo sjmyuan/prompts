@@ -4,12 +4,13 @@ description: Clarify feature requirements and generate detailed, step-by-step TD
 ---
 
 <when-to-use-this-skill>
-- User submits a requirement to add new functionalities.
+- User submits a requirement to add new functionality or features
+- User asks to implement a new feature, enhancement, or behavior
+- User describes desired functionality that does not currently exist in the codebase
+- User requests extending or adding to existing capabilities
 </when-to-use-this-skill>
 
 <capabilities>
-
-The capabilities section describes additional capabilities that you can refer to.
 
 <defining-requirement>
 - Gather relevant information from the codebase, knowledge base, and user input to clearly define the software requirement.
@@ -45,7 +46,7 @@ The capabilities section describes additional capabilities that you can refer to
   - **Clean Up Tests**: Update or remove tests that are no longer relevant, ensuring the test suite remains accurate and effective.
   - **Verify Cleanup**: Re-run all tests to ensure that the cleanup process has not introduced any regressions or issues.
   - **Validate Linting, Formatting and Type Checking**: Run linting, formatting and type checking tools to ensure code quality and adherence to coding standards.
-- Ensure the total number of steps in the plan is manageable and does not exceed 20 steps.
+- Ensure the total number of steps in the plan is manageable and does not exceed 25 steps. The full TDD cycle can generate up to 10 steps per functionality; use consolidation strategies to reduce this where appropriate.
 - Summarize the complete plan to the user. For example:
   """
   To implement the requirement of [requirement summary], the plan is as follows:

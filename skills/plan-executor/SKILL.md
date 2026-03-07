@@ -92,6 +92,15 @@ The capabilities section describes the key capabilities for executing plans effe
 - **Incremental Validation**: Don't wait until the end—validate incrementally to catch issues early
 </validation-checkpoints>
 
+<plan-cleanup>
+- **After Completion**: Once ALL steps in the plan are marked ✅ completed and the final summary is provided:
+  - Delete the PLAN.md file from the workspace
+  - Confirm the deletion to the user ("Cleaned up PLAN.md")
+  - This keeps the workspace clean and signals clear plan completion
+- **Only After Success**: Only delete PLAN.md if the entire plan executed successfully—don't delete if there are ❌ failed or 🚫 blocked steps
+- **Final Action**: Deleting PLAN.md should be the very last action after displaying the completion summary
+</plan-cleanup>
+
 <user-interaction>
 - **Autonomous by Default**: Execute the full plan without asking for permission at each step
 - **Pause for Clarity**: If a step is ambiguous or requires user input, pause and ask before proceeding
@@ -175,5 +184,12 @@ The rules section outlines decision criteria that determine which capabilities t
 <rule> **Plan Immutability**: Throughout execution, apply the **plan-tracking** immutability principle—never modify the plan structure, objectives, or steps except to update statuses or add brief clarifying notes. Never skip, reorder, or remove steps without explicit user approval. </rule>
 
 <rule> **Complete All Steps**: Execute ALL steps in the plan thoroughly, regardless of the number of steps or files affected. Do not stop early or leave steps partially completed. </rule>
+
+<rule> **After Plan Completion**: Apply the **plan-cleanup** capability when ALL steps are marked ✅ completed:
+  - Display the final completion summary with all steps showing ✅ status
+  - Delete the PLAN.md file from the workspace
+  - Confirm the deletion ("Cleaned up PLAN.md")
+  - Only perform cleanup if the entire plan succeeded—keep PLAN.md if any steps are ❌ failed or 🚫 blocked
+</rule>
 
 </rules>

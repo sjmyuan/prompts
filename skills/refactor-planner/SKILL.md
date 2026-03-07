@@ -4,15 +4,14 @@ description: Analyze refactoring needs and generate detailed, step-by-step TDD-b
 ---
 
 <when-to-use-this-skill>
-- User submits a refactor request to refactor existing functionalities
-- User submits a code issue fix request
-- User submits a code improvement request
+- User requests refactoring of existing code or functionality
+- User asks for code cleanup, restructuring, or quality improvements
+- User wants to reduce technical debt or improve code organization
+- User requests improvements to maintainability, readability, or performance without changing behavior
 </when-to-use-this-skill>
 
 
 <capabilities>
-
-The capabilities section describes additional capabilities that you can refer to.
 
 <defining-refactor-request>
 - Gather relevant information from the codebase, knowledge base, and user input to clearly define the refactor request.

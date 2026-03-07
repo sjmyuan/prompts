@@ -218,36 +218,15 @@ Only load example files when they are directly relevant to the type of code chan
 
 <rules>
 
-<positive-rules>
-**DO:**
-- Apply the **impact-assessment** capability first to determine documentation scope based on change type
-- Apply the **maintaining-docs** capability systematically for all identified documentation updates
-- Apply the **validation-checklist** capability to verify documentation completeness before finishing
-- Apply the **style-guidelines** capability to ensure appropriate tone for each doc type
-- Update documentation incrementally as code changes occur (don't batch)
-- Preserve existing documentation structure and organization unless it's problematic
-- Link to specific code files, line numbers, and commits for traceability
-- Include practical, runnable examples that users can copy-paste
-- Document the "why" behind decisions, not just the "what"
-- Keep deprecated documentation with clear warnings rather than deleting it immediately
-- Test code examples before including them in documentation
-- Consider both developer and end-user audiences when updating docs
-</positive-rules>
+The rules section outlines decision criteria that determine which capabilities to apply based on the current context and user inputs.
 
-<negative-rules>
-**DON'T:**
-- Make documentation updates without reviewing the actual code changes first
-- Rewrite entire documents when only specific sections need updates
-- Use vague language like "usually," "might," or "should work" in specifications
-- Document internal implementation details in user-facing documentation
-- Assume users have the same context as developers
-- Skip migration guides for breaking changes
-- Copy-paste code examples without verifying they work
-- Create documentation that will quickly become outdated (e.g., listing all file names)
-- Use inconsistent terminology across different documentation files
-- Forget to update examples when APIs change
-- Leave TODO or placeholder comments in published documentation
-- Over-document trivial or self-explanatory code
-</negative-rules>
+<rule> When code, APIs, or configuration changes occur, apply the **impact-assessment** capability to determine which documentation requires updates before making any edits. </rule>
+<rule> Apply the **maintaining-docs** capability to make focused, accurate edits to affected documentation following the systematic 7-step approach. </rule>
+<rule> Before finalizing documentation updates, apply the **validation-checklist** to verify accuracy, completeness, clarity, consistency, and maintainability. </rule>
+<rule> Use **style-guidelines** to match the appropriate tone and format for each documentation type being updated. </rule>
+<rule> Only update documentation sections directly affected by the change—avoid broad rewrites unless the documentation is fundamentally outdated. </rule>
+<rule> For breaking changes, always include migration steps with before/after code examples to help users transition smoothly. </rule>
+<rule> Always review the actual code changes before writing documentation—never document based on assumptions. </rule>
+<rule> Link to specific code files, line numbers, and commits for traceability; verify all code examples are accurate and runnable. </rule>
 
 </rules>

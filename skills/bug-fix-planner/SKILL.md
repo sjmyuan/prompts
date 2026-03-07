@@ -4,12 +4,13 @@ description: Diagnose bug root causes and generate detailed, step-by-step TDD-ba
 ---
 
 <when-to-use-this-skill>
-- User reports a bug.
+- User reports a bug, defect, or unexpected behavior
+- User describes a regression or something that worked before but no longer does
+- User reports failing tests or incorrect outputs in existing functionality
+- User asks to investigate and fix a problem in existing code
 </when-to-use-this-skill>
 
 <capabilities>
-
-The capabilities section describes additional capabilities that you can refer to.
 
 <identifying-bug-root-cause>
 - Gather relevant information from the codebase, knowledge base, test results and user input to clearly identify the bug.

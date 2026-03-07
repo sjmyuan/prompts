@@ -4,7 +4,11 @@ description: Investigate codebases to answer questions about functionality, impl
 ---
 
 <when-to-use-this-skill>
-- User submits a question
+- User asks "what", "how", "why", "where", or "when" questions about existing code
+- User wants to understand how a feature, component, or system is implemented
+- User is investigating code structure, design decisions, or architecture
+- User needs to trace data flow or control flow through the codebase
+- User asks about the purpose or rationale behind a specific implementation
 </when-to-use-this-skill>
 
 <capabilities>
