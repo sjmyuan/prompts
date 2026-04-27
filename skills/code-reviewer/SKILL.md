@@ -128,6 +128,20 @@ git diff HEAD...<supplied-branch>
    - ✓ Extensibility (easy to add features without major refactors)
    - ✓ Alignment with project goals (fits existing patterns and vision)
    - ✓ Technical debt (quick fixes that need follow-up noted)
+
+8. **Inconsistencies** *(treat existing code as potentially wrong — do NOT assume it is the correct baseline)*:
+   - ✓ Naming style clashes (e.g., `camelCase` vs `snake_case`, `get` prefix vs none)
+   - ✓ Pattern clashes (e.g., callbacks vs Promises vs async/await; class-based vs functional components)
+   - ✓ API usage clashes (e.g., two different libraries doing the same job, two different ways to call the same API)
+   - ✓ Error-handling style clashes (e.g., exceptions vs result objects vs error callbacks)
+   - ✓ Structural clashes (e.g., flat vs nested directory layout, co-located vs separated test files)
+   - ✓ Config/constant definition clashes (e.g., inline magic numbers vs named constants, scattered config vs centralized)
+
+   **For every inconsistency found**:
+   - Show **both** variants with concrete file/line references
+   - Explain the trade-offs of each without declaring a winner
+   - Explicitly ask the user (or note in the review) which variant should be the canonical one
+   - Do **not** recommend "align with existing code" unless the existing code is clearly the established, intentional pattern
 </conducting-code-review>
 
 <defining-severity-levels>
@@ -162,6 +176,11 @@ git diff HEAD...<supplied-branch>
   - Comment/documentation polish
   - Code organization preferences
   - Micro-optimizations with negligible impact
+
+- **⚠️ Inconsistency** (Decision required — severity escalates based on scope):
+  - Two or more conflicting patterns, styles, or usages detected across the codebase
+  - **Neither side is assumed correct** — the reviewer presents both and requests a decision
+  - Escalate to 🔴 Major if the inconsistency affects a widely-used pattern or public API surface
 </defining-severity-levels>
 
 <formatting-review-output>
@@ -194,6 +213,15 @@ git diff HEAD...<supplied-branch>
 ### 🟡 Minor Issues
 
 ### 🟢 Nits / Suggestions
+
+### ⚠️ Inconsistencies (Decision Required)
+*[If none, state "None identified"]*
+
+#### [Inconsistency Title]
+- **Variant A**: [description] — [path/to/file.ts:L10](path/to/file.ts#L10)
+- **Variant B**: [description] — [path/to/file.ts:L40](path/to/file.ts#L40)
+- **Trade-offs**: [neutral comparison of both approaches]
+- **Decision needed**: Which variant should be the project standard? *(Do not default to whichever appeared first — both may be wrong)*
 
 ---
 
@@ -233,6 +261,8 @@ git diff HEAD...<supplied-branch>
 6. **Skip overcrowded areas**: If >5 major issues in one area, flag it as needing broader refactor
 7. **Balance depth vs. breadth**: Deep dive on critical sections, skim lower-risk areas
 8. **Trust tests**: If comprehensive tests exist and pass, focus review on test quality
+9. **Scan for inconsistencies across the whole visible codebase**, not just the diff — look for places where similar problems are solved differently and surface them together
+10. **Treat all code as suspect**: Existing code may be legacy, copy-pasted, or simply wrong. Never use "it matches the existing code" as a reason to approve something.
 </review-efficiency-best-practices>
 
 <review-output-examples>
@@ -261,4 +291,7 @@ Only load example files when you need guidance on structuring review output for 
 <rule>If critical context is missing and assumptions would compromise review quality, ask the user for clarification before proceeding.</rule>
 <rule>Always include at least one positive highlight to encourage good practices.</rule>
 <rule>Refer to **review-output-examples** for guidance on structuring findings for different review scopes.</rule>
+<rule>**Never assume existing code is correct or represents the intended pattern.** Existing code is often legacy, hastily written, or already known to be problematic. Evaluate it with the same critical eye as new code.</rule>
+<rule>When two conflicting patterns, styles, or usages are found anywhere in the reviewed scope, always surface both under **⚠️ Inconsistencies**, present trade-offs neutrally, and explicitly request a decision from the user about which should be authoritative. Do not silently pick one as the standard.</rule>
+<rule>When assessing inconsistencies, read enough surrounding context (adjacent files, related modules) to determine whether either pattern is clearly dominant or intentional before reporting — but if genuinely ambiguous, report as an inconsistency requiring a decision.</rule>
 </rules>
