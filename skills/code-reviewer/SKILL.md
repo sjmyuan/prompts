@@ -7,6 +7,7 @@ description: Perform systematic code reviews on files, folders, diffs, commits, 
 - User explicitly requests a code review
 - User submits files, folders, diffs, commits, or pull requests for review
 - User asks for feedback on code quality, security, performance, or maintainability
+- User supplies one branch name (diff against current branch) or two branch names (diff between them)
 </when-to-use-this-skill>
 
 <capabilities>
@@ -20,6 +21,7 @@ description: Perform systematic code reviews on files, folders, diffs, commits, 
    - Multiple files: Consider interactions and integration points
    - Diff/commit: Focus on changed lines and their immediate context
    - Folder/module: Review module cohesion, interfaces, and architecture
+   - Branch diff: Obtain the diff first (see **getting-branch-diff**), then treat the result as a diff/commit review
    
 2. **Understand intent and context**:
    - What changed and why (bug fix, feature, refactor, optimization)
@@ -38,6 +40,34 @@ description: Perform systematic code reviews on files, folders, diffs, commits, 
    - For refactors: Focus on maintainability, test preservation, and behavior equivalence
    - For optimizations: Focus on performance validation, benchmarks, and edge case handling
 </gathering-review-context>
+
+<getting-branch-diff>
+**Objective**: Retrieve changed code between branches using git CLI so it can be reviewed.
+
+**Input variants**:
+- **One branch supplied** (`feature/my-branch`): diff that branch against the current checked-out branch.
+- **Two branches supplied** (`main feature/my-branch`): diff the first branch against the second.
+
+**Step 1 – Determine current branch** (only needed for the one-branch variant):
+```bash
+git rev-parse --abbrev-ref HEAD
+```
+
+**Step 2 – Obtain the full diff via git CLI**:
+```bash
+# Two branches supplied
+git diff <base-branch>...<target-branch>
+
+# One branch supplied (diff against current branch)
+git diff HEAD...<supplied-branch>
+```
+
+**Step 3 – Scope the review**:
+- Always review every changed file — never skip or truncate files regardless of diff size.
+- Summarize the list of changed files (with line counts) at the start of the review output.
+
+**Step 4 – Proceed to conducting-code-review** using the retrieved diff as the review artifact.
+</getting-branch-diff>
 
 <conducting-code-review>
 **Objective**: Systematically analyze code for correctness, quality, and risks.
@@ -211,6 +241,7 @@ When you need specific examples to understand how to structure and format code r
 
 - **Single File Reviews**: When reviewing a single new or modified file (component, module, etc.), read [examples/single-file-review.md](examples/single-file-review.md)
 - **Diff/Commit Reviews**: When reviewing diffs, commits, or bug fixes with focused changes, read [examples/diff-commit-review.md](examples/diff-commit-review.md)
+- **Branch Diff Reviews**: When the user supplies branch name(s) to compare, read [examples/branch-diff-review.md](examples/branch-diff-review.md)
 - **Performance Optimization Reviews**: When reviewing performance improvements, optimizations, or addressing performance issues, read [examples/performance-improvement.md](examples/performance-improvement.md)
 
 Only load example files when you need guidance on structuring review output for the specific review type to minimize context size.
@@ -225,6 +256,7 @@ Only load example files when you need guidance on structuring review output for 
 <rule>Use **defining-severity-levels** criteria consistently when categorizing findings.</rule>
 <rule>Format output according to **formatting-review-output** structure for consistency and readability.</rule>
 <rule>Apply **review-efficiency-best-practices** to maximize value and minimize review time.</rule>
+<rule>When the user supplies branch names for review, first apply **getting-branch-diff** to retrieve the full diff via git CLI before conducting the review. Always review every changed file — never skip any.</rule>
 <rule>Do not modify code directly during review. Suggest changes with patch-style snippets or clear descriptions.</rule>
 <rule>If critical context is missing and assumptions would compromise review quality, ask the user for clarification before proceeding.</rule>
 <rule>Always include at least one positive highlight to encourage good practices.</rule>
