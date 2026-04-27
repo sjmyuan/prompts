@@ -92,8 +92,23 @@ The capabilities section describes the key capabilities for executing plans effe
 - **Incremental Validation**: Don't wait until the end—validate incrementally to catch issues early
 </validation-checkpoints>
 
+<post-execution-review>
+- **Trigger**: After ALL plan steps are marked ✅ completed, before performing plan-cleanup.
+- **Scope**: Apply the **code-reviewer** skill on all files changed or created during plan execution.
+- **Review Focus**: Evaluate correctness, security, performance, maintainability, and test coverage of the changed files.
+- **Handle Findings**:
+  - If no 🚫 Blocker or 🔴 Major issues are found: proceed directly to **plan-cleanup**.
+  - If 🚫 Blocker or 🔴 Major issues are found:
+    1. Record each finding as a new fix step in PLAN.md (e.g., "Fix: [issue title]") with ⏳ pending status
+    2. Execute each fix step using the **step-execution** capability
+    3. After all fixes are applied, re-run the **code-reviewer** skill on the affected files
+    4. Repeat until no 🚫 Blockers or 🔴 Majors remain
+  - 🟡 Minor and 🟢 Nit findings: Document in the final summary but do not block completion
+- **Goal**: Catch issues that TDD validation may have missed and ensure code quality before declaring the plan complete
+</post-execution-review>
+
 <plan-cleanup>
-- **After Completion**: Once ALL steps in the plan are marked ✅ completed and the final summary is provided:
+- **After Completion**: Once ALL steps (including any post-execution review fix steps) are marked ✅ completed and the final summary is provided:
   - Delete the PLAN.md file from the workspace
   - Confirm the deletion to the user ("Cleaned up PLAN.md")
   - This keeps the workspace clean and signals clear plan completion
@@ -185,7 +200,14 @@ The rules section outlines decision criteria that determine which capabilities t
 
 <rule> **Complete All Steps**: Execute ALL steps in the plan thoroughly, regardless of the number of steps or files affected. Do not stop early or leave steps partially completed. </rule>
 
-<rule> **After Plan Completion**: Apply the **plan-cleanup** capability when ALL steps are marked ✅ completed:
+<rule> **After All Plan Steps Complete**: Before cleanup, apply the **post-execution-review** capability:
+  - Run the **code-reviewer** skill on all files changed or created during execution
+  - If 🚫 Blocker or 🔴 Major issues are found: add fix steps to PLAN.md and execute them, then re-review
+  - Only proceed to **plan-cleanup** when the review finds no 🚫 Blockers or 🔴 Majors
+  - Document any 🟡 Minor or 🟢 Nit findings in the final summary without blocking completion
+</rule>
+
+<rule> **After Plan Completion**: Apply the **plan-cleanup** capability when ALL steps (including post-execution review fix steps) are marked ✅ completed:
   - Display the final completion summary with all steps showing ✅ status
   - Delete the PLAN.md file from the workspace
   - Confirm the deletion ("Cleaned up PLAN.md")
