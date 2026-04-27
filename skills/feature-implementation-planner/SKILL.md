@@ -99,4 +99,5 @@ The rules section outlines decision criteria that determine which capabilities t
 <rule> After defining the requirement, apply the **adapting-tdd-approach** capability to evaluate whether to adapt TDD approach based on the implementation type and complexity. </rule>
 <rule> Apply the **implementation-planning** capability to generate a detailed implementation plan, incorporating baseline validation and step consolidation strategies. </rule>
 <rule> After presenting the implementation plan to the user, immediately apply the **plan-executor** skill to execute the steps. </rule>
+<rule> Always validate the baseline state before starting implementation to ensure a clean starting point. </rule>
 </rules>

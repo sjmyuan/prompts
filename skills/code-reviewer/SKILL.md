@@ -122,6 +122,7 @@ git diff HEAD...<supplied-branch>
    - ✓ Test determinism (no flaky tests, proper mocking)
    - ✓ Test readability (clear AAA structure, descriptive names)
    - ✓ Alignment with requirements (tests verify actual requirements)
+   - ✓ Test infrastructure: if the project has **no test coverage at all**, flag as 🔴 Major — recommend establishing a test baseline before merging production code
 
 7. **Architecture**:
    - ✓ Modularity (clear boundaries, appropriate abstractions)

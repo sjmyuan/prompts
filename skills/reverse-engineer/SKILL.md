@@ -16,6 +16,9 @@ description: Investigate codebases to answer questions about functionality, impl
 The capabilities section describes additional capabilities that you can refer to.
 
   <defining-question>
+  - **Assess Question Clarity First**: Before applying the full defining-question process, evaluate whether the question is already clear and unambiguous:
+    - **Simple, direct questions** (e.g., "Where is `UserService` defined?", "What does `processPayment()` do?") — skip the confirmation ritual and proceed directly to investigation.
+    - **Ambiguous or broad questions** (e.g., "How does authentication work?", "Why is this slow?") — apply the full process below to clarify scope before investigating.
   - **Understand User Intent**: Analyze the user's question to determine the question type:
     - **What**: Seeking information about functionality, structure, or existence ("What does X do?", "What files handle Y?")
     - **How**: Seeking understanding of mechanisms, processes, or implementation ("How does X work?", "How is Y implemented?")
@@ -152,7 +155,7 @@ Only load example files when they are directly relevant to the current question 
 
 The rules section outlines decision criteria that determine which capabilities to apply based on the current context and user inputs.
 
-<rule> When the user submits a question, always apply the **defining-question** capability first to clarify and structure it. Do not proceed with investigation until you have a clear understanding of what the user is asking. </rule>
+<rule> When the user submits a question, first apply the **defining-question** fast-path check. For simple, unambiguous questions, skip directly to **reverse-engineering**. For broad or ambiguous questions, apply the full clarification process before proceeding. </rule>
 
 <rule> After defining the question, apply the **reverse-engineering** capability to systematically investigate the codebase. Use appropriate search strategies based on the question type and available information. </rule>
 

@@ -109,6 +109,14 @@ The capabilities section describes additional capabilities that you can refer to
     - The functionality matches the acceptance criteria
     - The benefit is supported by the described functionality
     - Out-of-scope items do not contradict the acceptance criteria
+  - **Validate Against INVEST Criteria**: Before presenting the final draft, verify the story meets:
+    - **I**ndependent — can be developed and delivered without depending on another story in progress
+    - **N**egotiable — scope and implementation details are open to discussion
+    - **V**aluable — delivers clear value to the user or business
+    - **E**stimable — small and clear enough for the team to size it
+    - **S**mall — deliverable within a single sprint; if not, split it
+    - **T**estable — acceptance criteria are specific enough to verify
+    - If the story fails any criterion, revise it before presenting for final approval.
   - **Present for Final Approval**: Share the complete draft:
     - Ask the user to review and confirm
     - Offer to refine any section based on feedback

@@ -14,6 +14,7 @@ The capabilities section describes the key capabilities for executing plans effe
 
 <plan-tracking>
 - **Initialize Tracking**: At the start of execution, record all plan steps in a `PLAN.md` file in the workspace root with detailed structure:
+  - If `PLAN.md` already exists, check whether it contains an incomplete plan (steps with ❌ failed or 🚫 blocked status). If so, ask the user whether to **resume** from the last known state or **start fresh** (overwriting with the new plan). If starting fresh, overwrite entirely.
   - List each step with its number, title, and initial status (⏳ pending)
   - Include step descriptions or objectives if provided in the original plan
   - Preserve the complete step list for continuous reference
