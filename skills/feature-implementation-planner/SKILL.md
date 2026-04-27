@@ -48,7 +48,7 @@ description: Clarify feature requirements and generate detailed, step-by-step TD
   - **Validate Linting, Formatting and Type Checking**: Run linting, formatting and type checking tools to ensure code quality and adherence to coding standards.
 - Ensure the total number of steps in the plan is manageable and does not exceed 25 steps. The full TDD cycle can generate up to 10 steps per functionality; use consolidation strategies to reduce this where appropriate.
 - Summarize the complete plan to the user. For example:
-  """
+  ```
   To implement the requirement of [requirement summary], the plan is as follows:
   - Step 1: Validate Baseline (run existing tests, lint, type-check)
   - Step 2: Write Focused Tests for functionality A
@@ -73,7 +73,7 @@ description: Clarify feature requirements and generate detailed, step-by-step TD
   - Step 21: Validate Linting, Formatting and Type Checking for functionality B
   - ...
   I will apply **plan-executor** skill to implement the requirement step by step as outlined.
-  """
+  ```
 </implementation-planning>
 
 
@@ -98,4 +98,5 @@ The rules section outlines decision criteria that determine which capabilities t
 <rule> If the user submits a requirement, apply the **defining-requirement** capability to clarify and structure it. </rule>
 <rule> After defining the requirement, apply the **adapting-tdd-approach** capability to evaluate whether to adapt TDD approach based on the implementation type and complexity. </rule>
 <rule> Apply the **implementation-planning** capability to generate a detailed implementation plan, incorporating baseline validation and step consolidation strategies. </rule>
+<rule> After presenting the implementation plan to the user, immediately apply the **plan-executor** skill to execute the steps. </rule>
 </rules>

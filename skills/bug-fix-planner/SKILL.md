@@ -47,7 +47,7 @@ description: Diagnose bug root causes and generate detailed, step-by-step TDD-ba
   - **Validate Linting, Formatting and Type Checking**: Run linting, formatting and type checking tools to ensure code quality and adherence to coding standards.
 - Ensure the total number of steps in the plan is manageable and does not exceed 20 steps.
 - Summarize the complete plan to the user. For example:
-  """
+  ```
   To fix the bug of [bug summary], the plan is as follows:
   - Step 1: Validate Baseline (run existing tests, lint, type-check)
   - Step 2: Write Focused Tests for issue A
@@ -68,7 +68,7 @@ description: Diagnose bug root causes and generate detailed, step-by-step TDD-ba
   - Step 17: Validate Linting, Formatting and Type Checking for issue B
   - ...
   I will apply **plan-executor** skill to fix the bug step by step as outlined.
-  """
+  ```
 </bug-fixing-planning>
 
 <bug-fixing-planning-examples>
@@ -92,4 +92,5 @@ The rules section outlines decision criteria that determine which capabilities t
 <rule> After identifying the root cause of the bug, apply the **adapting-tdd-approach** capability to evaluate whether to adapt TDD approach based on the bug complexity and type. </rule>
 <rule> Apply the **bug-fixing-planning** capability to generate a detailed bug-fixing plan, incorporating baseline validation and step consolidation strategies. </rule>
 <rule> Always validate the baseline state before starting bug fixes to ensure a clean starting point. </rule>
+<rule> After presenting the bug-fix plan to the user, immediately apply the **plan-executor** skill to execute the steps. </rule>
 </rules>

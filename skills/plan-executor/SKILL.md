@@ -13,7 +13,7 @@ description: Execute structured plans step-by-step with progress tracking, valid
 The capabilities section describes the key capabilities for executing plans effectively.
 
 <plan-tracking>
-- **Initialize Tracking**: At the start of execution, record all plan steps in the tracking system (todo tool or PLAN.md file) with detailed structure:
+- **Initialize Tracking**: At the start of execution, record all plan steps in a `PLAN.md` file in the workspace root with detailed structure:
   - List each step with its number, title, and initial status (⏳ pending)
   - Include step descriptions or objectives if provided in the original plan
   - Preserve the complete step list for continuous reference

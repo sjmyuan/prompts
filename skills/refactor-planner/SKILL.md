@@ -47,7 +47,7 @@ description: Analyze refactoring needs and generate detailed, step-by-step TDD-b
   - **Validate Linting, Formatting and Type Checking**: Run linting, formatting and type checking tools to ensure code quality and adherence to coding standards.
 - Ensure the total number of steps in the plan is manageable and does not exceed 20 steps.
 - Summarize the complete plan to the user. For example:
-  """
+  ```
   To complete the refactoring request of [refactor request summary], the plan is as follows:
   - Step 1: Validate Baseline (run existing tests, lint, type-check)
   - Step 2: Write Focused Tests for refactor objective A
@@ -68,7 +68,7 @@ description: Analyze refactoring needs and generate detailed, step-by-step TDD-b
   - Step 17: Validate Linting, Formatting and Type Checking for refactor objective B
   - ... 
   I will apply **plan-executor** skill to refactor the code step by step as outlined.
-  """
+  ```
 </refactor-planning>
 
 <refactor-planning-examples>
@@ -92,5 +92,6 @@ The rules section outlines decision criteria that determine which capabilities t
 <rule> If the user submits a refactoring request, apply the **defining-refactor-request** capability to clarify the scope, objectives, and constraints of the refactor request. </rule>
 <rule> After defining the refactor request, apply the **adapting-tdd-approach** capability to evaluate whether to adapt tdd approach based on the refactoring type and complexity. </rule>
 <rule> Apply the **refactor-planning** capability to generate a detailed refactor plan, incorporating baseline validation and step consolidation strategies. </rule>
-<rule> Always check lint and type check together when fixing lint or type check issue </rule>
+<rule> After presenting the refactor plan to the user, immediately apply the **plan-executor** skill to execute the steps. </rule>
+<rule> Always check lint and type check together when fixing lint or type check issues. </rule>
 </rules>
