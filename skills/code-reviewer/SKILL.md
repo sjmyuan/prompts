@@ -59,6 +59,108 @@ Strategies for maximizing review value while respecting time constraints:
 - **Treat all code as suspect**: Existing code may be legacy, copy-pasted, or simply wrong. Never use "it matches the existing code" as a reason to approve something.
 </review-efficiency-knowledge>
 
+<defining-severity-levels>
+**Severity levels** — apply consistently when categorizing findings:
+
+- **🚫 Blocker** (MUST fix before merge):
+  - Security vulnerabilities (injection, auth bypass, data exposure)
+  - Data loss or corruption risks
+  - Critical functionality broken
+  - Build/deployment failures
+  - Breaking API changes without migration path
+  
+- **🔴 Major** (SHOULD fix before merge, requires strong justification to skip):
+  - Significant correctness issues (wrong results, unhandled errors)
+  - Performance problems affecting user experience
+  - Missing test coverage for critical paths
+  - Architectural violations that complicate future changes
+  - Type safety issues that could cause runtime errors
+  
+- **🟡 Minor** (Nice to fix, but can be deferred if time-constrained):
+  - Code duplication or maintainability issues
+  - Non-critical edge cases not handled
+  - Suboptimal patterns that work but could be improved
+  - Missing/incomplete documentation
+  - Inefficiencies that don't impact current use cases
+  
+- **🟢 Nit** (Suggestions for polish, no requirement to fix):
+  - Style inconsistencies (already handled by linter)
+  - Naming improvements
+  - Comment/documentation polish
+  - Code organization preferences
+  - Micro-optimizations with negligible impact
+
+- **⚠️ Inconsistency** (Decision required — severity escalates based on scope):
+  - Two or more conflicting patterns, styles, or usages detected across the codebase
+  - **Neither side is assumed correct** — the reviewer presents both and requests a decision
+  - Escalate to 🔴 Major if the inconsistency affects a widely-used pattern or public API surface
+</defining-severity-levels>
+
+<formatting-review-output>
+Standard template for all review output:
+
+```
+## Code Review Summary
+
+**Scope**: [Brief description of what was reviewed]
+**Focus Areas**: [e.g., correctness, security, performance]
+**Overall Assessment**: [Brief evaluation - e.g., "Ready to merge with minor changes" or "Requires blockers to be addressed"]
+
+---
+
+## Findings
+
+### 🚫 Blockers (Must Fix)
+*[If none, state "None identified"]*
+
+#### [Finding Title]
+- **File**: [path/to/file.ts:L10-L15](path/to/file.ts#L10-L15)
+- **Issue**: [Clear description of what's wrong and why it matters]
+- **Impact**: [Specific consequence if not fixed]
+- **Recommendation**: [Concrete fix with code snippet if helpful]
+
+### 🔴 Major Issues
+
+### 🟡 Minor Issues
+
+### 🟢 Nits / Suggestions
+
+### ⚠️ Inconsistencies (Decision Required)
+*[If none, state "None identified"]*
+
+#### [Inconsistency Title]
+- **Variant A**: [description] — [path/to/file.ts:L10](path/to/file.ts#L10)
+- **Variant B**: [description] — [path/to/file.ts:L40](path/to/file.ts#L40)
+- **Trade-offs**: [neutral comparison of both approaches]
+- **Decision needed**: Which variant should be the project standard? *(Do not default to whichever appeared first — both may be wrong)*
+
+---
+
+## Positive Highlights
+*[Call out well-done aspects: clear naming, good test coverage, clever solution, etc.]*
+
+---
+
+## Risks & Assumptions
+*[Potential issues not fully verifiable from code review alone, areas needing runtime validation]*
+
+---
+
+## Recommended Next Steps
+1. [Prioritized action items]
+2. [Suggested validations or manual tests]
+3. [Follow-up items that can be deferred]
+```
+
+**Formatting guidelines**:
+- Use file links with line numbers: `[file.ts](file.ts#L10-L15)`
+- Include code snippets when suggesting changes (use diff format for clarity)
+- Keep findings concise (2-4 sentences per issue)
+- Group related findings together
+- Reference symbols/functions by name in backticks: `` `handleSubmit()` ``
+- For clean reviews with no findings in a severity tier, omit that section rather than writing "None identified"
+</formatting-review-output>
+
 </knowledge>
 
 <capabilities>
@@ -120,6 +222,8 @@ git diff HEAD...<supplied-branch>
 - Summarize the list of changed files (with line counts) at the start of the review output.
 
 **Step 4 – Proceed to conducting-code-review** using the retrieved diff as the review artifact.
+
+> **Tip**: For uncommitted (staged/unstaged) changes, load and use the `get_changed_files` deferred tool instead of running git commands — it surfaces the same diff without needing a branch name.
 </getting-branch-diff>
 
 <conducting-code-review>
@@ -197,111 +301,6 @@ git diff HEAD...<supplied-branch>
    - Explicitly ask the user (or note in the review) which variant should be the canonical one
    - Do **not** recommend "align with existing code" unless the existing code is clearly the established, intentional pattern
 </conducting-code-review>
-
-<defining-severity-levels>
-**Objective**: Consistently categorize findings by impact and urgency.
-
-**Severity Criteria**:
-
-- **🚫 Blocker** (MUST fix before merge):
-  - Security vulnerabilities (injection, auth bypass, data exposure)
-  - Data loss or corruption risks
-  - Critical functionality broken
-  - Build/deployment failures
-  - Breaking API changes without migration path
-  
-- **🔴 Major** (SHOULD fix before merge, requires strong justification to skip):
-  - Significant correctness issues (wrong results, unhandled errors)
-  - Performance problems affecting user experience
-  - Missing test coverage for critical paths
-  - Architectural violations that complicate future changes
-  - Type safety issues that could cause runtime errors
-  
-- **🟡 Minor** (Nice to fix, but can be deferred if time-constrained):
-  - Code duplication or maintainability issues
-  - Non-critical edge cases not handled
-  - Suboptimal patterns that work but could be improved
-  - Missing/incomplete documentation
-  - Inefficiencies that don't impact current use cases
-  
-- **🟢 Nit** (Suggestions for polish, no requirement to fix):
-  - Style inconsistencies (already handled by linter)
-  - Naming improvements
-  - Comment/documentation polish
-  - Code organization preferences
-  - Micro-optimizations with negligible impact
-
-- **⚠️ Inconsistency** (Decision required — severity escalates based on scope):
-  - Two or more conflicting patterns, styles, or usages detected across the codebase
-  - **Neither side is assumed correct** — the reviewer presents both and requests a decision
-  - Escalate to 🔴 Major if the inconsistency affects a widely-used pattern or public API surface
-</defining-severity-levels>
-
-<formatting-review-output>
-**Objective**: Deliver clear, actionable, and well-structured feedback.
-
-**Output Structure**:
-
-```
-## Code Review Summary
-
-**Scope**: [Brief description of what was reviewed]
-**Focus Areas**: [e.g., correctness, security, performance]
-**Overall Assessment**: [Brief evaluation - e.g., "Ready to merge with minor changes" or "Requires blockers to be addressed"]
-
----
-
-## Findings
-
-### 🚫 Blockers (Must Fix)
-*[If none, state "None identified"]*
-
-#### [Finding Title]
-- **File**: [path/to/file.ts:L10-L15](path/to/file.ts#L10-L15)
-- **Issue**: [Clear description of what's wrong and why it matters]
-- **Impact**: [Specific consequence if not fixed]
-- **Recommendation**: [Concrete fix with code snippet if helpful]
-
-### 🔴 Major Issues
-
-### 🟡 Minor Issues
-
-### 🟢 Nits / Suggestions
-
-### ⚠️ Inconsistencies (Decision Required)
-*[If none, state "None identified"]*
-
-#### [Inconsistency Title]
-- **Variant A**: [description] — [path/to/file.ts:L10](path/to/file.ts#L10)
-- **Variant B**: [description] — [path/to/file.ts:L40](path/to/file.ts#L40)
-- **Trade-offs**: [neutral comparison of both approaches]
-- **Decision needed**: Which variant should be the project standard? *(Do not default to whichever appeared first — both may be wrong)*
-
----
-
-## Positive Highlights
-*[Call out well-done aspects: clear naming, good test coverage, clever solution, etc.]*
-
----
-
-## Risks & Assumptions
-*[Potential issues not fully verifiable from code review alone, areas needing runtime validation]*
-
----
-
-## Recommended Next Steps
-1. [Prioritized action items]
-2. [Suggested validations or manual tests]
-3. [Follow-up items that can be deferred]
-```
-
-**Formatting Guidelines**:
-- Use file links with line numbers: `[file.ts](file.ts#L10-L15)`
-- Include code snippets when suggesting changes (use diff format for clarity)
-- Keep findings concise (2-4 sentences per issue)
-- Group related findings together
-- Reference symbols/functions by name in backticks: `handleSubmit()`
-</formatting-review-output>
 
 <reviewing-skill-file>
 **Objective**: Evaluate a SKILL.md file for correct section structure, separation of concerns, and absence of duplication.
