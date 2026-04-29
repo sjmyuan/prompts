@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Perform systematic code reviews on files, folders, diffs, commits, or pull requests. Evaluates correctness, security, performance, maintainability, and test coverage. Provides prioritized, actionable feedback without making code changes. Use when users request reviews, feedback, or quality assessments.
+description: Perform systematic reviews of code, documents, and skill files across files, folders, diffs, commits, or pull requests. Evaluates correctness, security, performance, maintainability, and structural quality. Provides prioritized, actionable feedback without making changes. Use when users request reviews, feedback, or quality assessments on any artifact.
 ---
 
 <when-to-use-this-skill>
@@ -8,7 +8,58 @@ description: Perform systematic code reviews on files, folders, diffs, commits, 
 - User submits files, folders, diffs, commits, or pull requests for review
 - User asks for feedback on code quality, security, performance, or maintainability
 - User supplies one branch name (diff against current branch) or two branch names (diff between them)
+- User asks to review a skill file (SKILL.md) for correct structure or section usage
+- User asks to review a document (README, design doc, ADR, specification, runbook, etc.) for clarity, completeness, or structure
 </when-to-use-this-skill>
+
+<knowledge>
+
+<skill-file-section-semantics>
+A well-formed copilot skill file uses four sections with distinct, non-overlapping purposes:
+
+| Section | Purpose | What belongs here |
+|---|---|---|
+| `<knowledge>` | Facts the agent recalls | Reference tables, directory layouts, API signatures, platform constraints, banned practices, selection guides |
+| `<capabilities>` | Procedures the agent executes | Ordered step-by-step instructions for *how* to accomplish a task; named with an action verb |
+| `<rules>` | Routing triggers | "When [scenario] → use [capability]"; must not repeat what the capability already says |
+| `<examples>` | Concrete output models | Realistic input/output pairs; loaded on demand, not inline |
+
+**Common structural violations**:
+- Knowledge embedded in capabilities (lookup tables, API lists, constraint bullets inside a capability section)
+- Rules that re-state capability content instead of routing to it
+- Capabilities written as bullet-point fact lists instead of ordered procedural steps
+- Capabilities named as nouns (`<storage-management>`) instead of action verbs (`<manage-storage>`)
+- `<examples>` loaded eagerly instead of referenced by name for on-demand loading
+</skill-file-section-semantics>
+
+<example-selector>
+Load the relevant example file on demand when you need guidance on structuring review output. Only load what is needed to minimize context size.
+
+| Review type | Example file |
+|---|---|
+| Diff / commit / bug fix | [examples/diff-commit-review.md](examples/diff-commit-review.md) |
+| Branch diff (one or two branch names) | [examples/branch-diff-review.md](examples/branch-diff-review.md) |
+| Performance optimization | [examples/performance-improvement.md](examples/performance-improvement.md) |
+| Skill file (SKILL.md) | [examples/skill-file-review.md](examples/skill-file-review.md) |
+| Document (README, ADR, design doc, spec) | [examples/doc-review.md](examples/doc-review.md) |
+</example-selector>
+
+<review-efficiency-knowledge>
+Strategies for maximizing review value while respecting time constraints:
+
+- **Prioritize by risk**: Focus on security, correctness, and data integrity first
+- **Use context strategically**: Don't read the entire codebase; focus on changed code and immediate dependencies
+- **Leverage existing validations**: Note when linters/type-checkers already caught issues
+- **Batch similar findings**: Instead of 10 separate naming issues, group them
+- **Distinguish patterns from instances**: Flag the pattern once with multiple examples
+- **Skip overcrowded areas**: If >5 major issues in one area, flag it as needing a broader refactor
+- **Balance depth vs. breadth**: Deep-dive on critical sections, skim lower-risk areas
+- **Trust tests**: If comprehensive tests exist and pass, focus the review on test quality
+- **Scan for inconsistencies across the whole visible codebase**, not just the diff — look for places where similar problems are solved differently and surface them together
+- **Treat all code as suspect**: Existing code may be legacy, copy-pasted, or simply wrong. Never use "it matches the existing code" as a reason to approve something.
+</review-efficiency-knowledge>
+
+</knowledge>
 
 <capabilities>
 
@@ -39,6 +90,8 @@ description: Perform systematic code reviews on files, folders, diffs, commits, 
    - For features: Focus on requirements alignment, API design, and extensibility
    - For refactors: Focus on maintainability, test preservation, and behavior equivalence
    - For optimizations: Focus on performance validation, benchmarks, and edge case handling
+   - For skill files: Focus on section purpose compliance, duplication between rules and capabilities, and procedural step format
+   - For documents: Focus on structure, clarity, completeness, accuracy, and target-audience alignment
 </gathering-review-context>
 
 <getting-branch-diff>
@@ -250,48 +303,49 @@ git diff HEAD...<supplied-branch>
 - Reference symbols/functions by name in backticks: `handleSubmit()`
 </formatting-review-output>
 
-<review-efficiency-best-practices>
-**Objective**: Maximize review value while respecting time constraints.
+<reviewing-skill-file>
+**Objective**: Evaluate a SKILL.md file for correct section structure, separation of concerns, and absence of duplication.
 
-**Strategies**:
-1. **Prioritize by risk**: Focus on security, correctness, and data integrity first
-2. **Use context strategically**: Don't read entire codebase; focus on changed code and immediate dependencies
-3. **Leverage existing validations**: Note when linters/type-checkers already caught issues
-4. **Batch similar findings**: Instead of 10 separate naming issues, group them
-5. **Distinguish patterns from instances**: Flag the pattern once with multiple examples
-6. **Skip overcrowded areas**: If >5 major issues in one area, flag it as needing broader refactor
-7. **Balance depth vs. breadth**: Deep dive on critical sections, skim lower-risk areas
-8. **Trust tests**: If comprehensive tests exist and pass, focus review on test quality
-9. **Scan for inconsistencies across the whole visible codebase**, not just the diff — look for places where similar problems are solved differently and surface them together
-10. **Treat all code as suspect**: Existing code may be legacy, copy-pasted, or simply wrong. Never use "it matches the existing code" as a reason to approve something.
-</review-efficiency-best-practices>
+**Steps**:
+1. Read the full skill file to understand its domain and all sections.
+2. For each capability section, verify it describes *how to do something* as ordered steps — flag any that are fact lists, reference tables, or constraint bullets (those belong in `<knowledge>`).
+3. For each rule, verify it answers "when scenario X → use capability Y" — flag any rule that re-states content already in a capability (duplication).
+4. Check that a `<knowledge>` section exists and contains all reference material (tables, layouts, API signatures, platform constraints) that capabilities currently cite inline.
+5. Check capability section names use action verbs; flag noun-named sections.
+6. Check `<examples>` entries are referenced by file path for on-demand loading, not embedded inline.
+7. Apply **conducting-code-review** dimensions relevant to a structured document: correctness (section purpose), maintainability (duplication, single source of truth), and inconsistencies (mixed styles within a section type).
+8. Format findings using **formatting-review-output** and load **examples/skill-file-review.md** for output structure guidance.
+</reviewing-skill-file>
 
-<review-output-examples>
+<reviewing-document>
+**Objective**: Evaluate a document (README, design doc, ADR, specification, runbook, etc.) for clarity, completeness, structure, and accuracy.
 
-When you need specific examples to understand how to structure and format code review output, load the relevant example file from the examples folder:
-
-- **Single File Reviews**: When reviewing a single new or modified file (component, module, etc.), read [examples/single-file-review.md](examples/single-file-review.md)
-- **Diff/Commit Reviews**: When reviewing diffs, commits, or bug fixes with focused changes, read [examples/diff-commit-review.md](examples/diff-commit-review.md)
-- **Branch Diff Reviews**: When the user supplies branch name(s) to compare, read [examples/branch-diff-review.md](examples/branch-diff-review.md)
-- **Performance Optimization Reviews**: When reviewing performance improvements, optimizations, or addressing performance issues, read [examples/performance-improvement.md](examples/performance-improvement.md)
-
-Only load example files when you need guidance on structuring review output for the specific review type to minimize context size.
-
-</review-output-examples>
+**Steps**:
+1. Read the full document to understand its purpose, target audience, and scope.
+2. Evaluate **structure**: Is there a clear logical flow? Are sections in the expected order for the document type? Are headings consistent in level and phrasing?
+3. Evaluate **clarity**: Is the language clear and unambiguous? Are technical terms defined where needed? Are examples provided for complex concepts?
+4. Evaluate **completeness**: Are all required sections present (e.g., a README should cover purpose, prerequisites, setup, usage)? Are there unexplained gaps or placeholder text?
+5. Evaluate **accuracy**: Do code samples match the described behavior? Are version numbers, commands, and API signatures up to date?
+6. Evaluate **audience alignment**: Does the depth and assumed knowledge level match the intended reader? Is jargon appropriate or excessive?
+7. Apply **conducting-code-review** dimensions that are relevant to documents: correctness (accuracy), maintainability (single source of truth, no duplication with other docs), and inconsistencies (conflicting statements across sections).
+8. Format findings using **formatting-review-output** and load **examples/doc-review.md** for output structure guidance.
+</reviewing-document>
 
 </capabilities>
 
 <rules>
 <rule>When the user submits files, folders, diffs, or commits for review, first apply **gathering-review-context** to understand scope and intent.</rule>
+<rule>When the subject of review is a SKILL.md file, use **reviewing-skill-file**. Evaluate section placement, duplication between rules and capabilities, and whether capabilities are procedural steps rather than fact lists. Consult **skill-file-section-semantics** knowledge for the criteria.</rule>
+<rule>When the subject of review is a document (README, ADR, design doc, specification, runbook, etc.), use **reviewing-document**. Focus on structure, clarity, completeness, accuracy, and audience alignment.</rule>
 <rule>Apply **conducting-code-review** systematically across all relevant dimensions, focusing on areas most relevant to the change type.</rule>
 <rule>Use **defining-severity-levels** criteria consistently when categorizing findings.</rule>
 <rule>Format output according to **formatting-review-output** structure for consistency and readability.</rule>
-<rule>Apply **review-efficiency-best-practices** to maximize value and minimize review time.</rule>
+<rule>Apply **review-efficiency-knowledge** strategies to maximize value and minimize review time.</rule>
 <rule>When the user supplies branch names for review, first apply **getting-branch-diff** to retrieve the full diff via git CLI before conducting the review. Always review every changed file — never skip any.</rule>
 <rule>Do not modify code directly during review. Suggest changes with patch-style snippets or clear descriptions.</rule>
 <rule>If critical context is missing and assumptions would compromise review quality, ask the user for clarification before proceeding.</rule>
 <rule>Always include at least one positive highlight to encourage good practices.</rule>
-<rule>Refer to **review-output-examples** for guidance on structuring findings for different review scopes.</rule>
+<rule>Consult the **example-selector** knowledge table to load the appropriate example file for the review type being performed.</rule>
 <rule>**Never assume existing code is correct or represents the intended pattern.** Existing code is often legacy, hastily written, or already known to be problematic. Evaluate it with the same critical eye as new code.</rule>
 <rule>When two conflicting patterns, styles, or usages are found anywhere in the reviewed scope, always surface both under **⚠️ Inconsistencies**, present trade-offs neutrally, and explicitly request a decision from the user about which should be authoritative. Do not silently pick one as the standard.</rule>
 <rule>When assessing inconsistencies, read enough surrounding context (adjacent files, related modules) to determine whether either pattern is clearly dominant or intentional before reporting — but if genuinely ambiguous, report as an inconsistency requiring a decision.</rule>
