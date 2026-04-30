@@ -27,7 +27,7 @@ Always ensure existing tests pass before and after changes. Document the rationa
 </tdd-approach-selection>
 
 <example-selector>
-Load only the example directly relevant to the current implementation task to minimize context size.
+Load only the example directly relevant to the current implementation task to minimize context size. Each example covers the full workflow: requirement definition (**define-requirement**) and plan generation (**plan-implementation**).
 
 - **Adding a New Message Handler**: When implementing a new feature that involves message handling, service logic, and event processing, read [examples/adding-new-message-handler.md](examples/adding-new-message-handler.md)
 - **Simple Configuration Addition**: When implementing straightforward configuration properties without complex business logic, read [examples/simple-configuration-addition.md](examples/simple-configuration-addition.md)

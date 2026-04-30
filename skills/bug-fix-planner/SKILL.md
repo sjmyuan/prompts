@@ -27,7 +27,7 @@ Always ensure existing tests pass before and after changes. Document the rationa
 </tdd-approach-selection>
 
 <example-selector>
-Load only the example directly relevant to the current bug type to minimize context size.
+Load only the example directly relevant to the current bug type to minimize context size. Each example covers the full workflow: root cause identification (**identify-bug-root-cause**) and plan generation (**plan-bug-fix**).
 
 - **Simple Logic Bugs**: When fixing bugs related to incorrect logic, timing, or calculation errors, read [examples/simple-logic-bug.md](examples/simple-logic-bug.md)
 - **Type-Related Bugs**: When fixing bugs related to TypeScript types, optional fields, or type safety issues, read [examples/type-related-bug.md](examples/type-related-bug.md)

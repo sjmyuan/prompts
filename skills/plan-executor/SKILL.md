@@ -42,6 +42,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 - **Multi-File Implementation** — complex feature spanning multiple files and layers: [examples/multi-file-implementation.md](examples/multi-file-implementation.md)
 - **Handling Failed Steps** — error recovery, ❌→✅ status transitions, compilation failures: [examples/handling-failed-steps.md](examples/handling-failed-steps.md)
 - **Long Plan Execution** — 10+ step plans, context preservation across a long run: [examples/long-plan-execution.md](examples/long-plan-execution.md)
+- **Post-Execution Review and Cleanup** — applying code-reviewer after all steps complete, adding fix steps, deleting PLAN.md: [examples/post-execution-review.md](examples/post-execution-review.md)
 </example-selector>
 
 </knowledge>

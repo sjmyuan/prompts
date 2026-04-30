@@ -44,6 +44,7 @@ Load only the example directly relevant to the current question type to minimize
 - **"What" Questions** — functionality and structure: [examples/what-questions.md](examples/what-questions.md)
 - **"Why" Questions** — design rationale and decisions: [examples/why-questions.md](examples/why-questions.md)
 - **"Where" Questions** — code location and organization: [examples/where-questions.md](examples/where-questions.md)
+- **"When" Questions** — timing, lifecycle events, initialization sequences: [examples/when-questions.md](examples/when-questions.md)
 </example-selector>
 
 </knowledge>
