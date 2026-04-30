@@ -15,130 +15,46 @@ description: Investigate codebases to answer questions about functionality, impl
 
 The capabilities section describes additional capabilities that you can refer to.
 
-  <defining-question>
-  - **Assess Question Clarity First**: Before applying the full defining-question process, evaluate whether the question is already clear and unambiguous:
-    - **Simple, direct questions** (e.g., "Where is `UserService` defined?", "What does `processPayment()` do?") — skip the confirmation ritual and proceed directly to investigation.
-    - **Ambiguous or broad questions** (e.g., "How does authentication work?", "Why is this slow?") — apply the full process below to clarify scope before investigating.
-  - **Understand User Intent**: Analyze the user's question to determine the question type:
-    - **What**: Seeking information about functionality, structure, or existence ("What does X do?", "What files handle Y?")
-    - **How**: Seeking understanding of mechanisms, processes, or implementation ("How does X work?", "How is Y implemented?")
-    - **Why**: Seeking rationale, design decisions, or purpose ("Why is X done this way?", "Why does Y exist?")
-    - **Where**: Seeking location of code, files, or components ("Where is X defined?", "Where does Y happen?")
-    - **When**: Seeking timing, conditions, or lifecycle ("When does X trigger?", "When is Y initialized?")
-  - **Identify Scope and Context**: Determine the boundaries of investigation:
-    - Specific components, files, or modules mentioned
-    - Related features or functionalities that might be relevant
-    - Dependencies and integrations that could impact the answer
-    - Edge cases or special conditions that should be considered
-  - **Clarify Ambiguities**: Identify and resolve unclear terms:
-    - Technical terms that might have multiple meanings in the codebase
-    - Implicit assumptions about system behavior or architecture
-    - Missing context that would affect the investigation approach
-  - **Ask Clarifying Questions**: When needed, ask the user to:
-    - Specify which part of the system they're asking about
-    - Provide examples or scenarios to illustrate their question
-    - Clarify the depth of detail they need (high-level overview vs. detailed implementation)
-    - Indicate any constraints or specific aspects they're most interested in
-  - **Confirm Understanding**: Present a structured summary of your understanding:
-    - Restate the question in clear, specific terms
-    - List the areas of the codebase you plan to investigate
-    - Note any assumptions you're making
-    - Request confirmation or refinements before proceeding with investigation
-  </defining-question>
+  <define-question>
+1. **Assess Question Clarity First**: Before proceeding, evaluate whether the question is already clear and unambiguous:
+   - **Simple, direct questions** (e.g., "Where is `UserService` defined?", "What does `processPayment()` do?") — skip to **investigate-codebase** immediately.
+   - **Ambiguous or broad questions** (e.g., "How does authentication work?", "Why is this slow?") — apply the full clarification steps below.
+2. Analyze the question to determine its type: **What** (functionality/structure), **How** (mechanisms/processes), **Why** (rationale/design), **Where** (location), or **When** (timing/lifecycle).
+3. Identify the scope and boundaries of investigation: specific components, files, modules, dependencies, and edge cases.
+4. Clarify ambiguous terms, implicit assumptions, or missing context that would affect the investigation.
+5. If needed, ask the user to specify the relevant part of the system, provide examples, or clarify depth of detail.
+6. Present a structured summary of your understanding and request confirmation before proceeding.
+</define-question>
 
-  <reverse-engineering>
-  - **Strategic Code Discovery**: Use appropriate search strategies to locate relevant code:
-    - **Semantic search** for conceptual queries and understanding high-level patterns
-    - **Grep search** for exact strings, function/class names, or specific patterns
-    - **File search** when you know partial file names or directory structures
-    - Combine multiple search strategies to build comprehensive understanding
-  - **Analyze Code Structure**: Examine the discovered code to understand its organization:
-    - Identify main components, classes, functions, and their responsibilities
-    - Map out the component hierarchy and module structure
-    - Document architectural patterns and design approaches used
-    - Note naming conventions and code organization principles
-  - **Trace Control Flow**: Follow the execution path to understand behavior:
-    - Identify entry points (event handlers, API endpoints, main functions)
-    - Track function call sequences and execution order
-    - Document conditional branches and decision points
-    - Map out loops, iterations, and recursive patterns
-    - Note lifecycle methods and initialization sequences
-  - **Trace Data Flow**: Follow how data moves and transforms through the system:
-    - Identify data sources (APIs, databases, user input, configuration)
-    - Track data transformations and processing steps
-    - Document data structures and their evolution through the code
-    - Note state management patterns and data persistence mechanisms
-    - Identify data validation and sanitization points
-  - **Analyze Dependencies**: Understand relationships and integrations:
-    - List external libraries and frameworks used
-    - Document internal module dependencies and imports
-    - Identify service integrations and API connections
-    - Note configuration dependencies and environment requirements
-    - Map out shared utilities and helper functions
-  - **Examine Core Algorithms**: Extract and document key logic:
-    - Identify the main algorithms and their purpose
-    - Document calculation methods and business logic
-    - Note optimization techniques and performance considerations
-    - Explain error handling and edge case management
-    - Describe validation rules and constraints
-  - **Review Testing and Documentation**: Gather additional context:
-    - Examine existing tests to understand expected behavior
-    - Review inline comments and documentation for design rationale
-    - Check README, architecture docs, and requirements for context
-    - Note any TODOs or known issues mentioned in code
-  - **Synthesize Findings**: Combine all discovered information:
-    - Create a coherent narrative explaining the implementation
-    - Highlight key design decisions and their implications
-    - Note any potential issues, anti-patterns, or improvement opportunities
-    - Identify gaps in understanding that may require deeper investigation
-  </reverse-engineering>
+  <investigate-codebase>
+1. **Strategic Code Discovery**: Use appropriate search strategies to locate relevant code:
+   - **Semantic search** for conceptual queries and high-level patterns
+   - **Grep search** for exact strings, function/class names, or specific patterns
+   - **File search** when you know partial file names or directory structures
+   - Combine multiple strategies to build comprehensive understanding
+2. **Analyze Code Structure**: Identify main components, classes, functions, their responsibilities, the component hierarchy, architectural patterns, and naming conventions.
+3. **Trace Control Flow**: Follow entry points, function call sequences, conditional branches, loops, and lifecycle/initialization sequences.
+4. **Trace Data Flow**: Follow data sources, transformations, state management patterns, persistence mechanisms, and validation/sanitization points.
+5. **Analyze Dependencies**: List external libraries, internal module dependencies, service integrations, configuration dependencies, and shared utilities.
+6. **Examine Core Algorithms**: Extract key algorithms, calculation methods, business logic, error handling, and validation rules.
+7. **Review Testing and Documentation**: Check existing tests for expected behavior, inline comments and docs for design rationale, README/architecture docs for context, and any TODOs or known issues.
+8. **Synthesize Findings**: Create a coherent narrative explaining the implementation, highlight key design decisions, note any issues or improvement opportunities, and identify gaps requiring deeper investigation.
+</investigate-codebase>
 
-  <answer-presentation>
-  - **Structure the Answer**: Organize findings in a logical, easy-to-follow format:
-    - Start with a direct, concise answer to the user's question
-    - Follow with supporting details organized by importance
-    - Use clear headings and sections for different aspects
-    - Present information in order of relevance to the question
-  - **Provide Context**: Help the user understand the broader picture:
-    - Explain how the specific answer fits into the overall system
-    - Note related components or features that might be relevant
-    - Mention any architectural or design considerations
-    - Provide historical context if it helps understanding
-  - **Include Code References**: Support explanations with specific examples:
-    - Link to relevant files with line numbers using markdown format
-    - Include brief code snippets to illustrate key points
-    - Highlight the most important functions, classes, or methods
-    - Show data structures and their relationships when relevant
-  - **Explain Implementation Details**: Describe how things work:
-    - Walk through the control flow for the relevant functionality
-    - Explain data transformations and state changes
-    - Describe interactions between components
-    - Note any complex algorithms or business logic
-  - **Address Implications**: Help the user understand the impact:
-    - Explain why the implementation works the way it does
-    - Note any trade-offs or design decisions
-    - Identify potential edge cases or limitations
-    - Suggest related areas the user might want to explore
-  - **Use Clear Language**: Ensure the answer is accessible:
-    - Avoid jargon unless necessary; explain technical terms when used
-    - Use consistent terminology from the codebase
-    - Break down complex concepts into simpler parts
-    - Provide analogies or examples when helpful
-  - **Validate Completeness**: Ensure the answer fully addresses the question:
-    - Review if all aspects of the original question are answered
-    - Check if any important details are missing
-    - Confirm that code references are accurate and accessible
-    - Verify that explanations are clear and not ambiguous
-  - **Offer Next Steps**: Guide the user on what they can do with this information:
-    - Suggest related questions they might have
-    - Point to additional resources or documentation
-    - Recommend areas for deeper investigation if needed
-    - Highlight testing or experimentation opportunities
-  </answer-presentation>
+  <present-answer>
+1. **Structure the Answer**: Start with a direct, concise answer to the question; follow with supporting details ordered by importance and relevance.
+2. **Provide Context**: Explain how the answer fits into the overall system, note related components, and mention relevant architectural or design considerations.
+3. **Include Code References**: Link to relevant files with line numbers, include brief code snippets for key points, and highlight the most important functions or classes.
+4. **Explain Implementation Details**: Walk through control flow, explain data transformations and state changes, describe component interactions, and note complex algorithms or business logic.
+5. **Address Implications**: Explain why the implementation works the way it does, note trade-offs or design decisions, and identify potential edge cases or limitations.
+6. **Use Clear Language**: Avoid unnecessary jargon, use consistent terminology from the codebase, and provide analogies or examples when helpful.
+7. **Validate Completeness**: Confirm all aspects of the original question are answered and no important details are missing.
+8. **Offer Next Steps**: Suggest related questions, point to additional resources or documentation, and recommend areas for deeper investigation if needed.
+</present-answer>
 
 </capabilities>
 
-<question-investigation-examples>
+<examples>
 
 When you need specific examples to understand how to apply the question investigation approach, load the relevant example file from the examples folder:
 
@@ -149,28 +65,19 @@ When you need specific examples to understand how to apply the question investig
 
 Only load example files when they are directly relevant to the current question type to minimize context size.
 
-</question-investigation-examples>
+</examples>
 
 <rules>
 
 The rules section outlines decision criteria that determine which capabilities to apply based on the current context and user inputs.
 
-<rule> When the user submits a question, first apply the **defining-question** fast-path check. For simple, unambiguous questions, skip directly to **reverse-engineering**. For broad or ambiguous questions, apply the full clarification process before proceeding. </rule>
-
-<rule> After defining the question, apply the **reverse-engineering** capability to systematically investigate the codebase. Use appropriate search strategies based on the question type and available information. </rule>
-
-<rule> Throughout the investigation, gather enough context to provide a comprehensive answer. Don't stop after finding partial information—continue until you can fully address all aspects of the question. </rule>
-
-<rule> Always apply the **answer-presentation** capability when presenting your findings. Structure the answer clearly, include specific code references, and validate completeness before responding. </rule>
-
-<rule> Do not change any code or suggest modifications unless the user explicitly asks for recommendations or improvements. This skill is for investigation and explanation only. </rule>
-
-<rule> If the investigation reveals that the question cannot be fully answered due to missing code, unclear implementation, or ambiguous design, clearly state what you found and what remains unclear. Offer to investigate related areas or suggest how the user might find the missing information. </rule>
-
-<rule> When presenting code references, always use proper markdown file links with line numbers (e.g., [ComponentName.tsx](path/to/ComponentName.tsx#L10-L20)) for easy navigation. </rule>
-
-<rule> If during investigation you discover multiple possible interpretations of the question, present all relevant findings and let the user clarify which aspect they're most interested in. </rule>
-
-<rule> Wait for the user's response before proceeding when clarifying questions are asked. Do not make assumptions and continue without confirmation. </rule>
+<rule> When the user submits a question, apply **define-question** fast-path check. For simple, unambiguous questions, skip directly to **investigate-codebase**. For broad or ambiguous questions, apply the full clarification process first. </rule>
+<rule> After defining the question, apply **investigate-codebase** to systematically explore the codebase. Continue until you can fully address all aspects of the question. </rule>
+<rule> Always apply **present-answer** when presenting findings. Structure the answer clearly, include specific code references, and validate completeness. </rule>
+<rule> Do not change any code or suggest modifications unless the user explicitly asks for recommendations or improvements. </rule>
+<rule> If the investigation cannot fully answer the question due to missing code or ambiguous design, clearly state what was found and what remains unclear. </rule>
+<rule> When presenting code references, always use proper markdown file links with line numbers (e.g., [ComponentName.tsx](path/to/ComponentName.tsx#L10-L20)). </rule>
+<rule> If multiple possible interpretations are discovered, present all relevant findings and ask the user to clarify which aspect they're most interested in. </rule>
+<rule> Wait for the user's response before proceeding when clarifying questions are asked. </rule>
 
 </rules>

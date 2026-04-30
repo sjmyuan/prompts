@@ -10,44 +10,52 @@ description: Clarify feature requirements and generate detailed, step-by-step TD
 - User requests extending or adding to existing capabilities
 </when-to-use-this-skill>
 
+<knowledge>
+
+<tdd-approach-selection>
+Select the appropriate TDD variant based on the feature type:
+
+| Feature type | TDD approach |
+|---|---|
+| **Simple features** (small UI additions, basic form fields) | May consolidate test and implementation steps when logic is straightforward |
+| **Pure presentational components** | Focus on rendering and prop validation tests with minimal logic testing |
+| **Type-only additions** (adding new types/interfaces without behavior) | Focus on type-checking validation rather than test-first approach |
+| **Configuration changes** (adding constants, config options) | Minimal testing may suffice if changes don't affect behavior |
+| **Complex business logic** | Always follow full TDD cycle for safety and clarity |
+
+Always ensure existing tests pass before and after changes. Document the rationale for the chosen TDD variant in the plan.
+</tdd-approach-selection>
+
+</knowledge>
+
 <capabilities>
 
-<defining-requirement>
-- Gather relevant information from the codebase, knowledge base, and user input to clearly define the software requirement.
-- Identify and clarify any ambiguous terms or implicit assumptions to ensure proper understanding.
-- Ask questions to the user to refine and narrow down the focus of the software requirement as needed.
-- Present a structured summary of the requirement to the user and request confirmation or refinements.
-</defining-requirement>
+<define-requirement>
+1. Gather relevant information from the codebase, knowledge base, and user input to clearly define the software requirement.
+2. Identify and clarify any ambiguous terms or implicit assumptions to ensure proper understanding.
+3. Ask questions to the user to refine and narrow down the focus of the software requirement as needed.
+4. Present a structured summary of the requirement to the user and request confirmation or refinements.
+</define-requirement>
 
-<adapting-tdd-approach>
-- Recognize when the full TDD cycle may be adapted or streamlined based on the implementation type:
-  - **Simple features** (small UI additions, basic form fields): May consolidate test and implementation steps when logic is straightforward
-  - **Pure presentational components**: Focus on rendering and prop validation tests with minimal logic testing
-  - **Type-only additions** (adding new types/interfaces without behavior): Focus on type-checking validation rather than test-first approach
-  - **Configuration changes** (adding constants, config options): Minimal testing may suffice if changes don't affect behavior
-  - **Complex business logic**: Always follow full TDD cycle for safety and clarity
-- When adapting the approach, always ensure existing tests pass before and after changes
-- Document the rationale for adapting the TDD approach in the plan
-</adapting-tdd-approach>
-
-<implementation-planning>
-- **Validate Baseline**: Run existing tests, linting, and type-checking to ensure the codebase is in a clean state before implementation begins.
-- Break down high-level software requirements into specific, independently testable functionalities.
-- Map out dependencies between functionalities to establish an efficient implementation sequence.
-- **Consolidate Steps**: Group related functionalities together when they share context or can be tested together, reducing the total step count while maintaining clarity.
-- Create a detailed step-by-step implementation plan for the functionalities following the TDD approach. For each functionality, the steps should include:
-  - **Write Focused Tests**: Create precise unit tests for a single functionality, task or requirement, ensuring coverage of all possible scenarios, edge cases, and invalid inputs.  
-  - **Confirm Test Failure**: Execute the tests to verify they fail initially, confirming their validity before implementation begins.  
-  - **Implement Minimal Code**: Write the simplest code required to pass the tests, avoiding over-engineering or adding features not directly related to the current test cases.  
-  - **Verify Implementation**: Re-run the tests to confirm that the implemented code passes all test cases successfully. Debug and refine as necessary.  
-  - **Refactor**: Improve the code’s structure, readability, and performance while maintaining functionality, ensuring no tests break during the process.  
-  - **Validate Refactoring**: Run the tests again after refactoring to ensure the updated code still passes all test cases without introducing regressions.
-  - **Clean Up Unused Code**: Remove any obsolete or redundant code that is no longer needed after implementation.
-  - **Clean Up Tests**: Update or remove tests that are no longer relevant, ensuring the test suite remains accurate and effective.
-  - **Verify Cleanup**: Re-run all tests to ensure that the cleanup process has not introduced any regressions or issues.
-  - **Validate Linting, Formatting and Type Checking**: Run linting, formatting and type checking tools to ensure code quality and adherence to coding standards.
-- Ensure the total number of steps in the plan is manageable and does not exceed 25 steps. The full TDD cycle can generate up to 10 steps per functionality; use consolidation strategies to reduce this where appropriate.
-- Summarize the complete plan to the user. For example:
+<plan-implementation>
+1. **Validate Baseline**: Run existing tests, linting, and type-checking to ensure the codebase is in a clean state before implementation begins.
+2. Break down high-level software requirements into specific, independently testable functionalities.
+3. Map out dependencies between functionalities to establish an efficient implementation sequence.
+4. **Consolidate Steps**: Group related functionalities together when they share context or can be tested together, reducing the total step count while maintaining clarity.
+5. Consult **tdd-approach-selection** knowledge to select the appropriate TDD variant for each functionality.
+6. Create a detailed step-by-step implementation plan. For each functionality, include the following steps:
+   1. **Write Focused Tests**: Create precise unit tests for a single functionality, task or requirement, ensuring coverage of all possible scenarios, edge cases, and invalid inputs.  
+   2. **Confirm Test Failure**: Execute the tests to verify they fail initially, confirming their validity before implementation begins.  
+   3. **Implement Minimal Code**: Write the simplest code required to pass the tests, avoiding over-engineering or adding features not directly related to the current test cases.  
+   4. **Verify Implementation**: Re-run the tests to confirm that the implemented code passes all test cases successfully. Debug and refine as necessary.  
+   5. **Refactor**: Improve the code’s structure, readability, and performance while maintaining functionality, ensuring no tests break during the process.  
+   6. **Validate Refactoring**: Run the tests again after refactoring to ensure the updated code still passes all test cases without introducing regressions.
+   7. **Clean Up Unused Code**: Remove any obsolete or redundant code that is no longer needed after implementation.
+   8. **Clean Up Tests**: Update or remove tests that are no longer relevant, ensuring the test suite remains accurate and effective.
+   9. **Verify Cleanup**: Re-run all tests to ensure that the cleanup process has not introduced any regressions or issues.
+   10. **Validate Linting, Formatting and Type Checking**: Run linting, formatting and type checking tools to ensure code quality and adherence to coding standards.
+7. Ensure the total number of steps in the plan is manageable and does not exceed 25 steps. The full TDD cycle can generate up to 10 steps per functionality; use consolidation strategies to reduce this where appropriate.
+8. Summarize the complete plan to the user. For example:
   ```
   To implement the requirement of [requirement summary], the plan is as follows:
   - Step 1: Validate Baseline (run existing tests, lint, type-check)
@@ -74,30 +82,24 @@ description: Clarify feature requirements and generate detailed, step-by-step TD
   - ...
   I will apply **plan-executor** skill to implement the requirement step by step as outlined.
   ```
-</implementation-planning>
-
-
-<implementation-planning-examples>
-
-When you need specific examples to understand how to apply the implementation planning approach, load the relevant example file from the examples folder:
-
-- **Adding a New Message Handler**: When implementing a new feature that involves message handling, service logic, and event processing, read [examples/adding-new-message-handler.md](examples/adding-new-message-handler.md)
-- **Simple Configuration Addition**: When implementing straightforward configuration properties without complex business logic, read [examples/simple-configuration-addition.md](examples/simple-configuration-addition.md)
-- **Complex Transformation Logic**: When implementing sophisticated transformation algorithms or complex business rules requiring rigorous testing, read [examples/complex-transformation-logic.md](examples/complex-transformation-logic.md)
-
-Only load example files when they are directly relevant to the current implementation task to minimize context size.
-
-</implementation-planning-examples>
+</plan-implementation>
 
 </capabilities>
 
 <rules>
 
-The rules section outlines decision criteria that determine which capabilities to apply based on the current context and user inputs.
-
-<rule> If the user submits a requirement, apply the **defining-requirement** capability to clarify and structure it. </rule>
-<rule> After defining the requirement, apply the **adapting-tdd-approach** capability to evaluate whether to adapt TDD approach based on the implementation type and complexity. </rule>
-<rule> Apply the **implementation-planning** capability to generate a detailed implementation plan, incorporating baseline validation and step consolidation strategies. </rule>
+<rule> When the user submits a requirement, apply **define-requirement** to clarify and structure it. </rule>
+<rule> After defining the requirement, consult **tdd-approach-selection** knowledge to select the TDD variant, then apply **plan-implementation**. </rule>
 <rule> After presenting the implementation plan to the user, immediately apply the **plan-executor** skill to execute the steps. </rule>
-<rule> Always validate the baseline state before starting implementation to ensure a clean starting point. </rule>
+
 </rules>
+
+<examples>
+
+Load only the example directly relevant to the current implementation task to minimize context size.
+
+- **Adding a New Message Handler**: When implementing a new feature that involves message handling, service logic, and event processing, read [examples/adding-new-message-handler.md](examples/adding-new-message-handler.md)
+- **Simple Configuration Addition**: When implementing straightforward configuration properties without complex business logic, read [examples/simple-configuration-addition.md](examples/simple-configuration-addition.md)
+- **Complex Transformation Logic**: When implementing sophisticated transformation algorithms or complex business rules requiring rigorous testing, read [examples/complex-transformation-logic.md](examples/complex-transformation-logic.md)
+
+</examples>

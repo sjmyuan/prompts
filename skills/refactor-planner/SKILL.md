@@ -10,43 +10,50 @@ description: Analyze refactoring needs and generate detailed, step-by-step TDD-b
 - User requests improvements to maintainability, readability, or performance without changing behavior
 </when-to-use-this-skill>
 
+<knowledge>
+
+<tdd-approach-selection>
+Select the appropriate TDD variant based on the refactor type:
+
+| Refactor type | TDD approach |
+|---|---|
+| **Simple cleanups** (removing unused imports, fixing formatting) | May skip test creation if existing tests provide adequate coverage |
+| **Type improvements** (adding/refining TypeScript types) | Focus on type-checking validation rather than test-first approach |
+| **Documentation-only changes** | No test cycle needed; validate with linting only |
+| **Code organization** (file moves, renames) | Existing tests should pass unchanged |
+| **Complex logic changes** | Always follow full TDD cycle for safety |
+
+Always ensure existing tests pass before and after changes. Document the rationale for the chosen TDD variant in the plan.
+</tdd-approach-selection>
+
+</knowledge>
 
 <capabilities>
 
-<defining-refactor-request>
-- Gather relevant information from the codebase, knowledge base, and user input to clearly define the refactor request.
-- Identify and clarify any ambiguous terms or implicit assumptions to ensure proper understanding.
-- Ask questions to the user to refine and narrow down the focus of the refactor request as needed.
-- Present a structured summary of the refactor request to the user and request confirmation or refinements.
-</defining-refactor-request>
+<define-refactor-request>
+1. Gather relevant information from the codebase, knowledge base, and user input to clearly define the refactor request.
+2. Identify and clarify any ambiguous terms or implicit assumptions to ensure proper understanding.
+3. Ask questions to the user to refine and narrow down the focus of the refactor request as needed.
+4. Present a structured summary of the refactor request to the user and request confirmation or refinements.
+</define-refactor-request>
 
-<adapting-tdd-approach>
-- Recognize when the full TDD cycle may be adapted or streamlined based on the refactoring type:
-  - **Simple cleanups** (removing unused imports, fixing formatting): May skip test creation if existing tests provide adequate coverage
-  - **Type improvements** (adding/refining TypeScript types): Focus on type-checking validation rather than test-first approach
-  - **Documentation-only changes**: No test cycle needed, validate with linting only
-  - **Code organization** (file moves, renames): Existing tests should pass unchanged
-  - **Complex logic changes**: Always follow full TDD cycle for safety
-- When adapting the approach, always ensure existing tests pass before and after changes
-- Document the rationale for adapting the TDD approach in the plan
-</adapting-tdd-approach>
-
-<refactor-planning>
-- **Validate Baseline**: Run existing tests, linting, and type-checking to ensure the codebase is in a clean state before refactoring begins.
-- Break down the refactor request into specific, measurable objectives and clearly defined constraints.
-- Identify and map dependencies between objectives to establish an efficient and logical refactoring sequence.
-- **Consolidate Steps**: Group related objectives together when they share context or can be tested together, reducing the total step count while maintaining clarity.
-- Create a detailed step-by-step refactor plan following the TDD approach. For each objective, the steps should include:
-  - **Write Focused Tests**: Create precise unit tests targeting the specific refactoring objective, ensuring comprehensive coverage of all scenarios, edge cases, and invalid inputs.
-  - **Confirm Test Failure**: Execute the tests to verify they fail initially, validating that the tests correctly identify the current code behavior before refactoring begins.
-  - **Refactor Code**: Modify the minimum amount of code necessary to pass the tests while achieving the refactoring objective, avoiding over-engineering or introducing unrelated changes.
-  - **Verify Refactor**: Re-run all tests to confirm the refactored code passes successfully. Debug and refine as necessary to ensure correctness.
-  - **Clean Up Unused Code**: Remove any obsolete or redundant code that is no longer needed after the refactor.
-  - **Clean Up Tests**: Update or remove tests that are no longer relevant due to the refactor, ensuring the test suite remains accurate and effective.
-  - **Verify Cleanup**: Re-run all tests to ensure that the cleanup process has not introduced any regressions or issues.
-  - **Validate Linting, Formatting and Type Checking**: Run linting, formatting and type checking tools to ensure code quality and adherence to coding standards.
-- Ensure the total number of steps in the plan is manageable and does not exceed 20 steps.
-- Summarize the complete plan to the user. For example:
+<plan-refactor>
+1. **Validate Baseline**: Run existing tests, linting, and type-checking to ensure the codebase is in a clean state before refactoring begins.
+2. Break down the refactor request into specific, measurable objectives and clearly defined constraints.
+3. Identify and map dependencies between objectives to establish an efficient and logical refactoring sequence.
+4. **Consolidate Steps**: Group related objectives together when they share context or can be tested together, reducing the total step count while maintaining clarity.
+5. Consult **tdd-approach-selection** knowledge to select the appropriate TDD variant for each objective.
+6. Create a detailed step-by-step refactor plan. For each objective, include the following steps:
+   1. **Write Focused Tests**: Create precise unit tests targeting the specific refactoring objective, ensuring comprehensive coverage of all scenarios, edge cases, and invalid inputs.
+   2. **Confirm Test Failure**: Execute the tests to verify they fail initially, validating that the tests correctly identify the current code behavior before refactoring begins.
+   3. **Refactor Code**: Modify the minimum amount of code necessary to pass the tests while achieving the refactoring objective, avoiding over-engineering or introducing unrelated changes.
+   4. **Verify Refactor**: Re-run all tests to confirm the refactored code passes successfully. Debug and refine as necessary to ensure correctness.
+   5. **Clean Up Unused Code**: Remove any obsolete or redundant code that is no longer needed after the refactor.
+   6. **Clean Up Tests**: Update or remove tests that are no longer relevant due to the refactor, ensuring the test suite remains accurate and effective.
+   7. **Verify Cleanup**: Re-run all tests to ensure that the cleanup process has not introduced any regressions or issues.
+   8. **Validate Linting, Formatting and Type Checking**: Run linting, formatting and type checking tools to ensure code quality and adherence to coding standards.
+7. Ensure the total number of steps in the plan is manageable and does not exceed 20 steps.
+8. Summarize the complete plan to the user. For example:
   ```
   To complete the refactoring request of [refactor request summary], the plan is as follows:
   - Step 1: Validate Baseline (run existing tests, lint, type-check)
@@ -69,29 +76,24 @@ description: Analyze refactoring needs and generate detailed, step-by-step TDD-b
   - ... 
   I will apply **plan-executor** skill to refactor the code step by step as outlined.
   ```
-</refactor-planning>
-
-<refactor-planning-examples>
-
-When you need specific examples to understand how to apply the refactoring planning approach, load the relevant example file from the examples folder:
-
-- **Service Layer Splitting**: When refactoring involves breaking down large handler or service classes into smaller, focused components following Single Responsibility Principle, read [examples/service-splitting.md](examples/service-splitting.md)
-- **Validation Extraction**: When refactoring involves extracting validation logic from handlers or services into dedicated validator classes, read [examples/validation-extraction.md](examples/validation-extraction.md)
-- **Interface Implementation**: When refactoring involves improving abstraction by adding interfaces and dependency injection for better testability, read [examples/interface-implementation.md](examples/interface-implementation.md)
-
-Only load example files when they are directly relevant to the current refactoring task to minimize context size.
-
-</refactor-planning-examples>
+</plan-refactor>
 
 </capabilities>
 
 <rules>
 
-The rules section outlines decision criteria that determine which capabilities to apply based on the current context and user inputs.
-
-<rule> If the user submits a refactoring request, apply the **defining-refactor-request** capability to clarify the scope, objectives, and constraints of the refactor request. </rule>
-<rule> After defining the refactor request, apply the **adapting-tdd-approach** capability to evaluate whether to adapt tdd approach based on the refactoring type and complexity. </rule>
-<rule> Apply the **refactor-planning** capability to generate a detailed refactor plan, incorporating baseline validation and step consolidation strategies. </rule>
+<rule> When the user submits a refactoring request, apply **define-refactor-request** to clarify the scope, objectives, and constraints. </rule>
+<rule> After defining the refactor request, consult **tdd-approach-selection** knowledge to select the TDD variant, then apply **plan-refactor**. </rule>
 <rule> After presenting the refactor plan to the user, immediately apply the **plan-executor** skill to execute the steps. </rule>
-<rule> Always check lint and type check together when fixing lint or type check issues. </rule>
+
 </rules>
+
+<examples>
+
+Load only the example directly relevant to the current refactoring task to minimize context size.
+
+- **Service Layer Splitting**: When refactoring involves breaking down large handler or service classes into smaller, focused components following Single Responsibility Principle, read [examples/service-splitting.md](examples/service-splitting.md)
+- **Validation Extraction**: When refactoring involves extracting validation logic from handlers or services into dedicated validator classes, read [examples/validation-extraction.md](examples/validation-extraction.md)
+- **Interface Implementation**: When refactoring involves improving abstraction by adding interfaces and dependency injection for better testability, read [examples/interface-implementation.md](examples/interface-implementation.md)
+
+</examples>

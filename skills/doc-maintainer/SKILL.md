@@ -15,7 +15,9 @@ Use this skill when:
 - Configuration files (package.json, tsconfig, etc.) are modified in meaningful ways
 </when-to-use-this-skill>
 
-<docs>
+<knowledge>
+
+<documentation-types>
 This skill covers the following documentation types:
 - **Requirements** (requirements.md, feature specs)
 - **Architecture** (architecture.md, design docs, system diagrams)
@@ -28,12 +30,10 @@ This skill covers the following documentation types:
 - **Developer Guides** (contributing, coding standards, workflows)
 - **Deployment Documentation** (hosting, CI/CD, production setup)
 - **Inline Documentation** (JSDoc, code comments for complex logic)
-</docs>
+</documentation-types>
 
-<capabilities>
-
-<impact-assessment>
-Assess which documentation requires updates based on the change type:
+<impact-lookup>
+Which documentation to update based on the change type:
 
 **For Bug Fixes:**
 - Update troubleshooting guides if the bug was a common issue
@@ -64,60 +64,9 @@ Assess which documentation requires updates based on the change type:
 - Update deployment documentation
 - Document version compatibility requirements
 - Add migration guides for breaking dependency changes
-</impact-assessment>
+</impact-lookup>
 
-<maintaining-docs>
-Follow this systematic approach to update documentation:
-
-1. **Review the Change**
-   - Examine modified files, commit messages, and PR descriptions
-   - Identify what changed: behavior, API, UX, dependencies, structure
-   - Note the user impact and developer impact separately
-   - Check test files to understand new behavior validation
-
-2. **Identify Affected Documentation**
-   - Use the impact-assessment capability to determine doc scope
-   - List specific sections within each document that need updates
-   - Prioritize user-facing docs over internal notes
-   - Consider both direct and indirect documentation impacts
-
-3. **Make Focused, Accurate Edits**
-   - Update only the sections directly affected by the change
-   - Avoid broad rewrites unless documentation is fundamentally outdated
-   - Ensure technical accuracy by referencing the actual code
-   - Use precise terminology consistent with the codebase
-   - Maintain the existing tone and style of each document
-
-4. **Add or Update Examples**
-   - Provide code snippets showing new usage patterns
-   - Include before/after examples for changed APIs
-   - Demonstrate edge cases or common pitfalls
-   - Ensure examples are runnable and tested (when possible)
-   - Use realistic scenarios that match user context
-
-5. **Document Migration Steps**
-   - For breaking changes, provide clear step-by-step migration instructions
-   - Include code snippets showing the old and new way
-   - List all affected code patterns users need to update
-   - Explain the rationale for the change
-   - Estimate migration effort and provide timelines
-
-6. **Maintain Cross-References**
-   - Link related documentation sections
-   - Reference source code files and line numbers
-   - Point to relevant tests, examples, or config files
-   - Cite GitHub issues, PRs, or commit SHAs for traceability
-   - Update any broken links or outdated references
-
-7. **Record Design Decisions**
-   - Document why certain approaches were chosen
-   - Explain trade-offs and alternatives considered
-   - Note any constraints or assumptions
-   - Preserve context for future maintainers
-   - Update architecture decision records (ADRs) if applicable
-</maintaining-docs>
-
-<validation-checklist>
+<doc-validation-criteria>
 Before finalizing documentation updates, verify:
 
 **Accuracy:**
@@ -154,10 +103,10 @@ Before finalizing documentation updates, verify:
 - [ ] Duplicated information is minimized
 - [ ] Version-specific details are clearly marked
 - [ ] Documentation location is logical and discoverable
-</validation-checklist>
+</doc-validation-criteria>
 
-<style-guidelines>
-Adapt your writing style to the documentation type:
+<writing-style-reference>
+Adapt writing style to the documentation type:
 
 **Requirements & Specifications:**
 - Be precise and unambiguous
@@ -200,33 +149,82 @@ Adapt your writing style to the documentation type:
 - Categorize: Added, Changed, Deprecated, Removed, Fixed, Security
 - Be concise but specific
 - Reference issues/PRs when helpful
-</style-guidelines>
+</writing-style-reference>
+
+</knowledge>
+
+<capabilities>
+
+<maintain-docs>
+Follow this systematic approach to update documentation:
+
+1. **Review the Change**
+   - Examine modified files, commit messages, and PR descriptions
+   - Identify what changed: behavior, API, UX, dependencies, structure
+   - Note the user impact and developer impact separately
+   - Check test files to understand new behavior validation
+
+2. **Identify Affected Documentation**
+   - Consult **impact-lookup** knowledge to determine which documentation types require updates
+   - List specific sections within each document that need updates
+   - Prioritize user-facing docs over internal notes
+   - Consider both direct and indirect documentation impacts
+
+3. **Make Focused, Accurate Edits**
+   - Update only the sections directly affected by the change
+   - Avoid broad rewrites unless documentation is fundamentally outdated
+   - Ensure technical accuracy by referencing the actual code
+   - Use precise terminology consistent with the codebase
+   - Maintain the existing tone and style of each document
+
+4. **Add or Update Examples**
+   - Provide code snippets showing new usage patterns
+   - Include before/after examples for changed APIs
+   - Demonstrate edge cases or common pitfalls
+   - Ensure examples are runnable and tested (when possible)
+   - Use realistic scenarios that match user context
+
+5. **Document Migration Steps**
+   - For breaking changes, provide clear step-by-step migration instructions
+   - Include code snippets showing the old and new way
+   - List all affected code patterns users need to update
+   - Explain the rationale for the change
+   - Estimate migration effort and provide timelines
+
+6. **Maintain Cross-References**
+   - Link related documentation sections
+   - Reference source code files and line numbers
+   - Point to relevant tests, examples, or config files
+   - Cite GitHub issues, PRs, or commit SHAs for traceability
+   - Update any broken links or outdated references
+
+7. **Record Design Decisions**
+   - Document why certain approaches were chosen
+   - Explain trade-offs and alternatives considered
+   - Note any constraints or assumptions
+   - Preserve context for future maintainers
+   - Update architecture decision records (ADRs) if applicable
+
+8. **Validate Before Finalizing**
+   - Run through **doc-validation-criteria** knowledge to verify accuracy, completeness, clarity, consistency, and maintainability
+</maintain-docs>
+
+<rules>
+
+<rule> When code changes are provided, consult **impact-lookup** knowledge to identify which documentation types require updates, then apply **maintain-docs**. </rule>
+<rule> When writing or updating documentation, consult **writing-style-reference** knowledge to match the correct style for the document type. </rule>
+<rule> Before finalizing any documentation update, run through **doc-validation-criteria** knowledge to verify accuracy, completeness, clarity, consistency, and maintainability. </rule>
+<rule> For breaking changes, always include migration steps with before/after code examples. </rule>
+<rule> Only update documentation sections directly affected by the change — avoid broad rewrites unless the documentation is fundamentally outdated. </rule>
+
+</rules>
 
 <examples>
 
-When you need specific examples to understand how to document different types of code changes, load the relevant example file from the examples folder:
+Load only the example directly relevant to the current change type to minimize context size.
 
 - **Bug Fix Documentation**: When documenting bug fixes and issue resolutions, read [examples/bug-fix-documentation.md](examples/bug-fix-documentation.md)
 - **New Feature Documentation**: When documenting new features and capabilities, read [examples/new-feature-documentation.md](examples/new-feature-documentation.md)
 - **Refactor Documentation**: When documenting code refactoring and restructuring, read [examples/refactor-documentation.md](examples/refactor-documentation.md)
 
-Only load example files when they are directly relevant to the type of code change being documented to minimize context size.
-
 </examples>
-
-</capabilities>
-
-<rules>
-
-The rules section outlines decision criteria that determine which capabilities to apply based on the current context and user inputs.
-
-<rule> When code, APIs, or configuration changes occur, apply the **impact-assessment** capability to determine which documentation requires updates before making any edits. </rule>
-<rule> Apply the **maintaining-docs** capability to make focused, accurate edits to affected documentation following the systematic 7-step approach. </rule>
-<rule> Before finalizing documentation updates, apply the **validation-checklist** to verify accuracy, completeness, clarity, consistency, and maintainability. </rule>
-<rule> Use **style-guidelines** to match the appropriate tone and format for each documentation type being updated. </rule>
-<rule> Only update documentation sections directly affected by the change—avoid broad rewrites unless the documentation is fundamentally outdated. </rule>
-<rule> For breaking changes, always include migration steps with before/after code examples to help users transition smoothly. </rule>
-<rule> Always review the actual code changes before writing documentation—never document based on assumptions. </rule>
-<rule> Link to specific code files, line numbers, and commits for traceability; verify all code examples are accurate and runnable. </rule>
-
-</rules>

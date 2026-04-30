@@ -8,121 +8,106 @@ description: Execute structured plans step-by-step with progress tracking, valid
 - A structured, multi-step task requires systematic execution and progress tracking
 </when-to-use-this-skill>
 
+<knowledge>
+
+<step-status-definitions>
+Status emojis used to track each step:
+
+| Status | Emoji | Meaning |
+|---|---|---|
+| Pending | ⏳ | Not yet started |
+| In Progress | 🔄 | Currently being worked on |
+| Completed | ✅ | Successfully finished |
+| Failed | ❌ | Encountered errors (include error details) |
+| Blocked | 🚫 | Cannot proceed (include blocker details) |
+</step-status-definitions>
+
+<step-tracking-format>
+Record each step in PLAN.md using this format:
+
+```
+### Step N: [Step Title] [Status Emoji]
+**Objective**: [What this step achieves]
+**Files**: [Files created, modified, or deleted]
+**Implementation**: [Key changes or actions taken]
+**Validation**: [Test results or verification outcomes]
+**Status**: [Status emoji] [Status description]
+```
+</step-tracking-format>
+
+</knowledge>
+
 <capabilities>
 
-The capabilities section describes the key capabilities for executing plans effectively.
+<track-plan>
+1. At the start of execution, create `PLAN.md` in the workspace root.
+2. If `PLAN.md` already exists, check for steps with ❌ failed or 🚫 blocked status. If found, ask the user whether to **resume** from the last known state or **start fresh** (overwriting with the new plan).
+3. List each step with its number, title, and initial status ⏳ pending, using the **step-tracking-format** knowledge.
+4. Update step status immediately after each state change (⏳ → 🔄 → ✅, or ❌/🚫 on failure). Refer to **step-status-definitions** knowledge for emoji meanings.
+5. Never modify plan structure, objectives, or steps except to update statuses or add clarifying notes.
+6. Always display the complete step list so progress is visible even across context resets.
+</track-plan>
 
-<plan-tracking>
-- **Initialize Tracking**: At the start of execution, record all plan steps in a `PLAN.md` file in the workspace root with detailed structure:
-  - If `PLAN.md` already exists, check whether it contains an incomplete plan (steps with ❌ failed or 🚫 blocked status). If so, ask the user whether to **resume** from the last known state or **start fresh** (overwriting with the new plan). If starting fresh, overwrite entirely.
-  - List each step with its number, title, and initial status (⏳ pending)
-  - Include step descriptions or objectives if provided in the original plan
-  - Preserve the complete step list for continuous reference
-- **Detailed Step Format**: Track each step with comprehensive information:
-  ```
-  ### Step N: [Step Title] [Status Emoji]
-  **Objective**: [What this step achieves]
-  **Files**: [Files created, modified, or deleted]
-  **Implementation**: [Key changes or actions taken]
-  **Validation**: [Test results or verification outcomes]
-  **Status**: [Status emoji] [Status description]
-  ```
-- **Status Updates**: Update step status immediately after completion (⏳ pending → 🔄 in-progress → ✅ completed):
-  - ⏳ **Pending**: Not yet started
-  - 🔄 **In Progress**: Currently working on this step
-  - ✅ **Completed**: Successfully finished
-  - ❌ **Failed**: Encountered errors (include error details)
-  - 🚫 **Blocked**: Cannot proceed (include blocker details)
-- **Immutable Plan**: Never modify the plan structure, objectives, or steps except to update status or add clarifying notes
-- **Preserve Context**: Maintain the original plan's intent, sequence, and dependencies throughout execution
-- **Always Display Full List**: Show the complete step list with all statuses so progress is always visible, even across context resets
-</plan-tracking>
+<execute-step>
+1. Before starting a step, mark it as 🔄 in-progress in PLAN.md and briefly explain your approach.
+2. Execute the step fully — no partial implementations.
+3. After completing the step, validate the outcome meets the step's objectives.
+4. Mark the step as ✅ completed; document files changed, implementation details, and validation results in PLAN.md.
+5. Confirm the prerequisite step is fully ✅ completed before starting a step that depends on it.
+6. Display the full updated step list with current statuses after each completion.
+</execute-step>
 
-<step-execution>
-- **Sequential Execution**: Execute steps in order unless dependencies allow parallelization
-- **Update Status Before**: Mark step as 🔄 in-progress when starting work on it
-- **Think Aloud**: Before implementing each step, briefly explain your approach and what you're about to do
-- **Complete Thoroughly**: Fully complete each step before moving to the next—no partial implementations
-- **Validate Results**: After each critical step, verify the outcome meets the step's objectives
-- **Update Status After**: Immediately after completing a step:
-  - Mark step as ✅ completed
-  - Document files changed, implementation details, and validation results
-  - Display the full updated step list showing all current statuses
-- **Handle Dependencies**: When a step depends on another, confirm the prerequisite is fully completed first
-</step-execution>
+<report-progress>
+1. At plan start, display all steps with ⏳ pending status.
+2. After each step completion, update that step to ✅ and show the full step list with all current statuses.
+3. Include detailed information per step: files changed, implementation notes, validation results.
+4. Never summarize multiple steps together — each step must be listed individually with its own status and details.
+5. At plan end, show the final step list with all ✅ completed and provide a summary of accomplishments.
+</report-progress>
 
-<progress-reporting>
-- **Detailed Step Tracking**: List each step explicitly with full details, not summaries:
-  - Step number and title
-  - Current status (✅ completed, 🔄 in-progress, ⏳ pending, ❌ failed, 🚫 blocked)
-  - Files modified or created
-  - Key implementation details or code changes
-  - Validation results or test outcomes
-- **Always Show Full Plan**: Display all steps with their current status so the AI can:
-  - See exactly which steps are completed and which remain
-  - Maintain context even if conversation grows long
-  - Resume work accurately after context resets
-  - Avoid losing track of progress
-- **Update After Each Step**: Immediately after completing a step:
-  - Update the step's status to ✅ completed
-  - Add implementation details and outcomes
-  - Show the updated full step list with current statuses
-- **Never Summarize Multiple Steps**: Each step must be tracked individually with its own details—never group or summarize several steps together
-- **Continuous Visibility**: Maintain the complete step-by-step progress list throughout execution so it's always visible
-</progress-reporting>
+<handle-errors>
+1. Mark the failed step as ❌ with error details in PLAN.md.
+2. Document the error clearly.
+3. Analyze the root cause.
+4. Attempt to fix and retry the step.
+5. Update step status to ✅ if resolved, or 🚫 blocked if unresolvable.
+6. If blocked, consult the user before proceeding.
+7. Display the updated full step list with current statuses.
+8. Never skip a failed step or failed validation — address issues before proceeding.
+</handle-errors>
 
-<error-handling>
-- **Anticipate Issues**: Before executing complex steps, identify potential failure points
-- **Fail Fast**: If a step fails (e.g., tests don't pass, build errors), immediately investigate and resolve
-- **Recovery Strategy**: When encountering errors:
-  1. Mark the step as ❌ failed with error details in the progress list
-  2. Document the error clearly
-  3. Analyze the root cause
-  4. Attempt to fix and retry the step
-  5. Update step status to ✅ if resolved, or 🚫 blocked if unresolvable
-  6. If blocked, consult the user before proceeding
-  7. Display the updated full step list with current statuses
-- **Rollback Awareness**: Keep track of changes made, so you can revert if necessary
-- **Never Skip**: Don't skip failed steps or validation—address issues before proceeding
-</error-handling>
+<run-validation-checkpoints>
+1. After code changes, run relevant tests to confirm correctness.
+2. After significant changes, run linting, formatting, and type-checking.
+3. For build-dependent projects, verify the build succeeds at key milestones.
+4. Validate incrementally — do not wait until the end of the plan.
+</run-validation-checkpoints>
 
-<validation-checkpoints>
-- **Test Validation**: After code changes, run relevant tests to confirm correctness
-- **Quality Checks**: Periodically run linting, formatting, and type-checking (especially after significant changes)
-- **Build Verification**: For build-dependent projects, ensure the build succeeds at key milestones
-- **Incremental Validation**: Don't wait until the end—validate incrementally to catch issues early
-</validation-checkpoints>
+<review-post-execution>
+1. After ALL plan steps are marked ✅ completed, apply the **code-reviewer** skill on all files changed or created during execution.
+2. Evaluate correctness, security, performance, maintainability, and test coverage.
+3. If 🚫 Blocker or 🔴 Major issues are found:
+   1. Record each finding as a new fix step in PLAN.md with ⏳ pending status.
+   2. Apply **execute-step** for each fix step.
+   3. Re-run the **code-reviewer** skill on the affected files.
+   4. Repeat until no 🚫 Blockers or 🔴 Majors remain.
+4. If only 🟡 Minor and 🟢 Nit findings remain, document them in the final summary without blocking completion.
+5. Proceed to **clean-up-plan** only when the review passes.
+</review-post-execution>
 
-<post-execution-review>
-- **Trigger**: After ALL plan steps are marked ✅ completed, before performing plan-cleanup.
-- **Scope**: Apply the **code-reviewer** skill on all files changed or created during plan execution.
-- **Review Focus**: Evaluate correctness, security, performance, maintainability, and test coverage of the changed files.
-- **Handle Findings**:
-  - If no 🚫 Blocker or 🔴 Major issues are found: proceed directly to **plan-cleanup**.
-  - If 🚫 Blocker or 🔴 Major issues are found:
-    1. Record each finding as a new fix step in PLAN.md (e.g., "Fix: [issue title]") with ⏳ pending status
-    2. Execute each fix step using the **step-execution** capability
-    3. After all fixes are applied, re-run the **code-reviewer** skill on the affected files
-    4. Repeat until no 🚫 Blockers or 🔴 Majors remain
-  - 🟡 Minor and 🟢 Nit findings: Document in the final summary but do not block completion
-- **Goal**: Catch issues that TDD validation may have missed and ensure code quality before declaring the plan complete
-</post-execution-review>
+<clean-up-plan>
+1. Once ALL steps (including any post-execution review fix steps) are marked ✅ completed, display the final completion summary.
+2. Delete the PLAN.md file from the workspace.
+3. Confirm the deletion to the user ("Cleaned up PLAN.md").
+4. Only delete PLAN.md if the entire plan succeeded — keep it if any steps are ❌ failed or 🚫 blocked.
+</clean-up-plan>
 
-<plan-cleanup>
-- **After Completion**: Once ALL steps (including any post-execution review fix steps) are marked ✅ completed and the final summary is provided:
-  - Delete the PLAN.md file from the workspace
-  - Confirm the deletion to the user ("Cleaned up PLAN.md")
-  - This keeps the workspace clean and signals clear plan completion
-- **Only After Success**: Only delete PLAN.md if the entire plan executed successfully—don't delete if there are ❌ failed or 🚫 blocked steps
-- **Final Action**: Deleting PLAN.md should be the very last action after displaying the completion summary
-</plan-cleanup>
-
-<user-interaction>
-- **Autonomous by Default**: Execute the full plan without asking for permission at each step
-- **Pause for Clarity**: If a step is ambiguous or requires user input, pause and ask before proceeding
-- **Blocking Issues**: If stuck on a step due to missing information or external dependencies, inform the user and wait for guidance
-- **Deviations**: If you must deviate from the plan due to unforeseen issues, explain why and how you're adapting
-</user-interaction>
+<manage-user-interaction>
+1. Execute the full plan autonomously without asking for permission at each step.
+2. If a step is ambiguous or requires user input, pause and ask before proceeding.
+3. If blocked on a step due to missing information or external dependencies, inform the user and wait for guidance.
+4. If deviating from the plan due to unforeseen issues, explain why and how you're adapting.
+</manage-user-interaction>
 
 </capabilities>
 
@@ -150,69 +135,13 @@ The capabilities section describes the key capabilities for executing plans effe
 
 <rules>
 
-The rules section outlines decision criteria that determine which capabilities to apply based on the current context and user inputs.
-
-<rule> **At Plan Start**: Apply the **plan-tracking** capability to initialize the tracking system with all plan steps before beginning execution. </rule>
-
-<rule> **During Execution**: Apply the **step-execution** capability continuously:
-  - Before each step: mark as 🔄 in-progress and explain your approach
-  - During each step: execute thoroughly and handle dependencies
-  - After each step: 
-    - Validate results and mark as ✅ completed
-    - Document files changed, implementation details, and validation results
-    - Display the full updated step list with all current statuses
-</rule>
-
-<rule> **For All Plans**: Apply the **progress-reporting** capability continuously:
-  - At plan start: display all steps with ⏳ pending status
-  - After each step completion: update that step to ✅ and show the full step list with updated statuses
-  - Display detailed information for each step (files changed, implementation notes, validation results)
-  - Never summarize multiple steps—each step must be listed individually with its own details
-  - Maintain the complete detailed step list throughout execution for continuous visibility
-  - At plan end: show final step list with all ✅ completed and provide a summary of accomplishments
-</rule>
-
-<rule> **When Steps Fail or Encounter Errors**: Apply the **error-handling** capability immediately:
-  - Mark step as ❌ failed with error details
-  - Document the error clearly
-  - Analyze root cause
-  - Attempt to fix and retry
-  - Update status to ✅ if resolved or 🚫 blocked if unresolvable
-  - Display the updated full step list with current statuses
-  - If blocked, consult the user before proceeding
-  - Never skip failed validation steps
-</rule>
-
-<rule> **At Validation Points**: Apply the **validation-checkpoints** capability:
-  - After code changes: run relevant tests
-  - After significant changes: run linting, formatting, type-checking
-  - At major milestones: verify builds succeed
-  - Don't wait until the end—validate incrementally throughout execution
-</rule>
-
-<rule> **When Facing Ambiguity or Blockers**: Apply the **user-interaction** capability:
-  - If a step is unclear: pause and ask for clarification
-  - If external dependencies are missing: document the blocker and consult the user
-  - If deviations from the plan are necessary: explain why and how you're adapting
-  - Otherwise, execute autonomously without asking for permission at each step
-</rule>
-
-<rule> **Plan Immutability**: Throughout execution, apply the **plan-tracking** immutability principle—never modify the plan structure, objectives, or steps except to update statuses or add brief clarifying notes. Never skip, reorder, or remove steps without explicit user approval. </rule>
-
-<rule> **Complete All Steps**: Execute ALL steps in the plan thoroughly, regardless of the number of steps or files affected. Do not stop early or leave steps partially completed. </rule>
-
-<rule> **After All Plan Steps Complete**: Before cleanup, apply the **post-execution-review** capability:
-  - Run the **code-reviewer** skill on all files changed or created during execution
-  - If 🚫 Blocker or 🔴 Major issues are found: add fix steps to PLAN.md and execute them, then re-review
-  - Only proceed to **plan-cleanup** when the review finds no 🚫 Blockers or 🔴 Majors
-  - Document any 🟡 Minor or 🟢 Nit findings in the final summary without blocking completion
-</rule>
-
-<rule> **After Plan Completion**: Apply the **plan-cleanup** capability when ALL steps (including post-execution review fix steps) are marked ✅ completed:
-  - Display the final completion summary with all steps showing ✅ status
-  - Delete the PLAN.md file from the workspace
-  - Confirm the deletion ("Cleaned up PLAN.md")
-  - Only perform cleanup if the entire plan succeeded—keep PLAN.md if any steps are ❌ failed or 🚫 blocked
-</rule>
+<rule> **At Plan Start**: Apply **track-plan** to initialize PLAN.md with all plan steps before executing any step. </rule>
+<rule> **During Each Step**: Apply **execute-step** — mark 🔄 before starting, execute fully, validate and mark ✅ after completing, update PLAN.md. </rule>
+<rule> **Throughout Execution**: Apply **report-progress** — show the full step list with current statuses after every step. Never summarize multiple steps together. </rule>
+<rule> **When a Step Fails**: Apply **handle-errors** immediately — mark ❌, diagnose, fix and retry, escalate to 🚫 if unresolvable, consult the user before proceeding. </rule>
+<rule> **At Validation Points**: Apply **run-validation-checkpoints** after code changes and at major milestones. Validate incrementally, not just at the end. </rule>
+<rule> **When Facing Ambiguity or Blockers**: Apply **manage-user-interaction** — pause and ask rather than assuming. </rule>
+<rule> **After All Steps Complete**: Apply **review-post-execution**, then **clean-up-plan** once the review passes. </rule>
+<rule> **Plan Immutability**: Never modify plan structure, objectives, or step sequence except to update statuses or add brief clarifying notes. Never skip, reorder, or remove steps without explicit user approval. </rule>
 
 </rules>
