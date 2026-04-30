@@ -41,6 +41,12 @@
 - **Issue**: Both sections list facts and constraints (`"strict": true`, `rpx` for sizing) rather than describing a procedure to follow. A capability should answer "how do I apply TypeScript/styling in this project?", not just enumerate settings.
 - **Recommendation**: Convert to step-by-step procedures ("How to type a miniprogram codebase: 1. … 2. …") or, for purely factual entries (tsconfig flags, forbidden units), move them to `<knowledge>`.
 
+#### `<examples>` section is standalone instead of nested inside `<knowledge>`
+- **File**: [SKILL.md](SKILL.md#L162-L175)
+- **Issue**: The `<examples>` section exists at the top level of the skill file rather than as an `<example-selector>` entry inside `<knowledge>`. The preferred pattern places all lookup material inside `<knowledge>`.
+- **Impact**: Minor structural inconsistency; examples are still reachable, but the skill deviates from the recommended pattern.
+- **Recommendation**: Move the examples list into an `<example-selector>` entry inside the `<knowledge>` section.
+
 ### 🟢 Nits / Suggestions
 
 #### `<when-to-use-this-skill>` is well-formed — no change needed
@@ -78,15 +84,6 @@
 1. Introduce a `<knowledge>` section; move directory layout, lifecycle hooks, navigation tables, API signatures, and platform constraints into it. *(Addresses the two 🔴 major issues)*
 2. Rewrite each capability as an ordered step list with a clear action verb in the section name (e.g., `<add-page>`, `<canvas-setup-and-draw>`). *(Addresses 🟡 and ⚠️)*
 3. Rewrite rules as "scenario → capability" triggers; remove any rule that merely repeats a capability's content. *(Addresses the duplication 🔴)*
-4. Decide on prose-bullets vs. numbered-steps as the canonical capability format and apply it consistently. *(Resolves ⚠️)*
-
----
-
-## Key Review Characteristics
-
-- **Review Type**: Skill file structural review
-- **Severity Distribution**: 2 major, 2 minor, 1 nit, 1 inconsistency
-- **Primary Concerns**: Section placement, duplication between rules and capabilities, procedural step format
-- **Action Required**: Restructure before relying on this skill in production
-- **Testing Recommendation**: After restructuring, test the skill on representative prompts to verify correct routing behavior
+4. Move the `<examples>` section inside `<knowledge>` as an `<example-selector>` entry. *(Addresses 🟡 examples placement)*
+5. Decide on prose-bullets vs. numbered-steps as the canonical capability format and apply it consistently. *(Resolves ⚠️)*
 ````

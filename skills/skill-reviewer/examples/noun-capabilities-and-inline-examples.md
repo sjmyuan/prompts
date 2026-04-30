@@ -32,8 +32,6 @@
 - **Impact**: The agent has no template to follow for async scenarios; outputs will be inconsistent or incorrect.
 - **Recommendation**: Add `examples/async-validation.md` and link it from the `<examples>` section.
 
-### 🟡 Minor Issues
-
 #### Examples are embedded inline rather than referenced by file path
 - **File**: [SKILL.md](SKILL.md#L100-L145)
 - **Issue**: The `<examples>` section contains the full input/output content of both examples inline, rather than loading them on demand via file references. This inflates the skill context even when the examples are not relevant.
@@ -61,8 +59,14 @@
 
 ---
 
+## Risks & Assumptions
+- Review assumes the four-section semantics (knowledge / capabilities / rules / examples). If the intended skill format differs, findings may not apply.
+- No runtime evaluation of whether the agent applies capability steps more accurately after restructuring — that requires prompt testing.
+
+---
+
 ## Recommended Next Steps
 1. Rename all three capability sections to action-verb phrases. *(Resolves 🔴 naming)*
 2. Create `examples/async-validation.md` and link it from `<examples>`. *(Resolves 🔴 coverage gap)*
-3. Extract inline example content to separate files; replace with file-path references. *(Resolves 🟡 inline examples)*
+3. Extract inline example content to separate files; replace with file-path references. *(Resolves � inline examples)*
 ````

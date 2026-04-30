@@ -5,6 +5,7 @@ description: Review SKILL.md files for correct structure, section-purpose compli
 
 <when-to-use-this-skill>
 - User asks to review a skill file (SKILL.md)
+- User asks to improve or fix a skill file (SKILL.md)
 - User asks whether a SKILL.md is correctly structured
 - User asks for feedback on section placement, duplication, or capability format in a skill file
 </when-to-use-this-skill>
@@ -75,6 +76,8 @@ An example file is well-formed when it meets all of the following criteria:
 <review-skill-file>
 **Objective**: Evaluate a SKILL.md file for correct section structure, separation of concerns, and absence of duplication.
 
+**Note**: Do not modify the skill file during review. Suggest changes with clear descriptions or patch-style snippets.
+
 **Steps**:
 1. Read the full skill file to understand its domain and all sections.
 2. For each capability section, verify it describes *how to do something* as ordered steps — flag any that are fact lists, reference tables, or constraint bullets (those belong in `<knowledge>`).
@@ -82,23 +85,23 @@ An example file is well-formed when it meets all of the following criteria:
 4. Check that a `<knowledge>` section exists and contains all reference material (tables, layouts, API signatures, platform constraints) that capabilities currently cite inline.
 5. Check capability section names use action verbs; flag noun-named sections.
 6. Check that examples are exposed via an `<example-selector>` entry inside `<knowledge>` (preferred) rather than a standalone `<examples>` section. If a bare `<examples>` section exists instead, flag it as 🟡 Minor. Either way, verify that example content is referenced by file path — not embedded inline — and flag inline content as 🔴 Major.
-6b. Assess example coverage: cross-reference each named capability against the linked examples. Flag capabilities with no corresponding example as 🔴 Major; flag skills where examples cover only a subset of scenarios as 🟡 Minor. Consult **example-coverage-criteria** for the full rubric.
-6c. Load and review each linked example file:
+7. Assess example coverage: cross-reference each named capability against the linked examples. Flag capabilities with no corresponding example as 🔴 Major; flag skills where examples cover only a subset of scenarios as 🟡 Minor. Consult **example-coverage-criteria** for the full rubric.
+8. Load and review each linked example file:
     a. Verify the file has a clear scenario heading that names the trigger condition and the capability being demonstrated — flag missing or vague descriptions as 🟡 Minor.
     b. Verify the example output structure matches what the capability's steps would produce — flag structural drift as 🔴 Major.
     c. Check the scenario is realistic and non-trivial relative to the capability's complexity — flag toy/hello-world inputs for complex capabilities as 🟡 Minor.
     d. Check the example does not contradict any rule or knowledge entry in the parent skill — flag contradictions as 🔴 Major.
     e. Check that the example references the current capability name; flag stale names that no longer match the skill as 🟢 Nit.
     Consult **example-quality-criteria** for the full rubric.
-7. Surface inconsistencies: mixed styles within a section type, two conflicting patterns, or differing levels of procedural detail across capabilities of the same kind. Present both variants with file/line references and ask the user which should be canonical — do not silently pick one.
-8. Format findings with severity levels (🚫 Blocker, 🔴 Major, 🟡 Minor, 🟢 Nit, ⚠️ Inconsistency) and load **examples/skill-file-review.md** for output structure guidance.
+9. Surface inconsistencies: mixed styles within a section type, two conflicting patterns, or differing levels of procedural detail across capabilities of the same kind. Present both variants with file/line references and ask the user which should be canonical — do not silently pick one.
+10. Include a **Positive Highlights** section that acknowledges at least one well-structured aspect of the skill.
+11. Include a **Risks & Assumptions** section that states any assumptions made about the intended skill format (e.g., four-section semantics) and notes that no runtime evaluation was performed.
+12. Format findings with severity levels (🚫 Blocker, 🔴 Major, 🟡 Minor, 🟢 Nit, ⚠️ Inconsistency) and load **examples/skill-file-review.md** for output structure guidance.
 </review-skill-file>
 
 </capabilities>
 
 <rules>
-<rule>When the user submits a SKILL.md file for review, use **review-skill-file**. Evaluate section placement, duplication between rules and capabilities, and whether capabilities are procedural steps rather than fact lists. Consult **skill-file-section-semantics** for the criteria.</rule>
-<rule>Do not modify the skill file directly during review. Suggest changes with clear descriptions or patch-style snippets.</rule>
-<rule>Always include at least one positive highlight to acknowledge well-structured parts of the skill.</rule>
-<rule>When two conflicting patterns or styles are found within the skill file, surface both under ⚠️ Inconsistencies, present trade-offs neutrally, and explicitly request a decision from the user.</rule>
+<rule>When the user submits a SKILL.md file for review or asks to improve a skill file, use **review-skill-file**.</rule>
+<rule>When two or more conflicting patterns or styles are found within the skill file, use **review-skill-file** and surface them under ⚠️ Inconsistencies.</rule>
 </rules>
