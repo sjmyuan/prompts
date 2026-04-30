@@ -11,15 +11,41 @@ description: Investigate codebases to answer questions about functionality, impl
 - User asks about the purpose or rationale behind a specific implementation
 </when-to-use-this-skill>
 
-<capabilities>
+<knowledge>
 
-The capabilities section describes additional capabilities that you can refer to.
+<question-types>
+Select the question type to determine investigation focus:
+
+| Question type | Focus |
+|---|---|
+| **What** | Functionality, structure, data models, component inventory |
+| **How** | Mechanisms, processes, step-by-step implementation |
+| **Why** | Design rationale, trade-offs, historical decisions |
+| **Where** | Code location, file organization, module boundaries |
+| **When** | Timing, lifecycle events, initialization sequences |
+</question-types>
+
+<search-strategy-guide>
+Choose the search strategy based on what you are looking for:
+
+| Strategy | When to use |
+|---|---|
+| **Semantic search** | Conceptual queries and high-level patterns |
+| **Grep search** | Exact strings, function/class names, specific patterns |
+| **File search** | Partial file names or known directory structures |
+
+Combine multiple strategies to build comprehensive understanding.
+</search-strategy-guide>
+
+</knowledge>
+
+<capabilities>
 
   <define-question>
 1. **Assess Question Clarity First**: Before proceeding, evaluate whether the question is already clear and unambiguous:
    - **Simple, direct questions** (e.g., "Where is `UserService` defined?", "What does `processPayment()` do?") — skip to **investigate-codebase** immediately.
    - **Ambiguous or broad questions** (e.g., "How does authentication work?", "Why is this slow?") — apply the full clarification steps below.
-2. Analyze the question to determine its type: **What** (functionality/structure), **How** (mechanisms/processes), **Why** (rationale/design), **Where** (location), or **When** (timing/lifecycle).
+2. Consult **question-types** knowledge to determine the question type and investigation focus.
 3. Identify the scope and boundaries of investigation: specific components, files, modules, dependencies, and edge cases.
 4. Clarify ambiguous terms, implicit assumptions, or missing context that would affect the investigation.
 5. If needed, ask the user to specify the relevant part of the system, provide examples, or clarify depth of detail.
@@ -27,11 +53,7 @@ The capabilities section describes additional capabilities that you can refer to
 </define-question>
 
   <investigate-codebase>
-1. **Strategic Code Discovery**: Use appropriate search strategies to locate relevant code:
-   - **Semantic search** for conceptual queries and high-level patterns
-   - **Grep search** for exact strings, function/class names, or specific patterns
-   - **File search** when you know partial file names or directory structures
-   - Combine multiple strategies to build comprehensive understanding
+1. **Strategic Code Discovery**: Consult **search-strategy-guide** knowledge to select appropriate search tools, then locate relevant code.
 2. **Analyze Code Structure**: Identify main components, classes, functions, their responsibilities, the component hierarchy, architectural patterns, and naming conventions.
 3. **Trace Control Flow**: Follow entry points, function call sequences, conditional branches, loops, and lifecycle/initialization sequences.
 4. **Trace Data Flow**: Follow data sources, transformations, state management patterns, persistence mechanisms, and validation/sanitization points.
@@ -54,6 +76,19 @@ The capabilities section describes additional capabilities that you can refer to
 
 </capabilities>
 
+<rules>
+
+<rule> When the user submits a question, apply **define-question** fast-path check. For simple, unambiguous questions, skip directly to **investigate-codebase**. For broad or ambiguous questions, apply the full clarification process first. </rule>
+<rule> After defining the question, apply **investigate-codebase** to systematically explore the codebase. Continue until you can fully address all aspects of the question. </rule>
+<rule> Always apply **present-answer** when presenting findings. Structure the answer clearly, include specific code references, and validate completeness. </rule>
+<rule> Do not change any code or suggest modifications unless the user explicitly asks for recommendations or improvements. </rule>
+<rule> If the investigation cannot fully answer the question due to missing code or ambiguous design, clearly state what was found and what remains unclear. </rule>
+<rule> When presenting code references, always use proper markdown file links with line numbers (e.g., [ComponentName.tsx](path/to/ComponentName.tsx#L10-L20)). </rule>
+<rule> If multiple possible interpretations are discovered, present all relevant findings and ask the user to clarify which aspect they're most interested in. </rule>
+<rule> Wait for the user's response before proceeding when clarifying questions are asked. </rule>
+
+</rules>
+
 <examples>
 
 When you need specific examples to understand how to apply the question investigation approach, load the relevant example file from the examples folder:
@@ -66,18 +101,3 @@ When you need specific examples to understand how to apply the question investig
 Only load example files when they are directly relevant to the current question type to minimize context size.
 
 </examples>
-
-<rules>
-
-The rules section outlines decision criteria that determine which capabilities to apply based on the current context and user inputs.
-
-<rule> When the user submits a question, apply **define-question** fast-path check. For simple, unambiguous questions, skip directly to **investigate-codebase**. For broad or ambiguous questions, apply the full clarification process first. </rule>
-<rule> After defining the question, apply **investigate-codebase** to systematically explore the codebase. Continue until you can fully address all aspects of the question. </rule>
-<rule> Always apply **present-answer** when presenting findings. Structure the answer clearly, include specific code references, and validate completeness. </rule>
-<rule> Do not change any code or suggest modifications unless the user explicitly asks for recommendations or improvements. </rule>
-<rule> If the investigation cannot fully answer the question due to missing code or ambiguous design, clearly state what was found and what remains unclear. </rule>
-<rule> When presenting code references, always use proper markdown file links with line numbers (e.g., [ComponentName.tsx](path/to/ComponentName.tsx#L10-L20)). </rule>
-<rule> If multiple possible interpretations are discovered, present all relevant findings and ask the user to clarify which aspect they're most interested in. </rule>
-<rule> Wait for the user's response before proceeding when clarifying questions are asked. </rule>
-
-</rules>

@@ -56,8 +56,6 @@ Use this template when drafting the final user story:
 
 <capabilities>
 
-The capabilities section describes additional capabilities that you can refer to.
-
   <define-user>
 1. **Identify the User Type**: Determine who the user is in the story:
    - Distinguish between end users, admins, developers, or system actors
@@ -139,6 +137,22 @@ The capabilities section describes additional capabilities that you can refer to
 
 </capabilities>
 
+<rules>
+
+<rule> When the user submits a requirement, apply **define-user** to gather information about the user. Confirm before proceeding. </rule>
+<rule> After defining the user, apply **define-functionality** to identify key functionalities. Confirm before proceeding. </rule>
+<rule> After defining functionalities, apply **define-benefit** to clarify the benefits. Confirm before proceeding. </rule>
+<rule> After clarifying benefits, apply **define-acceptance-criteria** to list acceptance criteria in Given-When-Then format. Confirm before proceeding. </rule>
+<rule> After listing acceptance criteria, apply **define-out-of-scope** to identify out-of-scope items. Confirm before proceeding. </rule>
+<rule> After identifying out-of-scope items, apply **define-prerequisites** to gather prerequisites. Confirm before proceeding. </rule>
+<rule> After all sections are confirmed, apply **draft-user-story** using the **story-template** knowledge to produce the final user story. </rule>
+<rule> Always wait for the user's confirmation before advancing to the next capability. Do not skip steps or make assumptions without user input. </rule>
+<rule> If the user provides a rough draft, extract existing information and apply only the capabilities for missing or unclear sections rather than starting from scratch. </rule>
+<rule> When acceptance criteria lack Given-When-Then structure, reformat them accordingly and present to the user for confirmation before proceeding. </rule>
+<rule> After user confirmation at each step, update the user story document accordingly. </rule>
+
+</rules>
+
 <examples>
 
 When you need guidance on applying this skill to specific scenarios, load the relevant example file:
@@ -150,23 +164,3 @@ When you need guidance on applying this skill to specific scenarios, load the re
 Only load example files when they are directly relevant to the current scenario to minimize context size.
 
 </examples>
-
-<rules>
-
-The rules section outlines decision criteria that determine which capabilities to apply based on the current context and user inputs.
-
-<rule> When the user submits a requirement, apply **define-user** to gather information about the user. Confirm before proceeding. </rule>
-<rule> After defining the user, apply **define-functionality** to identify key functionalities. Confirm before proceeding. </rule>
-<rule> After defining functionalities, apply **define-benefit** to clarify the benefits. Confirm before proceeding. </rule>
-<rule> After clarifying benefits, apply **define-acceptance-criteria** to list acceptance criteria in Given-When-Then format. Confirm before proceeding. </rule>
-<rule> After listing acceptance criteria, apply **define-out-of-scope** to identify out-of-scope items. Confirm before proceeding. </rule>
-<rule> After identifying out-of-scope items, apply **define-prerequisites** to gather prerequisites. Confirm before proceeding. </rule>
-<rule> After all sections are confirmed, apply **draft-user-story** using the **story-template** knowledge to produce the final user story. </rule>
-<rule> Always wait for the user's confirmation before advancing to the next capability. Do not skip steps or make assumptions without user input. </rule>
-<rule> If the user provides a rough draft, extract existing information and apply only the capabilities for missing or unclear sections rather than starting from scratch. </rule>
-
-<rule> When acceptance criteria lack Given-When-Then structure, reformat them accordingly and present to the user for confirmation before proceeding. </rule>
-
-<rule> After user confirmation at each step, update the user story document accordingly. </rule>
-
-</rules>

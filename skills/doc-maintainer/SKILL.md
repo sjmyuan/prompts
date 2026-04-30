@@ -209,6 +209,8 @@ Follow this systematic approach to update documentation:
    - Run through **doc-validation-criteria** knowledge to verify accuracy, completeness, clarity, consistency, and maintainability
 </maintain-docs>
 
+</capabilities>
+
 <rules>
 
 <rule> When code changes are provided, consult **impact-lookup** knowledge to identify which documentation types require updates, then apply **maintain-docs**. </rule>
