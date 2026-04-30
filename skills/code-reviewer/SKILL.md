@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Perform systematic reviews of code, documents, and skill files across files, folders, diffs, commits, or pull requests. Evaluates correctness, security, performance, maintainability, and structural quality. Provides prioritized, actionable feedback without making changes. Use when users request reviews, feedback, or quality assessments on any artifact.
+description: Perform systematic reviews of code and documents across files, folders, diffs, commits, or pull requests. Evaluates correctness, security, performance, maintainability, and structural quality. Provides prioritized, actionable feedback without making changes. Use when users request reviews, feedback, or quality assessments on code or documents.
 ---
 
 <when-to-use-this-skill>
@@ -8,29 +8,10 @@ description: Perform systematic reviews of code, documents, and skill files acro
 - User submits files, folders, diffs, commits, or pull requests for review
 - User asks for feedback on code quality, security, performance, or maintainability
 - User supplies one branch name (diff against current branch) or two branch names (diff between them)
-- User asks to review a skill file (SKILL.md) for correct structure or section usage
 - User asks to review a document (README, design doc, ADR, specification, runbook, etc.) for clarity, completeness, or structure
 </when-to-use-this-skill>
 
 <knowledge>
-
-<skill-file-section-semantics>
-A well-formed copilot skill file uses four sections with distinct, non-overlapping purposes:
-
-| Section | Purpose | What belongs here |
-|---|---|---|
-| `<knowledge>` | Facts the agent recalls | Reference tables, directory layouts, API signatures, platform constraints, banned practices, selection guides |
-| `<capabilities>` | Procedures the agent executes | Ordered step-by-step instructions for *how* to accomplish a task; named with an action verb |
-| `<rules>` | Routing triggers | "When [scenario] → use [capability]"; must not repeat what the capability already says |
-| `<examples>` | Concrete output models | Realistic input/output pairs; loaded on demand, not inline |
-
-**Common structural violations**:
-- Knowledge embedded in capabilities (lookup tables, API lists, constraint bullets inside a capability section)
-- Rules that re-state capability content instead of routing to it
-- Capabilities written as bullet-point fact lists instead of ordered procedural steps
-- Capabilities named as nouns (`<storage-management>`) instead of action verbs (`<manage-storage>`)
-- `<examples>` loaded eagerly instead of referenced by name for on-demand loading
-</skill-file-section-semantics>
 
 <example-selector>
 Load the relevant example file on demand when you need guidance on structuring review output. Only load what is needed to minimize context size.
@@ -40,7 +21,6 @@ Load the relevant example file on demand when you need guidance on structuring r
 | Diff / commit / bug fix | [examples/diff-commit-review.md](examples/diff-commit-review.md) |
 | Branch diff (one or two branch names) | [examples/branch-diff-review.md](examples/branch-diff-review.md) |
 | Performance optimization | [examples/performance-improvement.md](examples/performance-improvement.md) |
-| Skill file (SKILL.md) | [examples/skill-file-review.md](examples/skill-file-review.md) |
 | Document (README, ADR, design doc, spec) | [examples/doc-review.md](examples/doc-review.md) |
 </example-selector>
 
@@ -192,7 +172,6 @@ Standard template for all review output:
    - For features: Focus on requirements alignment, API design, and extensibility
    - For refactors: Focus on maintainability, test preservation, and behavior equivalence
    - For optimizations: Focus on performance validation, benchmarks, and edge case handling
-   - For skill files: Focus on section purpose compliance, duplication between rules and capabilities, and procedural step format
    - For documents: Focus on structure, clarity, completeness, accuracy, and target-audience alignment
 </gathering-review-context>
 
@@ -302,20 +281,6 @@ git diff HEAD...<supplied-branch>
    - Do **not** recommend "align with existing code" unless the existing code is clearly the established, intentional pattern
 </conducting-code-review>
 
-<reviewing-skill-file>
-**Objective**: Evaluate a SKILL.md file for correct section structure, separation of concerns, and absence of duplication.
-
-**Steps**:
-1. Read the full skill file to understand its domain and all sections.
-2. For each capability section, verify it describes *how to do something* as ordered steps — flag any that are fact lists, reference tables, or constraint bullets (those belong in `<knowledge>`).
-3. For each rule, verify it answers "when scenario X → use capability Y" — flag any rule that re-states content already in a capability (duplication).
-4. Check that a `<knowledge>` section exists and contains all reference material (tables, layouts, API signatures, platform constraints) that capabilities currently cite inline.
-5. Check capability section names use action verbs; flag noun-named sections.
-6. Check `<examples>` entries are referenced by file path for on-demand loading, not embedded inline.
-7. Apply **conducting-code-review** dimensions relevant to a structured document: correctness (section purpose), maintainability (duplication, single source of truth), and inconsistencies (mixed styles within a section type).
-8. Format findings using **formatting-review-output** and load **examples/skill-file-review.md** for output structure guidance.
-</reviewing-skill-file>
-
 <reviewing-document>
 **Objective**: Evaluate a document (README, design doc, ADR, specification, runbook, etc.) for clarity, completeness, structure, and accuracy.
 
@@ -334,7 +299,6 @@ git diff HEAD...<supplied-branch>
 
 <rules>
 <rule>When the user submits files, folders, diffs, or commits for review, first apply **gathering-review-context** to understand scope and intent.</rule>
-<rule>When the subject of review is a SKILL.md file, use **reviewing-skill-file**. Evaluate section placement, duplication between rules and capabilities, and whether capabilities are procedural steps rather than fact lists. Consult **skill-file-section-semantics** knowledge for the criteria.</rule>
 <rule>When the subject of review is a document (README, ADR, design doc, specification, runbook, etc.), use **reviewing-document**. Focus on structure, clarity, completeness, accuracy, and audience alignment.</rule>
 <rule>Apply **conducting-code-review** systematically across all relevant dimensions, focusing on areas most relevant to the change type.</rule>
 <rule>Use **defining-severity-levels** criteria consistently when categorizing findings.</rule>
