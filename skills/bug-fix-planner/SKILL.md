@@ -85,7 +85,6 @@ Load only the example directly relevant to the current bug type to minimize cont
   - Step 16: Verify Cleanup for issue B
   - Step 17: Validate Linting, Formatting and Type Checking for issue B
   - ...
-  I will apply **plan-executor** skill to fix the bug step by step as outlined.
   ```
 </plan-bug-fix>
 
@@ -95,7 +94,6 @@ Load only the example directly relevant to the current bug type to minimize cont
 
 <rule> When the user reports a bug, apply **identify-bug-root-cause**. </rule>
 <rule> After identifying the root cause, consult **tdd-approach-selection** knowledge to select the TDD variant, then apply **plan-bug-fix**. </rule>
-<rule> After presenting the bug-fix plan to the user, immediately apply the **plan-executor** skill to execute the steps. </rule>
 
 </rules>
 

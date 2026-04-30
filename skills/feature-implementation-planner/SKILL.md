@@ -88,7 +88,6 @@ Load only the example directly relevant to the current implementation task to mi
   - Step 20: Verify Cleanup for functionality B
   - Step 21: Validate Linting, Formatting and Type Checking for functionality B
   - ...
-  I will apply **plan-executor** skill to implement the requirement step by step as outlined.
   ```
 </plan-implementation>
 
@@ -98,7 +97,6 @@ Load only the example directly relevant to the current implementation task to mi
 
 <rule> When the user submits a requirement, apply **define-requirement** to clarify and structure it. </rule>
 <rule> After defining the requirement, consult **tdd-approach-selection** knowledge to select the TDD variant, then apply **plan-implementation**. </rule>
-<rule> After presenting the implementation plan to the user, immediately apply the **plan-executor** skill to execute the steps. </rule>
 
 </rules>
 

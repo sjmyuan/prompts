@@ -2,7 +2,31 @@
 
 **Scenario**: Event messages lost when Azure Service Bus connection is interrupted
 
-**Root Cause**: EventPublisher not properly handling transient connection failures and missing retry logic
+---
+
+## Root Cause Identification
+
+Applies **identify-bug-root-cause**.
+
+**User reports:**
+> "We're seeing message loss when the Azure Service Bus connection drops intermittently. Some events get published but others just disappear with no error logged."
+
+**Agent gathers information** — reads `EventPublisherImpl.java`, `ServiceBusConfiguration.java`, and their tests. Finds: `ServiceBusSenderClient` is created with no `AmqpRetryOptions`; the `sendMessage()` call in `EventPublisherImpl` has no `try/catch`; the test suite has no connection-failure scenarios.
+
+**Agent asks clarifying questions:**
+> 1. Is message loss happening on all connection drops or only prolonged outages (>5 s)?
+> 2. Are there dead-letter queue entries, or are messages silently discarded?
+> 3. Is the retry policy expected to be at the SDK level or the application level?
+
+**User responds:**
+> Both short and long outages trigger it. No dead-letter entries — they're silently dropped. We expected SDK-level retries.
+
+**Agent confirms root cause:**
+> The `ServiceBusSenderClient` is constructed without an `AmqpRetryOptions` policy, so any transient connection error throws immediately and the message is lost. The `sendMessage()` call in `EventPublisherImpl` has no `try/catch`, so the exception propagates silently. Two issues: (1) add retry options to `ServiceBusConfiguration`, (2) add error handling in `EventPublisherImpl`.
+
+*User confirms: ✅*
+
+---
 
 **Bug-Fixing Plan**:
 

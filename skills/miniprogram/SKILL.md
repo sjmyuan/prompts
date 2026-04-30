@@ -110,6 +110,8 @@ Steps to create and register a new page:
 4. Register in `app.json` → `"pages"` (main package) or `"subpackages[].pages"` (subpackage, path relative to subpackage root).
 5. Use `this.setData()` for all data mutations; never mutate `this.data` directly; batch calls, avoid in loops.
 6. Encode complex route params with `encodeURIComponent(JSON.stringify(obj))`; decode in `onLoad(options)`.
+
+→ See `examples/inter-page-data-flow.md` for route param encoding, storage hand-off, globalData, and EventChannel patterns.
 </add-page>
 
 <create-component>
@@ -151,6 +153,8 @@ How to type a miniprogram codebase:
 3. Prefer `interface` for object shapes and `type` for unions/aliases.
 4. Load static JSON via `require('../../data/file.json') as MyType`.
 5. Use `as WechatMiniprogram.Canvas` / `as CanvasRenderingContext2D` only for WeChat canvas types; add a comment explaining why.
+
+→ See `examples/apply-typescript-patterns.md` for tsconfig setup, `IAppOption` declaration, and WeChat canvas type casts.
 </apply-typescript-patterns>
 
 <apply-styling>
@@ -158,6 +162,8 @@ How to style pages and components:
 1. Define design tokens as CSS custom properties on `page {}` in `app.scss`; reference via `var(--token-name)`.
 2. Use BEM naming (`block__element--modifier`) scoped to each page or component SCSS file; no global class leakage.
 3. Use inline `style` in WXML only for values computed at runtime in TypeScript; never for static styles.
+
+→ See `examples/apply-styling.md` for design token definitions, BEM class naming patterns, and rpx vs px guidance.
 </apply-styling>
 
 <configure-subpackage>

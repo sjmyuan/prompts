@@ -81,8 +81,7 @@ Load only the example directly relevant to the current refactoring task to minim
   - Step 15: Clean Up Tests for refactor objective B
   - Step 16: Verify Cleanup for refactor objective B
   - Step 17: Validate Linting, Formatting and Type Checking for refactor objective B
-  - ... 
-  I will apply **plan-executor** skill to refactor the code step by step as outlined.
+  - ...
   ```
 </plan-refactor>
 
@@ -92,7 +91,6 @@ Load only the example directly relevant to the current refactoring task to minim
 
 <rule> When the user submits a refactoring request, apply **define-refactor-request** to clarify the scope, objectives, and constraints. </rule>
 <rule> After defining the refactor request, consult **tdd-approach-selection** knowledge to select the TDD variant, then apply **plan-refactor**. </rule>
-<rule> After presenting the refactor plan to the user, immediately apply the **plan-executor** skill to execute the steps. </rule>
 
 </rules>
 

@@ -4,6 +4,32 @@
 
 **Scenario**: Implement multi-locale data attribute transformation with fallback logic and validation
 
+---
+
+## Requirement Definition
+
+Applies **define-requirement**.
+
+**User request:**
+> "We need to transform product attribute values so that each attribute is returned in the user's preferred locale, with a fallback to the default locale if the translation is missing, and with validation to reject invalid locale codes."
+
+**Agent asks clarifying questions:**
+> 1. What format are locale codes in — BCP 47 (`en-US`) or ISO 639-1 (`en`)?
+> 2. What constitutes a "missing" translation — null value, empty string, or both?
+> 3. Is the fallback always to a single default locale, or a priority chain (e.g., `fr-CA` → `fr` → `en`)?
+> 4. What happens if the fallback locale also has no translation — return null or throw?
+> 5. Are attribute values always strings, or can they be numeric/boolean?
+
+**User responds:**
+> BCP 47. Both null and empty string count as missing. Two-level chain: regional → base language → configured default. Return null if all levels miss. Values are always strings.
+
+**Agent confirms requirement:**
+> The `LocaleAttributeTransformer` must: (1) accept an attribute map keyed by locale, (2) resolve the value by trying the exact locale, then the base language, then the configured default, (3) treat null and empty string as absent, (4) reject malformed BCP 47 codes with a validation error, (5) return null if no match is found at any level. The `FallbackLocaleResolver` encapsulates the priority chain so it can be unit-tested independently.
+
+*User confirms: ✅*
+
+---
+
 ## Implementation Plan (Full TDD - Complex logic requires rigorous testing)
 
 **Steps:**

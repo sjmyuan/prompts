@@ -3,15 +3,40 @@
 ## User Request
 "Why does the service use event-driven architecture instead of REST API for data imports?"
 
-## Response Process
+---
 
-### 1. Architecture Analysis
+## Step 1 — Define Question (Broad/Ambiguous Path)
+
+Applies **define-question**.
+
+This question is broad — "the service" could refer to several services in the repo, and "event-driven vs REST" may relate to performance, coupling, history, or a specific trade-off. The full clarification steps apply.
+
+**Agent asks:**
+> 1. Which service are you asking about — `data-import-service`, `catalog-sync-service`, or another?
+> 2. Are you looking for the original design rationale (why it was built this way) or a current trade-off assessment (is this still the right approach)?
+> 3. Is there a specific concern motivating the question (e.g., latency, debugging difficulty, coupling)?
+
+**User responds:**
+> The `data-import-service`. Original design rationale — we're writing up the ADR. No specific concern.
+
+**Agent confirms scope:**
+> Investigate why `data-import-service` uses event-driven integration for data imports rather than synchronous REST calls, focusing on the original design rationale. Will examine architecture docs, ADR files, event listener implementation, and any comments indicating design intent.
+
+*User confirms: ✅ — proceed with investigation.*
+
+---
+
+## Step 2 — Investigate Codebase & Present Answer
+
+Applies **investigate-codebase** then **present-answer**.
+
+### Architecture Analysis
 - Review system architecture documentation
 - Analyze event listener implementation
 - Check for API endpoints
 - Review ADR (Architecture Decision Records) if available
 
-### 2. Documentation Review
+### Documentation Review
 ```markdown
 # From docs/architecture.md
 - Asynchronous processing for large data catalogs
@@ -19,7 +44,7 @@
 - Event-driven integration pattern
 ```
 
-### 3. Code Structure Analysis
+### Code Structure Analysis
 ```
 infrastructure/
 ├── eventlistener/
@@ -29,7 +54,7 @@ infrastructure/
     └── EventPublisherImpl.java  <- Event publisher
 ```
 
-### 4. Benefits Identified
+### Benefits Identified
 
 **From Implementation**:
 ```java
@@ -48,12 +73,12 @@ public void onDataImported(String message) {
 4. **Performance**: Non-blocking operations
 5. **Reliability**: Message persistence ensures no data loss
 
-### 5. Trade-offs Considered
+### Trade-offs Considered
 - **Eventual consistency** vs **immediate consistency**
 - **Complexity** vs **Scalability**
 - **Debugging difficulty** vs **System resilience**
 
-### 6. Answer Compilation
+### Answer Compilation
 The service uses event-driven architecture for several key reasons:
 
 1. **Asynchronous Processing**: Data imports can be large batches; async processing prevents timeouts
