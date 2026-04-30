@@ -182,7 +182,7 @@ Steps to add a page to a subpackage:
 
 <rule> When adding any new page, use **add-page**. Read `app.json` first — navigating to an unregistered page causes silent failures. </rule>
 
-<rule> When a page needs Canvas, use **canvas-setup-and-draw**. Never draw in `onLoad`; never use the legacy `wx.createCanvasContext` API. </rule>
+<rule> When a page needs Canvas, use **canvas-setup-and-draw**. </rule>
 
 <rule> When building a reusable component, use **create-component**. Register it with an absolute path to prevent depth-dependent breakage in subpackages. </rule>
 
@@ -194,7 +194,7 @@ Steps to add a page to a subpackage:
 
 <rule> When reading or writing persistent data, use **manage-storage**. All storage access must be centralised, trimmed before array writes, and wrapped in `try/catch`. </rule>
 
-<rule> When writing TypeScript, follow **apply-typescript-patterns**. Do not use `any` except for WeChat canvas/image callbacks; annotate those with a comment. </rule>
+<rule> When writing TypeScript, follow **apply-typescript-patterns**. </rule>
 
 <rule> When sizing UI elements, follow **apply-styling** (`rpx` for layout). Use `px` only for canvas physical pixel dimensions derived from `pixelRatio` in **canvas-setup-and-draw**. </rule>
 

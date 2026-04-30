@@ -157,7 +157,6 @@ Load only the example directly relevant to the current scenario to minimize cont
 <rule> Always wait for the user's confirmation before advancing to the next capability. Do not skip steps or make assumptions without user input. </rule>
 <rule> If the user provides a rough draft, extract existing information and apply only the capabilities for missing or unclear sections rather than starting from scratch. </rule>
 <rule> When acceptance criteria lack Given-When-Then structure, reformat them accordingly and present to the user for confirmation before proceeding. </rule>
-<rule> After user confirmation at each step, update the user story document accordingly. </rule>
 
 </rules>
 

@@ -26,67 +26,53 @@ This question is broad — "the service" could refer to several services in the 
 
 ---
 
-## Step 2 — Investigate Codebase & Present Answer
+## Step 2 — Investigate Codebase
 
-Applies **investigate-codebase** then **present-answer**.
+Applies **investigate-codebase**.
 
-### Architecture Analysis
-- Review system architecture documentation
-- Analyze event listener implementation
-- Check for API endpoints
-- Review ADR (Architecture Decision Records) if available
+**Architecture documentation** — reads `docs/architecture.md`:
+> "Asynchronous processing for large data catalogs; loose coupling between data source and external API via event-driven integration."
 
-### Documentation Review
-```markdown
-# From docs/architecture.md
-- Asynchronous processing for large data catalogs
-- Loose coupling between data source and external API
-- Event-driven integration pattern
-```
+**ADR search** — no dedicated ADR file found; design rationale is embedded in inline comments and the architecture doc.
 
-### Code Structure Analysis
+**Code structure analysis**:
 ```
 infrastructure/
 ├── eventlistener/
-│   ├── DataImportedListener.java  <- Event consumer
+│   ├── DataImportedListener.java   ← Kafka consumer
 │   └── CloudEventFactory.java
 └── externaladapter/
-    └── EventPublisherImpl.java  <- Event publisher
+    └── EventPublisherImpl.java     ← outbound publisher
 ```
 
-### Benefits Identified
-
-**From Implementation**:
+**Key implementation evidence**:
 ```java
 @KafkaListener(topics = "data.imported")
 public void onDataImported(String message) {
-    // Async processing
-    // No blocking calls
-    // Automatic retry handling
+    // Async processing — no blocking calls
+    // SDK-level retry handled by AmqpRetryOptions
 }
 ```
 
-**Advantages**:
-1. **Scalability**: Can process thousands of records asynchronously
-2. **Resilience**: Message queue provides retry and error handling
-3. **Loose Coupling**: Data source doesn't need to know about external API
-4. **Performance**: Non-blocking operations
-5. **Reliability**: Message persistence ensures no data loss
+**Trade-offs documented in comments and architecture doc**:
+- Eventual consistency accepted for data synchronization use cases
+- Added operational complexity (dead-letter queue, retry config) traded against system resilience
 
-### Trade-offs Considered
-- **Eventual consistency** vs **immediate consistency**
-- **Complexity** vs **Scalability**
-- **Debugging difficulty** vs **System resilience**
+---
 
-### Answer Compilation
-The service uses event-driven architecture for several key reasons:
+## Step 3 — Present Answer
 
-1. **Asynchronous Processing**: Data imports can be large batches; async processing prevents timeouts
-2. **Scalability**: Can scale consumers independently based on load
-3. **Loose Coupling**: Data source and external API systems are decoupled
-4. **Resilience**: Built-in retry, error handling, and message persistence
-5. **Performance**: Non-blocking operations allow higher throughput
+Applies **present-answer**.
 
-The trade-off is eventual consistency, but for data synchronization, this is acceptable as records don't need immediate real-time updates.
+`data-import-service` uses event-driven architecture because the original design prioritized scalability and resilience — large catalog imports would time out under REST, and any transient failure would lose data with no recovery path.
 
-**Decision documented in**: `docs/architecture.md`
+**Five supporting reasons from the architecture doc and implementation**:
+1. **Asynchronous processing** — catalog imports can contain thousands of records; async consumers prevent gateway timeouts. Evidence: `@KafkaListener` in [`DataImportedListener.java`](infrastructure/eventlistener/DataImportedListener.java).
+2. **Scalability** — Kafka consumer group members scale independently; REST would require vertical scaling of the import endpoint.
+3. **Loose coupling** — the data source publishes events without knowing about the external API consumer; [`EventPublisherImpl.java`](infrastructure/externaladapter/EventPublisherImpl.java) is the only integration point.
+4. **Resilience** — SDK-level retry means transient failures are handled automatically; no data loss on connection drops.
+5. **Message persistence** — the broker retains unprocessed messages; a consumer restart picks up where it left off without requiring a re-import.
+
+**Trade-off acknowledged**: Eventual consistency — records do not appear in the external API immediately after import. This was an accepted trade-off for data synchronization, documented in [`docs/architecture.md`](docs/architecture.md).
+
+**Next steps**: To assess whether event-driven is still the right approach, compare message lag metrics against current consistency requirements. To understand the retry configuration specifically, investigate `ServiceBusConfiguration.java`.

@@ -2,9 +2,36 @@
 
 **Scenario**: Application fails to start in production because a required environment variable for the database connection pool size is missing, causing the server to fall back to the default of 1 and time out under load
 
-**Root Cause**: `DB_POOL_SIZE` environment variable is not declared in the production deployment configuration; the application reads it at startup but has no validated default and no startup error
+---
 
-**Bug-Fixing Plan** (Adapted TDD - Validate with build/run):
+## Root Cause Identification
+
+Applies **identify-bug-root-cause**.
+
+**User reports:**
+> “The production deployment is timing out under moderate load. Locally it’s fine. We noticed the pool size looks wrong in the logs.”
+
+**Agent gathers information** — reads `DatabaseConfig.java`, `application-production.yml`, and deployment manifests. Finds: `DB_POOL_SIZE` is read via `${DB_POOL_SIZE:1}` — a Spring default of `1` silently takes effect when the variable is absent. The production deployment manifests do not declare `DB_POOL_SIZE`.
+
+**Agent asks:**
+> 1. Was `DB_POOL_SIZE` ever set in the production environment, or was it always missing?
+> 2. What is the expected pool size for production — is there a documented value?
+
+**User responds:**
+> It was never set; the team assumed the app would error if it was missing. Expected size is 20.
+
+**Agent confirms root cause:**
+> `DB_POOL_SIZE` is not declared in the production deployment configuration. The Spring placeholder default of `1` silently applies, causing connection starvation under any real load. Two fixes: (1) add the variable to the production config with the correct value, (2) replace the silent default with a fail-fast startup check so missing config is caught immediately.
+
+*User confirms: ✅*
+
+---
+
+## Bug-Fixing Plan (Adapted TDD — Validate with Build/Run)
+
+Applies **plan-bug-fix**.
+
+**Root Cause**: `DB_POOL_SIZE` environment variable is not declared in the production deployment configuration; the application reads it at startup but has no validated default and no startup error
 
 ## Steps
 

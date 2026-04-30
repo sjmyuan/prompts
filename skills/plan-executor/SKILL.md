@@ -126,9 +126,9 @@ Load only the example most relevant to the current execution scenario to minimiz
 <rules>
 
 <rule> **At Plan Start**: Apply **track-plan** to initialize PLAN.md with all plan steps before executing any step. </rule>
-<rule> **During Each Step**: Apply **execute-step** — mark 🔄 before starting, execute fully, validate and mark ✅ after completing, update PLAN.md. </rule>
+<rule> **During Each Step**: Apply **execute-step** for every step in the plan. </rule>
 <rule> **Throughout Execution**: Apply **report-progress** — show the full step list with current statuses after every step. Never summarize multiple steps together. </rule>
-<rule> **When a Step Fails**: Apply **handle-errors** immediately — mark ❌, diagnose, fix and retry, escalate to 🚫 if unresolvable, consult the user before proceeding. </rule>
+<rule> **When a Step Fails**: Apply **handle-errors** immediately. </rule>
 <rule> **At Validation Points**: Apply **run-validation-checkpoints** after code changes and at major milestones. Validate incrementally, not just at the end. </rule>
 <rule> **When Facing Ambiguity or Blockers**: Apply **manage-user-interaction** — pause and ask rather than assuming. </rule>
 <rule> **After All Steps Complete**: Apply **review-post-execution**, then **clean-up-plan** once the review passes. </rule>

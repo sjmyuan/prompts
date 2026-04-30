@@ -95,13 +95,24 @@ public class DataValidator {
 
 ---
 
-### Step 2: Move Validation Logic 🔄
+### Step 2: Move Validation Logic from Handler to Validator 🔄
 
-**Objective**: Extract validation logic from handler to validator
-**Files**: Already completed in Step 1 (validation logic was extracted during validator creation)
-**Implementation**: Validation methods created in DataValidator class
-**Validation**: All validation rules properly encapsulated
-**Status**: ✅ Completed (combined with Step 1)
+Starting Step 2...
+
+**Objective**: Remove the inline validation block from DataImportedHandler now that the logic lives in DataValidator
+**Files**: Modifying `application/service/DataImportedHandler.java`
+**Implementation**: Deleted the 40-line inline validation block from `DataImportedHandler.handle()`:
+```java
+// Removed from DataImportedHandler.handle():
+// if (record == null) { throw new IllegalArgumentException("..."); }
+// if (record.getId() == null || record.getId().isBlank()) { throw new IllegalArgumentException("..."); }
+// if (!record.getId().matches("^[A-Z0-9-]+$")) { throw new IllegalArgumentException("..."); }
+// if (record.getName() == null || record.getName().isBlank()) { throw new IllegalArgumentException("..."); }
+// if (record.getValue() == null || record.getValue().compareTo(BigDecimal.ZERO) < 0) { throw new IllegalArgumentException("..."); }
+```
+Handler reduced from 70 to ~30 lines; all validation logic now lives exclusively in `DataValidator`.
+**Validation**: Handler compiles; existing handler tests pass — no regressions from the removal
+**Status**: ✅ Completed
 
 #### Plan Status After Step 2
 ### Step 1: Create DataValidator class ✅

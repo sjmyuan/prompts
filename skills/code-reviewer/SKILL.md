@@ -96,6 +96,8 @@ Load the relevant example file on demand when you need guidance on structuring r
 | Branch diff (one or two branch names) | [examples/branch-diff-review.md](examples/branch-diff-review.md) |
 | Performance optimization | [examples/performance-improvement.md](examples/performance-improvement.md) |
 | Document (README, ADR, design doc, spec) | [examples/doc-review.md](examples/doc-review.md) |
+
+Note: **gathering-review-context** is demonstrated as the lead-in step in all four example files — load any one of them for output structure guidance on that capability.
 </example-selector>
 
 <review-efficiency-knowledge>
