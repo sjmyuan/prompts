@@ -94,8 +94,8 @@ Load only the example directly relevant to the current task to minimize context 
 - **Inter-page data flow** (route params, storage, globalData, EventChannel) — use with **add-page**: [examples/inter-page-data-flow.md](examples/inter-page-data-flow.md)
 - **Storage patterns** (read/write/trim with error handling) — use with **manage-storage**: [examples/storage-patterns.md](examples/storage-patterns.md)
 - **WeChat API usage** (network, permission, media) — use with **add-page** or **create-component**: [examples/wechat-api-usage.md](examples/wechat-api-usage.md)
-- **apply-typescript-patterns** — typing a miniprogram codebase (tsconfig, shared types, globalData): [examples/apply-typescript-patterns.md](examples/apply-typescript-patterns.md)
-- **apply-styling** — design tokens, BEM naming, rpx vs px: [examples/apply-styling.md](examples/apply-styling.md)
+- **Typing a miniprogram codebase** (tsconfig, strict mode, shared types, globalData) — use with **apply-typescript-patterns**: [examples/apply-typescript-patterns.md](examples/apply-typescript-patterns.md)
+- **Applying SCSS design system** (design tokens, BEM naming, rpx vs px) — use with **apply-styling**: [examples/apply-styling.md](examples/apply-styling.md)
 </example-selector>
 
 </knowledge>

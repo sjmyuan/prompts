@@ -165,7 +165,6 @@ Standard template for all review output:
 ## Findings
 
 ### 🚫 Blockers (Must Fix)
-*[If none, state "None identified"]*
 
 #### [Finding Title]
 - **File**: [path/to/file.ts:L10-L15](path/to/file.ts#L10-L15)
@@ -180,7 +179,6 @@ Standard template for all review output:
 ### 🟢 Nits / Suggestions
 
 ### ⚠️ Inconsistencies (Decision Required)
-*[If none, state "None identified"]*
 
 #### [Inconsistency Title]
 - **Variant A**: [description] — [path/to/file.ts:L10](path/to/file.ts#L10)

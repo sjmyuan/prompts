@@ -51,7 +51,7 @@ Load only the example directly relevant to the current question type to minimize
 
 <capabilities>
 
-  <define-question>
+<define-question>
 1. **Assess Question Clarity First**: Before proceeding, evaluate whether the question is already clear and unambiguous:
    - **Simple, direct questions** (e.g., "Where is `UserService` defined?", "What does `processPayment()` do?") — skip to **investigate-codebase** immediately.
    - **Ambiguous or broad questions** (e.g., "How does authentication work?", "Why is this slow?") — apply the full clarification steps below.
@@ -62,7 +62,7 @@ Load only the example directly relevant to the current question type to minimize
 6. Present a structured summary of your understanding and request confirmation before proceeding.
 </define-question>
 
-  <investigate-codebase>
+<investigate-codebase>
 1. **Strategic Code Discovery**: Consult **search-strategy-guide** knowledge to select appropriate search tools, then locate relevant code.
 2. **Analyze Code Structure**: Identify main components, classes, functions, their responsibilities, the component hierarchy, architectural patterns, and naming conventions.
 3. **Trace Control Flow**: Follow entry points, function call sequences, conditional branches, loops, and lifecycle/initialization sequences.
@@ -73,7 +73,7 @@ Load only the example directly relevant to the current question type to minimize
 8. **Synthesize Findings**: Create a coherent narrative explaining the implementation, highlight key design decisions, note any issues or improvement opportunities, and identify gaps requiring deeper investigation.
 </investigate-codebase>
 
-  <present-answer>
+<present-answer>
 1. **Structure the Answer**: Start with a direct, concise answer to the question; follow with supporting details ordered by importance and relevance.
 2. **Provide Context**: Explain how the answer fits into the overall system, note related components, and mention relevant architectural or design considerations.
 3. **Include Code References**: Link to relevant files with line numbers, include brief code snippets for key points, and highlight the most important functions or classes.

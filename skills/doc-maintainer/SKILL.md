@@ -157,6 +157,7 @@ Load only the example directly relevant to the current change type to minimize c
 - **Bug Fix Documentation**: When documenting bug fixes and issue resolutions, read [examples/bug-fix-documentation.md](examples/bug-fix-documentation.md)
 - **New Feature Documentation**: When documenting new features and capabilities, read [examples/new-feature-documentation.md](examples/new-feature-documentation.md)
 - **Refactor Documentation**: When documenting code refactoring and restructuring, read [examples/refactor-documentation.md](examples/refactor-documentation.md)
+- **Dependency/Infrastructure Documentation**: When documenting dependency upgrades, build tool changes, or infrastructure updates, read [examples/dependency-infrastructure-documentation.md](examples/dependency-infrastructure-documentation.md)
 </example-selector>
 
 </knowledge>
