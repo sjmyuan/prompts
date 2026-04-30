@@ -43,6 +43,25 @@ A well-covered examples section spans the skill's key scenarios. Check for these
 **Minimum viable coverage**: every distinct capability (or meaningfully different scenario variant) should have at least one linked example.
 </example-coverage-criteria>
 
+<example-quality-criteria>
+An example file is well-formed when it meets all of the following criteria:
+
+| Criterion | What to check |
+|---|---|
+| Clear scenario heading | States the skill domain, the trigger condition, and what makes this case distinct from other examples |
+| Realistic, non-trivial input | Representative of actual user requests — not a toy or hello-world scenario |
+| Output matches capability steps | The structure and content of the output follow the steps of the capability it demonstrates |
+| Traceable to a named capability | A reader can identify which capability produced this output |
+| No contradictions with the parent skill | The example output does not violate any rule or knowledge entry in the same skill |
+
+**Common example quality violations**:
+- Output structure does not match the steps in the corresponding capability (structural drift)
+- Scenario is trivially simple for a capability designed to handle complex cases
+- Scenario description is missing or vague — the reader cannot tell which trigger condition is being demonstrated
+- Example output contradicts a rule or knowledge constraint in the parent skill
+- Example was written for an older version of the skill and references renamed or removed capabilities
+</example-quality-criteria>
+
 <example-selector>
 - Load [examples/skill-file-review.md](examples/skill-file-review.md) for output structure guidance and a complex multi-violation review.
 - Load [examples/noun-capabilities-and-inline-examples.md](examples/noun-capabilities-and-inline-examples.md) for a review featuring noun-named capabilities, inline-embedded examples, and a coverage gap finding.
@@ -64,6 +83,13 @@ A well-covered examples section spans the skill's key scenarios. Check for these
 5. Check capability section names use action verbs; flag noun-named sections.
 6. Check that examples are exposed via an `<example-selector>` entry inside `<knowledge>` (preferred) rather than a standalone `<examples>` section. If a bare `<examples>` section exists instead, flag it as 🟡 Minor. Either way, verify that example content is referenced by file path — not embedded inline — and flag inline content as 🔴 Major.
 6b. Assess example coverage: cross-reference each named capability against the linked examples. Flag capabilities with no corresponding example as 🔴 Major; flag skills where examples cover only a subset of scenarios as 🟡 Minor. Consult **example-coverage-criteria** for the full rubric.
+6c. Load and review each linked example file:
+    a. Verify the file has a clear scenario heading that names the trigger condition and the capability being demonstrated — flag missing or vague descriptions as 🟡 Minor.
+    b. Verify the example output structure matches what the capability's steps would produce — flag structural drift as 🔴 Major.
+    c. Check the scenario is realistic and non-trivial relative to the capability's complexity — flag toy/hello-world inputs for complex capabilities as 🟡 Minor.
+    d. Check the example does not contradict any rule or knowledge entry in the parent skill — flag contradictions as 🔴 Major.
+    e. Check that the example references the current capability name; flag stale names that no longer match the skill as 🟢 Nit.
+    Consult **example-quality-criteria** for the full rubric.
 7. Surface inconsistencies: mixed styles within a section type, two conflicting patterns, or differing levels of procedural detail across capabilities of the same kind. Present both variants with file/line references and ask the user which should be canonical — do not silently pick one.
 8. Format findings with severity levels (🚫 Blocker, 🔴 Major, 🟡 Minor, 🟢 Nit, ⚠️ Inconsistency) and load **examples/skill-file-review.md** for output structure guidance.
 </review-skill-file>
