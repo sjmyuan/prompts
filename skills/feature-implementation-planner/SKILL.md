@@ -26,6 +26,14 @@ Select the appropriate TDD variant based on the feature type:
 Always ensure existing tests pass before and after changes. Document the rationale for the chosen TDD variant in the plan.
 </tdd-approach-selection>
 
+<example-selector>
+Load only the example directly relevant to the current implementation task to minimize context size.
+
+- **Adding a New Message Handler**: When implementing a new feature that involves message handling, service logic, and event processing, read [examples/adding-new-message-handler.md](examples/adding-new-message-handler.md)
+- **Simple Configuration Addition**: When implementing straightforward configuration properties without complex business logic, read [examples/simple-configuration-addition.md](examples/simple-configuration-addition.md)
+- **Complex Transformation Logic**: When implementing sophisticated transformation algorithms or complex business rules requiring rigorous testing, read [examples/complex-transformation-logic.md](examples/complex-transformation-logic.md)
+</example-selector>
+
 </knowledge>
 
 <capabilities>
@@ -94,12 +102,3 @@ Always ensure existing tests pass before and after changes. Document the rationa
 
 </rules>
 
-<examples>
-
-Load only the example directly relevant to the current implementation task to minimize context size.
-
-- **Adding a New Message Handler**: When implementing a new feature that involves message handling, service logic, and event processing, read [examples/adding-new-message-handler.md](examples/adding-new-message-handler.md)
-- **Simple Configuration Addition**: When implementing straightforward configuration properties without complex business logic, read [examples/simple-configuration-addition.md](examples/simple-configuration-addition.md)
-- **Complex Transformation Logic**: When implementing sophisticated transformation algorithms or complex business rules requiring rigorous testing, read [examples/complex-transformation-logic.md](examples/complex-transformation-logic.md)
-
-</examples>

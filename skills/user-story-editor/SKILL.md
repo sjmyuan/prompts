@@ -52,6 +52,14 @@ Use this template when drafting the final user story:
 
 </story-template>
 
+<example-selector>
+Load only the example directly relevant to the current scenario to minimize context size.
+
+- **Simple single-actor feature** — one user type, clear action (e.g., "Add login button", "Export CSV"): [examples/simple-feature-story.md](examples/simple-feature-story.md)
+- **Complex multi-role story** — multiple user types, conditional behavior, or complex workflows: [examples/multi-role-story.md](examples/multi-role-story.md)
+- **Refining an existing story** — user provides a rough draft or incomplete story to improve: [examples/refining-existing-story.md](examples/refining-existing-story.md)
+</example-selector>
+
 </knowledge>
 
 <capabilities>
@@ -153,14 +161,3 @@ Use this template when drafting the final user story:
 
 </rules>
 
-<examples>
-
-When you need guidance on applying this skill to specific scenarios, load the relevant example file:
-
-- **Simple single-actor feature**: For straightforward stories with one user type and a clear action (e.g., "Add a login button", "Export data as CSV"), read [examples/simple-feature-story.md](examples/simple-feature-story.md)
-- **Complex multi-role story**: For stories involving multiple user types, complex workflows, or conditional behavior, read [examples/multi-role-story.md](examples/multi-role-story.md)
-- **Refining an existing story**: When the user provides a rough draft to improve or an incomplete story to fill in, read [examples/refining-existing-story.md](examples/refining-existing-story.md)
-
-Only load example files when they are directly relevant to the current scenario to minimize context size.
-
-</examples>

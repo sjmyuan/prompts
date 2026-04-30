@@ -26,6 +26,14 @@ Select the appropriate TDD variant based on the bug type:
 Always ensure existing tests pass before and after changes. Document the rationale for the chosen TDD variant in the plan.
 </tdd-approach-selection>
 
+<example-selector>
+Load only the example directly relevant to the current bug type to minimize context size.
+
+- **Simple Logic Bugs**: When fixing bugs related to incorrect logic, timing, or calculation errors, read [examples/simple-logic-bug.md](examples/simple-logic-bug.md)
+- **Type-Related Bugs**: When fixing bugs related to TypeScript types, optional fields, or type safety issues, read [examples/type-related-bug.md](examples/type-related-bug.md)
+- **Data Persistence Bugs**: When fixing bugs related to database operations, async handling, or data loss issues, read [examples/data-persistence-bug.md](examples/data-persistence-bug.md)
+</example-selector>
+
 </knowledge>
 
 <capabilities>
@@ -89,12 +97,3 @@ Always ensure existing tests pass before and after changes. Document the rationa
 
 </rules>
 
-<examples>
-
-Load only the example directly relevant to the current bug type to minimize context size.
-
-- **Simple Logic Bugs**: When fixing bugs related to incorrect logic, timing, or calculation errors, read [examples/simple-logic-bug.md](examples/simple-logic-bug.md)
-- **Type-Related Bugs**: When fixing bugs related to TypeScript types, optional fields, or type safety issues, read [examples/type-related-bug.md](examples/type-related-bug.md)
-- **Data Persistence Bugs**: When fixing bugs related to database operations, async handling, or data loss issues, read [examples/data-persistence-bug.md](examples/data-persistence-bug.md)
-
-</examples>

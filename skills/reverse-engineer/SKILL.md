@@ -37,6 +37,15 @@ Choose the search strategy based on what you are looking for:
 Combine multiple strategies to build comprehensive understanding.
 </search-strategy-guide>
 
+<example-selector>
+Load only the example directly relevant to the current question type to minimize context size.
+
+- **"How" Questions** — implementation mechanisms and processes: [examples/how-questions.md](examples/how-questions.md)
+- **"What" Questions** — functionality and structure: [examples/what-questions.md](examples/what-questions.md)
+- **"Why" Questions** — design rationale and decisions: [examples/why-questions.md](examples/why-questions.md)
+- **"Where" Questions** — code location and organization: [examples/where-questions.md](examples/where-questions.md)
+</example-selector>
+
 </knowledge>
 
 <capabilities>
@@ -89,15 +98,3 @@ Combine multiple strategies to build comprehensive understanding.
 
 </rules>
 
-<examples>
-
-When you need specific examples to understand how to apply the question investigation approach, load the relevant example file from the examples folder:
-
-- **"How" Questions**: When investigating implementation mechanisms and processes (e.g., "How does authentication work?", "How is data persisted?"), read [examples/how-questions.md](examples/how-questions.md)
-- **"What" Questions**: When investigating functionality or structure (e.g., "What components handle routing?", "What data structures are used?"), read [examples/what-questions.md](examples/what-questions.md)
-- **"Why" Questions**: When investigating design rationale and decisions (e.g., "Why was this pattern chosen?", "Why does this behavior exist?"), read [examples/why-questions.md](examples/why-questions.md)
-- **"Where" Questions**: When investigating code location and organization (e.g., "Where is error handling implemented?", "Where are types defined?"), read [examples/where-questions.md](examples/where-questions.md)
-
-Only load example files when they are directly relevant to the current question type to minimize context size.
-
-</examples>

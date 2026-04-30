@@ -85,6 +85,18 @@ typings/                         ← project-level TypeScript type declarations
 - Banned in all committed code: `console.log`; hardcoded `appId` or secrets; `wx.getSystemInfoSync()` inside loops.
 </platform-constraints>
 
+<example-selector>
+Load only the example directly relevant to the current task to minimize context size.
+
+- **Adding a new page to a subpackage** — use with **configure-subpackage**: [examples/add-subpackage-page.md](examples/add-subpackage-page.md)
+- **Implementing a Canvas feature** (node acquisition, drawing, export) — use with **canvas-setup-and-draw**: [examples/canvas-feature.md](examples/canvas-feature.md)
+- **Creating a custom component** (observers and lifetimes) — use with **create-component**: [examples/custom-component.md](examples/custom-component.md)
+- **Inter-page data flow** (route params, storage, globalData, EventChannel) — use with **add-page**: [examples/inter-page-data-flow.md](examples/inter-page-data-flow.md)
+- **Storage patterns** (read/write/trim with error handling) — use with **manage-storage**: [examples/storage-patterns.md](examples/storage-patterns.md)
+- **WeChat API usage** (network, permission, media) — use with **add-page** or **create-component**: [examples/wechat-api-usage.md](examples/wechat-api-usage.md)
+- **apply-typescript-patterns**, **apply-styling**: no dedicated example file — follow the numbered steps in the capability directly.
+</example-selector>
+
 </knowledge>
 
 <capabilities>
@@ -185,15 +197,4 @@ Steps to add a page to a subpackage:
 
 </rules>
 
-<examples>
 
-**Available examples** — load only the one relevant to the current task:
-
-- **Adding a new page to a subpackage**: `examples/add-subpackage-page.md`
-- **Implementing a Canvas feature** (node acquisition, drawing, export): `examples/canvas-feature.md`
-- **Creating a custom component** (incl. observers and lifetimes): `examples/custom-component.md`
-- **Inter-page data flow** (route params, storage, globalData, EventChannel): `examples/inter-page-data-flow.md`
-- **Storage patterns** (read/write/trim with error handling): `examples/storage-patterns.md`
-- **WeChat API usage** (network, permission, media): `examples/wechat-api-usage.md`
-
-</examples>

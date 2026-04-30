@@ -26,6 +26,14 @@ Select the appropriate TDD variant based on the refactor type:
 Always ensure existing tests pass before and after changes. Document the rationale for the chosen TDD variant in the plan.
 </tdd-approach-selection>
 
+<example-selector>
+Load only the example directly relevant to the current refactoring task to minimize context size.
+
+- **Service Layer Splitting**: When refactoring involves breaking down large handler or service classes into smaller, focused components following Single Responsibility Principle, read [examples/service-splitting.md](examples/service-splitting.md)
+- **Validation Extraction**: When refactoring involves extracting validation logic from handlers or services into dedicated validator classes, read [examples/validation-extraction.md](examples/validation-extraction.md)
+- **Interface Implementation**: When refactoring involves improving abstraction by adding interfaces and dependency injection for better testability, read [examples/interface-implementation.md](examples/interface-implementation.md)
+</example-selector>
+
 </knowledge>
 
 <capabilities>
@@ -88,12 +96,3 @@ Always ensure existing tests pass before and after changes. Document the rationa
 
 </rules>
 
-<examples>
-
-Load only the example directly relevant to the current refactoring task to minimize context size.
-
-- **Service Layer Splitting**: When refactoring involves breaking down large handler or service classes into smaller, focused components following Single Responsibility Principle, read [examples/service-splitting.md](examples/service-splitting.md)
-- **Validation Extraction**: When refactoring involves extracting validation logic from handlers or services into dedicated validator classes, read [examples/validation-extraction.md](examples/validation-extraction.md)
-- **Interface Implementation**: When refactoring involves improving abstraction by adding interfaces and dependency injection for better testability, read [examples/interface-implementation.md](examples/interface-implementation.md)
-
-</examples>

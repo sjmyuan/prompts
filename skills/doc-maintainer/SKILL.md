@@ -151,6 +151,14 @@ Adapt writing style to the documentation type:
 - Reference issues/PRs when helpful
 </writing-style-reference>
 
+<example-selector>
+Load only the example directly relevant to the current change type to minimize context size.
+
+- **Bug Fix Documentation**: When documenting bug fixes and issue resolutions, read [examples/bug-fix-documentation.md](examples/bug-fix-documentation.md)
+- **New Feature Documentation**: When documenting new features and capabilities, read [examples/new-feature-documentation.md](examples/new-feature-documentation.md)
+- **Refactor Documentation**: When documenting code refactoring and restructuring, read [examples/refactor-documentation.md](examples/refactor-documentation.md)
+</example-selector>
+
 </knowledge>
 
 <capabilities>
@@ -216,17 +224,6 @@ Follow this systematic approach to update documentation:
 <rule> When code changes are provided, consult **impact-lookup** knowledge to identify which documentation types require updates, then apply **maintain-docs**. </rule>
 <rule> When writing or updating documentation, consult **writing-style-reference** knowledge to match the correct style for the document type. </rule>
 <rule> Before finalizing any documentation update, run through **doc-validation-criteria** knowledge to verify accuracy, completeness, clarity, consistency, and maintainability. </rule>
-<rule> For breaking changes, always include migration steps with before/after code examples. </rule>
-<rule> Only update documentation sections directly affected by the change — avoid broad rewrites unless the documentation is fundamentally outdated. </rule>
 
 </rules>
 
-<examples>
-
-Load only the example directly relevant to the current change type to minimize context size.
-
-- **Bug Fix Documentation**: When documenting bug fixes and issue resolutions, read [examples/bug-fix-documentation.md](examples/bug-fix-documentation.md)
-- **New Feature Documentation**: When documenting new features and capabilities, read [examples/new-feature-documentation.md](examples/new-feature-documentation.md)
-- **Refactor Documentation**: When documenting code refactoring and restructuring, read [examples/refactor-documentation.md](examples/refactor-documentation.md)
-
-</examples>

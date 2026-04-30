@@ -35,6 +35,15 @@ Record each step in PLAN.md using this format:
 ```
 </step-tracking-format>
 
+<example-selector>
+Load only the example most relevant to the current execution scenario to minimize context size.
+
+- **Single Component Refactor** — simple focused task, detailed progress updates: [examples/single-component-refactor.md](examples/single-component-refactor.md)
+- **Multi-File Implementation** — complex feature spanning multiple files and layers: [examples/multi-file-implementation.md](examples/multi-file-implementation.md)
+- **Handling Failed Steps** — error recovery, ❌→✅ status transitions, compilation failures: [examples/handling-failed-steps.md](examples/handling-failed-steps.md)
+- **Long Plan Execution** — 10+ step plans, context preservation across a long run: [examples/long-plan-execution.md](examples/long-plan-execution.md)
+</example-selector>
+
 </knowledge>
 
 <capabilities>
@@ -111,27 +120,7 @@ Record each step in PLAN.md using this format:
 
 </capabilities>
 
-<examples>
 
-**Note**: Detailed execution examples are available in separate files to reduce context size. Load only the specific example you need.
-
-**Available Examples**:
-- **Single Component Refactor**: Simple 7-step refactor extracting validation logic from DataImportedHandler into a dedicated validator class with detailed progress updates
-  - Load: [examples/single-component-refactor.md](examples/single-component-refactor.md)
-- **Multi-File Implementation**: Complex 7-step implementation adding data category transformation feature across multiple Java files and layers with full step tracking
-  - Load: [examples/multi-file-implementation.md](examples/multi-file-implementation.md)
-- **Handling Failed Steps**: Error recovery and debugging during bug fix implementation when encountering compilation errors and missing dependencies, showing ❌→✅ status transitions
-  - Load: [examples/handling-failed-steps.md](examples/handling-failed-steps.md)
-- **Long Plan Execution**: Comprehensive 15-step authentication system implementation demonstrating continuous visibility and context preservation for long plans
-  - Load: [examples/long-plan-execution.md](examples/long-plan-execution.md)
-
-**When to load**: Load a specific example when you need concrete guidance for a similar scenario. Choose based on:
-- **Single Component Refactor** - for simple, focused refactoring tasks
-- **Multi-File Implementation** - for complex features spanning multiple files
-- **Handling Failed Steps** - for understanding error recovery patterns
-- **Long Plan Execution** - for managing plans with 10+ steps without losing context
-
-</examples>
 
 <rules>
 
