@@ -9,13 +9,22 @@
 
 **Scope**: `skills/commit-message-writer/SKILL.md` — full skill file  
 **Focus Areas**: Section purpose compliance, duplication, naming, example coverage  
-**Overall Assessment**: Well-structured. All sections serve their intended purpose with no major violations. Two minor nits noted.
+**Overall Assessment**: Well-structured. All sections serve their intended purpose with no major violations. One minor issue and two nits noted.
 
 ---
 
 ## Findings
 
-### 🟢 Nits / Suggestions
+### � Minor Issues
+
+#### Examples exposed via standalone `<examples>` section instead of `<example-selector>` inside `<knowledge>`
+- **File**: [SKILL.md](SKILL.md#L58-L64)
+- **Issue**: The skill uses a top-level `<examples>` section rather than an `<example-selector>` entry nested inside `<knowledge>`. The preferred pattern places all lookup material in one place so the agent knows exactly where to find reference content.
+- **Recommendation**: Move the examples list into an `<example-selector>` block inside the `<knowledge>` section. The three file references and their scenario descriptions can stay exactly as-is; only the placement changes.
+
+---
+
+### �🟢 Nits / Suggestions
 
 #### `<knowledge>` entry for commit type prefixes could include a "when in doubt" fallback
 - **File**: [SKILL.md](SKILL.md#L12-L28)
@@ -33,19 +42,20 @@
 - `<knowledge>` cleanly holds the prefix table, 72-character line-wrap rule, and footer format — none of this is duplicated in the capability body. Exemplary separation of concerns.
 - `<write-commit-message>` uses numbered steps throughout and is named with a clear action verb. The steps are sequential and unambiguous.
 - Rules correctly use "scenario → capability" routing. None re-state capability content.
-- `<examples>` section references three separate files covering: a simple bug fix, a multi-file feature, and a breaking-change migration. Coverage spans the main scenario variants.
+- Example coverage is complete: three files covering a simple bug fix, a multi-file feature, and a breaking-change migration span the main scenario variants.
 - `<when-to-use-this-skill>` is tight and correctly scoped.
 
 ---
 
 ## Risks & Assumptions
-- Review assumes the four-section semantics (knowledge / capabilities / rules / examples). If the intended skill format differs, findings may not apply.
+- Review assumes the four-section semantics (knowledge / capabilities / rules) with examples exposed via `<example-selector>` inside `<knowledge>`. If the intended skill format differs, findings may not apply.
 
 ---
 
 ## Recommended Next Steps
-1. Add a "when in doubt" fallback note to the prefix table. *(Resolves 🟢 nit)*
-2. Rewrite the breaking-change rule to explicitly name the capability. *(Resolves 🟢 nit)*
+1. Move the `<examples>` section into `<knowledge>` as an `<example-selector>` entry. *(Resolves 🟡 minor)*
+2. Add a "when in doubt" fallback note to the prefix table. *(Resolves 🟢 nit)*
+3. Rewrite the breaking-change rule to explicitly name the capability. *(Resolves 🟢 nit)*
 
-No structural changes required. This skill is ready for production use.
+One minor structural fix required; otherwise ready for production use.
 ````

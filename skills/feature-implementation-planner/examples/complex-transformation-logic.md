@@ -32,42 +32,32 @@ Applies **define-requirement**.
 
 ## Implementation Plan (Full TDD - Complex logic requires rigorous testing)
 
+**Consolidation rationale**: `LocaleAttributeTransformer` and `FallbackLocaleResolver` form a single cohesive unit — the transformer delegates entirely to the resolver and they share test fixtures. Consolidating them into one TDD cycle reduces the total step count from 32 to 22 without sacrificing coverage.
+
 **Steps:**
 - Step 1: Validate Baseline
-- Step 2-11: Full TDD cycle for LocaleAttributeTransformer core logic
-  - Step 2: Write Tests for LocaleAttributeTransformer
+- Step 2-11: Full TDD cycle for LocaleAttributeTransformer + FallbackLocaleResolver (consolidated — tightly coupled components, shared test fixtures)
+  - Step 2: Write Tests for LocaleAttributeTransformer and FallbackLocaleResolver
   - Step 3: Confirm Test Failure
-  - Step 4: Implement core transformation algorithm
-  - Step 5: Verify Tests Pass
-  - Step 6: Refactor algorithm for clarity
-  - Step 7: Validate Refactoring
-  - Step 8: Clean Up unused code
-  - Step 9: Clean Up Tests
+  - Step 4: Implement core transformation algorithm (LocaleAttributeTransformer)
+  - Step 5: Implement fallback resolution logic (FallbackLocaleResolver)
+  - Step 6: Verify Tests Pass
+  - Step 7: Refactor transformer and resolver for clarity
+  - Step 8: Validate Refactoring
+  - Step 9: Clean Up unused code and tests
   - Step 10: Verify Cleanup
-  - Step 11: Validate Quality
-- Step 12-21: Full TDD cycle for FallbackLocaleResolver service
-  - Step 12: Write Tests for FallbackLocaleResolver
+  - Step 11: Validate Linting, Formatting and Type Checking
+- Step 12-21: Full TDD cycle for integration with DataImportedHandler
+  - Step 12: Write Tests for handler integration
   - Step 13: Confirm Test Failure
-  - Step 14: Implement fallback resolution logic
+  - Step 14: Integrate transformation logic with handler
   - Step 15: Verify Tests Pass
-  - Step 16: Refactor service methods
+  - Step 16: Refactor handler integration
   - Step 17: Validate Refactoring
-  - Step 18: Clean Up unused code
-  - Step 19: Clean Up Tests
-  - Step 20: Verify Cleanup
-  - Step 21: Validate Quality
-- Step 22-31: Full TDD cycle for integration with DataImportedHandler
-  - Step 22: Write Tests for handler integration
-  - Step 23: Confirm Test Failure
-  - Step 24: Integrate transformation logic with handler
-  - Step 25: Verify Tests Pass
-  - Step 26: Refactor handler integration
-  - Step 27: Validate Refactoring
-  - Step 28: Clean Up unused code
-  - Step 29: Clean Up Tests
-  - Step 30: Verify Cleanup
-  - Step 31: Validate Quality
-- Step 32: Final Validation (comprehensive test run with all scenarios)
+  - Step 18: Clean Up unused code and tests
+  - Step 19: Verify Cleanup
+  - Step 20: Validate Linting, Formatting and Type Checking
+- Step 21: Final Validation (comprehensive test run with all scenarios)
 
 ## Key Characteristics
 
@@ -78,8 +68,8 @@ Applies **define-requirement**.
   - Edge cases (missing attributes, invalid locales, empty data)
   - Boundary conditions (max attribute length, special characters)
   - Integration scenarios with message handling
-- **Total Steps**: 32 steps - demonstrates complete TDD discipline for complex features
-- **Separation**: Clear phases for transformer core, fallback resolver, and handler integration
+- **Total Steps**: 21 steps — two components consolidated into one TDD cycle because they share context; handler integration kept as a separate cycle
+- **Separation**: Clear phases for transformer layer (core + resolver) and handler integration
 - **Focus**: Data transformation correctness, locale handling, error resilience
 
 ## When to Use This Pattern
