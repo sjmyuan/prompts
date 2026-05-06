@@ -132,6 +132,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 <rule> **At Validation Points**: Apply **run-validation-checkpoints** after code changes and at major milestones. Validate incrementally, not just at the end. </rule>
 <rule> **When Facing Ambiguity or Blockers**: Apply **manage-user-interaction** — pause and ask rather than assuming. </rule>
 <rule> **After All Steps Complete**: Apply **review-post-execution**, then **clean-up-plan** once the review passes. </rule>
+<rule> **PLAN.md Cleanup**: PLAN.md MUST be deleted after a successful plan execution. Never leave PLAN.md in the workspace when all steps are ✅ completed. </rule>
 <rule> **Plan Immutability**: Never modify plan structure, objectives, or step sequence except to update statuses or add brief clarifying notes. Never skip, reorder, or remove steps without explicit user approval. </rule>
 
 </rules>

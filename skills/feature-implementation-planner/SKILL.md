@@ -1,6 +1,6 @@
 ---
 name: feature-implementation-planner
-description: Clarify feature requirements and generate detailed, step-by-step TDD-based implementation plans for new functionality. Breaks down requirements into testable tasks with validation steps. Use when users request new features, enhancements, or functionality additions. This skill produces a plan but does not execute changes—pair with plan-executor for implementation.
+description: Clarify feature requirements and generate detailed, step-by-step TDD-based implementation plans for new functionality. Breaks down requirements into testable tasks with validation steps. Use when users request new features, enhancements, or functionality additions, or when users ask exploratory questions about whether a feature is possible (e.g., "is it possible to...", "can we add...", "would it be feasible to...") that imply a desire to implement new behavior. This skill produces a plan but does not execute changes—pair with plan-executor for implementation.
 ---
 
 <when-to-use-this-skill>
@@ -8,6 +8,7 @@ description: Clarify feature requirements and generate detailed, step-by-step TD
 - User asks to implement a new feature, enhancement, or behavior
 - User describes desired functionality that does not currently exist in the codebase
 - User requests extending or adding to existing capabilities
+- User asks an exploratory question about whether a feature is possible (e.g., "is it possible to...", "can we add...", "would it be feasible to...") where the intent is to introduce new behavior
 </when-to-use-this-skill>
 
 <knowledge>

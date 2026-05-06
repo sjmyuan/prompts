@@ -1,6 +1,6 @@
 ---
 name: skill-reviewer
-description: Review SKILL.md files for correct structure, section-purpose compliance, and absence of duplication. Evaluates whether knowledge, capabilities, rules, and examples sections each serve their intended purpose. Use when users request feedback or a quality assessment on a copilot skill file.
+description: Review SKILL.md files for correct structure, section-purpose compliance, and absence of duplication. Evaluates whether knowledge, capabilities, rules, and examples sections each serve their intended purpose. Use when users request feedback, a quality assessment, or want to improve, fix, or ensure a copilot skill file triggers correctly.
 ---
 
 <when-to-use-this-skill>
@@ -13,13 +13,15 @@ description: Review SKILL.md files for correct structure, section-purpose compli
 <knowledge>
 
 <skill-file-section-semantics>
-A well-formed copilot skill file uses four sections with distinct, non-overlapping purposes:
+A well-formed copilot skill file uses these sections with distinct, non-overlapping purposes:
 
 | Section | Purpose | What belongs here |
 |---|---|---|
-| `<knowledge>` | Facts the agent recalls | Reference tables, directory layouts, API signatures, platform constraints, banned practices, selection guides |
+| Frontmatter `description:` | Skill-load decision | Plain-language summary used by VS Code/Copilot to decide whether to load this skill; must cover **all** activation scenarios |
+| `<when-to-use-this-skill>` | Post-load scope check | Bullet list of user-facing scenarios that confirm this skill applies; must align with the frontmatter `description` |
+| `<knowledge>` | Facts the agent recalls | Reference tables, directory layouts, API signatures, platform constraints, banned practices, selection guides; large rubrics extracted to `reference/` files and loaded on demand |
 | `<capabilities>` | Procedures the agent executes | Ordered step-by-step instructions for *how* to accomplish a task; named with an action verb |
-| `<rules>` | Routing triggers | "When [scenario] → use [capability]"; must not repeat what the capability already says |
+| `<rules>` | Internal routing triggers | "When [scenario] → use [capability]"; must not repeat what the capability already says; **may be omitted in single-capability skills** |
 | `<example-selector>` in `<knowledge>` | Example routing guide | Named file references with one-line scenario descriptions; loaded on demand |
 
 **Common structural violations**:
@@ -29,44 +31,31 @@ A well-formed copilot skill file uses four sections with distinct, non-overlappi
 - Capabilities named as nouns (`<storage-management>`) instead of action verbs (`<manage-storage>`)
 - A bare `<examples>` section used instead of an `<example-selector>` entry inside `<knowledge>` (the preferred pattern keeps all lookup material in one place)
 - `<examples>` content embedded inline rather than referenced by file path for on-demand loading
+- Large reference rubrics embedded inline in SKILL.md instead of extracted to `reference/` files
 </skill-file-section-semantics>
 
-<example-coverage-criteria>
-A well-covered examples section spans the skill's key scenarios. Check for these gaps:
+<trigger-correctness>
+A skill fires correctly only when its external trigger (frontmatter `description`) and internal trigger (`<when-to-use-this-skill>`) are consistent and complete.
 
-| Gap | Severity |
-|---|---|
-| A named capability has no corresponding example | 🔴 Major — agent has no output model for that workflow |
-| Examples cover only simple/happy-path inputs | 🟡 Minor — edge cases are unguided |
-| Example count is fewer than distinct capabilities | 🟡 Minor — at least one scenario is unrepresented |
-| Example labels reference outdated or renamed capabilities | 🟢 Nit — drift between names |
+| Part | Location | Role |
+|---|---|---|
+| Frontmatter `description:` | YAML header | Used by VS Code/Copilot to decide whether to load this skill; must cover **all** scenarios in `<when-to-use-this-skill>` |
+| `<when-to-use-this-skill>` | Top-level section | Granular bullet list read by the agent after the skill is loaded; confirms correct activation |
 
-**Minimum viable coverage**: every distinct capability (or meaningfully different scenario variant) should have at least one linked example.
-</example-coverage-criteria>
-
-<example-quality-criteria>
-An example file is well-formed when it meets all of the following criteria:
-
-| Criterion | What to check |
-|---|---|
-| Clear scenario heading | States the skill domain, the trigger condition, and what makes this case distinct from other examples |
-| Realistic, non-trivial input | Representative of actual user requests — not a toy or hello-world scenario |
-| Output matches capability steps | The structure and content of the output follow the steps of the capability it demonstrates |
-| Traceable to a named capability | A reader can identify which capability produced this output |
-| No contradictions with the parent skill | The example output does not violate any rule or knowledge entry in the same skill |
-
-**Common example quality violations**:
-- Output structure does not match the steps in the corresponding capability (structural drift)
-- Scenario is trivially simple for a capability designed to handle complex cases
-- Scenario description is missing or vague — the reader cannot tell which trigger condition is being demonstrated
-- Example output contradicts a rule or knowledge constraint in the parent skill
-- Example was written for an older version of the skill and references renamed or removed capabilities
-</example-quality-criteria>
+**Common trigger violations**:
+- `description` covers only a subset of `<when-to-use-this-skill>` scenarios → skill silently fails to activate for uncovered scenarios
+- `description` is so broad it fires for unrelated requests → skill is over-triggered
+- `<when-to-use-this-skill>` entries are too vague (e.g., "User asks about X") without specifying the intent verb (review / fix / create / improve)
+- `<when-to-use-this-skill>` is absent — the agent has no post-load scope check
+- A scenario listed in `<when-to-use-this-skill>` has no corresponding keyword or verb phrase in `description`
+</trigger-correctness>
 
 <example-selector>
 - Load [examples/skill-file-review.md](examples/skill-file-review.md) for output structure guidance and a complex multi-violation review.
 - Load [examples/noun-capabilities-and-inline-examples.md](examples/noun-capabilities-and-inline-examples.md) for a review featuring noun-named capabilities, inline-embedded examples, and a coverage gap finding.
 - Load [examples/clean-skill-review.md](examples/clean-skill-review.md) for a near-passing review showing what a well-structured skill looks like with only minor nits.
+- Load [reference/example-coverage-criteria.md](reference/example-coverage-criteria.md) when assessing example coverage (step 8 of **review-skill-file**).
+- Load [reference/example-quality-criteria.md](reference/example-quality-criteria.md) when reviewing individual example files (step 9 of **review-skill-file**).
 </example-selector>
 
 </knowledge>
@@ -80,28 +69,30 @@ An example file is well-formed when it meets all of the following criteria:
 
 **Steps**:
 1. Read the full skill file to understand its domain and all sections.
-2. For each capability section, verify it describes *how to do something* as ordered steps — flag any that are fact lists, reference tables, or constraint bullets (those belong in `<knowledge>`).
-3. For each rule, verify it answers "when scenario X → use capability Y" — flag any rule that re-states content already in a capability (duplication).
-4. Check that a `<knowledge>` section exists and contains all reference material (tables, layouts, API signatures, platform constraints) that capabilities currently cite inline.
-5. Check capability section names use action verbs; flag noun-named sections.
-6. Check that examples are exposed via an `<example-selector>` entry inside `<knowledge>` (preferred) rather than a standalone `<examples>` section. If a bare `<examples>` section exists instead, flag it as 🟡 Minor. Either way, verify that example content is referenced by file path — not embedded inline — and flag inline content as 🔴 Major.
-7. Assess example coverage: cross-reference each named capability against the linked examples. Flag capabilities with no corresponding example as 🔴 Major; flag skills where examples cover only a subset of scenarios as 🟡 Minor. Consult **example-coverage-criteria** for the full rubric.
-8. Load and review each linked example file:
+2. **Check trigger correctness**: Compare the frontmatter `description` against every entry in `<when-to-use-this-skill>`. Flag any scenario whose keyword or intent verb is absent from `description` as 🟡 Minor. If `<when-to-use-this-skill>` is missing entirely, flag as 🔴 Major. Consult **trigger-correctness** in `<knowledge>` for the full rubric.
+3. For each capability section, verify it describes *how to do something* as ordered steps — flag any that are fact lists, reference tables, or constraint bullets (those belong in `<knowledge>`).
+4. For each rule, verify it answers "when scenario X → use capability Y" — flag any rule that re-states content already in a capability (duplication). If the skill has only one capability and no `<rules>` section, do not flag its absence.
+5. Check that a `<knowledge>` section exists and contains all reference material (tables, layouts, API signatures, platform constraints) that capabilities currently cite inline. Also check that large reference rubrics are not embedded directly in SKILL.md — they should be in `reference/` files loaded on demand; flag inline rubrics as 🔴 Major.
+6. Check capability section names use action verbs; flag noun-named sections.
+7. Check that examples are exposed via an `<example-selector>` entry inside `<knowledge>` (preferred) rather than a standalone `<examples>` section. If a bare `<examples>` section exists instead, flag it as 🟡 Minor. Either way, verify that example content is referenced by file path — not embedded inline — and flag inline content as 🔴 Major.
+8. Assess example coverage: cross-reference each named capability against the linked examples. Flag capabilities with no corresponding example as 🔴 Major; flag skills where examples cover only a subset of scenarios as 🟡 Minor. Load **reference/example-coverage-criteria.md** for the full rubric.
+9. Load and review each linked example file:
     a. Verify the file has a clear scenario heading that names the trigger condition and the capability being demonstrated — flag missing or vague descriptions as 🟡 Minor.
     b. Verify the example output structure matches what the capability's steps would produce — flag structural drift as 🔴 Major.
     c. Check the scenario is realistic and non-trivial relative to the capability's complexity — flag toy/hello-world inputs for complex capabilities as 🟡 Minor.
     d. Check the example does not contradict any rule or knowledge entry in the parent skill — flag contradictions as 🔴 Major.
     e. Check that the example references the current capability name; flag stale names that no longer match the skill as 🟢 Nit.
-    Consult **example-quality-criteria** for the full rubric.
-9. Surface inconsistencies: mixed styles within a section type, two conflicting patterns, or differing levels of procedural detail across capabilities of the same kind. Present both variants with file/line references and ask the user which should be canonical — do not silently pick one.
-10. Include a **Positive Highlights** section that acknowledges at least one well-structured aspect of the skill.
-11. Include a **Risks & Assumptions** section that states any assumptions made about the intended skill format (e.g., four-section semantics) and notes that no runtime evaluation was performed.
-12. Format findings with severity levels (🚫 Blocker, 🔴 Major, 🟡 Minor, 🟢 Nit, ⚠️ Inconsistency) and load **examples/skill-file-review.md** for output structure guidance.
+    Load **reference/example-quality-criteria.md** for the full rubric.
+10. Surface inconsistencies: mixed styles within a section type, two conflicting patterns, or differing levels of procedural detail across capabilities of the same kind. Present both variants with file/line references and ask the user which should be canonical — do not silently pick one.
+11. Include a **Positive Highlights** section that acknowledges at least one well-structured aspect of the skill.
+12. Include a **Risks & Assumptions** section that states any assumptions made about the intended skill format (e.g., four-section semantics) and notes that no runtime evaluation was performed.
+13. Format findings with severity levels (🚫 Blocker, 🔴 Major, 🟡 Minor, 🟢 Nit, ⚠️ Inconsistency) and load **examples/skill-file-review.md** for output structure guidance.
 </review-skill-file>
 
 </capabilities>
 
 <rules>
-<rule>When the user submits a SKILL.md file for review or asks to improve a skill file, use **review-skill-file**.</rule>
+<rule>When the user submits a SKILL.md file for review or asks to improve or fix a skill file, use **review-skill-file**.</rule>
+<rule>When the user asks whether a skill will trigger or activate correctly, or whether its description matches its scenarios, use **review-skill-file** and focus on step 2 (trigger correctness).</rule>
 <rule>When two or more conflicting patterns or styles are found within the skill file, use **review-skill-file** and surface them under ⚠️ Inconsistencies.</rule>
 </rules>
