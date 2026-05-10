@@ -12,12 +12,12 @@ If yes → use this skill. If no (restructuring existing behavior only) → use 
 - User describes desired functionality that does not currently exist in the codebase
 - User requests extending or adding to existing capabilities
 - User asks an exploratory question about whether a feature is possible (e.g., "is it possible to...", "can we add...", "would it be feasible to...") where the intent is to introduce new behavior
-
-**NOT this skill** when the goal is purely to restructure or clean up existing code without changing what it does → use refactor-planner instead.
-**When both apply** (restructure existing code AND add new behavior): use refactor-planner first to stabilize the structure, then use this skill for the new behavior.
 </when-to-use-this-skill>
 
-<knowledge>
+<skill-boundaries>
+**NOT this skill** when the goal is purely to restructure or clean up existing code without changing what it does → use refactor-planner instead.
+**When both apply** (restructure existing code AND add new behavior): use refactor-planner first to stabilize the structure, then use this skill for the new behavior.
+</skill-boundaries>
 
 <tdd-approach-selection>
 Select the appropriate TDD variant based on the feature type:
@@ -33,15 +33,15 @@ Select the appropriate TDD variant based on the feature type:
 Always ensure existing tests pass before and after changes. Document the rationale for the chosen TDD variant in the plan.
 </tdd-approach-selection>
 
-<example-selector>
+<context-loading-guide>
 Load only the example directly relevant to the current implementation task to minimize context size. Each example covers the full workflow: requirement definition (**define-requirement**) and plan generation (**plan-implementation**).
 
-| Scenario | Reference |
-|---|---|
-| New message handler — message handling, service logic, and event processing | [examples/adding-new-message-handler.md](examples/adding-new-message-handler.md) |
-| Simple configuration addition — straightforward config properties without complex business logic | [examples/simple-configuration-addition.md](examples/simple-configuration-addition.md) |
-| Complex transformation logic — sophisticated algorithms or complex business rules requiring rigorous testing | [examples/complex-transformation-logic.md](examples/complex-transformation-logic.md) |
-</example-selector>
+| Load when | Provides | File |
+|---|---|---|
+| User requests new message handling, service logic, or event processing functionality | Full workflow: requirement definition + implementation plan for message handler features | [examples/adding-new-message-handler.md](examples/adding-new-message-handler.md) |
+| User requests a straightforward config property or flag addition without complex business logic | Full workflow: requirement definition + implementation plan for simple configuration additions | [examples/simple-configuration-addition.md](examples/simple-configuration-addition.md) |
+| User requests a sophisticated algorithm, complex transformation, or intricate business rule | Full workflow: requirement definition + implementation plan for complex logic features | [examples/complex-transformation-logic.md](examples/complex-transformation-logic.md) |
+</context-loading-guide>
 
 </knowledge>
 

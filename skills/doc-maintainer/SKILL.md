@@ -32,92 +32,27 @@ This skill covers the following documentation types:
 </documentation-types>
 
 <impact-lookup>
-Which documentation to update based on the change type:
-
-**For Bug Fixes:**
-- Update troubleshooting guides if the bug was a common issue
-- Revise usage examples if they demonstrated the buggy behavior
-- Update changelog with bug fix details
-- Check if requirements or specs need correction
-
-**For New Features:**
-- Add or update requirements documentation
-- Extend architecture docs if new components or patterns are introduced
-- Update README with feature overview and setup instructions
-- Create or update usage examples demonstrating the feature
-- Add API documentation for new interfaces or endpoints
-- Update configuration guides if new settings are required
-- Document any breaking changes or migration steps
-
-**For Refactors:**
-- Update architecture docs if structure or patterns changed
-- Revise developer guides if workflows or practices changed
-- Update configuration guides if build/dev setup changed
-- Refresh inline documentation for refactored code
-- Check if examples need updates for new code organization
-- Verify README accuracy (file paths, command references)
-
-**For Dependency/Infrastructure Changes:**
-- Update README installation and setup sections
-- Revise configuration guides
-- Update deployment documentation
-- Document version compatibility requirements
-- Add migration guides for breaking dependency changes
+See [reference/impact-lookup.md](reference/impact-lookup.md) for the full lookup table: which documentation types to update for bug fixes, new features, refactors, and dependency/infrastructure changes. Load before step 2 of **maintain-docs**.
 </impact-lookup>
 
 <doc-validation-criteria>
-Before finalizing documentation updates, verify:
-
-**Accuracy:**
-- [ ] All code examples compile/run without errors
-- [ ] API signatures match actual implementation
-- [ ] Configuration examples use correct syntax
-- [ ] File paths and references are correct
-- [ ] Version numbers and dates are accurate
-
-**Completeness:**
-- [ ] All affected documentation sections identified and updated
-- [ ] Breaking changes clearly documented with migration paths
-- [ ] New features have usage examples
-- [ ] Edge cases and limitations are mentioned
-- [ ] Related documentation is cross-referenced
-
-**Clarity:**
-- [ ] Documentation is understandable to the target audience
-- [ ] Technical jargon is explained or avoided
-- [ ] Step-by-step instructions are unambiguous
-- [ ] Examples are well-commented and self-explanatory
-- [ ] Structure follows a logical flow
-
-**Consistency:**
-- [ ] Terminology matches the codebase and existing docs
-- [ ] Formatting follows the project's documentation style
-- [ ] Tone is consistent with other documentation
-- [ ] Examples follow consistent patterns
-- [ ] Cross-references use standard linking format
-
-**Maintainability:**
-- [ ] Documentation is not overly coupled to implementation details
-- [ ] Examples are simple and focused
-- [ ] Duplicated information is minimized
-- [ ] Version-specific details are clearly marked
-- [ ] Documentation location is logical and discoverable
+See [reference/doc-validation-criteria.md](reference/doc-validation-criteria.md) for the full validation checklist: Accuracy, Completeness, Clarity, Consistency, and Maintainability (25 items). Load before running step 8 of **maintain-docs**.
 </doc-validation-criteria>
 
 <writing-style-reference>
 See [reference/writing-style-guide.md](reference/writing-style-guide.md) for per-documentation-type style rules (Requirements, Architecture, README, API docs, Usage Examples, Troubleshooting, Changelog). Load on demand when updating a document type.
 </writing-style-reference>
 
-<example-selector>
+<context-loading-guide>
 Load only the example directly relevant to the current change type to minimize context size.
 
-| Scenario | Reference |
-|---|---|
-| Bug fix — documenting issue resolutions | [examples/bug-fix-documentation.md](examples/bug-fix-documentation.md) |
-| New feature — documenting new capabilities | [examples/new-feature-documentation.md](examples/new-feature-documentation.md) |
-| Refactor — documenting structural changes | [examples/refactor-documentation.md](examples/refactor-documentation.md) |
-| Dependency / infrastructure changes | [examples/dependency-infrastructure-documentation.md](examples/dependency-infrastructure-documentation.md) |
-</example-selector>
+| Load when | Provides | File |
+|---|---|---|
+| Documenting a bug fix or issue resolution | Full workflow example: assess impact + update docs for a bug fix | [examples/bug-fix-documentation.md](examples/bug-fix-documentation.md) |
+| Documenting a new feature | Full workflow example: assess impact + update docs for new functionality | [examples/new-feature-documentation.md](examples/new-feature-documentation.md) |
+| Documenting a refactor or structural change | Full workflow example: assess impact + update docs for a refactor | [examples/refactor-documentation.md](examples/refactor-documentation.md) |
+| Documenting dependency or infrastructure changes | Full workflow example: assess impact + update docs for dependency/infra changes | [examples/dependency-infrastructure-documentation.md](examples/dependency-infrastructure-documentation.md) |
+</context-loading-guide>
 
 </knowledge>
 

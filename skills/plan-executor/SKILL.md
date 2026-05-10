@@ -35,15 +35,17 @@ Record each step in PLAN.md using this format:
 ```
 </step-tracking-format>
 
-<example-selector>
+<context-loading-guide>
 Load only the example most relevant to the current execution scenario to minimize context size.
 
-- **Single Component Refactor** — simple focused task, detailed progress updates: [examples/single-component-refactor.md](examples/single-component-refactor.md)
-- **Multi-File Implementation** — complex feature spanning multiple files and layers: [examples/multi-file-implementation.md](examples/multi-file-implementation.md)
-- **Handling Failed Steps** — error recovery, ❌→✅ status transitions, compilation failures: [examples/handling-failed-steps.md](examples/handling-failed-steps.md)
-- **Long Plan Execution** — 10+ step plans, context preservation across a long run: [examples/long-plan-execution.md](examples/long-plan-execution.md)
-- **Post-Execution Review and Cleanup** — applying code-reviewer after all steps complete, adding fix steps, deleting PLAN.md: [examples/post-execution-review.md](examples/post-execution-review.md)
-</example-selector>
+| Load when | Provides | File |
+|---|---|---|
+| Executing a small, focused plan (single component or focused task) | Output model: detailed progress updates for a simple focused execution | [examples/single-component-refactor.md](examples/single-component-refactor.md) |
+| Executing a plan that spans multiple files and architectural layers | Output model: execution tracking across multiple files and layers | [examples/multi-file-implementation.md](examples/multi-file-implementation.md) |
+| A step fails with compilation errors or unexpected output | Output model: error recovery, ❌→✅ status transitions, and retry patterns | [examples/handling-failed-steps.md](examples/handling-failed-steps.md) |
+| Executing a plan with 10+ steps requiring context preservation | Output model: long plan progress tracking and context continuity | [examples/long-plan-execution.md](examples/long-plan-execution.md) |
+| All plan steps are complete and post-execution review is needed | Output model: applying code-reviewer after completion, adding fix steps, deleting PLAN.md | [examples/post-execution-review.md](examples/post-execution-review.md) |
+</context-loading-guide>
 
 </knowledge>
 
@@ -127,12 +129,10 @@ Load only the example most relevant to the current execution scenario to minimiz
 
 <rule> **At Plan Start**: Apply **track-plan** to initialize PLAN.md with all plan steps before executing any step. </rule>
 <rule> **During Each Step**: Apply **execute-step** for every step in the plan. </rule>
-<rule> **Throughout Execution**: Apply **report-progress** — show the full step list with current statuses after every step. Never summarize multiple steps together. </rule>
+<rule> **Throughout Execution**: Apply **report-progress** — show the full step list with current statuses after every step. </rule>
 <rule> **When a Step Fails**: Apply **handle-errors** immediately. </rule>
 <rule> **At Validation Points**: Apply **run-validation-checkpoints** after code changes and at major milestones. Validate incrementally, not just at the end. </rule>
 <rule> **When Facing Ambiguity or Blockers**: Apply **manage-user-interaction** — pause and ask rather than assuming. </rule>
 <rule> **After All Steps Complete**: Apply **review-post-execution**, then **clean-up-plan** once the review passes. </rule>
-<rule> **PLAN.md Cleanup**: PLAN.md MUST be deleted after a successful plan execution. Never leave PLAN.md in the workspace when all steps are ✅ completed. </rule>
-<rule> **Plan Immutability**: Never modify plan structure, objectives, or step sequence except to update statuses or add brief clarifying notes. Never skip, reorder, or remove steps without explicit user approval. </rule>
 
 </rules>

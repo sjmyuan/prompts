@@ -52,15 +52,15 @@ Use this template when drafting the final user story:
 
 </story-template>
 
-<example-selector>
-Load only the example directly relevant to the current scenario to minimize context size.
+<context-loading-guide>
+Load only the example directly relevant to the current scenario to minimize context size. Each example walks through all 7 capabilities in sequence (**define-user** → **define-functionality** → **define-benefit** → **define-acceptance-criteria** → **define-out-of-scope** → **define-prerequisites** → **draft-user-story**).
 
-| Scenario | Reference |
-|---|---|
-| Simple single-actor feature — one user type, clear action (e.g., "Add login button", "Export CSV") | [examples/simple-feature-story.md](examples/simple-feature-story.md) |
-| Complex multi-role story — multiple user types, conditional behavior, or complex workflows | [examples/multi-role-story.md](examples/multi-role-story.md) |
-| Refining an existing story — user provides a rough draft or incomplete story to improve | [examples/refining-existing-story.md](examples/refining-existing-story.md) |
-</example-selector>
+| Load when | Provides | File |
+|---|---|---|
+| User requests a story for a feature with a single user type and a clear, direct action | Full walkthrough of all 7 capabilities for a simple single-actor story (e.g., Export CSV) | [examples/simple-feature-story.md](examples/simple-feature-story.md) |
+| User requests a story involving multiple user roles, conditional behavior, or complex workflows | Full walkthrough of all 7 capabilities for a multi-role story | [examples/multi-role-story.md](examples/multi-role-story.md) |
+| User provides a rough draft or incomplete story and wants it improved | Full walkthrough of all 7 capabilities applied to refining an existing draft | [examples/refining-existing-story.md](examples/refining-existing-story.md) |
+</context-loading-guide>
 
 </knowledge>
 
@@ -156,7 +156,6 @@ Load only the example directly relevant to the current scenario to minimize cont
 <rule> After listing acceptance criteria, apply **define-out-of-scope** to identify out-of-scope items. Confirm before proceeding. </rule>
 <rule> After identifying out-of-scope items, apply **define-prerequisites** to gather prerequisites. Confirm before proceeding. </rule>
 <rule> After all sections are confirmed, apply **draft-user-story** using the **story-template** knowledge to produce the final user story. </rule>
-<rule> Always wait for the user's confirmation before advancing to the next capability. Do not skip steps or make assumptions without user input. </rule>
 <rule> If the user provides a rough draft, extract existing information and apply only the capabilities for missing or unclear sections rather than starting from scratch. </rule>
 <rule> When acceptance criteria lack Given-When-Then structure, reformat them accordingly and present to the user for confirmation before proceeding. </rule>
 

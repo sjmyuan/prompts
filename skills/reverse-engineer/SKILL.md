@@ -37,17 +37,17 @@ Choose the search strategy based on what you are looking for:
 Combine multiple strategies to build comprehensive understanding.
 </search-strategy-guide>
 
-<example-selector>
+<context-loading-guide>
 Load only the example directly relevant to the current question type to minimize context size.
 
-| Scenario | Reference |
-|---|---|
-| "How" questions — implementation mechanisms and processes | [examples/how-questions.md](examples/how-questions.md) |
-| "What" questions — functionality and structure | [examples/what-questions.md](examples/what-questions.md) |
-| "Why" questions — design rationale and decisions | [examples/why-questions.md](examples/why-questions.md) |
-| "Where" questions — code location and organization | [examples/where-questions.md](examples/where-questions.md) |
-| "When" questions — timing, lifecycle events, initialization sequences | [examples/when-questions.md](examples/when-questions.md) |
-</example-selector>
+| Load when | Provides | File |
+|---|---|---|
+| User asks how something works (implementation mechanisms, processes, pipelines) | Output model: investigation and answer for "How" questions | [examples/how-questions.md](examples/how-questions.md) |
+| User asks what something is or does (functionality, structure, data models) | Output model: investigation and answer for "What" questions | [examples/what-questions.md](examples/what-questions.md) |
+| User asks why a design decision was made (rationale, trade-offs, history) | Output model: investigation and answer for "Why" questions | [examples/why-questions.md](examples/why-questions.md) |
+| User asks where code lives (file location, module boundaries, organization) | Output model: investigation and answer for "Where" questions | [examples/where-questions.md](examples/where-questions.md) |
+| User asks when something happens (timing, lifecycle events, initialization order) | Output model: investigation and answer for "When" questions | [examples/when-questions.md](examples/when-questions.md) |
+</context-loading-guide>
 
 </knowledge>
 
@@ -93,11 +93,8 @@ Load only the example directly relevant to the current question type to minimize
 <rule> When the user submits a question, apply **define-question** fast-path check. For simple, unambiguous questions, skip directly to **investigate-codebase**. For broad or ambiguous questions, apply the full clarification process first. </rule>
 <rule> After defining the question, apply **investigate-codebase** to systematically explore the codebase. Continue until you can fully address all aspects of the question. </rule>
 <rule> Always apply **present-answer** when presenting findings. Structure the answer clearly, include specific code references, and validate completeness. </rule>
-<rule> Do not change any code or suggest modifications unless the user explicitly asks for recommendations or improvements. </rule>
 <rule> If the investigation cannot fully answer the question due to missing code or ambiguous design, clearly state what was found and what remains unclear. </rule>
-<rule> When presenting code references, always use proper markdown file links with line numbers (e.g., [ComponentName.tsx](path/to/ComponentName.tsx#L10-L20)). </rule>
 <rule> If multiple possible interpretations are discovered, present all relevant findings and ask the user to clarify which aspect they're most interested in. </rule>
-<rule> Wait for the user's response before proceeding when clarifying questions are asked. </rule>
 
 </rules>
 

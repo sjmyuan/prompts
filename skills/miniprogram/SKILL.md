@@ -1,6 +1,6 @@
 ---
 name: miniprogram
-description: Develop WeChat Miniprogram features following platform conventions and best practices. Use this skill whenever working on any WeChat Miniprogram project.
+description: Develop WeChat Miniprogram features following platform conventions and best practices. Use this skill when adding pages, components, or features to a WeChat Miniprogram project.
 ---
 
 <when-to-use-this-skill>
@@ -89,20 +89,20 @@ typings/                         ← project-level TypeScript type declarations
 See [reference/pii-permission-checklist.md](reference/pii-permission-checklist.md) for the full API-to-data-category mapping table and the four privacy obligations to verify before shipping any feature that collects user data. Load on demand when adding a feature that uses a sensitive API.
 </pii-permission-checklist>
 
-<example-selector>
+<context-loading-guide>
 Load only the example directly relevant to the current task to minimize context size.
 
-| Scenario | Reference |
-|---|---|
-| Adding a new page to a subpackage — use with **configure-subpackage** | [examples/add-subpackage-page.md](examples/add-subpackage-page.md) |
-| Implementing a Canvas feature (node acquisition, drawing, export) — use with **canvas-setup-and-draw** | [examples/canvas-feature.md](examples/canvas-feature.md) |
-| Creating a custom component (observers and lifetimes) — use with **create-component** | [examples/custom-component.md](examples/custom-component.md) |
-| Inter-page data flow (route params, storage, globalData, EventChannel) — use with **add-page** | [examples/inter-page-data-flow.md](examples/inter-page-data-flow.md) |
-| Storage patterns (read/write/trim with error handling) — use with **manage-storage** | [examples/storage-patterns.md](examples/storage-patterns.md) |
-| WeChat API usage (network, permission, media) — use with **add-page** or **create-component** | [examples/wechat-api-usage.md](examples/wechat-api-usage.md) |
-| Typing a miniprogram codebase (tsconfig, strict mode, shared types, globalData) — use with **apply-typescript-patterns** | [examples/apply-typescript-patterns.md](examples/apply-typescript-patterns.md) |
-| Applying SCSS design system (design tokens, BEM naming, rpx vs px) — use with **apply-styling** | [examples/apply-styling.md](examples/apply-styling.md) |
-</example-selector>
+| Load when | Provides | File |
+|---|---|---|
+| Adding a new page to a subpackage — applying **configure-subpackage** | Full walkthrough: subpackage page file creation and app.json registration | [examples/add-subpackage-page.md](examples/add-subpackage-page.md) |
+| Implementing Canvas 2D drawing, image processing, or export — applying **canvas-setup-and-draw** | Full walkthrough: node acquisition, drawing, and export patterns | [examples/canvas-feature.md](examples/canvas-feature.md) |
+| Creating a custom component (observers, lifetimes, event triggering) — applying **create-component** | Full file templates: observers, lifetimes, and triggerEvent patterns | [examples/custom-component.md](examples/custom-component.md) |
+| Managing data flow between pages (route params, storage, globalData, EventChannel) — applying **add-page** | All four inter-page data passing patterns with code templates | [examples/inter-page-data-flow.md](examples/inter-page-data-flow.md) |
+| Implementing persistent storage (read/write/trim) — applying **manage-storage** | Read/write/trim code templates with try/catch error handling | [examples/storage-patterns.md](examples/storage-patterns.md) |
+| Using WeChat APIs (network requests, permissions, media) — applying **add-page** or **create-component** | Network request, permission authorization, and media code templates | [examples/wechat-api-usage.md](examples/wechat-api-usage.md) |
+| Setting up TypeScript types for a miniprogram codebase — applying **apply-typescript-patterns** | tsconfig setup, IAppOption declaration, and WeChat canvas type cast examples | [examples/apply-typescript-patterns.md](examples/apply-typescript-patterns.md) |
+| Styling pages or components with the SCSS design system — applying **apply-styling** | Design token definitions, BEM class naming patterns, and rpx vs px guidance | [examples/apply-styling.md](examples/apply-styling.md) |
+</context-loading-guide>
 
 </knowledge>
 

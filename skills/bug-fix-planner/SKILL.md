@@ -1,6 +1,6 @@
 ---
 name: bug-fix-planner
-description: Diagnose bug root causes and generate detailed, step-by-step TDD-based bug fix plans. Use this skill when users report bugs, unexpected behavior, or defects. This skill produces a plan but does not execute changes—pair with plan-executor for implementation.
+description: Diagnose bug root causes and generate detailed, step-by-step TDD-based bug fix plans. Use this skill when users report bugs, regressions, unexpected behavior, or defects, or ask to investigate and fix problems in existing code. This skill produces a plan but does not execute changes—pair with plan-executor for implementation.
 ---
 
 <when-to-use-this-skill>
@@ -26,17 +26,17 @@ Select the appropriate TDD variant based on the bug type:
 Always ensure existing tests pass before and after changes. Document the rationale for the chosen TDD variant in the plan.
 </tdd-approach-selection>
 
-<example-selector>
+<context-loading-guide>
 Load only the example directly relevant to the current bug type to minimize context size. Each example covers the full workflow: root cause identification (**identify-bug-root-cause**) and plan generation (**plan-bug-fix**).
 
-| Scenario | Reference |
-|---|---|
-| Simple logic bug — incorrect logic, timing, or calculation errors | [examples/simple-logic-bug.md](examples/simple-logic-bug.md) |
-| Type-related bug — TypeScript types, optional fields, or type safety issues | [examples/type-related-bug.md](examples/type-related-bug.md) |
-| Data persistence bug — database operations, async handling, or data loss (treat as Complex in **tdd-approach-selection**) | [examples/data-persistence-bug.md](examples/data-persistence-bug.md) |
-| Configuration bug — missing or incorrect environment settings, build config, or startup validation | [examples/configuration-bug.md](examples/configuration-bug.md) |
-| Performance bug — slow responses, N+1 queries, memory leaks, or inefficient algorithms | [examples/performance-bug.md](examples/performance-bug.md) |
-</example-selector>
+| Load when | Provides | File |
+|---|---|---|
+| User reports incorrect logic, timing, or calculation errors | Full workflow: root-cause identification + fix plan for simple/logic bugs | [examples/simple-logic-bug.md](examples/simple-logic-bug.md) |
+| User reports TypeScript type errors, optional field issues, or type safety problems | Full workflow: root-cause identification + fix plan for type-related bugs | [examples/type-related-bug.md](examples/type-related-bug.md) |
+| User reports database operation failures, async handling issues, or data loss | Full workflow: root-cause identification + fix plan for data persistence bugs (use Complex TDD variant) | [examples/data-persistence-bug.md](examples/data-persistence-bug.md) |
+| User reports missing or incorrect environment settings, build config, or startup validation failures | Full workflow: root-cause identification + fix plan for configuration bugs | [examples/configuration-bug.md](examples/configuration-bug.md) |
+| User reports slow responses, N+1 queries, memory leaks, or inefficient algorithms | Full workflow: root-cause identification + fix plan for performance bugs | [examples/performance-bug.md](examples/performance-bug.md) |
+</context-loading-guide>
 
 </knowledge>
 

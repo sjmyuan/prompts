@@ -17,10 +17,10 @@
 
 ### � Minor Issues
 
-#### Examples exposed via standalone `<examples>` section instead of `<example-selector>` inside `<knowledge>`
+#### Examples exposed via standalone `<examples>` section instead of `<context-loading-guide>` inside `<knowledge>`
 - **File**: [SKILL.md](SKILL.md#L58-L64)
-- **Issue**: The skill uses a top-level `<examples>` section rather than an `<example-selector>` entry nested inside `<knowledge>`. The preferred pattern places all lookup material in one place so the agent knows exactly where to find reference content.
-- **Recommendation**: Move the examples list into an `<example-selector>` block inside the `<knowledge>` section. The three file references and their scenario descriptions can stay exactly as-is; only the placement changes.
+- **Issue**: The skill uses a top-level `<examples>` section rather than a `<context-loading-guide>` entry nested inside `<knowledge>`. The preferred pattern consolidates all on-demand context — examples, references, rubrics — in one place so the agent always knows where to look.
+- **Recommendation**: Move the examples list into a `<context-loading-guide>` block inside the `<knowledge>` section. The file references can stay exactly as-is; only the placement and tag name change.
 
 ---
 
@@ -48,12 +48,12 @@
 ---
 
 ## Risks & Assumptions
-- Review assumes the four-section semantics (knowledge / capabilities / rules) with examples exposed via `<example-selector>` inside `<knowledge>`. If the intended skill format differs, findings may not apply.
+- Review assumes the four-section semantics (knowledge / capabilities / rules) with on-demand context exposed via `<context-loading-guide>` inside `<knowledge>`. If the intended skill format differs, findings may not apply.
 
 ---
 
 ## Recommended Next Steps
-1. Move the `<examples>` section into `<knowledge>` as an `<example-selector>` entry. *(Resolves 🟡 minor)*
+1. Move the `<examples>` section into `<knowledge>` as a `<context-loading-guide>` entry. *(Resolves 🟡 minor)*
 2. Add a "when in doubt" fallback note to the prefix table. *(Resolves 🟢 nit)*
 3. Rewrite the breaking-change rule to explicitly name the capability. *(Resolves 🟢 nit)*
 

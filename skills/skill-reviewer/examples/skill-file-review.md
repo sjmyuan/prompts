@@ -84,6 +84,6 @@
 1. Introduce a `<knowledge>` section; move directory layout, lifecycle hooks, navigation tables, API signatures, and platform constraints into it. *(Addresses the two 🔴 major issues)*
 2. Rewrite each capability as an ordered step list with a clear action verb in the section name (e.g., `<add-page>`, `<canvas-setup-and-draw>`). *(Addresses 🟡 and ⚠️)*
 3. Rewrite rules as "scenario → capability" triggers; remove any rule that merely repeats a capability's content. *(Addresses the duplication 🔴)*
-4. Move the `<examples>` section inside `<knowledge>` as an `<example-selector>` entry. *(Addresses 🟡 examples placement)*
+4. Move the `<examples>` section inside `<knowledge>` as a `<context-loading-guide>` entry. *(Addresses 🟡 examples placement)*
 5. Decide on prose-bullets vs. numbered-steps as the canonical capability format and apply it consistently. *(Resolves ⚠️)*
 ````

@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Perform systematic reviews of code and documents across files, folders, diffs, commits, or pull requests. Evaluates correctness, security, performance, maintainability, and structural quality. Provides prioritized, actionable feedback without making changes. Use when users request reviews, feedback, or quality assessments on code or documents.
+description: Perform systematic reviews of code and documents across files, folders, diffs, commits, pull requests, or branch comparisons. Evaluates correctness, security, performance, maintainability, and structural quality. Provides prioritized, actionable feedback without making changes. Use when users request reviews, feedback, or quality assessments on code or documents.
 ---
 
 <when-to-use-this-skill>
@@ -17,18 +17,16 @@ description: Perform systematic reviews of code and documents across files, fold
 See [reference/review-dimensions.md](reference/review-dimensions.md) for the full 8-dimension checklist (Correctness, Maintainability, Performance, Security, APIs, Tests, Architecture, Inconsistencies). Load before applying **conducting-code-review**.
 </review-dimensions-reference>
 
-<example-selector>
-Load the relevant example file on demand when you need guidance on structuring review output. Only load what is needed to minimize context size.
+<context-loading-guide>
+Load on demand to minimize context size. **gathering-review-context** is demonstrated as the lead-in step in all four example files — load any one for output structure guidance on that capability.
 
-| Review type | Example file |
-|---|---|
-| Diff / commit / bug fix | [examples/diff-commit-review.md](examples/diff-commit-review.md) |
-| Branch diff (one or two branch names) | [examples/branch-diff-review.md](examples/branch-diff-review.md) |
-| Performance optimization | [examples/performance-improvement.md](examples/performance-improvement.md) |
-| Document (README, ADR, design doc, spec) | [examples/doc-review.md](examples/doc-review.md) |
-
-Note: **gathering-review-context** is demonstrated as the lead-in step in all four example files — load any one of them for output structure guidance on that capability.
-</example-selector>
+| Load when | Provides | File |
+|---|---|---|
+| About to review a diff, commit, or bug fix | Output structure example for diff/commit reviews | [examples/diff-commit-review.md](examples/diff-commit-review.md) |
+| User supplies one or two branch names for comparison | Output structure example for branch diff reviews | [examples/branch-diff-review.md](examples/branch-diff-review.md) |
+| Reviewing a performance optimization or slow-code change | Output structure example for performance-focused reviews | [examples/performance-improvement.md](examples/performance-improvement.md) |
+| Reviewing a document (README, ADR, design doc, specification, runbook) | Output structure example for document reviews | [examples/doc-review.md](examples/doc-review.md) |
+</context-loading-guide>
 
 <review-efficiency-knowledge>
 Strategies for maximizing review value while respecting time constraints:
@@ -46,40 +44,7 @@ Strategies for maximizing review value while respecting time constraints:
 </review-efficiency-knowledge>
 
 <defining-severity-levels>
-**Severity levels** — apply consistently when categorizing findings:
-
-- **🚫 Blocker** (MUST fix before merge):
-  - Security vulnerabilities (injection, auth bypass, data exposure)
-  - Data loss or corruption risks
-  - Critical functionality broken
-  - Build/deployment failures
-  - Breaking API changes without migration path
-  
-- **🔴 Major** (SHOULD fix before merge, requires strong justification to skip):
-  - Significant correctness issues (wrong results, unhandled errors)
-  - Performance problems affecting user experience
-  - Missing test coverage for critical paths
-  - Architectural violations that complicate future changes
-  - Type safety issues that could cause runtime errors
-  
-- **🟡 Minor** (Nice to fix, but can be deferred if time-constrained):
-  - Code duplication or maintainability issues
-  - Non-critical edge cases not handled
-  - Suboptimal patterns that work but could be improved
-  - Missing/incomplete documentation
-  - Inefficiencies that don't impact current use cases
-  
-- **🟢 Nit** (Suggestions for polish, no requirement to fix):
-  - Style inconsistencies (already handled by linter)
-  - Naming improvements
-  - Comment/documentation polish
-  - Code organization preferences
-  - Micro-optimizations with negligible impact
-
-- **⚠️ Inconsistency** (Decision required — severity escalates based on scope):
-  - Two or more conflicting patterns, styles, or usages detected across the codebase
-  - **Neither side is assumed correct** — the reviewer presents both and requests a decision
-  - Escalate to 🔴 Major if the inconsistency affects a widely-used pattern or public API surface
+See [reference/severity-levels.md](reference/severity-levels.md) for the full severity rubric (🚫 Blocker, 🔴 Major, 🟡 Minor, 🟢 Nit, ⚠️ Inconsistency) with criteria for each level. Load before categorizing review findings.
 </defining-severity-levels>
 
 <formatting-review-output>
@@ -158,7 +123,7 @@ git diff HEAD...<supplied-branch>
 2. For each violation found, assign a severity level using **defining-severity-levels** knowledge and prepare a concise finding.
 3. For dimension 8 (Inconsistencies): capture every conflicting pattern with both variants and concrete file/line references; note trade-offs and flag for a user decision — do not silently pick one.
 4. Format all findings using the **formatting-review-output** knowledge template.
-5. Load the appropriate example from the **example-selector** table for output structure guidance.
+5. Load the appropriate example from the **context-loading-guide** table for output structure guidance.
 </conducting-code-review>
 
 <reviewing-document>
@@ -188,7 +153,7 @@ git diff HEAD...<supplied-branch>
 <rule>Do not modify code directly during review. Suggest changes with patch-style snippets or clear descriptions.</rule>
 <rule>If critical context is missing and assumptions would compromise review quality, ask the user for clarification before proceeding.</rule>
 <rule>Always include at least one positive highlight to encourage good practices.</rule>
-<rule>Consult the **example-selector** knowledge table to load the appropriate example file for the review type being performed.</rule>
+<rule>Consult the **context-loading-guide** knowledge table to load the appropriate example file for the review type being performed.</rule>
 <rule>**Never assume existing code is correct or represents the intended pattern.** Existing code is often legacy, hastily written, or already known to be problematic. Evaluate it with the same critical eye as new code.</rule>
 <rule>When two conflicting patterns, styles, or usages are found anywhere in the reviewed scope, always surface both under **⚠️ Inconsistencies**, present trade-offs neutrally, and explicitly request a decision from the user about which should be authoritative. Do not silently pick one as the standard.</rule>
 <rule>When assessing inconsistencies, read enough surrounding context (adjacent files, related modules) to determine whether either pattern is clearly dominant or intentional before reporting — but if genuinely ambiguous, report as an inconsistency requiring a decision.</rule>

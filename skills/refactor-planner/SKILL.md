@@ -32,15 +32,15 @@ Select the appropriate TDD variant based on the refactor type:
 Always ensure existing tests pass before and after changes. Document the rationale for the chosen TDD variant in the plan.
 </tdd-approach-selection>
 
-<example-selector>
+<context-loading-guide>
 Load only the example directly relevant to the current refactoring task to minimize context size. Each example covers the full workflow: refactor request definition (**define-refactor-request**) and plan generation (**plan-refactor**).
 
-| Scenario | Reference |
-|---|---|
-| Service layer splitting — breaking large handler/service classes into focused components (SRP) | [examples/service-splitting.md](examples/service-splitting.md) |
-| Validation extraction — extracting validation logic into dedicated validator classes | [examples/validation-extraction.md](examples/validation-extraction.md) |
-| Interface implementation — adding interfaces and dependency injection for better testability | [examples/interface-implementation.md](examples/interface-implementation.md) |
-</example-selector>
+| Load when | Provides | File |
+|---|---|---|
+| User requests splitting a large handler or service class into focused components (SRP) | Full workflow: refactor definition + plan for service layer splitting | [examples/service-splitting.md](examples/service-splitting.md) |
+| User requests extracting validation logic into a dedicated validator class | Full workflow: refactor definition + plan for validation extraction | [examples/validation-extraction.md](examples/validation-extraction.md) |
+| User requests adding interfaces and dependency injection to improve testability | Full workflow: refactor definition + plan for interface implementation | [examples/interface-implementation.md](examples/interface-implementation.md) |
+</context-loading-guide>
 
 </knowledge>
 
