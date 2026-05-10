@@ -1,10 +1,9 @@
 ---
 name: doc-maintainer
-description: Synchronize documentation with code changes across README, architecture docs, API docs, and requirements. Assesses documentation impact and provides focused updates, migration guides, and examples. Use after implementing bug fixes, features, or refactors that affect documented behavior, APIs, or workflows.
+description: Synchronize documentation with code changes across README, architecture docs, API docs, and requirements. Assesses documentation impact and provides focused updates, migration guides, and examples. Use after implementing bug fixes, features, or refactors that affect documented behavior, APIs, or workflows, or when documentation is stale, inconsistent, or missing.
 ---
 
 <when-to-use-this-skill>
-Use this skill when:
 - Code changes affect public behavior, APIs, developer workflows, or user-facing features
 - New features introduce functionality requiring documentation
 - Bug fixes change expected behavior or usage patterns
@@ -106,58 +105,18 @@ Before finalizing documentation updates, verify:
 </doc-validation-criteria>
 
 <writing-style-reference>
-Adapt writing style to the documentation type:
-
-**Requirements & Specifications:**
-- Be precise and unambiguous
-- Use "must," "should," "may" consistently (RFC 2119 style)
-- Focus on what, not how
-- Include acceptance criteria
-
-**Architecture Documentation:**
-- Use diagrams where helpful (describe them in text)
-- Explain the "why" behind architectural decisions
-- Document constraints and trade-offs
-- Keep high-level; avoid implementation minutiae
-
-**README:**
-- Start with a brief, compelling overview
-- Prioritize getting started quickly
-- Use bullet points and short paragraphs
-- Include badges, screenshots, or demos where relevant
-
-**API Documentation:**
-- Document all parameters, return values, and exceptions
-- Provide type signatures (TypeScript, JSDoc)
-- Include usage examples for each method
-- Note deprecations and version compatibility
-
-**Usage Examples:**
-- Show realistic, practical scenarios
-- Include necessary imports and setup
-- Comment complex or non-obvious code
-- Demonstrate both common and advanced usage
-
-**Troubleshooting Guides:**
-- Use problem-solution format
-- Include error messages users actually see
-- Provide step-by-step debugging instructions
-- Link to related issues or discussions
-
-**Changelog:**
-- Group by version, newest first
-- Categorize: Added, Changed, Deprecated, Removed, Fixed, Security
-- Be concise but specific
-- Reference issues/PRs when helpful
+See [reference/writing-style-guide.md](reference/writing-style-guide.md) for per-documentation-type style rules (Requirements, Architecture, README, API docs, Usage Examples, Troubleshooting, Changelog). Load on demand when updating a document type.
 </writing-style-reference>
 
 <example-selector>
 Load only the example directly relevant to the current change type to minimize context size.
 
-- **Bug Fix Documentation**: When documenting bug fixes and issue resolutions, read [examples/bug-fix-documentation.md](examples/bug-fix-documentation.md)
-- **New Feature Documentation**: When documenting new features and capabilities, read [examples/new-feature-documentation.md](examples/new-feature-documentation.md)
-- **Refactor Documentation**: When documenting code refactoring and restructuring, read [examples/refactor-documentation.md](examples/refactor-documentation.md)
-- **Dependency/Infrastructure Documentation**: When documenting dependency upgrades, build tool changes, or infrastructure updates, read [examples/dependency-infrastructure-documentation.md](examples/dependency-infrastructure-documentation.md)
+| Scenario | Reference |
+|---|---|
+| Bug fix — documenting issue resolutions | [examples/bug-fix-documentation.md](examples/bug-fix-documentation.md) |
+| New feature — documenting new capabilities | [examples/new-feature-documentation.md](examples/new-feature-documentation.md) |
+| Refactor — documenting structural changes | [examples/refactor-documentation.md](examples/refactor-documentation.md) |
+| Dependency / infrastructure changes | [examples/dependency-infrastructure-documentation.md](examples/dependency-infrastructure-documentation.md) |
 </example-selector>
 
 </knowledge>

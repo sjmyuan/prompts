@@ -1,6 +1,6 @@
 ---
 name: user-story-editor
-description: 'The user story editor assists with drafting user stories by gathering requirements, defining users, functionalities, benefits, acceptance criteria, out-of-scope items, and prerequisites. Produces structured user stories using iterative Q&A with the user.'
+description: Assist with drafting and refining user stories by gathering requirements, defining users, functionalities, benefits, acceptance criteria, out-of-scope items, and prerequisites. Use when users want to create, write, or refine a user story, define acceptance criteria, or clarify scope and prerequisites for a feature.
 ---
 
 <when-to-use-this-skill>
@@ -55,16 +55,18 @@ Use this template when drafting the final user story:
 <example-selector>
 Load only the example directly relevant to the current scenario to minimize context size.
 
-- **Simple single-actor feature** — one user type, clear action (e.g., "Add login button", "Export CSV"): [examples/simple-feature-story.md](examples/simple-feature-story.md)
-- **Complex multi-role story** — multiple user types, conditional behavior, or complex workflows: [examples/multi-role-story.md](examples/multi-role-story.md)
-- **Refining an existing story** — user provides a rough draft or incomplete story to improve: [examples/refining-existing-story.md](examples/refining-existing-story.md)
+| Scenario | Reference |
+|---|---|
+| Simple single-actor feature — one user type, clear action (e.g., "Add login button", "Export CSV") | [examples/simple-feature-story.md](examples/simple-feature-story.md) |
+| Complex multi-role story — multiple user types, conditional behavior, or complex workflows | [examples/multi-role-story.md](examples/multi-role-story.md) |
+| Refining an existing story — user provides a rough draft or incomplete story to improve | [examples/refining-existing-story.md](examples/refining-existing-story.md) |
 </example-selector>
 
 </knowledge>
 
 <capabilities>
 
-  <define-user>
+<define-user>
 1. **Identify the User Type**: Determine who the user is in the story:
    - Distinguish between end users, admins, developers, or system actors
    - Consider multiple user types if the story spans different roles
@@ -76,7 +78,7 @@ Load only the example directly relevant to the current scenario to minimize cont
 3. **Confirm User Definition**: Present a structured summary, state the defined user role and context, and request confirmation or refinements before proceeding.
 </define-user>
 
-  <define-functionality>
+<define-functionality>
 1. **Identify Core Action**: Determine the primary action the user wants to perform:
    - Ask "What does the user want to do?" to extract the core verb and action
    - Break complex features into smaller, independent actions when appropriate
@@ -88,7 +90,7 @@ Load only the example directly relevant to the current scenario to minimize cont
 3. **Confirm Functionality**: Summarize the core action in plain language and request confirmation before proceeding to benefits.
 </define-functionality>
 
-  <define-benefit>
+<define-benefit>
 1. **Identify Business or User Value**: Determine the "why" behind the story:
    - Ask "What problem does this solve?" or "What value does this deliver?"
    - Connect the benefit to measurable outcomes when possible (e.g., reduces time, increases accuracy)
@@ -97,7 +99,7 @@ Load only the example directly relevant to the current scenario to minimize cont
 3. **Confirm Benefits**: Summarize the primary benefit in plain language and request confirmation before proceeding to acceptance criteria.
 </define-benefit>
 
-  <define-acceptance-criteria>
+<define-acceptance-criteria>
 1. **Structure as Given-When-Then**: Write each criterion in BDD format:
    - **Given**: The precondition or initial state
    - **When**: The action the user performs
@@ -107,7 +109,7 @@ Load only the example directly relevant to the current scenario to minimize cont
 4. **Confirm Acceptance Criteria**: Present the criteria list in Given-When-Then format and request confirmation or additions before proceeding.
 </define-acceptance-criteria>
 
-  <define-out-of-scope>
+<define-out-of-scope>
 1. **Identify Exclusions**: Explicitly state what the story does NOT cover:
    - Features deferred to future stories
    - Related functionality that might be assumed but is not included
@@ -116,7 +118,7 @@ Load only the example directly relevant to the current scenario to minimize cont
 3. **Confirm Out-of-Scope Items**: Present the list and request confirmation or additions before proceeding.
 </define-out-of-scope>
 
-  <define-prerequisites>
+<define-prerequisites>
 1. **Identify Dependencies**: Determine what must be true before work begins:
    - Other user stories or features that must be completed first
    - Technical infrastructure or configuration required
@@ -125,7 +127,7 @@ Load only the example directly relevant to the current scenario to minimize cont
 3. **Confirm Prerequisites**: Present the prerequisites list and request confirmation before finalizing the user story.
 </define-prerequisites>
 
-  <draft-user-story>
+<draft-user-story>
 1. **Assemble the Story**: Combine all confirmed elements using the **story-template** knowledge:
    - User story statement: "As a [user], I want [functionality], so that [benefit]"
    - Acceptance criteria in Given-When-Then format

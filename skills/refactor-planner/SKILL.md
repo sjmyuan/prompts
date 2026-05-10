@@ -35,9 +35,11 @@ Always ensure existing tests pass before and after changes. Document the rationa
 <example-selector>
 Load only the example directly relevant to the current refactoring task to minimize context size. Each example covers the full workflow: refactor request definition (**define-refactor-request**) and plan generation (**plan-refactor**).
 
-- **Service Layer Splitting**: When refactoring involves breaking down large handler or service classes into smaller, focused components following Single Responsibility Principle, read [examples/service-splitting.md](examples/service-splitting.md)
-- **Validation Extraction**: When refactoring involves extracting validation logic from handlers or services into dedicated validator classes, read [examples/validation-extraction.md](examples/validation-extraction.md)
-- **Interface Implementation**: When refactoring involves improving abstraction by adding interfaces and dependency injection for better testability, read [examples/interface-implementation.md](examples/interface-implementation.md)
+| Scenario | Reference |
+|---|---|
+| Service layer splitting — breaking large handler/service classes into focused components (SRP) | [examples/service-splitting.md](examples/service-splitting.md) |
+| Validation extraction — extracting validation logic into dedicated validator classes | [examples/validation-extraction.md](examples/validation-extraction.md) |
+| Interface implementation — adding interfaces and dependency injection for better testability | [examples/interface-implementation.md](examples/interface-implementation.md) |
 </example-selector>
 
 </knowledge>

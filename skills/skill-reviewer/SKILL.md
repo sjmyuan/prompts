@@ -30,6 +30,7 @@ A well-formed copilot skill file uses these sections with distinct, non-overlapp
 - Capabilities written as bullet-point fact lists instead of ordered procedural steps
 - Capabilities named as nouns (`<storage-management>`) instead of action verbs (`<manage-storage>`)
 - A bare `<examples>` section used instead of an `<example-selector>` entry inside `<knowledge>` (the preferred pattern keeps all lookup material in one place)
+- `<example-selector>` written as a bullet list instead of a two-column table with **Scenario** and **Reference** columns
 - `<examples>` content embedded inline rather than referenced by file path for on-demand loading
 - Large reference rubrics embedded inline in SKILL.md instead of extracted to `reference/` files
 </skill-file-section-semantics>
@@ -59,11 +60,15 @@ A skill fires correctly only when its external trigger (frontmatter `description
 </trigger-correctness>
 
 <example-selector>
-- Load [examples/skill-file-review.md](examples/skill-file-review.md) for output structure guidance and a complex multi-violation review.
-- Load [examples/noun-capabilities-and-inline-examples.md](examples/noun-capabilities-and-inline-examples.md) for a review featuring noun-named capabilities, inline-embedded examples, and a coverage gap finding.
-- Load [examples/clean-skill-review.md](examples/clean-skill-review.md) for a near-passing review showing what a well-structured skill looks like with only minor nits.
-- Load [reference/example-coverage-criteria.md](reference/example-coverage-criteria.md) when assessing example coverage (step 8 of **review-skill-file**).
-- Load [reference/example-quality-criteria.md](reference/example-quality-criteria.md) when reviewing individual example files (step 9 of **review-skill-file**).
+
+| Scenario | Reference |
+|---|---|
+| Output structure guidance and a complex multi-violation review | [examples/skill-file-review.md](examples/skill-file-review.md) |
+| Review featuring noun-named capabilities, inline-embedded examples, and a coverage gap finding | [examples/noun-capabilities-and-inline-examples.md](examples/noun-capabilities-and-inline-examples.md) |
+| Near-passing review showing what a well-structured skill looks like with only minor nits | [examples/clean-skill-review.md](examples/clean-skill-review.md) |
+| Assessing example coverage (step 8 of **review-skill-file**) | [reference/example-coverage-criteria.md](reference/example-coverage-criteria.md) |
+| Reviewing individual example files (step 9 of **review-skill-file**) | [reference/example-quality-criteria.md](reference/example-quality-criteria.md) |
+
 </example-selector>
 
 </knowledge>
@@ -87,7 +92,7 @@ A skill fires correctly only when its external trigger (frontmatter `description
 4. For each rule, verify it answers "when scenario X → use capability Y" — flag any rule that re-states content already in a capability (duplication). If the skill has only one capability and no `<rules>` section, do not flag its absence.
 5. Check that a `<knowledge>` section exists and contains all reference material (tables, layouts, API signatures, platform constraints) that capabilities currently cite inline. Also check that large reference rubrics are not embedded directly in SKILL.md — they should be in `reference/` files loaded on demand; flag inline rubrics as 🔴 Major.
 6. Check capability section names use action verbs; flag noun-named sections.
-7. Check that examples are exposed via an `<example-selector>` entry inside `<knowledge>` (preferred) rather than a standalone `<examples>` section. If a bare `<examples>` section exists instead, flag it as 🟡 Minor. Either way, verify that example content is referenced by file path — not embedded inline — and flag inline content as 🔴 Major.
+7. Check that examples are exposed via an `<example-selector>` entry inside `<knowledge>` (preferred) rather than a standalone `<examples>` section. If a bare `<examples>` section exists instead, flag it as 🟡 Minor. If an `<example-selector>` exists but is written as a bullet list instead of a two-column table (**Scenario** | **Reference**), flag it as 🟡 Minor. Either way, verify that example content is referenced by file path — not embedded inline — and flag inline content as 🔴 Major.
 8. Assess example coverage: cross-reference each named capability against the linked examples. Flag capabilities with no corresponding example as 🔴 Major; flag skills where examples cover only a subset of scenarios as 🟡 Minor. Load **reference/example-coverage-criteria.md** for the full rubric.
 9. Load and review each linked example file:
     a. Verify the file has a clear scenario heading that names the trigger condition and the capability being demonstrated — flag missing or vague descriptions as 🟡 Minor.

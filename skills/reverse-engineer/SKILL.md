@@ -40,11 +40,13 @@ Combine multiple strategies to build comprehensive understanding.
 <example-selector>
 Load only the example directly relevant to the current question type to minimize context size.
 
-- **"How" Questions** — implementation mechanisms and processes: [examples/how-questions.md](examples/how-questions.md)
-- **"What" Questions** — functionality and structure: [examples/what-questions.md](examples/what-questions.md)
-- **"Why" Questions** — design rationale and decisions: [examples/why-questions.md](examples/why-questions.md)
-- **"Where" Questions** — code location and organization: [examples/where-questions.md](examples/where-questions.md)
-- **"When" Questions** — timing, lifecycle events, initialization sequences: [examples/when-questions.md](examples/when-questions.md)
+| Scenario | Reference |
+|---|---|
+| "How" questions — implementation mechanisms and processes | [examples/how-questions.md](examples/how-questions.md) |
+| "What" questions — functionality and structure | [examples/what-questions.md](examples/what-questions.md) |
+| "Why" questions — design rationale and decisions | [examples/why-questions.md](examples/why-questions.md) |
+| "Where" questions — code location and organization | [examples/where-questions.md](examples/where-questions.md) |
+| "When" questions — timing, lifecycle events, initialization sequences | [examples/when-questions.md](examples/when-questions.md) |
 </example-selector>
 
 </knowledge>

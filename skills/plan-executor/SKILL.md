@@ -5,7 +5,7 @@ description: Execute structured plans step-by-step with progress tracking, valid
 
 <when-to-use-this-skill>
 - You need to execute an outlined plan (implementation plan, refactoring plan, or bug-fix plan)
-- A structured, multi-step task requires systematic execution and progress tracking
+- A structured plan from bug-fix-planner, feature-implementation-planner, or refactor-planner needs to be carried out with progress tracking and validation checkpoints
 </when-to-use-this-skill>
 
 <knowledge>
