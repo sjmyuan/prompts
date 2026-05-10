@@ -31,7 +31,7 @@ Applies **define-refactor-request**.
 ## Refactoring Plan
 
 ### Steps
-- Step 1: Validate Baseline (run tests, mvn spotless:check, Checkstyle)
+- Step 1: Validate Baseline (run tests, mvn spotless:check, mvn checkstyle:check, mvn compile)
 - Step 2: Write Tests for CategoryMappingService
 - Step 3: Confirm Test Failure
 - Step 4: Extract CategoryMappingService from DataImportedHandler
@@ -39,7 +39,7 @@ Applies **define-refactor-request**.
 - Step 6: Clean Up unused code in DataImportedHandler
 - Step 7: Clean Up Tests
 - Step 8: Verify Cleanup
-- Step 9: Validate Quality (mvn spotless:check, Checkstyle)
+- Step 9: Validate Linting, Formatting and Type Checking (mvn spotless:check, mvn checkstyle:check, mvn compile)
 - Step 10: Write Tests for PriceTransformationService
 - Step 11: Confirm Test Failure
 - Step 12: Extract PriceTransformationService from DataImportedHandler
@@ -47,7 +47,7 @@ Applies **define-refactor-request**.
 - Step 14: Clean Up unused code in DataImportedHandler
 - Step 15: Clean Up Tests
 - Step 16: Verify Cleanup
-- Step 17: Validate Quality (mvn spotless:check, Checkstyle)
+- Step 17: Validate Linting, Formatting and Type Checking (mvn spotless:check, mvn checkstyle:check, mvn compile)
 
 ## Key Characteristics
 

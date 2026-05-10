@@ -42,12 +42,20 @@ A skill fires correctly only when its external trigger (frontmatter `description
 | Frontmatter `description:` | YAML header | Used by VS Code/Copilot to decide whether to load this skill; must cover **all** scenarios in `<when-to-use-this-skill>` |
 | `<when-to-use-this-skill>` | Top-level section | Granular bullet list read by the agent after the skill is loaded; confirms correct activation |
 
+**Description trigger clarity criteria**:
+- The `description` must explicitly state *when* the skill should be loaded — typically expressed as a "Use when…" or "Use for…" phrase at the end
+- The `description` must include the primary intent verbs (e.g., review / fix / create / improve) that match the `<when-to-use-this-skill>` bullets
+- The trigger phrase in `description` must cover **all** scenarios listed in `<when-to-use-this-skill>` (no under-coverage)
+- The trigger phrase in `description` must not cover scenarios **absent** from `<when-to-use-this-skill>` (no over-triggering)
+
 **Common trigger violations**:
+- `description` has no explicit trigger phrase ("Use when…" clause missing) → VS Code/Copilot has no reliable signal to load the skill
 - `description` covers only a subset of `<when-to-use-this-skill>` scenarios → skill silently fails to activate for uncovered scenarios
 - `description` is so broad it fires for unrelated requests → skill is over-triggered
 - `<when-to-use-this-skill>` entries are too vague (e.g., "User asks about X") without specifying the intent verb (review / fix / create / improve)
 - `<when-to-use-this-skill>` is absent — the agent has no post-load scope check
 - A scenario listed in `<when-to-use-this-skill>` has no corresponding keyword or verb phrase in `description`
+- Trigger language in `description` contradicts or differs from `<when-to-use-this-skill>` scope (e.g., `description` says "fix" but `<when-to-use-this-skill>` only lists review scenarios)
 </trigger-correctness>
 
 <example-selector>
@@ -69,7 +77,12 @@ A skill fires correctly only when its external trigger (frontmatter `description
 
 **Steps**:
 1. Read the full skill file to understand its domain and all sections.
-2. **Check trigger correctness**: Compare the frontmatter `description` against every entry in `<when-to-use-this-skill>`. Flag any scenario whose keyword or intent verb is absent from `description` as 🟡 Minor. If `<when-to-use-this-skill>` is missing entirely, flag as 🔴 Major. Consult **trigger-correctness** in `<knowledge>` for the full rubric.
+2. **Check description trigger clarity and consistency**:
+   a. Verify the frontmatter `description` contains an explicit trigger phrase (e.g., "Use when…" or "Use for…") that states when the skill should be loaded — flag a missing trigger phrase as 🔴 Major.
+   b. Check that the intent verbs and key scenarios in the trigger phrase match the bullets in `<when-to-use-this-skill>` (bidirectional): flag any `<when-to-use-this-skill>` scenario whose keyword or intent verb is absent from `description` as 🟡 Minor (under-coverage); flag any trigger scenario in `description` absent from `<when-to-use-this-skill>` as 🟡 Minor (over-triggering or undocumented scope).
+   c. If `<when-to-use-this-skill>` is missing entirely, flag as 🔴 Major.
+   d. Flag any direct contradiction between the scope described in `description` and the bullets in `<when-to-use-this-skill>` as 🔴 Major.
+   Consult **trigger-correctness** in `<knowledge>` for the full rubric.
 3. For each capability section, verify it describes *how to do something* as ordered steps — flag any that are fact lists, reference tables, or constraint bullets (those belong in `<knowledge>`).
 4. For each rule, verify it answers "when scenario X → use capability Y" — flag any rule that re-states content already in a capability (duplication). If the skill has only one capability and no `<rules>` section, do not flag its absence.
 5. Check that a `<knowledge>` section exists and contains all reference material (tables, layouts, API signatures, platform constraints) that capabilities currently cite inline. Also check that large reference rubrics are not embedded directly in SKILL.md — they should be in `reference/` files loaded on demand; flag inline rubrics as 🔴 Major.

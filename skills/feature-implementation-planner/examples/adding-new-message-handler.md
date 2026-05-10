@@ -7,7 +7,7 @@
 ## Implementation Plan
 
 **Steps:**
-- Step 1: Validate Baseline (run tests, mvn spotless:check, Checkstyle)
+- Step 1: Validate Baseline (run tests, mvn spotless:check, mvn checkstyle:check, mvn compile)
 - Step 2: Write Tests for DataUpdatedHandler
 - Step 3: Confirm Test Failure
 - Step 4: Implement DataUpdatedHandler
@@ -25,7 +25,7 @@
 - Step 16: Clean Up unused imports/code
 - Step 17: Clean Up Tests
 - Step 18: Verify Cleanup
-- Step 19: Validate Quality (mvn spotless:check, Checkstyle)
+- Step 19: Validate Linting, Formatting and Type Checking (mvn spotless:check, mvn checkstyle:check, mvn compile)
 
 ## Key Characteristics
 

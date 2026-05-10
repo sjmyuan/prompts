@@ -12,8 +12,7 @@ Add interface abstraction and dependency injection to EventPublisherImpl for bet
 - Step 4: Update DataImportedHandler to depend on interface instead of implementation
 - Step 5: Verify existing tests still pass
 - Step 6: Update Spring configuration for interface-based dependency injection
-- Step 7: Run Checkstyle and fix any issues
-- Step 8: Validate Quality
+- Step 7: Validate Linting, Formatting and Type Checking (mvn spotless:check, mvn checkstyle:check, mvn compile)
 
 ### Notes
 This example demonstrates an adapted TDD approach where the focus is on improving abstraction and dependency injection. Since we're refactoring without changing behavior, existing tests provide adequate coverage. The key is ensuring tests pass before and after the refactoring.

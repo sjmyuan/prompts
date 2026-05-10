@@ -15,7 +15,7 @@ Extract validation logic from DataImportedHandler into dedicated DataValidator c
   - Step 6: Clean Up Unused Code
   - Step 7: Clean Up Tests
   - Step 8: Verify Cleanup
-  - Step 9: Validate Quality (mvn spotless:check, Checkstyle)
+  - Step 9: Validate Linting, Formatting and Type Checking (mvn spotless:check, mvn checkstyle:check, mvn compile)
 - Step 10-17: Full TDD cycle for integrating validator into handler
   - Step 10: Write Focused Tests for handler integration
   - Step 11: Confirm Test Failure
@@ -24,8 +24,8 @@ Extract validation logic from DataImportedHandler into dedicated DataValidator c
   - Step 14: Clean Up Unused Code in handler
   - Step 15: Clean Up Tests
   - Step 16: Verify Cleanup
-  - Step 17: Validate Quality
-- Step 18: Final validation across all changes
+  - Step 17: Validate Linting, Formatting and Type Checking (mvn spotless:check, mvn checkstyle:check, mvn compile)
+- Step 18: Final Validation (run all tests, lint, and type-check: mvn spotless:check, mvn checkstyle:check, mvn compile)
 
 ### Notes
 This example demonstrates the full TDD cycle for extracting validation logic into a dedicated class. The validator extraction requires comprehensive testing at both the validator level and the integration level with the handler.

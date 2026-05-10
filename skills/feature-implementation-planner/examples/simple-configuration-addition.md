@@ -13,7 +13,7 @@
 - Step 4: Add retry properties to application.yaml and configuration class
 - Step 5: Update EventPublisherImpl to use retry configuration
 - Step 6: Verify Tests Pass
-- Step 7: Validate Quality (mvn spotless:check, Checkstyle)
+- Step 7: Validate Linting, Formatting and Type Checking (mvn spotless:check, mvn checkstyle:check, mvn compile)
 
 ## Key Characteristics
 

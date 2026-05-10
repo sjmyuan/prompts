@@ -1,14 +1,20 @@
 ---
 name: feature-implementation-planner
-description: Clarify feature requirements and generate detailed, step-by-step TDD-based implementation plans for new functionality. Breaks down requirements into testable tasks with validation steps. Use when users request new features, enhancements, or functionality additions, or when users ask exploratory questions about whether a feature is possible (e.g., "is it possible to...", "can we add...", "would it be feasible to...") that imply a desire to implement new behavior. This skill produces a plan but does not execute changes—pair with plan-executor for implementation.
+description: Clarify feature requirements and generate detailed, step-by-step TDD-based implementation plans for new functionality. Introduces new observable behavior that does not exist today. Use when users request new features, enhancements, or functionality additions, or when users ask exploratory questions about whether a feature is possible (e.g., "is it possible to...", "can we add...", "would it be feasible to...") that imply a desire to implement new behavior. This skill produces a plan but does not execute changes—pair with plan-executor for implementation.
 ---
 
 <when-to-use-this-skill>
+**Key question: Will this introduce observable behavior that doesn't exist today?**
+If yes → use this skill. If no (restructuring existing behavior only) → use refactor-planner.
+
 - User submits a requirement to add new functionality or features
 - User asks to implement a new feature, enhancement, or behavior
 - User describes desired functionality that does not currently exist in the codebase
 - User requests extending or adding to existing capabilities
 - User asks an exploratory question about whether a feature is possible (e.g., "is it possible to...", "can we add...", "would it be feasible to...") where the intent is to introduce new behavior
+
+**NOT this skill** when the goal is purely to restructure or clean up existing code without changing what it does → use refactor-planner instead.
+**When both apply** (restructure existing code AND add new behavior): use refactor-planner first to stabilize the structure, then use this skill for the new behavior.
 </when-to-use-this-skill>
 
 <knowledge>

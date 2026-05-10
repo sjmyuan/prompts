@@ -1,13 +1,19 @@
 ---
 name: refactor-planner
-description: Analyze refactoring needs and generate detailed, step-by-step TDD-based refactoring plans. Handles code cleanup, architecture improvements, technical debt, and code quality enhancements. Use when users request refactoring, code improvements, structural changes, or cleanup tasks. This skill produces a plan but does not execute changes—pair with plan-executor for implementation.
+description: Analyze refactoring needs and generate detailed, step-by-step TDD-based refactoring plans. Preserves existing observable behavior while improving internal structure, quality, or organization. Handles code cleanup, architecture improvements, technical debt, and code quality enhancements. Use when users request refactoring, code improvements, structural changes, or cleanup tasks. This skill produces a plan but does not execute changes—pair with plan-executor for implementation.
 ---
 
 <when-to-use-this-skill>
+**Key question: Will the external/observable behavior stay the same after the change?**
+If yes → use this skill. If no (new behavior is being introduced) → use feature-implementation-planner.
+
 - User requests refactoring of existing code or functionality
 - User asks for code cleanup, restructuring, or quality improvements
 - User wants to reduce technical debt or improve code organization
 - User requests improvements to maintainability, readability, or performance without changing behavior
+
+**NOT this skill** when the goal is to introduce new functionality or behavior → use feature-implementation-planner instead.
+**When both apply** (restructure existing code AND add new behavior): use this skill first to stabilize the structure, then use feature-implementation-planner for the new behavior.
 </when-to-use-this-skill>
 
 <knowledge>

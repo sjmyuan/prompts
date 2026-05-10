@@ -57,7 +57,7 @@ Applies **define-requirement**.
   - Step 18: Clean Up unused code and tests
   - Step 19: Verify Cleanup
   - Step 20: Validate Linting, Formatting and Type Checking
-- Step 21: Final Validation (comprehensive test run with all scenarios)
+- Step 21: Final Validation (run all tests, lint, and type-check: mvn spotless:check, mvn checkstyle:check, mvn compile)
 
 ## Key Characteristics
 
