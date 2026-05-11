@@ -12,12 +12,12 @@ If yes → use this skill. If no (restructuring existing behavior only) → use 
 - User describes desired functionality that does not currently exist in the codebase
 - User requests extending or adding to existing capabilities
 - User asks an exploratory question about whether a feature is possible (e.g., "is it possible to...", "can we add...", "would it be feasible to...") where the intent is to introduce new behavior
-</when-to-use-this-skill>
 
-<skill-boundaries>
 **NOT this skill** when the goal is purely to restructure or clean up existing code without changing what it does → use refactor-planner instead.
 **When both apply** (restructure existing code AND add new behavior): use refactor-planner first to stabilize the structure, then use this skill for the new behavior.
-</skill-boundaries>
+</when-to-use-this-skill>
+
+<knowledge>
 
 <tdd-approach-selection>
 Select the appropriate TDD variant based on the feature type:

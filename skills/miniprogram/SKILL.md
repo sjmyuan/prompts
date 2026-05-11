@@ -1,6 +1,6 @@
 ---
 name: miniprogram
-description: Develop WeChat Miniprogram features following platform conventions and best practices. Use this skill when adding pages, components, or features to a WeChat Miniprogram project.
+description: Develop WeChat Miniprogram features following platform conventions and best practices. Use this skill when adding pages, components, or features to a WeChat Miniprogram project, debugging platform-specific runtime errors, or configuring routing, TabBar, or subpackage structure.
 ---
 
 <when-to-use-this-skill>
@@ -186,27 +186,25 @@ Steps to add a page to a subpackage:
 
 <rules>
 
-<rule> When adding any new page, use **add-page**. Read `app.json` first — navigating to an unregistered page causes silent failures. </rule>
+<rule> When adding any new page, use **add-page**. </rule>
 
 <rule> When a page needs Canvas, use **canvas-setup-and-draw**. </rule>
 
-<rule> When building a reusable component, use **create-component**. Register it with an absolute path to prevent depth-dependent breakage in subpackages. </rule>
+<rule> When building a reusable component, use **create-component**. </rule>
 
-<rule> When placing a non-TabBar feature page, use **configure-subpackage**. Only TabBar pages and globally shared components belong in the main package. </rule>
+<rule> When placing a non-TabBar feature page, use **configure-subpackage**. </rule>
 
-<rule> When choosing a navigation call, consult the **navigation-apis** knowledge table. Using the wrong API silently does nothing. </rule>
+<rule> When choosing a navigation call, consult the **navigation-apis** knowledge table. </rule>
 
 <rule> When passing data between pages, select the pattern from the **navigation-apis** data-passing table based on the situation. </rule>
 
-<rule> When reading or writing persistent data, use **manage-storage**. All storage access must be centralised, trimmed before array writes, and wrapped in `try/catch`. </rule>
+<rule> When reading or writing persistent data, use **manage-storage**. </rule>
 
 <rule> When writing TypeScript, follow **apply-typescript-patterns**. </rule>
 
-<rule> When sizing UI elements, follow **apply-styling** (`rpx` for layout). Use `px` only for canvas physical pixel dimensions derived from `pixelRatio` in **canvas-setup-and-draw**. </rule>
+<rule> When sizing UI elements, follow **apply-styling**. </rule>
 
 <rule> Before implementing any feature that uses an API or component listed in **pii-permission-checklist**, verify all four privacy obligations: `requiredPrivateInfos` declaration, privacy-agreement popup, denied-permission guidance, and privacy policy update. Remind the user if any obligation is unmet. </rule>
-
-<rule> All user-visible strings must be in the project's primary language. </rule>
 
 <rule> When referencing examples, load only the one file relevant to the current task. </rule>
 

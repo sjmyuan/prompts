@@ -82,8 +82,8 @@ Load only the example directly relevant to the current question type to minimize
 4. **Explain Implementation Details**: Walk through control flow, explain data transformations and state changes, describe component interactions, and note complex algorithms or business logic.
 5. **Address Implications**: Explain why the implementation works the way it does, note trade-offs or design decisions, and identify potential edge cases or limitations.
 6. **Use Clear Language**: Avoid unnecessary jargon, use consistent terminology from the codebase, and provide analogies or examples when helpful.
-7. **Validate Completeness**: Confirm all aspects of the original question are answered and no important details are missing.
-8. **Offer Next Steps**: Suggest related questions, point to additional resources or documentation, and recommend areas for deeper investigation if needed.
+7. **Validate Completeness**: Confirm all aspects of the original question are answered and no important details are missing. If the investigation cannot fully answer due to missing code or ambiguous design, clearly state what was found and what remains unclear.
+8. **Offer Next Steps**: Suggest related questions, point to additional resources or documentation, and recommend areas for deeper investigation if needed. If multiple possible interpretations were discovered, present all findings and ask the user to clarify which aspect they're most interested in.
 </present-answer>
 
 </capabilities>
@@ -93,8 +93,6 @@ Load only the example directly relevant to the current question type to minimize
 <rule> When the user submits a question, apply **define-question** fast-path check. For simple, unambiguous questions, skip directly to **investigate-codebase**. For broad or ambiguous questions, apply the full clarification process first. </rule>
 <rule> After defining the question, apply **investigate-codebase** to systematically explore the codebase. Continue until you can fully address all aspects of the question. </rule>
 <rule> Always apply **present-answer** when presenting findings. Structure the answer clearly, include specific code references, and validate completeness. </rule>
-<rule> If the investigation cannot fully answer the question due to missing code or ambiguous design, clearly state what was found and what remains unclear. </rule>
-<rule> If multiple possible interpretations are discovered, present all relevant findings and ask the user to clarify which aspect they're most interested in. </rule>
 
 </rules>
 

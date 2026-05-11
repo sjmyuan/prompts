@@ -143,11 +143,10 @@ git diff HEAD...<supplied-branch>
 </capabilities>
 
 <rules>
-<rule>When the user submits files, folders, diffs, or commits for review, first apply **gathering-review-context** to understand scope and intent.</rule>
-<rule>When the subject of review is a document (README, ADR, design doc, specification, runbook, etc.), use **reviewing-document**. Focus on structure, clarity, completeness, accuracy, and audience alignment.</rule>
-<rule>Apply **conducting-code-review** systematically across all relevant dimensions, focusing on areas most relevant to the change type.</rule>
-<rule>Use **defining-severity-levels** criteria consistently when categorizing findings.</rule>
-<rule>Format output according to **formatting-review-output** structure for consistency and readability.</rule>
+<rule>When the user submits files, folders, diffs, or commits for review, first apply **gathering-review-context**, then **conducting-code-review**.</rule>
+<rule>When the user supplies one or two branch names for comparison, first apply **getting-branch-diff** to retrieve the diff, then apply **conducting-code-review**.</rule>
+<rule>When the subject of review is a document (README, ADR, design doc, specification, runbook, etc.), use **reviewing-document** instead of **conducting-code-review**.</rule>
+</rules>
 <rule>Apply **review-efficiency-knowledge** strategies to maximize value and minimize review time.</rule>
 <rule>When the user supplies branch names for review, first apply **getting-branch-diff** to retrieve the full diff via git CLI before conducting the review. Always review every changed file — never skip any.</rule>
 <rule>Do not modify code directly during review. Suggest changes with patch-style snippets or clear descriptions.</rule>

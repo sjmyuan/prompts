@@ -1,6 +1,6 @@
 ---
 name: doc-maintainer
-description: Synchronize documentation with code changes across README, architecture docs, API docs, and requirements. Assesses documentation impact and provides focused updates, migration guides, and examples. Use after implementing bug fixes, features, or refactors that affect documented behavior, APIs, or workflows, or when documentation is stale, inconsistent, or missing.
+description: Synchronize documentation with code changes across README, architecture docs, API docs, and requirements. Assesses documentation impact and provides focused updates, migration guides, and examples. Use after implementing bug fixes, features, or refactors that affect documented behavior, APIs, or workflows, or when documentation is stale, inconsistent, or missing, or when tests reveal discrepancies between documented and actual behavior, or when configuration files affecting developer setup are modified.
 ---
 
 <when-to-use-this-skill>
@@ -116,9 +116,7 @@ Follow this systematic approach to update documentation:
 
 <rules>
 
-<rule> When code changes are provided, consult **impact-lookup** knowledge to identify which documentation types require updates, then apply **maintain-docs**. </rule>
-<rule> When writing or updating documentation, consult **writing-style-reference** knowledge to match the correct style for the document type. </rule>
-<rule> Before finalizing any documentation update, run through **doc-validation-criteria** knowledge to verify accuracy, completeness, clarity, consistency, and maintainability. </rule>
+<rule> When code changes or documentation gaps are provided, apply **maintain-docs**. </rule>
 
 </rules>
 

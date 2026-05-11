@@ -1,10 +1,35 @@
 # Example: Adding a New Message Handler Feature
 
-**Use Case**: When implementing a new feature that involves both message handling and service logic.
-
 **Scenario**: Add ability to handle DataUpdated messages and publish transformed data updates to external API service
 
+---
+
+## Requirement Definition
+
+Applies **define-requirement**.
+
+**User request:**
+> "We need to handle DataUpdated messages coming in from the message bus and publish the transformed data to our external API service."
+
+**Agent asks clarifying questions:**
+> 1. What fields does a `DataUpdated` message contain, and how does the update event differ from `DataImported`?
+> 2. Should the transformation logic be the same as for `DataImported`, or does `DataUpdated` require different field mapping?
+> 3. Are there existing handler and deserializer patterns we should follow for consistency?
+> 4. Should the new handler publish to the same outbound topic as `DataImportedHandler`, or a separate one?
+
+**User responds:**
+> Same fields as DataImported. Updates need an additional `lastUpdated` timestamp field in the outgoing message. Yes, follow the existing handler/dispatcher/deserializer layering. Same outbound topic.
+
+**Agent confirms requirement:**
+> Add a `DataUpdatedHandler` that consumes `DataUpdated` messages, applies the existing data transformation plus a `lastUpdated` timestamp field, and publishes the result to the outbound topic via `EventPublisherImpl`. Follow the same handler/dispatcher/deserializer architecture as `DataImportedHandler`.
+
+*User confirms: ✅*
+
+---
+
 ## Implementation Plan
+
+Applies **plan-implementation**.
 
 **Steps:**
 - Step 1: Validate Baseline (run tests, mvn spotless:check, mvn checkstyle:check, mvn compile)

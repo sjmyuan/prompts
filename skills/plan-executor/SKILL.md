@@ -45,6 +45,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 | A step fails with compilation errors or unexpected output | Output model: error recovery, ❌→✅ status transitions, and retry patterns | [examples/handling-failed-steps.md](examples/handling-failed-steps.md) |
 | Executing a plan with 10+ steps requiring context preservation | Output model: long plan progress tracking and context continuity | [examples/long-plan-execution.md](examples/long-plan-execution.md) |
 | All plan steps are complete and post-execution review is needed | Output model: applying code-reviewer after completion, adding fix steps, deleting PLAN.md | [examples/post-execution-review.md](examples/post-execution-review.md) |
+| A step is ambiguous, requires user input, or cannot proceed due to a missing dependency or external blocker | Output model: pausing execution at a blocked step, informing the user, and resuming after input | [examples/handling-failed-steps.md](examples/handling-failed-steps.md) |
 </context-loading-guide>
 
 </knowledge>

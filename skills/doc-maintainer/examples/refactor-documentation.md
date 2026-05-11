@@ -4,7 +4,24 @@
 
 **Change Type**: Refactor
 
-**Documentation Updates**:
+---
+
+## Change Review and Documentation Impact
+
+Applies **maintain-docs** (steps 1–2).
+
+**Agent reviews the change** — reads refactored files and PR description:
+> `IncomingMessageToHandlerDispatcher` previously held an inline `Map<MessageType, Handler>`. A new `MessageHandlerRegistry` bean was extracted to own handler registration and lookup. The dispatcher now delegates to the registry. No external behavior change.
+
+**Agent identifies affected documentation** (consults **impact-lookup** for refactor):
+> - **docs/architecture.md**: Update to show the new `MessageHandlerRegistry` component and its relationship to the dispatcher.
+> - **Developer Guide**: Update the "adding new message handlers" walkthrough to reference the registry.
+> - **Inline JavaDoc**: Document the registry's registration mechanism and the reason for the extraction.
+> README and user-facing docs unaffected — no observable behavior change.
+
+---
+
+## Documentation Updates
 
 ## 1. docs/architecture.md
 

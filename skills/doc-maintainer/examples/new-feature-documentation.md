@@ -4,7 +4,24 @@
 
 **Change Type**: New Feature
 
-**Documentation Updates**:
+---
+
+## Change Review and Documentation Impact
+
+Applies **maintain-docs** (steps 1–2).
+
+**Agent reviews the change** — reads new files and PR description:
+> New `CategoryTransformer` service added to the application layer. Consumes `CategoryMappingRepository` for mapping rules from `application.yaml`. Called from `DataImportedHandler` to transform source categories into external API categories.
+
+**Agent identifies affected documentation** (consults **impact-lookup** for new feature):
+> - **README.md**: Add feature summary under "Features".
+> - **docs/architecture.md**: Add the new service component and its data flow.
+> - **docs/data.md**: Document the category mapping configuration structure.
+> - **Usage examples**: Show how the service is wired into the handler.
+
+---
+
+## Documentation Updates
 
 ## 1. README.md
 

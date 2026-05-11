@@ -4,7 +4,24 @@
 
 **Change Type**: Bug Fix
 
-**Documentation Updates**:
+---
+
+## Change Review and Documentation Impact
+
+Applies **maintain-docs** (steps 1–2).
+
+**Agent reviews the change** — reads commit diff and modified files:
+> `DataImportedHandler.java`: Added `Optional<MetadataInfo>` guard to prevent `NullPointerException` when metadata list is empty. Behavior change: handler now throws `IllegalArgumentException` on empty metadata rather than propagating a NPE.
+
+**Agent identifies affected documentation** (consults **impact-lookup** for bug fix):
+> - **CHANGELOG.md**: Record the fix and version.
+> - **Operations/Troubleshooting doc**: Note the fix for operators who may have seen this error.
+> - **Inline JavaDoc**: Document the new validation behavior on the handler method.
+> README and architecture docs unaffected — no public API or structural change.
+
+---
+
+## Documentation Updates
 
 ## 1. CHANGELOG.md
 

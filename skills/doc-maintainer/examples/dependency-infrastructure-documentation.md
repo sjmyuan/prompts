@@ -4,7 +4,24 @@
 
 **Change Type**: Dependency/Infrastructure Change
 
-**Documentation Updates**:
+---
+
+## Change Review and Documentation Impact
+
+Applies **maintain-docs** (steps 1–2).
+
+**Agent reviews the change** — reads `pom.xml` diff and updated configuration files:
+> Spring Boot upgraded from 2.7 → 3.2. Breaking changes: Java minimum raised from 11 to 17; all `javax.*` imports migrated to `jakarta.*`; `spring.redis.*` config prefix replaced with `spring.data.redis.*`.
+
+**Agent identifies affected documentation** (consults **impact-lookup** for dependency/infrastructure change):
+> - **README.md**: Update prerequisites (Java version) and setup instructions.
+> - **docs/configuration.md**: Update Redis config prefix with migration note.
+> - **CHANGELOG.md**: Record the upgrade and list all breaking changes.
+> - **Migration guide**: Create `docs/migration-2.x-to-3.x.md` for step-by-step upgrade instructions.
+
+---
+
+## Documentation Updates
 
 ## 1. README.md
 
