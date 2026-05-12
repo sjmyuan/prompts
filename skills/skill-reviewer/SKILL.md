@@ -14,51 +14,11 @@ description: Review SKILL.md files for correct structure, section-purpose compli
 <knowledge>
 
 <skill-file-section-semantics>
-A well-formed copilot skill file uses these sections with distinct, non-overlapping purposes:
-
-| Section | Purpose | What belongs here |
-|---|---|---|
-| Frontmatter `description:` | Skill-load decision | Plain-language summary used by VS Code/Copilot to decide whether to load this skill; must cover **all** activation scenarios |
-| `<when-to-use-this-skill>` | Post-load scope check | Bullet list of user-facing scenarios that confirm this skill applies; must align with the frontmatter `description` |
-| `<knowledge>` | Facts the agent recalls | Reference tables, directory layouts, API signatures, platform constraints, banned practices, selection guides; large rubrics extracted to `reference/` files and loaded on demand |
-| `<capabilities>` | Procedures the agent executes | Ordered step-by-step instructions for *how* to accomplish a task; named with an action verb |
-| `<rules>` | Internal routing triggers | "When [scenario] → use [capability]"; must not repeat what the capability already says; **may be omitted in single-capability skills** |
-| `<context-loading-guide>` in `<knowledge>` | On-demand context router | Condition-first table (`Load when` \| `Provides` \| `File`) that states the exact condition under which each file (examples, references, rubrics) should be loaded; loaded on demand |
-
-**Common structural violations**:
-- Knowledge embedded in capabilities (lookup tables, API lists, constraint bullets inside a capability section)
-- Rules that re-state capability content instead of routing to it
-- Capabilities written as bullet-point fact lists instead of ordered procedural steps
-- Capabilities named as nouns (`<storage-management>`) instead of action verbs (`<manage-storage>`)
-- A bare `<examples>` section used instead of a `<context-loading-guide>` entry inside `<knowledge>` (the preferred pattern consolidates all on-demand context — examples, references, rubrics — in one place)
-- `<context-loading-guide>` written as a bullet list, or as a two-column **Scenario | Reference** table — the first column must be a decision condition ("Load when…"), not a content description
-- `<context-loading-guide>` first column describes *what the file contains* instead of *when to load it* — forces the agent to infer the loading condition, leading to missed or wrong loads
-- `<examples>` content embedded inline rather than referenced by file path for on-demand loading
-- Large reference rubrics embedded inline in SKILL.md instead of extracted to `reference/` files
+Section-purpose table and common structural violations. Load **reference/section-semantics.md** for the full rubric.
 </skill-file-section-semantics>
 
 <trigger-correctness>
-A skill fires correctly only when its external trigger (frontmatter `description`) and internal trigger (`<when-to-use-this-skill>`) are consistent and complete.
-
-| Part | Location | Role |
-|---|---|---|
-| Frontmatter `description:` | YAML header | Used by VS Code/Copilot to decide whether to load this skill; must cover **all** scenarios in `<when-to-use-this-skill>` |
-| `<when-to-use-this-skill>` | Top-level section | Granular bullet list read by the agent after the skill is loaded; confirms correct activation |
-
-**Description trigger clarity criteria**:
-- The `description` must explicitly state *when* the skill should be loaded — typically expressed as a "Use when…" or "Use for…" phrase at the end
-- The `description` must include the primary intent verbs (e.g., review / fix / create / improve) that match the `<when-to-use-this-skill>` bullets
-- The trigger phrase in `description` must cover **all** scenarios listed in `<when-to-use-this-skill>` (no under-coverage)
-- The trigger phrase in `description` must not cover scenarios **absent** from `<when-to-use-this-skill>` (no over-triggering)
-
-**Common trigger violations**:
-- `description` has no explicit trigger phrase ("Use when…" clause missing) → VS Code/Copilot has no reliable signal to load the skill
-- `description` covers only a subset of `<when-to-use-this-skill>` scenarios → skill silently fails to activate for uncovered scenarios
-- `description` is so broad it fires for unrelated requests → skill is over-triggered
-- `<when-to-use-this-skill>` entries are too vague (e.g., "User asks about X") without specifying the intent verb (review / fix / create / improve)
-- `<when-to-use-this-skill>` is absent — the agent has no post-load scope check
-- A scenario listed in `<when-to-use-this-skill>` has no corresponding keyword or verb phrase in `description`
-- Trigger language in `description` contradicts or differs from `<when-to-use-this-skill>` scope (e.g., `description` says "fix" but `<when-to-use-this-skill>` only lists review scenarios)
+Criteria for description trigger clarity and `<when-to-use-this-skill>` consistency. Load **reference/trigger-correctness.md** for the full rubric.
 </trigger-correctness>
 
 <severity-levels>
@@ -79,9 +39,14 @@ A skill fires correctly only when its external trigger (frontmatter `description
 
 | Load when | Provides | File |
 |---|---|---|
+| Evaluating section structure, naming, or on-demand context placement (steps 1, 3–7) | Section-purpose table and common structural violations | [reference/section-semantics.md](reference/section-semantics.md) |
+| Checking trigger clarity and description-to-when-to-use coverage (step 2) | Trigger-correctness criteria, trigger phrase rules, and common violations | [reference/trigger-correctness.md](reference/trigger-correctness.md) |
+| Writing or evaluating the `description` field (step 2a) | Two-part description template with example | [reference/description-template.md](reference/description-template.md) |
+| Scoring description quality (step 2b) | Five-dimension scoring rubric with pass/fail thresholds | [reference/description-scoring.md](reference/description-scoring.md) |
 | Before writing review output — load first, every review | Canonical output format, severity label usage, multi-violation structure | [examples/skill-file-review.md](examples/skill-file-review.md) |
 | You detect noun-named capabilities or inline-embedded examples | Output model for naming and inline-content findings | [examples/noun-capabilities-and-inline-examples.md](examples/noun-capabilities-and-inline-examples.md) |
 | The skill appears mostly well-structured (few or no major findings) | Output model for a near-passing review | [examples/clean-skill-review.md](examples/clean-skill-review.md) |
+| Trigger-correctness failures are the primary or dominant finding | Output model for a review focused on description/when-to-use mismatches | [examples/trigger-correctness-violation.md](examples/trigger-correctness-violation.md) |
 | Executing step 8 (example coverage assessment) | Coverage gap criteria and severity table | [reference/example-coverage-criteria.md](reference/example-coverage-criteria.md) |
 | Executing step 9 (individual example file review) | Quality criteria checklist for example files | [reference/example-quality-criteria.md](reference/example-quality-criteria.md) |
 
@@ -100,12 +65,12 @@ A skill fires correctly only when its external trigger (frontmatter `description
 1. Read the full skill file to understand its domain and all sections.
    a. Verify all expected top-level sections are present: frontmatter YAML, `<when-to-use-this-skill>`, `<knowledge>`, and `<capabilities>`; flag any missing required section as 🔴 Major.
    b. Verify sections appear in the correct order: frontmatter → `<when-to-use-this-skill>` → `<knowledge>` → `<capabilities>` → `<rules>` (if present); flag out-of-order sections as 🟡 Minor.
-2. **Check description trigger clarity and consistency**:
-   a. Verify the frontmatter `description` contains an explicit trigger phrase (e.g., "Use when…" or "Use for…") that states when the skill should be loaded — flag a missing trigger phrase as 🔴 Major.
-   b. Check that the intent verbs and key scenarios in the trigger phrase match the bullets in `<when-to-use-this-skill>` (bidirectional): flag any `<when-to-use-this-skill>` scenario whose keyword or intent verb is absent from `description` as 🟡 Minor (under-coverage); flag any trigger scenario in `description` absent from `<when-to-use-this-skill>` as 🟡 Minor (over-triggering or undocumented scope).
-   c. If `<when-to-use-this-skill>` is missing entirely, flag as 🔴 Major.
-   d. Flag any direct contradiction between the scope described in `description` and the bullets in `<when-to-use-this-skill>` as 🔴 Major.
-   Consult **trigger-correctness** in `<knowledge>` for the full rubric.
+2. **Check description quality and trigger consistency** — load **reference/trigger-correctness.md** first:
+   a. Verify the frontmatter `description` follows the two-part template (domain summary + trigger phrase) — load **reference/description-template.md**; flag a missing trigger phrase as 🔴 Major.
+   b. Score the description using the five-dimension quality metric — load **reference/description-scoring.md**; report the score (x/10) and flag a score ≤5 as 🔴 Major; flag a score of 6–8 as 🟡 Minor.
+   c. Check that the intent verbs and key scenarios in the trigger phrase match the bullets in `<when-to-use-this-skill>` (bidirectional): flag any `<when-to-use-this-skill>` scenario whose keyword or intent verb is absent from `description` as 🟡 Minor (under-coverage); flag any trigger scenario in `description` absent from `<when-to-use-this-skill>` as 🟡 Minor (over-triggering or undocumented scope).
+   d. If `<when-to-use-this-skill>` is missing entirely, flag as 🔴 Major.
+   e. Flag any direct contradiction between the scope described in `description` and the bullets in `<when-to-use-this-skill>` as 🔴 Major.
 3. For each capability section, verify it describes *how to do something* as ordered steps — flag any that are fact lists, reference tables, or constraint bullets (those belong in `<knowledge>`).
 4. For each rule, verify it answers "when scenario X → use capability Y" — flag any rule that re-states content already in a capability (duplication). If the skill has only one capability and no `<rules>` section, do not flag its absence.
 5. Check that a `<knowledge>` section exists and contains all reference material (tables, layouts, API signatures, platform constraints) that capabilities currently cite inline. Also check that large reference rubrics are not embedded directly in SKILL.md — they should be in `reference/` files loaded on demand; flag inline rubrics as 🔴 Major.
