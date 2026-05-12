@@ -47,7 +47,7 @@ Applies **define-requirement**.
   - Step 9: Clean Up unused code and tests
   - Step 10: Verify Cleanup
   - Step 11: Validate Linting, Formatting and Type Checking
-- Step 12-21: Full TDD cycle for integration with DataImportedHandler
+- Step 12-20: Full TDD cycle for integration with DataImportedHandler
   - Step 12: Write Tests for handler integration
   - Step 13: Confirm Test Failure
   - Step 14: Integrate transformation logic with handler

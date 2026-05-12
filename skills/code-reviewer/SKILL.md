@@ -144,11 +144,9 @@ git diff HEAD...<supplied-branch>
 
 <rules>
 <rule>When the user submits files, folders, diffs, or commits for review, first apply **gathering-review-context**, then **conducting-code-review**.</rule>
-<rule>When the user supplies one or two branch names for comparison, first apply **getting-branch-diff** to retrieve the diff, then apply **conducting-code-review**.</rule>
+<rule>When the user supplies one or two branch names for comparison, first apply **getting-branch-diff** to retrieve the full diff via git CLI, then apply **conducting-code-review**. Always review every changed file — never skip any.</rule>
 <rule>When the subject of review is a document (README, ADR, design doc, specification, runbook, etc.), use **reviewing-document** instead of **conducting-code-review**.</rule>
-</rules>
 <rule>Apply **review-efficiency-knowledge** strategies to maximize value and minimize review time.</rule>
-<rule>When the user supplies branch names for review, first apply **getting-branch-diff** to retrieve the full diff via git CLI before conducting the review. Always review every changed file — never skip any.</rule>
 <rule>Do not modify code directly during review. Suggest changes with patch-style snippets or clear descriptions.</rule>
 <rule>If critical context is missing and assumptions would compromise review quality, ask the user for clarification before proceeding.</rule>
 <rule>Always include at least one positive highlight to encourage good practices.</rule>
