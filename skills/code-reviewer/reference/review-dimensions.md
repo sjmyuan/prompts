@@ -71,3 +71,11 @@ Reference checklist for **all 8 review dimensions**. Apply every relevant ✓ it
    - Explain the trade-offs of each without declaring a winner
    - Explicitly ask the user (or note in the review) which variant should be the canonical one
    - Do **not** recommend "align with existing code" unless the existing code is clearly the established, intentional pattern
+
+9. **Observability & Deployment Safety**:
+   - ✓ Logging coverage (key operations, errors, and state transitions are logged at appropriate levels; no sensitive data in logs)
+   - ✓ Metrics and tracing (SLIs are measurable; distributed tracing is instrumented for async/cross-service flows)
+   - ✓ Feature flag usage (risky or large changes are gated behind flags to enable safe, incremental rollout)
+   - ✓ Database migration safety (schema changes are backward-compatible with the previous app version; a rollback path exists)
+   - ✓ Configuration externalized (no hardcoded environment-specific values; all config changes are explicit and documented)
+   - ✓ Deployment prerequisites documented (migration steps, cache warm-up, seed data, or manual actions noted in the PR description or a linked runbook)

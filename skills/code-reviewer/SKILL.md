@@ -13,19 +13,19 @@ description: Perform systematic reviews of code and documents across files, fold
 
 <knowledge>
 
-<review-dimensions-reference>
-See [reference/review-dimensions.md](reference/review-dimensions.md) for the full 8-dimension checklist (Correctness, Maintainability, Performance, Security, APIs, Tests, Architecture, Inconsistencies). Load before applying **conducting-code-review**.
-</review-dimensions-reference>
-
 <context-loading-guide>
-Load on demand to minimize context size. **gathering-review-context** is demonstrated as the lead-in step in all four example files — load any one for output structure guidance on that capability.
+Load all resources on demand. **gathering-review-context** is demonstrated explicitly in `branch-diff-review.md`; other examples show only the review output phase.
 
 | Load when | Provides | File |
 |---|---|---|
+| About to apply review dimensions to code | Full 9-dimension checklist (Correctness, Maintainability, Performance, Security, APIs, Tests, Architecture, Inconsistencies, Observability & Deployment Safety) with ✓ items | [reference/review-dimensions.md](reference/review-dimensions.md) |
+| About to categorize findings by severity | Severity rubric (🚫 Blocker, 🔴 Major, 🟡 Minor, 🟢 Nit, ⚠️ Inconsistency) with criteria for each level | [reference/severity-levels.md](reference/severity-levels.md) |
+| About to write review output | Standard review output template (Summary, Findings, Positive Highlights, Risks & Assumptions, Next Steps) and formatting guidelines | [reference/review-output-format.md](reference/review-output-format.md) |
 | About to review a diff, commit, or bug fix | Output structure example for diff/commit reviews | [examples/diff-commit-review.md](examples/diff-commit-review.md) |
 | User supplies one or two branch names for comparison | Output structure example for branch diff reviews | [examples/branch-diff-review.md](examples/branch-diff-review.md) |
 | Reviewing a performance optimization or slow-code change | Output structure example for performance-focused reviews | [examples/performance-improvement.md](examples/performance-improvement.md) |
 | Reviewing a document (README, ADR, design doc, specification, runbook) | Output structure example for document reviews | [examples/doc-review.md](examples/doc-review.md) |
+| Reviewing a PR that adds a migration, new service endpoint, or cache layer | Output structure example for observability and deployment safety reviews | [examples/deployment-safety-review.md](examples/deployment-safety-review.md) |
 </context-loading-guide>
 
 <review-efficiency-knowledge>
@@ -42,14 +42,6 @@ Strategies for maximizing review value while respecting time constraints:
 - **Scan for inconsistencies across the whole visible codebase**, not just the diff — look for places where similar problems are solved differently and surface them together
 - **Treat all code as suspect**: Existing code may be legacy, copy-pasted, or simply wrong. Never use "it matches the existing code" as a reason to approve something.
 </review-efficiency-knowledge>
-
-<defining-severity-levels>
-See [reference/severity-levels.md](reference/severity-levels.md) for the full severity rubric (🚫 Blocker, 🔴 Major, 🟡 Minor, 🟢 Nit, ⚠️ Inconsistency) with criteria for each level. Load before categorizing review findings.
-</defining-severity-levels>
-
-<formatting-review-output>
-See [reference/review-output-format.md](reference/review-output-format.md) for the standard review output template (Summary, Findings by severity, Positive Highlights, Risks & Assumptions, Next Steps) and formatting guidelines. Load before presenting review findings.
-</formatting-review-output>
 
 </knowledge>
 
@@ -119,10 +111,10 @@ git diff HEAD...<supplied-branch>
 **Objective**: Systematically analyze code for correctness, quality, and risks.
 
 **Steps**:
-1. Consult **review-dimensions-reference** knowledge and apply each of the 8 dimensions to the reviewed code. For each dimension, evaluate all relevant ✓ checklist items and note any violations.
-2. For each violation found, assign a severity level using **defining-severity-levels** knowledge and prepare a concise finding.
+1. Load [reference/review-dimensions.md](reference/review-dimensions.md) via the **context-loading-guide** and apply each of the 9 dimensions to the reviewed code. For each dimension, evaluate all relevant ✓ checklist items and note any violations. Apply **review-efficiency-knowledge** strategies throughout to prioritize findings by risk and impact.
+2. For each violation found, load [reference/severity-levels.md](reference/severity-levels.md) via the **context-loading-guide**, assign a severity level, and prepare a concise finding.
 3. For dimension 8 (Inconsistencies): capture every conflicting pattern with both variants and concrete file/line references; note trade-offs and flag for a user decision — do not silently pick one.
-4. Format all findings using the **formatting-review-output** knowledge template.
+4. Load [reference/review-output-format.md](reference/review-output-format.md) via the **context-loading-guide** and format all findings using the standard template.
 5. Load the appropriate example from the **context-loading-guide** table for output structure guidance.
 </conducting-code-review>
 
@@ -137,7 +129,7 @@ git diff HEAD...<supplied-branch>
 5. Evaluate **accuracy**: Do code samples match the described behavior? Are version numbers, commands, and API signatures up to date?
 6. Evaluate **audience alignment**: Does the depth and assumed knowledge level match the intended reader? Is jargon appropriate or excessive?
 7. Apply **conducting-code-review** dimensions that are relevant to documents: correctness (accuracy), maintainability (single source of truth, no duplication with other docs), and inconsistencies (conflicting statements across sections).
-8. Format findings using **formatting-review-output** and load **examples/doc-review.md** for output structure guidance.
+8. Load [reference/review-output-format.md](reference/review-output-format.md) via the **context-loading-guide** and format all findings using the standard template; load **examples/doc-review.md** for output structure guidance.
 </reviewing-document>
 
 </capabilities>
@@ -146,8 +138,7 @@ git diff HEAD...<supplied-branch>
 <rule>When the user submits files, folders, diffs, or commits for review, first apply **gathering-review-context**, then **conducting-code-review**.</rule>
 <rule>When the user supplies one or two branch names for comparison, first apply **getting-branch-diff** to retrieve the full diff via git CLI, then apply **conducting-code-review**. Always review every changed file — never skip any.</rule>
 <rule>When the subject of review is a document (README, ADR, design doc, specification, runbook, etc.), use **reviewing-document** instead of **conducting-code-review**.</rule>
-<rule>Apply **review-efficiency-knowledge** strategies to maximize value and minimize review time.</rule>
-<rule>Do not modify code directly during review. Suggest changes with patch-style snippets or clear descriptions.</rule>
+<rule>When presenting findings, output recommendations only — never directly edit or apply changes to the reviewed code.</rule>
 <rule>If critical context is missing and assumptions would compromise review quality, ask the user for clarification before proceeding.</rule>
 <rule>Always include at least one positive highlight to encourage good practices.</rule>
 <rule>Consult the **context-loading-guide** knowledge table to load the appropriate example file for the review type being performed.</rule>

@@ -42,6 +42,18 @@ Standard template for all review output:
 
 ---
 
+## Performance Analysis *(include only for performance optimization reviews)*
+### Improvements Confirmed
+*[List algorithmic, query, caching, or I/O improvements with before/after summary]*
+
+### Concerns & Risks
+*[Cold cache, cache stampede, memory overhead, single points of failure, etc.]*
+
+### Metrics to Monitor Post-Deployment
+*[p50/p95/p99 latency, cache hit rate, DB query count, error rate, etc.]*
+
+---
+
 ## Risks & Assumptions
 *[Potential issues not fully verifiable from code review alone, areas needing runtime validation]*
 
