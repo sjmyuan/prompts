@@ -18,6 +18,6 @@ Applies **create-concept-diagram** in the svg-editor skill.
    - Apply `<connection-routing>` from SKILL.md for natural-looking curves.
 4. **Add labels**:
    - Central concept: larger font (18px, bold). Level-1: 14px, bold. Level-2: 12px, regular.
-   - For connection labels (relationships), place at curve midpoint with white background rect.
+   - For connection labels (relationships), place at the parametric midpoint of the curve (the longest and only segment) with a white background rect.
 5. **Apply color coding**: Use `<color-palettes>` from SKILL.md for concept diagrams. Color intensity can decrease radially (central: most saturated, outer: lighter).
 6. **Set viewBox** and output raw SVG.

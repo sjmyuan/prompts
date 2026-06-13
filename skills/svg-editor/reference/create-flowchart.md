@@ -16,7 +16,7 @@ Applies **create-flowchart** in the svg-editor skill.
 4. **Draw connection paths**:
    - Use orthogonal routing (horizontal and vertical segments only) via `<path>` commands.
    - Attach arrows to the end of each path using `marker-end="url(#arrow)"`.
-   - For decision branches, label each branch path with a text label (e.g., "Yes" / "No") placed on a small white rectangular background.
+   - For decision branches, label each branch path with a text label (e.g., "Yes" / "No") placed at the midpoint of the longest straight segment (typically the only segment), on a small white rectangular background.
    - Apply `<connection-routing>` from SKILL.md for proper endpoint attachment.
 5. **Render nodes**:
    - Process steps: `<rect rx="6" ry="6">`

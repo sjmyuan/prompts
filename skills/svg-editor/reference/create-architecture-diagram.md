@@ -19,7 +19,7 @@ Applies **create-architecture-diagram** in the svg-editor skill.
    - Apply `<connection-routing>` from SKILL.md for clean line routing.
 5. **Add labels**:
    - Component names inside boxes. Layer names in the layer header band.
-   - For connections, add protocol or data-flow labels at midpoints.
+   - For connections, add protocol or data-flow labels at the midpoint of the longest straight segment of each connection line.
 6. **Add decorations**:
    - Optional: cloud shape for external systems (use overlapping `<circle>` and `<path>` elements).
    - Optional: database cylinder shape for storage tiers (ellipse top + rect body + ellipse bottom).

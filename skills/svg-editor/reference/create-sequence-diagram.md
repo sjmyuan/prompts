@@ -21,6 +21,6 @@ Applies **create-sequence-diagram** in the svg-editor skill.
    - Self-message: loop from lifeline back to same lifeline using a small rectangular path.
    - Apply `<connection-routing>` from SKILL.md for proper line placement.
 6. **Add message labels**:
-   - Place label text above each message line, centered, offset 8px upward.
+   - Place label text above each message line, centered at the midpoint of the line (single segment), offset 8px upward.
 7. **Add frames** (optional): Use `<rect rx="4" ry="4" stroke-dasharray="4,4">` for alt/opt/loop frames. Place frame label in top-left corner with a small filled rectangle and white text.
 8. **Set viewBox** and output raw SVG.
