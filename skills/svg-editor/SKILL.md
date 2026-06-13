@@ -1,6 +1,6 @@
 ---
 name: svg-editor
-description: Create SVG diagrams and illustrations with professional layout, clear connections, and no overlapping elements. Use when creating flowcharts / process diagrams / architecture diagrams / sequence diagrams / concept diagrams / charts, or when fixing overlapping elements and unclear connections in any SVG visual diagram.
+description: Create SVG diagrams and illustrations with professional layout, clear connections, and no overlapping elements. Use when creating flowcharts / process diagrams / architecture diagrams / sequence diagrams / concept diagrams / charts, when fixing overlapping elements and unclear connections in any SVG visual diagram, or when editing or modifying an existing SVG file.
 ---
 
 <when-to-use-this-skill>
@@ -11,6 +11,8 @@ description: Create SVG diagrams and illustrations with professional layout, cle
 - User wants to create a chart, graph, or data visualization as SVG
 - User wants to create any SVG diagram that needs proper layout, visible elements, and clear connections
 - User wants to fix overlapping elements, improve connection clarity, or adjust spacing in an existing SVG
+- User wants to edit, modify, or update an existing SVG diagram (change colors, text, shapes, fonts, or styling)
+- User wants to add, remove, or rearrange elements in an existing SVG diagram
 </when-to-use-this-skill>
 
 <knowledge>
@@ -121,6 +123,111 @@ How to size shapes based on text content.
 - For left-aligned text blocks, use `text-anchor="start"` and offset x by +12px from shape left edge.
 </text-sizing>
 
+<flowchart-components>
+Basic flowchart building blocks, their SVG shapes, valid connection points, and usage rules.
+
+| Component | Shape | SVG Element | Dimensions | Connection points (attach lines here) | Usage |
+|---|---|---|---|---|---|
+| Start / End (Terminator) | Rounded rectangle | `<rect rx="20" ry="20">` | 120×40px or 140×50px | Center of bottom edge (outgoing), center of top edge (incoming) | One Start per flowchart (no incoming), one or more End nodes (no outgoing) |
+| Process (Action Step) | Rectangle | `<rect rx="4" ry="4">` | 140×50px (min width 80px) | Center of top/bottom edges for vertical flow; center of left/right edges for horizontal flow | Standard action step, one incoming and one outgoing line |
+| Decision | Diamond | `<polygon>` with 4 points | 80×80px (fit bounding box) | All 4 vertex points: top (incoming), right (Yes/True branch), bottom (incoming or outgoing), left (No/False branch) | Exactly one incoming, two or more outgoing branches; each branch MUST be labeled |
+| Subprocess | Rectangle with side bars | `<rect>` + 2 vertical side lines | 140×50px | Same as Process | References another flowchart/subroutine |
+| Document | Rectangle with wavy bottom | `<rect>` + `<path>` wave | 140×60px | Center of top edge (incoming), center of bottom edge (outgoing) | Represents a document or report output |
+| Data / Database | Cylinder (ellipse + rect + ellipse) | `<ellipse>` + `<rect>` + `<ellipse>` | 100×60px (top ellipse 100×20) | Center of top ellipse (incoming/outgoing) | Data storage, database read/write |
+| On-page Connector | Circle | `<circle>` | 30×30px (r=15) | Any edge point (incoming/outgoing) | Jump between non-adjacent flow sections on same page; matching label required |
+| Off-page Connector | Pentagon / Home plate | `<polygon>` | 40×40px | Top edge (incoming), bottom edge (outgoing) | Jump to another page; matching label required |
+| Parallel / Fork | Horizontal bar | `<rect>` | 160×8px | Center of left edge (incoming), center of right edge (outgoing); top & bottom edges for outgoing parallel branches | Split or join concurrent flows |
+| Flow line | Arrow | `<path>` with `marker-end` | stroke-width=2 | Attaches from source connection point to target connection point | Connects two components; use orthogonal routing |
+
+**Connection point rules**:
+- **Vertical flow (top-to-bottom, default)**: Connect from bottom-center of source to top-center of target. For decisions, connect from bottom/top vertex to top-center of next shape.
+- **Horizontal branches**: Connect from right-center of decision to top-center of branch target. The horizontal segment should extend at least 40px from the decision vertex before turning vertically.
+- **Merge points**: When two branches converge to the same target, use a T-junction: the vertical line from above meets the horizontal line from the side at a right angle connection maintained by `<path d="M... L... L...">` without overlap.
+- **Minimum edge distance**: Lines must attach to the **exact center** of the designated connection point on the shape edge (±2px tolerance). Off-center connections cause visual misalignment.
+- For process/terminator/subprocess shapes, the valid connection points are exactly 4: top-center, bottom-center, left-center, right-center.
+- For decision diamonds, the valid connection points are exactly 4: the 4 vertex corners. Never connect to the midpoint of a diamond edge — always use the vertices.
+</flowchart-components>
+
+<connection-validation>
+Rules for detecting and avoiding connection issues in flowcharts.
+
+<line-intersection-detection>
+**Line intersection detection** — checking if two lines cross when they should not.
+
+- **Orthogonal line segments**: A connection path consists of alternating horizontal and vertical segments. For each pair of connections, test every segment of one against every segment of the other.
+- **Intersection test (horizontal vs vertical)**: A horizontal segment `(x1,y) → (x2,y)` and a vertical segment `(x,y1) → (x,y2)` intersect if `x` is between `x1` and `x2` AND `y` is between `y1` and `y2`. Ignore intersections at shared endpoints (where two lines meet at the same component is expected).
+- **Same-direction segments**: Two horizontal segments on the same y must not overlap in x-range. Two vertical segments on the same x must not overlap in y-range.
+- **Resolution when intersection is detected**:
+  1. Insert an intermediate waypoint: raise one line to cross above the other at the intersection point, creating a bridge-like detour. Add a vertical offset of at least 10px before and after the crossing.
+  2. Re-route one connection around the obstacle using a 3-turn path (Z-shape) instead of a 1-turn path (L-shape).
+  3. Increase column spacing between the two branches by 40–60px to eliminate the crossing entirely.
+  4. As a last resort, swap the order of branches (left ↔ right) if the semantics allow it.
+- **Line-shape intersection**: Treat each shape's bounding box as a rectangle. Test if any line segment passes through a bounding box of a shape that is NOT its source or target. This is a critical error — the line must be re-routed around that shape.
+</line-intersection-detection>
+
+<label-position-validation>
+**Label position validation** — checking that labels on connection lines are readable and not overlapping.
+
+- **Label placement**: Place labels at the midpoint of the **longest straight segment** of the connection path. For a single-segment connection, this is the standard midpoint between two shapes.
+- **Label background**: Always wrap connection labels in a `<rect>` background (white fill, 2–4px padding around text, `rx="3"`) placed directly behind the `<text>` element. This masks any line underneath.
+- **Overlap check**: After placing a label, check its bounding box against all other elements (shapes, other labels, connection lines). The label background rect must not overlap any shape or other label. If overlap is detected:
+  1. Move the label to the next-longest straight segment of the same connection.
+  2. If no segment has sufficient room, shorten the label text or place it offset perpendicularly by +16px from the line (still with background rect).
+  3. As last resort, increase spacing between the two shapes to create more room.
+- **Label alignment**: Labels on horizontal segments should be centered above the line (offset y -14px). Labels on vertical segments should be centered to the right of the line (offset x +14px). When space is constrained, flip to the opposite side.
+- **Label text length**: Ensure the label background rect width = (text chars × 7px) + 12px. If the straight segment is shorter than this width, the label does not fit — apply overflow resolution above.
+</label-position-validation>
+
+<connection-endpoint-validation>
+**Connection endpoint validation** — checking that lines connect properly to their components.
+
+- **Endpoint-on-edge check**: The line endpoint coordinates must lie exactly on the edge of the target shape's bounding box. For a process rect at `(x, y, w, h)`, the valid endpoint x must equal `x + w/2` (top/bottom edge center) or `x`/`x+w` (left/right edge center with appropriate y).
+- **Minimum entry segment**: The straight line segment entering the target shape must be at least **15px long** before the endpoint. This ensures the arrowhead has room to render clearly without clipping into the shape edge.
+- **Gap/overlap check**: The endpoint should touch the shape edge exactly. If there's a gap > 2px between endpoint and shape edge, extend the line. If the endpoint is inside the shape (> 2px penetration), retract the line.
+- **Arrow alignment**: The arrow marker's orientation must match the direction of the final line segment entering the target. For a downward vertical entry, the arrow must point down. Verify `orient="auto"` is set on the `<marker>`.
+- **Orphan connection check**: Every line must have both a valid source component and a valid target component. If a component is removed, all its incident lines must also be removed or re-routed to a new component.
+</connection-endpoint-validation>
+
+<arrow-style-guide>
+**Arrow style guide** — when to use each arrow type.
+
+| Arrow style | SVG marker | When to use |
+|---|---|---|
+| Standard solid arrow | `<path d="M 0 0 L 10 5 L 0 10 z" fill="#546E7A">` | Default for all sequential flow connections |
+| Dashed line + solid arrow | `stroke-dasharray="6,4"` + standard marker | Async flow, data flow, or alternative path (not the main flow) |
+| Open arrow (V-shape) | `<path d="M 0 0 L 10 5 L 0 10" fill="none" stroke="#546E7A" stroke-width="2">` | Data flow in architecture/sequence diagrams; not typical for flowcharts |
+| Bidirectional / Double arrow | Two markers (`marker-start` + `marker-end`) | Two-way communication; rare in flowcharts, use for architecture diagrams |
+| Dot / Circle terminus | `<circle cx="5" cy="5" r="3" fill="#546E7A">` | Off-page connector references or notes; not for main flow |
+
+- **Marker sizing**: Arrowhead length = stroke-width × 4, arrowhead width = stroke-width × 3. For stroke-width=2: length=8px, width=6px. Use `viewBox="0 0 10 10"` and scale via `markerWidth`/`markerHeight`.
+- **Marker color**: Match the line stroke color. When changing line colors, create a new `<marker>` definition per color with matching fill.
+- **No-arrow connections**: Merge lines (T-junctions where two lines converge) should not have an arrow on the merging segment — the main line carries the arrow.
+</arrow-style-guide>
+
+<turn-routing-guide>
+**Turn routing guide** — when and how to bend connection lines.
+
+- **1-turn (L-shaped, single bend)**: Use when source and target are on adjacent axes (e.g., source bottom-center → target left-center). Path: `M sx sy L sx ty L tx ty` — the turn happens at the intersection of the source x and target y (or vice versa).
+- **2-turn (Z-shaped, two bends)**: Use when source and target share the same alignment axis but are offset (e.g., both are on the same vertical line but staggered horizontally). Path: `M sx sy L sx midY L tx midY L tx ty` — route away from source to a clear mid-y corridor, travel horizontally, then route to target.
+- **3-turn (C-shaped, three bends)**: Use when a direct 1-turn or 2-turn path would intersect another shape or connection. Path: `M sx sy L sx ay L bx ay L bx by L tx by L tx ty` — route away from source, travel to a clear corridor away from obstacles, route around the obstacle, then approach target.
+- **When to turn at a right angle**:
+  - Turn **immediately** (within 20px of the source shape edge) if the outgoing direction is clear of obstacles.
+  - Turn **delayed** (after 40–60px straight travel from source) if there are adjacent branches or parallel lines nearby — the extra straight run creates visual separation.
+  - Do NOT turn inside the clearance zone of another shape — maintain ≥25px from any other shape's bounding box at the turn point.
+- **Turn direction preference**:
+  - In top-to-bottom flowcharts: route right-side turns (decision Yes branch) to the right, left-side turns (No branch) to the left.
+  - Route clockwise when possible (turn right, then down, then left) — this is more natural for reader eye-tracking.
+  - Avoid routing a line behind (upstream of) its source shape — always route forward in the flow direction.
+- **Multi-branch turns**: When one decision node has multiple outgoing branches:
+  - The Yes/True branch turns right and flows downward on the right side.
+  - The No/False branch turns left and flows downward on the left side.
+  - Both branches should maintain ≥40px horizontal distance from the main flow axis.
+  - Both branches must converge back to the main flow at a merge point below, using T-junctions.
+- **Turn point rounding** (optional): Use `stroke-linejoin="round"` on `<path>` for slightly rounded corners at turn points, making the diagram look polished. Do not add `rx`/`ry` to individual segments — this SVG attribute does not apply to paths.
+</turn-routing-guide>
+
+</connection-validation>
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -137,6 +244,8 @@ How to size shapes based on text content.
 | Executing **create-chart** (need detailed steps) | Chart step-by-step instructions with axis planning, data rendering, and legend placement | [reference/create-chart.md](reference/create-chart.md) |
 | Fixing overlapping elements, unclear connections, or spacing issues in an existing SVG | Layout analysis and fix example showing before/after transformation | [examples/layout-fix-example.md](examples/layout-fix-example.md) |
 | Executing **analyze-and-fix-layout** (need detailed steps) | Layout analysis step-by-step instructions with overlap detection and connection re-routing | [reference/analyze-and-fix-layout.md](reference/analyze-and-fix-layout.md) |
+| Editing or modifying an existing SVG (color/text/element changes, restructuring) | SVG editing example showing style updates, element additions, and restructuring | [examples/modify-existing-svg-example.md](examples/modify-existing-svg-example.md) |
+| Executing **modify-existing-svg** (need detailed steps) | SVG editing step-by-step instructions with element identification, modification planning, and structured editing | [reference/modify-existing-svg.md](reference/modify-existing-svg.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -173,6 +282,11 @@ Load **reference/create-chart.md** for detailed step-by-step instructions.
 Load **reference/analyze-and-fix-layout.md** for detailed step-by-step instructions.
 </analyze-and-fix-layout>
 
+<modify-existing-svg>
+**Objective**: Modify an existing SVG diagram by changing colors, text, fonts, styling, or by adding, removing, or rearranging elements.
+Load **reference/modify-existing-svg.md** for detailed step-by-step instructions.
+</modify-existing-svg>
+
 </capabilities>
 
 <rules>
@@ -182,5 +296,6 @@ Load **reference/analyze-and-fix-layout.md** for detailed step-by-step instructi
 <rule>When the user describes a central topic with branching related concepts, a mind map, or an explanatory diagram, apply **create-concept-diagram**.</rule>
 <rule>When the user provides data values and wants a visual representation (bar, line, pie, scatter), apply **create-chart**.</rule>
 <rule>When the user provides an existing SVG with overlapping elements, unclear lines, or cramped spacing, apply **analyze-and-fix-layout**.</rule>
+<rule>When the user provides an existing SVG and wants to change its colors, text, fonts, styling, or add/remove/rearrange elements (without layout overlap issues being the primary concern), apply **modify-existing-svg**.</rule>
 <rule>When the user's request spans multiple diagram types (e.g., a flowchart embedded in an architecture diagram), apply the relevant capabilities sequentially and compose the output as a single SVG.</rule>
 </rules>
