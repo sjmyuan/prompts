@@ -86,6 +86,15 @@ try:
         get_gradient_defs,
         get_shadow_filter,
     )
+    from .svg_shapes import (
+        generate_node_svg,
+        generate_edge_svg,
+        generate_label_svg,
+        generate_title_bar,
+        generate_arrow_marker,
+        get_shape_dimensions,
+        get_node_type_colors,
+    )
 except ImportError:
     from geometry import (
         BBox,
@@ -125,6 +134,15 @@ except ImportError:
         PPT_PALETTE,
         get_gradient_defs,
         get_shadow_filter,
+    )
+    from svg_shapes import (
+        generate_node_svg,
+        generate_edge_svg,
+        generate_label_svg,
+        generate_title_bar,
+        generate_arrow_marker,
+        get_shape_dimensions,
+        get_node_type_colors,
     )
 
 
@@ -395,29 +413,58 @@ def compute_diagram(desc: Dict[str, Any]) -> Dict[str, Any]:
         text_elements, PPT_PALETTE["blue_fill_start"]
     )
 
-    # --- Assemble output ---
-    output = {
-        "diagram_type": diagram_type,
-        "title": title,
-        "ppt_mode": ppt_mode,
-        "viewbox": viewbox,
-        "nodes": [
+    # --- Step 9: Generate SVG fragments ---
+    node_map = {n["id"]: n for n in nodes}
+
+    svg_nodes = []
+    for n in nodes:
+        colors = get_node_type_colors(n.get("type", "process"), ppt_mode)
+        svg_shape = generate_node_svg(
+            node_id=n["id"],
+            shape_type=n.get("type", "process"),
+            text=n.get("text", ""),
+            x=n.get("x", 0),
+            y=n.get("y", 0),
+            width=n.get("width", 140),
+            height=n.get("height", 50),
+            ppt_mode=ppt_mode,
+            colors=colors,
+        )
+        svg_nodes.append(
             {
                 "id": n["id"],
                 "type": n.get("type", "process"),
                 "text": n.get("text", ""),
-                "x": n.get("x", 0),
-                "y": n.get("y", 0),
-                "width": n.get("width", 140),
-                "height": n.get("height", 50),
-                "bbox": n.get("bbox"),
-                "fill": n.get("fill", ""),
-                "stroke": n.get("stroke", ""),
-                "text_color": n.get("text_color", ""),
+                "x": round(n.get("x", 0), 1),
+                "y": round(n.get("y", 0), 1),
+                "width": round(n.get("width", 140), 1),
+                "height": round(n.get("height", 50), 1),
+                "bbox": (
+                    tuple(round(v, 1) for v in n["bbox"]) if n.get("bbox") else None
+                ),
+                "fill": colors["fill"],
+                "stroke": colors["stroke"],
+                "text_color": colors["text_color"],
+                "svg_shape": svg_shape,
+                "colors": colors,
             }
-            for n in nodes
-        ],
-        "edges": [
+        )
+
+    line_color = PPT_PALETTE["connection"]
+    dashed_color = PPT_PALETTE["connection_dashed"]
+    svg_edges = []
+    for c in connections:
+        color = dashed_color if c["style"] == "dashed" else line_color
+        svg_line = generate_edge_svg(
+            edge_id=c["id"],
+            path_d=c["path_d"],
+            style=c["style"],
+            color=color,
+            ppt_mode=ppt_mode,
+            bezier=c["bezier"],
+            label=c["label"],
+        )
+        svg_edges.append(
             {
                 "id": c["id"],
                 "from": c["from"],
@@ -427,10 +474,19 @@ def compute_diagram(desc: Dict[str, Any]) -> Dict[str, Any]:
                 "path_d": c["path_d"],
                 "bezier": c["bezier"],
                 "waypoints": [(round(p[0], 1), round(p[1], 1)) for p in c["waypoints"]],
+                "svg_line": svg_line,
             }
-            for c in connections
-        ],
-        "labels": [
+        )
+
+    svg_labels = []
+    for l in labels:
+        svg_label = generate_label_svg(
+            text=l.get("text", ""),
+            x=round(l["x"], 1),
+            y=round(l["y"], 1),
+            bg_rect=tuple(round(v, 1) for v in l["bg_rect"]),
+        )
+        svg_labels.append(
             {
                 "conn_id": l.get("conn_id", ""),
                 "text": l.get("text", ""),
@@ -438,10 +494,32 @@ def compute_diagram(desc: Dict[str, Any]) -> Dict[str, Any]:
                 "y": round(l["y"], 1),
                 "bg_rect": tuple(round(v, 1) for v in l["bg_rect"]),
                 "side": l.get("side", ""),
+                "svg_label": svg_label,
             }
-            for l in labels
-        ],
+        )
+
+    # SVG markers and title bar
+    svg_markers = (
+        generate_arrow_marker(color=line_color)
+        + "\n"
+        + generate_arrow_marker(color=dashed_color, marker_id="arrow-dashed")
+    )
+    svg_title = (
+        generate_title_bar(title, viewbox["width"]) if ppt_mode and title else ""
+    )
+
+    # --- Assemble output ---
+    output = {
+        "diagram_type": diagram_type,
+        "title": title,
+        "ppt_mode": ppt_mode,
+        "viewbox": viewbox,
+        "nodes": svg_nodes,
+        "edges": svg_edges,
+        "labels": svg_labels,
         "defs": defs,
+        "svg_markers": svg_markers,
+        "svg_title_bar": svg_title,
         "validation": {
             "node_overlaps": overlaps_found,
             "connection_issues": connection_issues,
