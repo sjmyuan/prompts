@@ -1,6 +1,6 @@
 ---
 name: svg-editor
-description: Create SVG diagrams and illustrations with professional layout, clear connections, and no overlapping elements. Use when creating flowcharts / process diagrams / architecture diagrams / sequence diagrams / concept diagrams / charts, when fixing overlapping elements and unclear connections in any SVG visual diagram, or when editing or modifying an existing SVG file.
+description: Create SVG diagrams and illustrations with professional PPT-presentation-quality layout, clear connections, and no overlapping elements. Use when creating flowcharts / process diagrams / architecture diagrams / sequence diagrams / concept diagrams / charts, when fixing overlapping elements and unclear connections in any SVG visual diagram, when editing/modifying an existing SVG file, or when designing presentation-ready diagrams suitable for PPT/Keynote/Google Slides.
 ---
 
 <when-to-use-this-skill>
@@ -13,9 +13,46 @@ description: Create SVG diagrams and illustrations with professional layout, cle
 - User wants to fix overlapping elements, improve connection clarity, or adjust spacing in an existing SVG
 - User wants to edit, modify, or update an existing SVG diagram (change colors, text, shapes, fonts, or styling)
 - User wants to add, remove, or rearrange elements in an existing SVG diagram
+- User wants SVG output that looks polished and professional enough for PowerPoint, Keynote, or Google Slides presentations
+- User wants an existing SVG diagram upgraded to PPT-presentation quality (add shadows, gradients, title hierarchy, slide-ready layout)
 </when-to-use-this-skill>
 
 <knowledge>
+
+<ppt-design-requirements>
+All SVG output must meet professional presentation standards suitable for embedding in PPT/Keynote/Google Slides. These requirements apply to **every** diagram type generated or edited by this skill.
+
+**Slide-ready dimensions**:
+- Default aspect ratio: **16:9** (e.g., `viewBox="0 0 960 540"` is the standard PPT slide coordinate space). Use `viewBox="0 0 720 540"` for 4:3 legacy slides only when explicitly requested.
+- The diagram should fill 60–85% of the slide area, leaving margins for the PPT title bar and presenter notes.
+- Always include a **title area** at the top of the diagram: a bold, centered title text at y=30–40, font-size=20–24px, with optional subtitle at y=55–65, font-size=14–16px, color `#616161`.
+- Leave a 30px bottom margin for optional slide footers or source annotations.
+
+**Professional visual effects** (PPT-style polish):
+- **Drop shadows**: Apply `<filter id="shadow">` with `feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.15"` to key shapes (title bars, hero containers, callout boxes). This creates the layered depth effect of PPT shapes.
+- **Subtle gradients**: Replace flat fills with soft linear gradients for background panels and hero shapes. Use `<linearGradient>` with a 5–10% brightness variation between stops (e.g., `#E3F2FD` → `#BBDEFB`). Do NOT overdo gradients — they should be barely perceptible.
+- **Rounded corners**: All rectangles should have `rx="6" ry="6"` or higher (PPT defaults to rounded shapes). Use `rx="4"` for small labels, `rx="8"` for containers.
+- **Icons and visual anchors**: Use Unicode symbols, simple SVG paths, or emoji as visual anchors inside shapes when appropriate (e.g., ⚙ for settings, 📊 for data, 🔒 for security). Place icons at 18–24px font-size inside a small circle or to the left of text labels.
+
+**Typography for presentations**:
+- **Title**: `font-family="Segoe UI, -apple-system, Helvetica Neue, Arial, sans-serif"`, bold, font-size=22px, color=`#1A1A1A`.
+- **Section headers**: font-size=16px, bold, color=`#333333`.
+- **Body labels**: font-size=14px, regular, color=`#424242`.
+- **Small annotations**: font-size=11px, color=`#757575`.
+- **Minimum readable font size**: 10px at 960×540 viewBox. Anything smaller is unreadable on a projected slide.
+- **Font consistency**: Use exactly one font-family stack across the entire SVG. Do NOT mix serif and sans-serif in the same diagram.
+
+**Color contrast for projection**:
+- All text must have a contrast ratio ≥ 4.5:1 against its background (WCAG AA for presentation readability).
+- Light fills (`#E3F2FD`, `#E8F5E9`, `#FFF3E0`) with dark text (`#212121`) meet this. Avoid dark fills with dark text, or light fills with light text.
+- On dark slide backgrounds, use light fills (`#37474F`, `#455A64`) with white text (`#FFFFFF`).
+
+**Simplicity and scannability**:
+- Limit to 5–8 main visual elements per diagram. If the concept requires more, split into multiple diagrams.
+- Each shape should contain ≤ 15 words of text. Use keywords, not sentences.
+- Group-related elements with subtle background panels (rounded rect with `fill="#F5F5F5"`, no stroke) and a section label.
+- Use generous whitespace: minimum 40px between unrelated groups, 20px within groups.
+</ppt-design-requirements>
 
 <svg-layout-principles>
 Core rules for arranging elements in any diagram type.
@@ -31,7 +68,19 @@ Core rules for arranging elements in any diagram type.
 </svg-layout-principles>
 
 <color-palettes>
-Recommended color schemes for different diagram types.
+Recommended color schemes for different diagram types. Choose the **PPT Professional** palette as the default for all presentation-bound diagrams. Use the Basic palette only when the user explicitly requests flat/minimal styling.
+
+**PPT Professional palette (default for presentations)**:
+
+| Diagram type | Background | Shape fill | Border | Connection | Text |
+|---|---|---|---|---|---|
+| Flowchart | `#FFFFFF` | Process: `#E8F0FE`→`#D2E3FC` (gradient), Decision: `#FEF7E0`→`#FDE293` (gradient), Start/End: `#E6F4EA`→`#CEEAD6` (gradient) | `#1A73E8` / `#F9AB00` / `#34A853` | `#5F6368` | `#202124` |
+| Architecture | `#F8F9FA` | Layer 1: `#E8F0FE`, Layer 2: `#E6F4EA`, Layer 3: `#FEF7E0`, External: `#F3E8FD` | `#3C4043` | `#80868B` | `#202124` |
+| Sequence | `#FFFFFF` | Actor box: `#E8F0FE`, Activation bar: `#D2E3FC` | `#1A73E8` | `#5F6368` (solid), `#9AA0A6` (dashed) | `#202124` |
+| Concept | `#FFFFFF` | Central: `#E8F0FE`, Branch: `#F3E8FD`, Leaf: `#E6F4EA` | `#1A73E8` | `#80868B` | `#202124` |
+| Chart | `#FFFFFF` | Bars: `#1A73E8`, Line: `#EA4335`, Pie: `#1A73E8`/`#EA4335`/`#FBBC04`/`#34A853`/`#8E24AA` | `#DADCE0` | Grid: `#E8EAED` | `#3C4043` |
+
+**Basic palette (flat/minimal, use only when explicitly requested)**:
 
 | Diagram type | Background | Shape fill | Border | Connection | Text |
 |---|---|---|---|---|---|
@@ -59,13 +108,27 @@ Guidelines for drawing lines and arrows between elements.
 </connection-routing>
 
 <svg-element-reference>
-Common SVG elements and attributes used in diagrams.
+Common SVG elements and attributes used in diagrams. Includes PPT-quality variants with drop shadows and gradients.
 
 ```svg
-<!-- Rectangle (process step, node, component) -->
+<!-- Drop shadow filter (PPT-style) — define once in <defs> -->
+<filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+  <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity="0.12"/>
+</filter>
+
+<!-- Gradient definition (PPT-style soft gradient) -->
+<linearGradient id="gradBlue" x1="0%" y1="0%" x2="0%" y2="100%">
+  <stop offset="0%" stop-color="#E8F0FE"/>
+  <stop offset="100%" stop-color="#D2E3FC"/>
+</linearGradient>
+
+<!-- Rectangle with shadow (PPT-style process step) -->
+<rect x="10" y="10" width="140" height="50" rx="8" ry="8" fill="url(#gradBlue)" stroke="#1A73E8" stroke-width="1.5" filter="url(#shadow)"/>
+
+<!-- Rectangle (flat, no shadow — for minimal style) -->
 <rect x="10" y="10" width="120" height="40" rx="4" ry="4" fill="#E3F2FD" stroke="#1565C0" stroke-width="2"/>
 
-<!-- Rounded rectangle (start/end, database) -->
+<!-- Rounded rectangle (start/end) -->
 <rect x="10" y="10" width="120" height="40" rx="20" ry="20" fill="#E8F5E9" stroke="#2E7D32" stroke-width="2"/>
 
 <!-- Diamond (decision) — use polygon -->
@@ -75,52 +138,61 @@ Common SVG elements and attributes used in diagrams.
 <circle cx="60" cy="60" r="30" fill="#E3F2FD" stroke="#1565C0" stroke-width="2"/>
 <ellipse cx="60" cy="60" rx="40" ry="25" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="2"/>
 
-<!-- Text -->
-<text x="70" y="35" text-anchor="middle" dominant-baseline="middle" font-family="Arial, sans-serif" font-size="14" fill="#212121">Label</text>
+<!-- Text with PPT font stack -->
+<text x="70" y="35" text-anchor="middle" dominant-baseline="middle" font-family="Segoe UI, -apple-system, Helvetica Neue, Arial, sans-serif" font-size="14" fill="#202124">Label</text>
+
+<!-- PPT Title bar -->
+<rect x="0" y="0" width="960" height="60" fill="#1A73E8" filter="url(#shadow)"/>
+<text x="480" y="36" text-anchor="middle" font-family="Segoe UI, -apple-system, Helvetica Neue, Arial, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF">Diagram Title</text>
 
 <!-- Arrow marker definition -->
 <defs>
   <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-    <path d="M 0 0 L 10 5 L 0 10 z" fill="#546E7A"/>
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#5F6368"/>
   </marker>
 </defs>
 
 <!-- Path with arrow -->
-<path d="M 130 30 L 250 30" stroke="#546E7A" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 130 30 L 250 30" stroke="#5F6368" stroke-width="2" marker-end="url(#arrow)"/>
 
 <!-- Dashed line -->
-<path d="M 130 30 L 250 30" stroke="#90A4AE" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+<path d="M 130 30 L 250 30" stroke="#9AA0A6" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
 
 <!-- Curved connection -->
-<path d="M 130 30 C 190 30, 190 60, 250 60" fill="none" stroke="#546E7A" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M 130 30 C 190 30, 190 60, 250 60" fill="none" stroke="#5F6368" stroke-width="2" marker-end="url(#arrow)"/>
 
 <!-- Label background pill -->
 <rect x="180" y="24" width="30" height="16" rx="3" fill="#FFFFFF" stroke="none"/>
-<text x="195" y="32" text-anchor="middle" font-size="10" fill="#546E7A">Yes</text>
+<text x="195" y="32" text-anchor="middle" font-size="10" fill="#5F6368">Yes</text>
 </svg-element-reference>
 
 <viewbox-strategy>
-How to choose and scale the SVG viewBox.
+How to choose and scale the SVG viewBox. For all PPT-bound diagrams, prefer 16:9 aspect ratio.
 
-- **Simple diagrams** (≤5 nodes): `viewBox="0 0 600 400"`
-- **Medium diagrams** (5–15 nodes): `viewBox="0 0 800 600"`
-- **Large diagrams** (15–30 nodes): `viewBox="0 0 1000 800"`
-- **Wide diagrams** (many horizontal nodes): `viewBox="0 0 1200 600"`
-- **Tall diagrams** (many vertical nodes): `viewBox="0 0 800 1000"`
+- **PPT standard (16:9, default)**: `viewBox="0 0 960 540"` — this is the primary viewBox for all presentation diagrams.
+- **PPT standard (4:3, legacy)**: `viewBox="0 0 720 540"` — use only when the user explicitly requests 4:3.
+- **Simple diagrams** (≤5 nodes): `viewBox="0 0 800 450"` (16:9) or `viewBox="0 0 600 400"` (standalone).
+- **Medium diagrams** (5–15 nodes): `viewBox="0 0 960 540"` (16:9) or `viewBox="0 0 800 600"` (standalone).
+- **Large diagrams** (15–30 nodes): `viewBox="0 0 1200 675"` (16:9) or `viewBox="0 0 1000 800"` (standalone).
+- **Wide diagrams** (many horizontal nodes): `viewBox="0 0 1200 600"`.
+- **Tall diagrams** (many vertical nodes): `viewBox="0 0 800 1000"`.
 - Rule of thumb: Calculate bounding box of all elements, then add 40px padding on all sides. Round up to nearest 50px.
 - For responsive scaling, keep width/height ratio in `viewBox` consistent. Set SVG width to 100% and height to auto in HTML.
+- When embedding in PPT, the diagram content area should fit within the middle 80% of the viewBox, leaving top margin for title and bottom margin for footer.
 </viewbox-strategy>
 
 <text-sizing>
-How to size shapes based on text content.
+How to size shapes based on text content. For PPT diagrams, use larger font sizes and generous padding.
 
-- **Single-line text**: height = 40px; width = (text length in characters × 9px) + 24px padding; minimum width = 80px.
-- **Multi-line text**: height = (line count × 22px) + 16px padding; width = (longest line chars × 9px) + 24px padding.
-- **Headers/titles**: font-size 18px, bold.
-- **Body labels**: font-size 14px, regular.
+- **Single-line text (PPT)**: height = 48px; width = (text length in characters × 10px) + 32px padding; minimum width = 100px.
+- **Single-line text (standalone)**: height = 40px; width = (text length in characters × 9px) + 24px padding; minimum width = 80px.
+- **Multi-line text**: height = (line count × 24px) + 20px padding; width = (longest line chars × 10px) + 32px padding.
+- **PPT title**: font-size 20–24px, bold, color `#1A1A1A`.
+- **Section headers**: font-size 16px, bold, color `#333333`.
+- **Body labels**: font-size 14px, regular, color `#424242`.
 - **Small annotations**: font-size 11px, color `#757575`.
 - Use `text-anchor="middle"` and `dominant-baseline="middle"` for centered text.
-- For left-aligned text blocks, use `text-anchor="start"` and offset x by +12px from shape left edge.
+- For left-aligned text blocks, use `text-anchor="start"` and offset x by +14px from shape left edge.
 </text-sizing>
 
 <flowchart-components>
@@ -228,6 +300,62 @@ Rules for detecting and avoiding connection issues in flowcharts.
 
 </connection-validation>
 
+<computation-scripts>
+All geometric calculations MUST be done by running Python scripts, NOT by AI reasoning or manual coordinate math. The scripts in `scripts/` provide deterministic, tested computations for layout, routing, labeling, and color validation.
+
+**Scripts directory**: `skills/svg-editor/scripts/`
+
+| Script | Purpose | Key functions |
+|---|---|---|
+| `compute_all.py` | **Main orchestrator** — takes JSON description, outputs JSON with all computed positions/paths/labels | `compute_diagram(desc)` — call from terminal: `python3 scripts/compute_all.py '<json>'` |
+| `geometry.py` | Bounding box math, overlap detection, point/segment intersection | `overlap()`, `connection_point()`, `segment_line_intersection()`, `inflate_bbox()`, `union_bbox()` |
+| `routing.py` | Orthogonal/bezier connection path computation, endpoint validation, intersection detection | `orthogonal_path()`, `bezier_path()`, `connection_endpoints()`, `detect_intersections()`, `endpoint_valid()` |
+| `layout.py` | Grid/radial layout, force-directed overlap resolution, viewBox computation | `flow_layout()`, `decision_branch_positions()`, `force_directed_layout()`, `compute_viewbox()` |
+| `labeling.py` | Label placement on connection paths, overlap checking | `label_position()`, `compute_all_labels()`, `label_overlap_check()` |
+| `colors.py` | WCAG contrast ratio, PPT palette, gradient/shadow SVG defs | `contrast_ratio()`, `wcag_aa_check()`, `get_gradient_defs()`, `get_shadow_filter()` |
+
+**compute_all.py input format** (JSON):
+```json
+{
+  "diagram_type": "flowchart",
+  "title": "Diagram Title",
+  "ppt_mode": true,
+  "flow_direction": "top-to-bottom",
+  "nodes": [
+    {"id": "start", "type": "start", "text": "Start", "width": 130, "height": 48, "row": 0, "col": 0},
+    {"id": "p1", "type": "process", "text": "Step 1", "width": 150, "height": 54, "row": 1, "col": 0},
+    {"id": "d1", "type": "decision", "text": "Ok?", "width": 90, "height": 90, "row": 2, "col": 0},
+    {"id": "end", "type": "end", "text": "End", "width": 130, "height": 48, "row": 4, "col": 0}
+  ],
+  "edges": [
+    {"id": "e1", "from": "start", "to": "p1"},
+    {"id": "e2", "from": "p1", "to": "d1"},
+    {"id": "e3", "from": "d1", "to": "end", "label": "Yes", "branch": "yes", "style": "solid"}
+  ]
+}
+```
+
+**compute_all.py output** includes:
+- `nodes[]` — each with computed `x`, `y`, `bbox`
+- `edges[]` — each with computed `path_d`, `waypoints[]`, `src_point`, `dst_point`
+- `labels[]` — each with `x`, `y`, `bg_rect`, `side` for placement
+- `viewbox` — computed `{x, y, width, height}`
+- `defs` — SVG `<filter>` and `<linearGradient>` strings (when ppt_mode=true)
+- `validation` — `node_overlaps`, `connection_issues`, `color_issues`, `all_clear`
+
+**When to run compute_all.py**:
+- Before generating ANY new SVG diagram — always compute layout via the script first
+- When the user provides explicit node descriptions and connections — convert to JSON and run
+- When modifying layout of an existing diagram — reconstruct JSON from the SVG, modify, re-run
+- Do NOT manually calculate x/y coordinates, path d-strings, or label positions — use the script
+
+**When to use individual script functions** (for partial computations):
+- Use `geometry.overlap()` to check if two specific shapes overlap
+- Use `routing.orthogonal_path()` to re-route a single connection around a new obstacle
+- Use `colors.contrast_ratio()` to validate a specific text/background color pair
+- Use `labeling.label_position()` to reposition a single label after layout change
+</computation-scripts>
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -246,6 +374,10 @@ Rules for detecting and avoiding connection issues in flowcharts.
 | Executing **analyze-and-fix-layout** (need detailed steps) | Layout analysis step-by-step instructions with overlap detection and connection re-routing | [reference/analyze-and-fix-layout.md](reference/analyze-and-fix-layout.md) |
 | Editing or modifying an existing SVG (color/text/element changes, restructuring) | SVG editing example showing style updates, element additions, and restructuring | [examples/modify-existing-svg-example.md](examples/modify-existing-svg-example.md) |
 | Executing **modify-existing-svg** (need detailed steps) | SVG editing step-by-step instructions with element identification, modification planning, and structured editing | [reference/modify-existing-svg.md](reference/modify-existing-svg.md) |
+| Upgrading an existing SVG to PPT-presentation quality (adding shadows, gradients, title bars, slide-ready layout) | PPT upgrade example showing before/after transformation with professional effects | [examples/layout-fix-example.md](examples/layout-fix-example.md) |
+| Executing **upgrade-to-ppt-quality** (need detailed steps) | PPT upgrade step-by-step instructions with shadow filters, gradient definitions, typography, and slide layout | [reference/modify-existing-svg.md](reference/modify-existing-svg.md) |
+| Computing layout, connection paths, or label positions for any diagram type | Python computation scripts for all geometric calculations (overlap, routing, labeling, contrast) | [scripts/compute_all.py](scripts/compute_all.py) |
+| Need individual geometry/routing/layout/labeling/color functions for partial computation | Python utility modules for geometric calculations | [scripts/](scripts/) |
 </context-loading-guide>
 
 </knowledge>
@@ -253,32 +385,50 @@ Rules for detecting and avoiding connection issues in flowcharts.
 <capabilities>
 
 <create-flowchart>
-**Objective**: Generate a flowchart, process diagram, or workflow diagram as raw SVG.
+**Objective**: Generate a PPT-presentation-quality flowchart, process diagram, or workflow diagram as raw SVG.
+
+**CRITICAL — Computation**: All position, path, and label calculations MUST be done by running `python3 scripts/compute_all.py` with a JSON description of nodes and edges. Never manually calculate coordinates, path d-strings, or label positions. See `<computation-scripts>` for the JSON format and script reference.
+
 Load **reference/create-flowchart.md** for detailed step-by-step instructions.
 </create-flowchart>
 
 <create-architecture-diagram>
-**Objective**: Generate a system architecture, component, or deployment diagram as raw SVG.
+**Objective**: Generate a PPT-presentation-quality system architecture, component, or deployment diagram as raw SVG.
+
+**CRITICAL — Computation**: All position, path, and label calculations MUST be done by running `python3 scripts/compute_all.py`. Never manually calculate coordinates.
+
 Load **reference/create-architecture-diagram.md** for detailed step-by-step instructions.
 </create-architecture-diagram>
 
 <create-sequence-diagram>
-**Objective**: Generate a UML-style sequence diagram showing message passing between actors/components as raw SVG.
+**Objective**: Generate a PPT-presentation-quality UML-style sequence diagram showing message passing between actors/components as raw SVG.
+
+**CRITICAL — Computation**: All position, path, and label calculations MUST be done by running `python3 scripts/compute_all.py`. Never manually calculate coordinates.
+
 Load **reference/create-sequence-diagram.md** for detailed step-by-step instructions.
 </create-sequence-diagram>
 
 <create-concept-diagram>
-**Objective**: Generate a concept diagram, mind map, or visual explanation as raw SVG.
+**Objective**: Generate a PPT-presentation-quality concept diagram, mind map, or visual explanation as raw SVG.
+
+**CRITICAL — Computation**: All position, path, and label calculations MUST be done by running `python3 scripts/compute_all.py`. Never manually calculate coordinates.
+
 Load **reference/create-concept-diagram.md** for detailed step-by-step instructions.
 </create-concept-diagram>
 
 <create-chart>
-**Objective**: Generate a chart, graph, or data visualization as raw SVG.
+**Objective**: Generate a PPT-presentation-quality chart, graph, or data visualization as raw SVG.
+
+**CRITICAL — Computation**: All position, path, and label calculations MUST be done by running `python3 scripts/compute_all.py`. Never manually calculate coordinates.
+
 Load **reference/create-chart.md** for detailed step-by-step instructions.
 </create-chart>
 
 <analyze-and-fix-layout>
-**Objective**: Analyze an existing SVG diagram and fix overlapping elements, unclear connections, or poor spacing.
+**Objective**: Analyze an existing SVG diagram and fix overlapping elements, unclear connections, or poor spacing. Also apply PPT-quality styling enhancements to the repaired output.
+
+**CRITICAL — Computation**: Overlap detection MUST use `scripts/geometry.py` functions (call via `python3 -c "from scripts.geometry import overlap; ..."`). Connection re-routing MUST use `scripts/routing.py`. Never manually check for overlaps or compute paths.
+
 Load **reference/analyze-and-fix-layout.md** for detailed step-by-step instructions.
 </analyze-and-fix-layout>
 
@@ -287,15 +437,38 @@ Load **reference/analyze-and-fix-layout.md** for detailed step-by-step instructi
 Load **reference/modify-existing-svg.md** for detailed step-by-step instructions.
 </modify-existing-svg>
 
+<upgrade-to-ppt-quality>
+**Objective**: Upgrade an existing SVG diagram to professional PPT-presentation quality by adding drop shadows, soft gradients, a title bar, slide-ready 16:9 dimensions, and PPT-standard typography.
+
+**Steps**:
+1. **Analyze current SVG**: Read the existing SVG. Identify whether it already has `<defs>`, `<filter>`, or `<linearGradient>` elements. Note current viewBox dimensions, colors, font families, and whether a title bar exists.
+2. **Set PPT viewBox**: If the current viewBox is not 16:9 (960×540), explain to the user that the aspect ratio will change and confirm before proceeding. For 4:3 presentations, use 720×540.
+3. **Add PPT defs**: Insert or extend `<defs>` with:
+   - Drop shadow filter: `<filter id="shadow">` with `feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.12"`
+   - Soft gradients for shape fills (e.g., `#E8F0FE` → `#D2E3FC`) matching the PPT Professional palette
+4. **Add title bar**: Insert a full-width title bar `<rect>` at the top of the viewBox (y=0, height=60px) with the diagram's main topic as title text in white, bold, 20–22px font on a `#1A73E8` background with shadow.
+5. **Upgrade shape styling**: Apply `filter="url(#shadow)"` to key shapes, replace flat fills with gradient URLs, increase `rx`/`ry` to 6–8px for rounded corners, and update stroke colors to the PPT Professional palette.
+6. **Upgrade typography**: Replace font-family with `Segoe UI, -apple-system, Helvetica Neue, Arial, sans-serif`. Bump body font-size to 14px minimum. Set text colors to `#202124` (primary), `#424242` (secondary), `#757575` (annotation).
+7. **Adjust spacing**: Increase minimum inter-element gap to 40px. Add section background panels (`<rect fill="#F5F5F5" rx="8">`) to group related elements.
+8. **Validate**: Check contrast ratios (≥4.5:1 text-to-background), ensure all text ≥10px, verify no elements overflow the viewBox, and confirm the title bar has `filter="url(#shadow)"`.
+
+Load **reference/modify-existing-svg.md** for detailed step-by-step instructions on SVG editing patterns.
+</upgrade-to-ppt-quality>
+
 </capabilities>
 
 <rules>
-<rule>When the user describes a process flow, workflow, or algorithm with branching and decision steps, apply **create-flowchart**.</rule>
+<rule>When generating any new SVG diagram, ALWAYS run `python3 scripts/compute_all.py` first with a JSON description of nodes and edges. Use the script's output (positions, paths, labels, viewbox, defs) to construct the SVG. Never manually calculate x/y coordinates, path d-strings, or label positions.</rule>
+<rule>When checking for overlapping elements, ALWAYS use `python3 -c "import sys; sys.path.insert(0, 'scripts'); from geometry import overlap; ..."` — never visually estimate or reason about overlaps.</rule>
+<rule>When validating connection endpoints or detecting line intersections, ALWAYS use functions from `scripts/routing.py` — never manually inspect SVG coordinates.</rule>
+<rule>When validating color contrast, ALWAYS use `python3 -c "import sys; sys.path.insert(0, 'scripts'); from colors import contrast_ratio; ..."` — never estimate contrast visually.</rule>
+<rule>When the user describes a process flow, workflow, or algorithm with branching and decision steps, apply **create-flowchart**. Output will be PPT-presentation-quality by default.</rule>
 <rule>When the user describes a system with tiers, layers, components, or services and their relationships, apply **create-architecture-diagram**.</rule>
 <rule>When the user describes interactions between actors/components over time with message passing, apply **create-sequence-diagram**.</rule>
 <rule>When the user describes a central topic with branching related concepts, a mind map, or an explanatory diagram, apply **create-concept-diagram**.</rule>
 <rule>When the user provides data values and wants a visual representation (bar, line, pie, scatter), apply **create-chart**.</rule>
 <rule>When the user provides an existing SVG with overlapping elements, unclear lines, or cramped spacing, apply **analyze-and-fix-layout**.</rule>
 <rule>When the user provides an existing SVG and wants to change its colors, text, fonts, styling, or add/remove/rearrange elements (without layout overlap issues being the primary concern), apply **modify-existing-svg**.</rule>
+<rule>When the user wants to upgrade an existing SVG to PPT-presentation quality — adding professional effects like shadows, gradients, title bars, or slide-ready layout — apply **upgrade-to-ppt-quality**.</rule>
 <rule>When the user's request spans multiple diagram types (e.g., a flowchart embedded in an architecture diagram), apply the relevant capabilities sequentially and compose the output as a single SVG.</rule>
 </rules>
