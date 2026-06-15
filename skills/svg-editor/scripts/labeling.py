@@ -8,36 +8,20 @@ checks for overlaps with shapes and other labels.
 import math
 from typing import Tuple, List, Dict, Any, Optional
 
-try:
-    from .geometry import (
-        BBox,
-        Point,
-        overlap_with_margin,
-        find_overlapping,
-        overlap,
-        bbox_to_rect,
-        center,
-    )
-    from .routing import (
-        longest_straight_segment,
-        midpoint_of_segment,
-        segment_is_horizontal,
-    )
-except ImportError:
-    from geometry import (
-        BBox,
-        Point,
-        overlap_with_margin,
-        find_overlapping,
-        overlap,
-        bbox_to_rect,
-        center,
-    )
-    from routing import (
-        longest_straight_segment,
-        midpoint_of_segment,
-        segment_is_horizontal,
-    )
+from geometry import (
+    BBox,
+    Point,
+    overlap_with_margin,
+    find_overlapping,
+    overlap,
+    bbox_to_rect,
+    center,
+)
+from routing import (
+    longest_straight_segment,
+    midpoint_of_segment,
+    segment_is_horizontal,
+)
 
 
 def label_position(

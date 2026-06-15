@@ -1,16 +1,13 @@
 """
 SVG shape and element generation for diagram nodes and edges.
 
-Takes computed layout data from compute_all.py and generates SVG
+Takes computed layout data (positions, paths) and generates SVG
 markup strings for shapes, markers, title bars, and labels.
 """
 
 from typing import Dict, Any, List, Optional
 
-try:
-    from .colors import PPT_PALETTE, get_fill_gradient_id
-except ImportError:
-    from colors import PPT_PALETTE, get_fill_gradient_id
+from colors import PPT_PALETTE, get_fill_gradient_id
 
 
 def get_shape_dimensions(

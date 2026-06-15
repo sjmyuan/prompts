@@ -8,30 +8,17 @@ and validates connections for intersections.
 import math
 from typing import Tuple, List, Optional, Dict, Any
 
-try:
-    from .geometry import (
-        BBox,
-        Point,
-        connection_point,
-        bbox_to_rect,
-        segment_line_intersection,
-        segment_rect_intersection,
-        inflate_bbox,
-        center,
-        distance,
-    )
-except ImportError:
-    from geometry import (
-        BBox,
-        Point,
-        connection_point,
-        bbox_to_rect,
-        segment_line_intersection,
-        segment_rect_intersection,
-        inflate_bbox,
-        center,
-        distance,
-    )
+from geometry import (
+    BBox,
+    Point,
+    connection_point,
+    bbox_to_rect,
+    segment_line_intersection,
+    segment_rect_intersection,
+    inflate_bbox,
+    center,
+    distance,
+)
 
 
 def orthogonal_path(

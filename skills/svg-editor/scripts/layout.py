@@ -8,28 +8,16 @@ and viewBox computation.
 import math
 from typing import Tuple, List, Dict, Any, Optional
 
-try:
-    from .geometry import (
-        BBox,
-        Point,
-        overlap_with_margin,
-        find_overlapping,
-        union_bbox,
-        shift_bbox,
-        center,
-        inflate_bbox,
-    )
-except ImportError:
-    from geometry import (
-        BBox,
-        Point,
-        overlap_with_margin,
-        find_overlapping,
-        union_bbox,
-        shift_bbox,
-        center,
-        inflate_bbox,
-    )
+from geometry import (
+    BBox,
+    Point,
+    overlap_with_margin,
+    find_overlapping,
+    union_bbox,
+    shift_bbox,
+    center,
+    inflate_bbox,
+)
 
 
 def flow_layout(

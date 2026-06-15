@@ -28,7 +28,7 @@ Before starting, load `<ppt-design-requirements>` and `<svg-layout-principles>` 
    - Preserve `<g>` grouping structure unless user requests restructuring
    - When changing colors, update both fills and strokes consistently from `colors.PPT_PALETTE`
    - When changing text, call `svg_shapes.get_shape_dimensions()` to compute new shape sizes
-   - When adding new elements, run `compute_all.py` with updated JSON to compute positions and SVG fragments
+   - When adding new elements, run the **Compute node positions** and **Generate SVG for a shape** snippets to compute positions and SVG fragments
    - When removing elements, also remove orphaned connections
    - **PPT upgrade steps** (apply when user requests PPT quality):
      a. Generate PPT defs: `colors.get_shadow_filter()` and `colors.get_gradient_defs()`

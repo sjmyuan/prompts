@@ -28,7 +28,7 @@ All SVG output must meet professional presentation standards suitable for PPT/Ke
 </ppt-design-requirements>
 
 <svg-layout-principles>
-Core rules for arranging elements. Computation is handled by scripts; these are high-level design principles.
+Core rules for arranging elements. All geometric computations MUST use Python snippets, never manual reasoning.
 
 - **Canvas**: `viewBox="0 0 960 540"` default. Leave 20–40px padding on all edges.
 - **Spacing**: Minimum 20px gap between adjacent shapes. Group-related: 10–15px internal, 30–40px external.
@@ -37,74 +37,120 @@ Core rules for arranging elements. Computation is handled by scripts; these are 
 - **Alignment**: Same-level elements aligned to common baseline. Text centered within shapes.
 - **Sizing**: Same semantic type → uniform size. Compute via `svg_shapes.get_shape_dimensions()`.
 - **Z-order**: Render connections before shapes (lines appear underneath). Text labels on top.
-- **Overlap avoidance**: Use `python3 scripts/compute_all.py` — never manually check overlaps.
+- **Overlap avoidance**: Use `geometry.overlap()` / `geometry.find_overlapping()` — never manually check overlaps.
 </svg-layout-principles>
 
-<computation-scripts>
-All geometric calculations — positions, paths, labels, colors, and SVG element generation — MUST be done by running Python scripts, never by AI reasoning or manual coordinate math.
+<computation-snippets>
+All geometric calculations — positions, paths, labels, colors, and SVG element generation — MUST be done by running Python snippets, never by AI reasoning or manual coordinate math.
 
-**Scripts directory**: `skills/svg-editor/scripts/`
+**Scripts directory**: `skills/svg-editor/scripts/` — standalone `.py` files, no package, no orchestrator.
 
-| Script | Purpose | Key output |
+| Module | Purpose | Key functions |
 |---|---|---|
-| `compute_all.py` | **Main orchestrator** — JSON in, complete layout + SVG fragments out | `nodes[].svg_shape`, `edges[].svg_line`, `labels[].svg_label`, `svg_markers`, `svg_title_bar` |
-| `svg_shapes.py` | Generates SVG element strings for nodes, edges, labels, markers, title bars | Shape SVGs with proper colors, gradients, shadows per node type |
-| `geometry.py` | Bounding box math, overlap detection, point/segment intersection | Overlap checks, connection points |
-| `routing.py` | Orthogonal/bezier path computation, endpoint validation, intersection detection | Path d-strings, waypoints |
-| `layout.py` | Grid/radial layout, force-directed overlap resolution, viewBox computation | Node positions, viewBox |
-| `labeling.py` | Label placement on connection paths, overlap checking | Label positions with background rects |
-| `colors.py` | WCAG contrast ratio, PPT palette, gradient/shadow SVG defs | Color validation, filter/gradient strings |
+| `svg_shapes.py` | SVG element strings for nodes, edges, labels, markers, title bars | `generate_node_svg()`, `generate_edge_svg()`, `generate_label_svg()`, `generate_title_bar()`, `generate_arrow_marker()`, `get_shape_dimensions()`, `get_node_type_colors()` |
+| `geometry.py` | Bounding box math, overlap detection, intersections | `overlap()`, `find_overlapping()`, `connection_point()`, `center()`, `distance()`, `segment_line_intersection()` |
+| `routing.py` | Orthogonal/bezier path computation, endpoint validation | `orthogonal_path()`, `connection_endpoints()`, `path_to_svg_d()`, `bezier_path()`, `detect_intersections()`, `endpoint_valid()` |
+| `layout.py` | Grid/radial layout, force-directed overlap resolution, viewBox | `flow_layout()`, `decision_branch_positions()`, `resolve_overlaps()`, `force_directed_layout()`, `compute_viewbox()`, `distribute_along_circle()` |
+| `labeling.py` | Label placement on connection paths | `label_position()`, `compute_all_labels()`, `label_overlap_check()` |
+| `colors.py` | WCAG contrast, PPT palette, gradient/shadow defs | `contrast_ratio()`, `wcag_aa_check()`, `get_gradient_defs()`, `get_shadow_filter()`, `PPT_PALETTE` |
 
-**Usage** — always run for new diagrams:
+**Calling convention** — always use `python3 -c` with `sys.path.insert`:
 ```bash
-python3 scripts/compute_all.py '<json_description>'
+python3 -c "
+import sys; sys.path.insert(0, 'scripts')
+from module_name import function_name
+result = function_name(...)
+print(result)
+"
 ```
 
-**Input format** (JSON):
-```json
-{
-  "diagram_type": "flowchart",
-  "title": "Diagram Title",
-  "ppt_mode": true,
-  "nodes": [
-    {"id": "start", "type": "start", "text": "Start", "row": 0, "col": 0},
-    {"id": "p1", "type": "process", "text": "Step 1", "row": 1, "col": 0},
-    {"id": "d1", "type": "decision", "text": "Ok?", "row": 2, "col": 0}
-  ],
-  "edges": [
-    {"id": "e1", "from": "start", "to": "p1"},
-    {"id": "e2", "from": "p1", "to": "d1", "label": "Yes"}
-  ]
-}
+**Common snippet patterns** (use these verbatim when building diagrams):
+
+**Compute node positions (flowchart grid)**:
+```bash
+python3 -c "
+import sys; sys.path.insert(0, 'scripts')
+from layout import flow_layout
+from svg_shapes import get_shape_dimensions
+nodes = [
+    {'id': 'start', 'type': 'start', 'text': 'Start', 'row': 0, 'col': 0},
+    {'id': 'p1', 'type': 'process', 'text': 'Step 1', 'row': 1, 'col': 0},
+]
+for n in nodes:
+    dims = get_shape_dimensions(n['text'], n['type'], ppt_mode=True)
+    n.update(dims)
+nodes = flow_layout(nodes, 'top-to-bottom', node_gap=130, branch_gap=260, start_offset=(100, 140))
+for n in nodes:
+    print(f\"{n['id']}: x={n['x']:.0f} y={n['y']:.0f} w={n['width']:.0f} h={n['height']:.0f}\")
+"
 ```
 
-**Output fields**:
-| Field | Description |
-|---|---|
-| `nodes[].svg_shape` | Complete SVG element string for this node (shape + text) |
-| `edges[].svg_line` | Complete SVG `<path>` with marker and styling |
-| `labels[].svg_label` | SVG `<rect>` + `<text>` for connection labels |
-| `svg_markers` | Arrow marker `<defs>` (solid and dashed) |
-| `svg_title_bar` | Title bar SVG elements (when `ppt_mode=true`) |
-| `defs` | Shadow filter and gradient SVG definitions |
-| `validation` | Overlap/intersection/color check results |
-| `viewbox` | Computed `{x, y, width, height}` |
+**Check shape overlaps**:
+```bash
+python3 -c "
+import sys; sys.path.insert(0, 'scripts')
+from geometry import find_overlapping
+bboxes = [(100,140,130,48), (250,140,140,50)]
+issues = find_overlapping(bboxes, margin=10)
+print(f'Overlaps: {issues}')
+"
+```
 
-**SVG assembly** — after getting script output, just concatenate:
-1. `<svg viewBox="...">` from `output.viewbox`
-2. `<defs>` from `output.defs` + `output.svg_markers`
-3. `output.svg_title_bar`
-4. `output.edges[].svg_line` (connections first = appear underneath)
-5. `output.nodes[].svg_shape` (shapes on top of lines)
-6. `output.labels[].svg_label` (labels on top)
-7. `</svg>`
+**Route a connection between two shapes**:
+```bash
+python3 -c "
+import sys; sys.path.insert(0, 'scripts')
+from routing import connection_endpoints, orthogonal_path, path_to_svg_d
+src_bbox = (100, 140, 130, 48)
+dst_bbox = (250, 270, 140, 50)
+src_pt, dst_pt, src_side, dst_side = connection_endpoints(src_bbox, dst_bbox)
+waypoints = orthogonal_path(src_pt, dst_pt, src_side, dst_side)
+print(path_to_svg_d(waypoints))
+"
+```
 
-**When to use individual scripts** (partial computations):
-- `geometry.overlap()` to check specific shape overlaps
-- `routing.orthogonal_path()` to re-route a single connection around an obstacle
-- `colors.contrast_ratio()` to validate specific color pairs
-- `svg_shapes.generate_node_svg()` to regenerate a single node shape
-</computation-scripts>
+**Generate SVG for a shape**:
+```bash
+python3 -c "
+import sys; sys.path.insert(0, 'scripts')
+from svg_shapes import generate_node_svg, generate_edge_svg, generate_arrow_marker, generate_title_bar
+node_svg = generate_node_svg('id', 'process', 'My Text', x=100, y=140, width=130, height=48)
+edge_svg = generate_edge_svg('e1', 'M 165 188 L 320 188', style='solid')
+marker = generate_arrow_marker()
+title = generate_title_bar('Diagram Title', 960)
+print(node_svg)
+"
+```
+
+**Validate color contrast**:
+```bash
+python3 -c "
+import sys; sys.path.insert(0, 'scripts')
+from colors import wcag_aa_check
+result = wcag_aa_check('#202124', '#E8F0FE')
+print(f'Pass: {result[\"pass\"]}, Ratio: {result[\"ratio\"]}')
+"
+```
+
+**Compute viewBox for SVG**:
+```bash
+python3 -c "
+import sys; sys.path.insert(0, 'scripts')
+from layout import compute_viewbox
+bboxes = [(100,140,130,48), (250,270,140,50), (100,270,130,48)]
+vx, vy, vw, vh = compute_viewbox(bboxes, padding=40, target_aspect=16/9, title_bar_height=70)
+print(f'viewBox=\"0 0 {vw} {vh}\"')
+"
+```
+
+**SVG assembly pattern** (after computing all parts):
+1. `<svg viewBox="...">` from computed viewBox
+2. `<defs>` with `colors.get_shadow_filter()` + `colors.get_gradient_defs()` + arrow markers
+3. Title bar from `svg_shapes.generate_title_bar(title, width)`
+4. Connection `<path>` elements from `svg_shapes.generate_edge_svg()`
+5. Shape elements from `svg_shapes.generate_node_svg()`
+6. Label elements from `svg_shapes.generate_label_svg()`
+7. `</svg>`</computation-snippets>
 
 <context-loading-guide>
 
@@ -126,8 +172,7 @@ python3 scripts/compute_all.py '<json_description>'
 | Executing **modify-existing-svg** (need detailed steps) | Step-by-step SVG modification instructions | [reference/modify-existing-svg.md](reference/modify-existing-svg.md) |
 | Upgrading existing SVG to PPT-presentation quality | PPT upgrade example with professional effects | [examples/layout-fix-example.md](examples/layout-fix-example.md) |
 | Executing **upgrade-to-ppt-quality** (need detailed steps) | Step-by-step PPT upgrade instructions | [reference/modify-existing-svg.md](reference/modify-existing-svg.md) |
-| Computing layout, paths, labels, or SVG fragments for any diagram | Python computation scripts for all geometric calculations | [scripts/compute_all.py](scripts/compute_all.py) |
-| Need individual geometry/routing/layout/labeling/color functions | Python utility modules for partial computation | [scripts/](scripts/) |
+| Need to compute node positions, route connections, generate SVG elements, or validate layout | Python snippet modules for each computation task | [scripts/](scripts/) |
 </context-loading-guide>
 
 </knowledge>
@@ -139,29 +184,32 @@ python3 scripts/compute_all.py '<json_description>'
 
 **Steps**:
 1. **Analyze the process**: Identify start/end nodes, process steps, decisions, branches, and flow direction from user description. Extract a diagram title.
-2. **Build JSON description**: Construct JSON with `diagram_type: "flowchart"`, `ppt_mode: true`, `nodes[]` (with `id`, `type`, `text`, `row`, `col`), and `edges[]` (with `from`, `to`, optional `label` and `branch`). Omit `width`/`height` — scripts auto-compute.
-3. **Run script**: Execute `python3 scripts/compute_all.py '<json>'`. Capture the JSON output.
-4. **Review validation**: Check `validation.all_clear`. If `false`, fix overlaps/intersections by adjusting row/col spacing and re-running.
-5. **Assemble SVG**: Concatenate `svg_markers` + `svg_title_bar` + connection `svg_line`s + node `svg_shape`s + label `svg_label`s inside `<svg viewBox="..."><defs>...</defs>...</svg>`.
-6. **Output**: Return raw, valid SVG code with no surrounding explanation.
+2. **Build node/edge data**: Construct a list of nodes (with `id`, `type`, `text`, `row`, `col`) and edges (with `from`, `to`, optional `label`, `branch`).
+3. **Compute positions via snippet**: Run the **Compute node positions** snippet from `<computation-snippets>` to get `x`, `y`, `width`, `height`, `bbox` for each node.
+4. **Route connections**: For each edge, run the **Route a connection** snippet with the source/dest node bounding boxes to get SVG path strings.
+5. **Generate SVG elements**: Run the **Generate SVG for a shape** snippet for each node and edge.
+6. **Validate**: Run the **Check shape overlaps** and **Validate color contrast** snippets. Fix any issues.
+7. **Compute viewBox**: Run the **Compute viewBox** snippet with all element bounding boxes.
+8. **Assemble SVG**: Follow the **SVG assembly pattern** in `<computation-snippets>`.
+9. **Output**: Return raw, valid SVG code with no surrounding explanation.
 
 Load **reference/create-flowchart.md** for detailed step-by-step instructions.
 </create-flowchart>
 
 <create-architecture-diagram>
-**Objective**: Generate a PPT-quality system architecture, component, or deployment diagram as raw SVG. Build JSON with `diagram_type: "architecture"`, run `compute_all.py`, assemble output. Load **reference/create-architecture-diagram.md** for details.
+**Objective**: Generate a PPT-quality system architecture, component, or deployment diagram as raw SVG. Build node/edge data, call inline snippets from `<computation-snippets>` to compute positions/connections/SVG fragments, then assemble. Load **reference/create-architecture-diagram.md** for details.
 </create-architecture-diagram>
 
 <create-sequence-diagram>
-**Objective**: Generate a PPT-quality sequence diagram showing message passing as raw SVG. Build JSON with `diagram_type: "sequence"`, run `compute_all.py`, assemble output. Load **reference/create-sequence-diagram.md** for details.
+**Objective**: Generate a PPT-quality sequence diagram showing message passing as raw SVG. Build node/edge data, call inline snippets from `<computation-snippets>` to compute positions/connections/SVG fragments, then assemble. Load **reference/create-sequence-diagram.md** for details.
 </create-sequence-diagram>
 
 <create-concept-diagram>
-**Objective**: Generate a PPT-quality concept diagram, mind map, or visual explanation as raw SVG. Build JSON with `diagram_type: "concept"`, run `compute_all.py`, assemble output. Load **reference/create-concept-diagram.md** for details.
+**Objective**: Generate a PPT-quality concept diagram, mind map, or visual explanation as raw SVG. Build node/edge data with central and branch nodes, call inline snippets from `<computation-snippets>` to compute radial positions/connections/SVG fragments, then assemble. Load **reference/create-concept-diagram.md** for details.
 </create-concept-diagram>
 
 <create-chart>
-**Objective**: Generate a PPT-quality chart, graph, or data visualization as raw SVG. Build JSON with `diagram_type: "chart"`, run `compute_all.py`, assemble output. Load **reference/create-chart.md** for details.
+**Objective**: Generate a PPT-quality chart, graph, or data visualization as raw SVG. Build data series, compute positions/viewBox via snippets from `<computation-snippets>`, then render chart-specific elements (axes, bars, slices) manually. Load **reference/create-chart.md** for details.
 </create-chart>
 
 <analyze-and-fix-layout>
@@ -169,10 +217,12 @@ Load **reference/create-flowchart.md** for detailed step-by-step instructions.
 
 **Steps**:
 1. **Parse SVG**: Identify all significant elements and their bounding boxes.
-2. **Detect overlaps**: Run `python3 -c "from scripts.geometry import overlap; ..."` to check shape overlaps and reconstruct node/edge JSON for `compute_all.py` to detect connection issues.
-3. **Fix**: Adjust positions, re-route connections via `routing.orthogonal_path()`, expand viewBox.
-4. **Re-run script** with corrected JSON to regenerate clean SVG fragments.
-5. **Output**: Return the complete corrected SVG.
+2. **Detect overlaps**: Run the **Check shape overlaps** snippet from `<computation-snippets>` with extracted bounding boxes.
+3. **Detect connection issues**: Run the **Route a connection** snippet to check path intersections via `routing.detect_intersections()`.
+4. **Fix**: Adjust positions, re-route connections via `routing.orthogonal_path()`, expand viewBox via `layout.compute_viewbox()`.
+5. **Regenerate**: Re-run **Generate SVG for a shape** snippet with corrected positions.
+6. **Validate**: Re-check overlaps and contrasts, verify no elements overflow viewBox.
+7. **Output**: Return the complete corrected SVG.
 
 Load **reference/analyze-and-fix-layout.md** for detailed steps.
 </analyze-and-fix-layout>
@@ -200,10 +250,10 @@ Load **reference/modify-existing-svg.md** for detailed SVG editing patterns.
 </capabilities>
 
 <rules>
-<rule>When generating ANY new SVG diagram, ALWAYS run `python3 scripts/compute_all.py` first with a JSON description. Use the output's SVG fragments (`svg_shape`, `svg_line`, `svg_label`, `svg_markers`, `svg_title_bar`) to assemble the SVG. Never manually write SVG elements or calculate coordinates.</rule>
-<rule>When checking for overlapping elements, ALWAYS use `python3 -c "from scripts.geometry import overlap; ..."` — never visually estimate.</rule>
-<rule>When validating connection endpoints or detecting line intersections, ALWAYS use `scripts/routing.py` functions.</rule>
-<rule>When validating color contrast, ALWAYS use `python3 -c "from scripts.colors import contrast_ratio; ..."` — never estimate visually.</rule>
+<rule>When computing node positions, routing connections, generating SVG elements, or computing viewBox, ALWAYS use the corresponding snippets from `<computation-snippets>` — never manually calculate coordinates or write raw SVG.</rule>
+<rule>When checking for overlapping elements, ALWAYS run the **Check shape overlaps** snippet — never visually estimate.</rule>
+<rule>When validating connection endpoints or detecting line intersections, ALWAYS use `routing.detect_intersections()` or run the **Route a connection** snippet.</rule>
+<rule>When validating color contrast, ALWAYS run the **Validate color contrast** snippet — never estimate visually.</rule>
 <rule>When the user describes a process flow with branching and decision steps, apply **create-flowchart**.</rule>
 <rule>When the user describes a system with tiers, layers, or components, apply **create-architecture-diagram**.</rule>
 <rule>When the user describes interactions between actors over time, apply **create-sequence-diagram**.</rule>
