@@ -3,16 +3,30 @@
 Applies **create-chart** in the svg-editor skill.
 
 **Steps**:
-1. **Identify chart type and data**: Determine if user wants bar, line, pie, area, or scatter chart. Extract data series (labels and values).
-2. **Build node data**: Define minimal nodes for title and legend (charts are mostly custom-rendered).
-3. **Compute chart area dimensions**: Use `layout.compute_viewbox()` with chart area bbox to get the viewBox. Use PPT-standard chart area: x=80 to x=880, y=100 to y=480.
-4. **Render chart elements manually** (charts have specific visual shapes not covered by generic node types):
-   - **Bar chart**: Draw `<rect>` for each bar. Bar width = (category width / bars in group) × 0.7. Grouped bars use fills from `colors.PPT_PALETTE`.
-   - **Line chart**: Draw `<polyline>` or `<path>` connecting data points. Add `<circle>` markers.
-   - **Pie chart**: Draw each slice as `<path>` arc. Add percentage labels outside each slice with leader lines.
-   - **Scatter plot**: Draw `<circle>` for each data point.
-5. **Add grid and axes**: Draw axis lines, horizontal grid lines at Y tick marks, tick labels, and axis titles using PPT-standard colors from `colors.PPT_PALETTE`.
-6. **Validate contrast**: Run the **Validate color contrast** snippet for all text elements against their backgrounds.
-7. **Add legend** (required for multi-series): Place in top-right or bottom-center. Each item: 12×12px colored rect + text label.
-8. **Assemble SVG**: Follow the **SVG assembly pattern** in `<computation-snippets>` (skip title bar if chart has its own title area).
-9. **Output**: Return raw, valid SVG code.
+0. **Use `chart_builder` — do NOT write chart SVG manually.** `chart_builder` (backed by matplotlib) generates a complete, PPT-styled SVG for bar, line, and pie charts in one call.
+1. **Identify chart type and data**: Determine if user wants bar, line, or pie chart. Extract categories, series, and a title.
+2. **Call the appropriate `chart_builder` function** and print the result:
+   ```bash
+   # Bar chart
+   python3 -c "
+   import sys; sys.path.insert(0, 'scripts')
+   from chart_builder import render_bar_chart
+   print(render_bar_chart(['Q1','Q2','Q3','Q4'], [120,145,98,175], 'Quarterly Revenue', ylabel='USD (k)'))
+   "
+
+   # Line chart
+   python3 -c "
+   import sys; sys.path.insert(0, 'scripts')
+   from chart_builder import render_line_chart
+   series = [{'label': 'Revenue', 'values': [120,145,98,175]}, {'label': 'Cost', 'values': [80,90,85,95]}]
+   print(render_line_chart(['Q1','Q2','Q3','Q4'], series, 'Revenue vs Cost', ylabel='USD (k)'))
+   "
+
+   # Pie chart
+   python3 -c "
+   import sys; sys.path.insert(0, 'scripts')
+   from chart_builder import render_pie_chart
+   print(render_pie_chart(['APAC','EMEA','AMER'], [35,28,37], 'Revenue by Region'))
+   "
+   ```
+3. **Output**: Return the SVG string produced by `chart_builder`. No manual assembly is needed.
