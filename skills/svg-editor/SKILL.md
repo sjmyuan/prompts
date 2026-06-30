@@ -53,6 +53,7 @@ description: Create SVG diagrams with professional PPT-quality layout, clear con
 | Executing **analyze-and-fix-layout** | Step-by-step layout fix instructions | [reference/analyze-and-fix-layout.md](reference/analyze-and-fix-layout.md) |
 | Executing **modify-existing-svg** or **upgrade-to-ppt-quality** | Step-by-step SVG modification/upgrade instructions | [reference/modify-existing-svg.md](reference/modify-existing-svg.md) |
 | Need example output for any diagram type | Example SVG files for each diagram type | [examples/](examples/) |
+| Need help with arrow/arrowhead connections | Arrow marker geometry, refX/refY, orient=auto, common mistakes | [examples/arrow-connections-example.md](examples/arrow-connections-example.md) |
 | Need script calling patterns or snippets | Full script calling guide with example snippets | [reference/computation-snippets.md](reference/computation-snippets.md) |
 | Need design standards or layout principles | PPT design requirements and layout principles | [reference/design-standards.md](reference/design-standards.md) |
 </context-loading-guide>

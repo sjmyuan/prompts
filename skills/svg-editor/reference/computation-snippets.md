@@ -44,6 +44,88 @@ print(result)
 
 > **Chart shortcut**: for bar/line/pie charts, call `chart_builder.render_*_chart()` instead — returns a complete standalone SVG, skipping the manual assembly above.
 
+## Arrow Marker Geometry (Critical for Correct Connections)
+
+**Understanding the arrow marker is essential to avoid misaligned arrowheads.** The marker is a triangle drawn in its own coordinate system and placed at the end of a `<path>` via `marker-end="url(#arrow)"`.
+
+### Marker Coordinate System
+
+```
+Marker-local coordinates (arrow points RIGHT):
+   (0,0) ─────────────────── (arrow_width, 0)
+   │  ▲                      /
+   │  │ base               /
+   │  ▼                  /  ← tip at (arrow_width, arrow_height/2)
+   (0, arrow_height) ───
+```
+
+The arrow path: `M 0 0 L {arrow_width} {arrow_height/2} L 0 {arrow_height} z`
+
+### The refX / refY Problem
+
+`refX` and `refY` define which point in the marker aligns with the **line endpoint**.
+
+| Setting | Line connects to | Visual effect | Use case |
+|---|---|---|---|
+| `refX=0, refY=0` **(SVG default, WRONG for arrows)** | Top-left corner of triangle base | Arrow visually offset from line | Never — this is the bug |
+| `refX=arrow_width, refY=half_h` **(tip_ref=True, RECOMMENDED)** | Arrow **tip** | Tip touches target shape edge, arrowhead extends backward along the line | **Standard diagrams** — arrow tip touches the target shape |
+| `refX=0, refY=half_h` **(tip_ref=False)** | Center of arrow **base** | Line ends at base, tip extends forward | When the line should visibly stop before the target |
+
+### How orient="auto" Rotates the Arrow
+
+With `orient="auto"`, SVG examines the line's last segment direction and rotates the marker accordingly. The marker's x-axis always aligns with the line direction:
+
+| Line direction | Arrow rotation | refX direction | refY direction |
+|---|---|---|---|
+| → (right) | 0° (no rotation) | → right | ↓ down |
+| ↓ (down) | 90° CW | ↓ down | ← left |
+| ← (left) | 180° | ← left | ↑ up |
+| ↑ (up) | 270° CW | ↑ up | → right |
+
+### markerUnits="strokeWidth" — Size Scaling
+
+With `markerUnits="strokeWidth"`, all marker coordinates are multiplied by the stroke width of the line. Example:
+- `arrow_width=10, stroke-width=2` → actual arrow width = 20 user-space units
+- `arrow_width=10, stroke-width=1.5` → actual arrow width = 15 user-space units
+
+**Rule of thumb**: For a typical diagram with stroke-width=2, an `arrow_width` of 8–10 produces a well-proportioned arrowhead.
+
+### Correct Call Pattern
+
+```bash
+python3 -c "
+import sys; sys.path.insert(0, 'scripts')
+from svg_builder import generate_arrow_marker
+
+# Standard arrow: tip touches the target shape edge
+# This goes in <defs> and is referenced by generate_edge_svg() as marker-end
+print(generate_arrow_marker('arrow', '#555555', arrow_width=10, arrow_height=10, tip_ref=True))
+"
+```
+
+When using `generate_edge_svg()`, the arrow marker `#arrow` is automatically referenced via `marker_end="url(#arrow)"`. The edge path's last point should be on the **edge of the target shape** — the arrow tip will be placed exactly there.
+
+### Verifying Arrow Alignment
+
+To programmatically verify that an arrow will connect correctly:
+
+```bash
+python3 -c "
+import sys; sys.path.insert(0, 'scripts')
+from routing import connection_endpoints
+from geometry import BBox
+
+src = (100, 200, 130, 48)   # source bbox
+dst = (300, 400, 130, 48)   # target bbox
+src_pt, dst_pt, src_side, dst_side = connection_endpoints(src, dst, 'top-to-bottom')
+# dst_pt is on the EDGE of the target shape
+# With refX=arrow_width (tip_ref=True), the arrow TIP will be exactly at dst_pt
+print(f'Source exit: {src_pt}, side={src_side}')
+print(f'Target entry: {dst_pt}, side={dst_side}')
+print(f'Arrow tip will be at: {dst_pt}')
+"
+```
+
 ## Common Script Calls
 
 **Compute node positions (grid layout):**

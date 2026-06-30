@@ -308,18 +308,84 @@ def generate_edge_svg(
     return _to_str(path)
 
 
-def generate_arrow_marker(marker_id: str = "arrow", color: str = "#555555") -> str:
-    """Generate the SVG arrow marker definition string via svgwrite."""
+def generate_arrow_marker(
+    marker_id: str = "arrow",
+    color: str = "#555555",
+    arrow_width: float = 10.0,
+    arrow_height: float = 10.0,
+    tip_ref: bool = True,
+) -> str:
+    """Generate the SVG arrow marker definition string via svgwrite.
+
+    The arrow is a triangle pointing right (in marker-local coordinates):
+        Base:  vertical line from (0, 0) to (0, arrow_height)
+        Tip:   at (arrow_width, arrow_height/2)
+
+    When tip_ref=True (default): refX/refY are set to the arrow **tip**, so the
+    line endpoint touches the target shape edge and the arrowhead extends
+    backward. This is the standard convention for diagrams.
+
+    When tip_ref=False: refX/refY are set to the **center of the base**, so the
+    line ends at the base and the arrow tip extends forward.
+
+    With orient="auto" and markerUnits="strokeWidth":
+      - If the line goes RIGHT  → arrow points right  (tip at +x)
+      - If the line goes DOWN   → arrow points down   (tip rotated 90° CW)
+      - If the line goes LEFT   → arrow points left   (tip rotated 180°)
+      - If the line goes UP     → arrow points up     (tip rotated 270° CW)
+
+    The actual size on screen = (width, height) * stroke-width.
+    """
     d = _dwg()
-    marker = d.marker(
-        id=marker_id,
-        insert=(9, 5),
-        size=(10, 10),
-        orient="auto",
-        markerUnits="strokeWidth",
+    half_h = arrow_height / 2.0
+
+    # Build the marker element
+    marker_attrs: Dict[str, Any] = {
+        "id": marker_id,
+        "viewBox": f"0 0 {arrow_width} {arrow_height}",
+        "orient": "auto",
+        "markerUnits": "strokeWidth",
+        "markerWidth": str(arrow_width),
+        "markerHeight": str(arrow_height),
+    }
+
+    if tip_ref:
+        # Arrow TIP connects to line endpoint (tip touches target shape)
+        marker_attrs["refX"] = str(arrow_width)
+        marker_attrs["refY"] = str(half_h)
+    else:
+        # Arrow BASE center connects to line endpoint
+        marker_attrs["refX"] = "0"
+        marker_attrs["refY"] = str(half_h)
+
+    marker = d.marker(**marker_attrs)
+    marker.add(
+        d.path(
+            d=f"M 0 0 L {arrow_width} {half_h} L 0 {arrow_height} z",
+            fill=color,
+        )
     )
-    marker.add(d.path(d="M 0 0 L 10 5 L 0 10 z", fill=color))
     return _to_str(marker)
+
+
+def generate_arrow_marker_reverse(
+    marker_id: str = "arrow-reverse",
+    color: str = "#555555",
+    arrow_width: float = 10.0,
+    arrow_height: float = 10.0,
+) -> str:
+    """Generate an arrow marker where the line endpoint connects to the
+    **center of the base** (arrow tip extends forward from the line end).
+
+    Convenience wrapper — equivalent to generate_arrow_marker(tip_ref=False).
+    """
+    return generate_arrow_marker(
+        marker_id=marker_id,
+        color=color,
+        arrow_width=arrow_width,
+        arrow_height=arrow_height,
+        tip_ref=False,
+    )
 
 
 def generate_label_svg(
