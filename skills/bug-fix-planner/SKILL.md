@@ -1,6 +1,6 @@
 ---
 name: bug-fix-planner
-description: Diagnose bug root causes and generate detailed, step-by-step TDD-based bug fix plans. Use this skill when users report bugs, regressions, unexpected behavior, or defects, or ask to investigate and fix problems in existing code. This skill produces a plan but does not execute changes—pair with plan-executor for implementation.
+description: Diagnose bug root causes and generate detailed, step-by-step TDD-based bug fix plans. Use this skill when users report bugs, regressions, failing tests, unexpected behavior, or defects, or ask to investigate and fix problems in existing code.
 ---
 
 <when-to-use-this-skill>
@@ -38,6 +38,10 @@ Load only the example directly relevant to the current bug type to minimize cont
 | User reports slow responses, N+1 queries, memory leaks, or inefficient algorithms | Full workflow: root-cause identification + fix plan for performance bugs | [examples/performance-bug.md](examples/performance-bug.md) |
 </context-loading-guide>
 
+<skill-boundary>
+This skill produces a **plan** but does not execute changes. Pair with **plan-executor** for implementation.
+</skill-boundary>
+
 </knowledge>
 
 <capabilities>
@@ -65,7 +69,7 @@ Load only the example directly relevant to the current bug type to minimize cont
    6. **Clean Up Tests**: Update or remove tests that are no longer relevant due to the bug fix, ensuring the test suite remains accurate and effective.
    7. **Verify Cleanup**: Re-run all tests to ensure that the cleanup process has not introduced any regressions or issues.
    8. **Validate Linting, Formatting and Type Checking**: Run linting, formatting and type checking tools to ensure code quality and adherence to coding standards.
-7. Ensure the total number of steps in the plan is manageable and does not exceed 20 steps.
+7. **Validate Plan Quality**: Review the plan for completeness — verify every identified issue has a corresponding fix step, the selected TDD variant is documented with rationale, dependencies between issues are correctly ordered, and the total step count does not exceed 20. Confirm that all verification checkpoints (Confirm Test Failure, Verify Fix, Verify Cleanup) are included for each issue.
 8. Summarize the complete plan to the user. For example:
   ```
   To fix the bug of [bug summary], the plan is as follows:

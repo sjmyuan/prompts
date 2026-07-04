@@ -47,6 +47,7 @@ Load only the example directly relevant to the current question type to minimize
 | User asks why a design decision was made (rationale, trade-offs, history) | Output model: investigation and answer for "Why" questions | [examples/why-questions.md](examples/why-questions.md) |
 | User asks where code lives (file location, module boundaries, organization) | Output model: investigation and answer for "Where" questions | [examples/where-questions.md](examples/where-questions.md) |
 | User asks when something happens (timing, lifecycle events, initialization order) | Output model: investigation and answer for "When" questions | [examples/when-questions.md](examples/when-questions.md) |
+| Validating answer completeness before presenting findings (step 7 of present-answer) | Structured checklist: question coverage, code references, implementation detail, context, next steps | [reference/answer-completeness-checklist.md](reference/answer-completeness-checklist.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -82,7 +83,7 @@ Load only the example directly relevant to the current question type to minimize
 4. **Explain Implementation Details**: Walk through control flow, explain data transformations and state changes, describe component interactions, and note complex algorithms or business logic.
 5. **Address Implications**: Explain why the implementation works the way it does, note trade-offs or design decisions, and identify potential edge cases or limitations.
 6. **Use Clear Language**: Avoid unnecessary jargon, use consistent terminology from the codebase, and provide analogies or examples when helpful.
-7. **Validate Completeness**: Confirm all aspects of the original question are answered and no important details are missing. If the investigation cannot fully answer due to missing code or ambiguous design, clearly state what was found and what remains unclear.
+7. **Validate Completeness**: Load **reference/answer-completeness-checklist.md** and verify: all question aspects addressed, code references include file paths + line numbers, control and data flow traced, edge cases and limitations noted, next steps offered. If the investigation cannot fully answer due to missing code or ambiguous design, clearly state what was found and what remains unclear.
 8. **Offer Next Steps**: Suggest related questions, point to additional resources or documentation, and recommend areas for deeper investigation if needed. If multiple possible interpretations were discovered, present all findings and ask the user to clarify which aspect they're most interested in.
 </present-answer>
 

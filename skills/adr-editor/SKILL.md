@@ -90,7 +90,15 @@ When the user has only one option, prompt them to consider alternatives from the
 2. Prompt the user for metadata: preferred title, owners, and status (draft | adopt | declined | superseded).
 3. Load **reference/adr-template.md** and populate the template with all collected information, using the user's recommended option as "Chosen option" with a synthesized justification.
 4. Fill in the Consequences section based on the evaluated pros/cons and risks discussed.
-5. Present the completed ADR to the user for final review and ask: "Would you like to adjust any section before saving?"
+5. Verify the completed ADR against this quality checklist:
+   - [ ] Problem statement is clear, scoped, and unambiguous
+   - [ ] Decision drivers include both hard constraints and soft preferences
+   - [ ] At least 2 distinct options were evaluated
+   - [ ] Each option has pros/cons explicitly tied to decision drivers
+   - [ ] Chosen option justification references specific drivers
+   - [ ] Consequences section addresses risks and positive impacts
+   - [ ] Metadata (title, owners, status) is populated
+6. Present the completed ADR to the user for final review and ask: "Would you like to adjust any section before saving?"
 </compile-adr>
 
 </capabilities>

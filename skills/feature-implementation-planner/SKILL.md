@@ -1,6 +1,6 @@
 ---
 name: feature-implementation-planner
-description: Clarify feature requirements and generate detailed, step-by-step TDD-based implementation plans for new functionality. Introduces new observable behavior that does not exist today. Use when users request new features, enhancements, or functionality additions, or when users ask exploratory questions about whether a feature is possible (e.g., "is it possible to...", "can we add...", "would it be feasible to...") that imply a desire to implement new behavior. This skill produces a plan but does not execute changes—pair with plan-executor for implementation.
+description: Clarify feature requirements and generate detailed, step-by-step TDD-based implementation plans for new functionality. Use when users request new features, enhancements, or ask whether a feature is possible. Produces a plan only — pair with plan-executor for implementation.
 ---
 
 <when-to-use-this-skill>
@@ -41,6 +41,7 @@ Load only the example directly relevant to the current implementation task to mi
 | User requests new message handling, service logic, or event processing functionality | Full workflow: requirement definition + implementation plan for message handler features | [examples/adding-new-message-handler.md](examples/adding-new-message-handler.md) |
 | User requests a straightforward config property or flag addition without complex business logic | Full workflow: requirement definition + implementation plan for simple configuration additions | [examples/simple-configuration-addition.md](examples/simple-configuration-addition.md) |
 | User requests a sophisticated algorithm, complex transformation, or intricate business rule | Full workflow: requirement definition + implementation plan for complex logic features | [examples/complex-transformation-logic.md](examples/complex-transformation-logic.md) |
+| Validating plan quality before presenting to the user (step 8 of plan-implementation) | Structured checklist: coverage, sequencing, step management, TDD fidelity, clarity | [reference/plan-quality-checklist.md](reference/plan-quality-checklist.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -72,7 +73,8 @@ Load only the example directly relevant to the current implementation task to mi
    9. **Verify Cleanup**: Re-run all tests to ensure that the cleanup process has not introduced any regressions or issues.
    10. **Validate Linting, Formatting and Type Checking**: Run linting, formatting and type checking tools to ensure code quality and adherence to coding standards.
 7. Ensure the total number of steps in the plan is manageable and does not exceed 25 steps. The full TDD cycle can generate up to 10 steps per functionality; use consolidation strategies to reduce this where appropriate.
-8. Summarize the complete plan to the user. For example:
+8. **Validate Plan Quality**: Load **reference/plan-quality-checklist.md** and verify: every functionality has tests defined, dependency ordering is correct, step count ≤ 25, and TDD variants are documented. Revise any failing items before presenting to the user.
+9. Summarize the complete plan to the user. For example:
   ```
   To implement the requirement of [requirement summary], the plan is as follows:
   - Step 1: Validate Baseline (run existing tests, lint, type-check)

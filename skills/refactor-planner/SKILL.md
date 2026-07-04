@@ -40,6 +40,7 @@ Load only the example directly relevant to the current refactoring task to minim
 | User requests splitting a large handler or service class into focused components (SRP) | Full workflow: refactor definition + plan for service layer splitting | [examples/service-splitting.md](examples/service-splitting.md) |
 | User requests extracting validation logic into a dedicated validator class | Full workflow: refactor definition + plan for validation extraction | [examples/validation-extraction.md](examples/validation-extraction.md) |
 | User requests adding interfaces and dependency injection to improve testability | Full workflow: refactor definition + plan for interface implementation | [examples/interface-implementation.md](examples/interface-implementation.md) |
+| Validating plan quality before presenting to the user (step 8 of plan-refactor) | Structured checklist: coverage, sequencing, step management, TDD fidelity, clarity | [reference/plan-quality-checklist.md](reference/plan-quality-checklist.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -69,7 +70,8 @@ Load only the example directly relevant to the current refactoring task to minim
    7. **Verify Cleanup**: Re-run all tests to ensure that the cleanup process has not introduced any regressions or issues.
    8. **Validate Linting, Formatting and Type Checking**: Run linting, formatting and type checking tools to ensure code quality and adherence to coding standards.
 7. Ensure the total number of steps in the plan is manageable and does not exceed 20 steps.
-8. Summarize the complete plan to the user. For example:
+8. **Validate Plan Quality**: Load **reference/plan-quality-checklist.md** and verify: every objective has tests defined, dependency ordering is correct, step count ≤ 20, and TDD variants are documented. Revise any failing items before presenting to the user.
+9. Summarize the complete plan to the user. For example:
   ```
   To complete the refactoring request of [refactor request summary], the plan is as follows:
   - Step 1: Validate Baseline (run existing tests, lint, type-check)

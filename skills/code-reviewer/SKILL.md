@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Perform systematic reviews of code and documents across files, folders, diffs, commits, pull requests, or branch comparisons. Evaluates correctness, security, performance, maintainability, and structural quality. Provides prioritized, actionable feedback without making changes. Use when users request reviews, feedback, or quality assessments on code or documents.
+description: Systematic code and document reviews across files, diffs, commits, PRs, or branches. Evaluates correctness, security, performance, maintainability with actionable feedback. Use when requesting reviews, feedback, or quality checks.
 ---
 
 <when-to-use-this-skill>
@@ -116,6 +116,7 @@ git diff HEAD...<supplied-branch>
 3. For dimension 8 (Inconsistencies): capture every conflicting pattern with both variants and concrete file/line references; note trade-offs and flag for a user decision — do not silently pick one.
 4. Load [reference/review-output-format.md](reference/review-output-format.md) via the **context-loading-guide** and format all findings using the standard template.
 5. Load the appropriate example from the **context-loading-guide** table for output structure guidance.
+6. **Validate output**: Verify (a) every finding has a severity label, (b) Positive Highlights section is present, (c) no empty severity sections are included per formatting guidelines, (d) each inconsistency entry includes both variants and a decision request, (e) at least one recommendation is actionable.
 </conducting-code-review>
 
 <reviewing-document>
@@ -138,11 +139,4 @@ git diff HEAD...<supplied-branch>
 <rule>When the user submits files, folders, diffs, or commits for review, first apply **gathering-review-context**, then **conducting-code-review**.</rule>
 <rule>When the user supplies one or two branch names for comparison, first apply **getting-branch-diff** to retrieve the full diff via git CLI, then apply **conducting-code-review**. Always review every changed file — never skip any.</rule>
 <rule>When the subject of review is a document (README, ADR, design doc, specification, runbook, etc.), use **reviewing-document** instead of **conducting-code-review**.</rule>
-<rule>When presenting findings, output recommendations only — never directly edit or apply changes to the reviewed code.</rule>
-<rule>If critical context is missing and assumptions would compromise review quality, ask the user for clarification before proceeding.</rule>
-<rule>Always include at least one positive highlight to encourage good practices.</rule>
-<rule>Consult the **context-loading-guide** knowledge table to load the appropriate example file for the review type being performed.</rule>
-<rule>**Never assume existing code is correct or represents the intended pattern.** Existing code is often legacy, hastily written, or already known to be problematic. Evaluate it with the same critical eye as new code.</rule>
-<rule>When two conflicting patterns, styles, or usages are found anywhere in the reviewed scope, always surface both under **⚠️ Inconsistencies**, present trade-offs neutrally, and explicitly request a decision from the user about which should be authoritative. Do not silently pick one as the standard.</rule>
-<rule>When assessing inconsistencies, read enough surrounding context (adjacent files, related modules) to determine whether either pattern is clearly dominant or intentional before reporting — but if genuinely ambiguous, report as an inconsistency requiring a decision.</rule>
 </rules>

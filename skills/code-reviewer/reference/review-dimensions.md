@@ -1,6 +1,6 @@
 # Review Dimensions Reference
 
-Reference checklist for **all 8 review dimensions**. Apply every relevant ✓ item from each dimension when conducting a code review.
+Reference checklist for **all 9 review dimensions**. Apply every relevant ✓ item from each dimension when conducting a code review.
 
 1. **Correctness & Robustness**:
    - ✓ Logic errors and edge cases (null/undefined, empty collections, boundary values)
