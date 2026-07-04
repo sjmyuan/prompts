@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <linearGradient id="step1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#eef2ff"/>
+      <stop offset="100%" stop-color="#e0e7ff"/>
+    </linearGradient>
+    <linearGradient id="step2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0fdf4"/>
+      <stop offset="100%" stop-color="#dcfce7"/>
+    </linearGradient>
+    <linearGradient id="step3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff7ed"/>
+      <stop offset="100%" stop-color="#ffedd5"/>
+    </linearGradient>
+    <linearGradient id="step4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fef2f2"/>
+      <stop offset="100%" stop-color="#fee2e2"/>
+    </linearGradient>
+    <linearGradient id="step5" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f5f3ff"/>
+      <stop offset="100%" stop-color="#ede9fe"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto">
+      <polygon points="0 0, 12 4, 0 8" fill="#9ca3af"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="480" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#1f2937">完整实践框架：五步法</text>
+
+  <!-- Step boxes positioned horizontally -->
+
+  <!-- Step 1: 诊断 -->
+  <rect x="15" y="52" width="160" height="190" rx="12" fill="url(#step1)" stroke="#a5b4fc" stroke-width="2"/>
+  <circle cx="95" cy="82" r="18" fill="#6366f1"/>
+  <text x="95" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">1</text>
+  <text x="95" y="115" text-anchor="middle" font-size="15" font-weight="700" fill="#1e1b4b">诊断</text>
+  <text x="95" y="135" text-anchor="middle" font-size="12" fill="#4f46e5">发现问题</text>
+  <line x1="35" y1="148" x2="155" y2="148" stroke="#c7d2fe" stroke-width="1"/>
+  <text x="95" y="168" text-anchor="middle" font-size="11" fill="#374151">少了什么？→ 缺失</text>
+  <text x="95" y="186" text-anchor="middle" font-size="11" fill="#374151">多了什么？→ 越界</text>
+  <text x="95" y="208" text-anchor="middle" font-size="11" fill="#6b7280">都有→先处理越界</text>
+  <text x="95" y="228" text-anchor="middle" font-size="10" fill="#9ca3af">关键判断：输出对比</text>
+
+  <!-- Arrow 1→2 -->
+  <line x1="175" y1="147" x2="215" y2="147" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 2: 定方向 -->
+  <rect x="219" y="52" width="160" height="190" rx="12" fill="url(#step2)" stroke="#86efac" stroke-width="2"/>
+  <circle cx="299" cy="82" r="18" fill="#22c55e"/>
+  <text x="299" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">2</text>
+  <text x="299" y="115" text-anchor="middle" font-size="15" font-weight="700" fill="#14532d">定方向</text>
+  <text x="299" y="135" text-anchor="middle" font-size="12" fill="#15803d">明确优化方向</text>
+  <line x1="239" y1="148" x2="359" y2="148" stroke="#bbf7d0" stroke-width="1"/>
+  <text x="299" y="168" text-anchor="middle" font-size="11" fill="#374151">缺失 → 补充</text>
+  <text x="299" y="186" text-anchor="middle" font-size="11" fill="#374151">越界 → 限制</text>
+  <text x="299" y="210" text-anchor="middle" font-size="11" fill="#6b7280">方向不对</text>
+  <text x="299" y="228" text-anchor="middle" font-size="10" fill="#9ca3af">再多的调整也白费</text>
+
+  <!-- Arrow 2→3 -->
+  <line x1="379" y1="147" x2="419" y2="147" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 3: 找根因 -->
+  <rect x="423" y="52" width="160" height="190" rx="12" fill="url(#step3)" stroke="#fdba74" stroke-width="2"/>
+  <circle cx="503" cy="82" r="18" fill="#f97316"/>
+  <text x="503" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">3</text>
+  <text x="503" y="115" text-anchor="middle" font-size="15" font-weight="700" fill="#7c2d12">找根因</text>
+  <text x="503" y="135" text-anchor="middle" font-size="12" fill="#c2410c">SRK 定位</text>
+  <line x1="443" y1="148" x2="563" y2="148" stroke="#fed7aa" stroke-width="1"/>
+  <text x="503" y="168" text-anchor="middle" font-size="11" fill="#374151">信息不足？→ 知识</text>
+  <text x="503" y="186" text-anchor="middle" font-size="11" fill="#374151">规则不对？→ 规则</text>
+  <text x="503" y="204" text-anchor="middle" font-size="11" fill="#374151">执行不稳？→ 技能</text>
+  <text x="503" y="228" text-anchor="middle" font-size="10" fill="#9ca3af">三种根因，三种解法</text>
+
+  <!-- Arrow 3→4 -->
+  <line x1="583" y1="147" x2="623" y2="147" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 4: 选对策 -->
+  <rect x="627" y="52" width="160" height="190" rx="12" fill="url(#step4)" stroke="#fecaca" stroke-width="2"/>
+  <circle cx="707" cy="82" r="18" fill="#ef4444"/>
+  <text x="707" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">4</text>
+  <text x="707" y="115" text-anchor="middle" font-size="15" font-weight="700" fill="#7f1d1d">选对策</text>
+  <text x="707" y="135" text-anchor="middle" font-size="12" fill="#b91c1c">实践矩阵匹配</text>
+  <line x1="647" y1="148" x2="767" y2="148" stroke="#fecaca" stroke-width="1"/>
+  <text x="707" y="168" text-anchor="middle" font-size="10" fill="#374151">知识+补充/知识+限制</text>
+  <text x="707" y="184" text-anchor="middle" font-size="10" fill="#374151">规则+补充/规则+限制</text>
+  <text x="707" y="200" text-anchor="middle" font-size="10" fill="#374151">技能+补充/技能+限制</text>
+  <text x="707" y="228" text-anchor="middle" font-size="10" fill="#9ca3af">6 种组合，对号入座</text>
+
+  <!-- Arrow 4→5 -->
+  <line x1="787" y1="147" x2="827" y2="147" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 5: 验证与迭代 -->
+  <rect x="831" y="52" width="115" height="190" rx="12" fill="url(#step5)" stroke="#c4b5fd" stroke-width="2"/>
+  <circle cx="888" cy="82" r="18" fill="#8b5cf6"/>
+  <text x="888" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">5</text>
+  <text x="888" y="115" text-anchor="middle" font-size="15" font-weight="700" fill="#3b0764">验证</text>
+  <text x="888" y="135" text-anchor="middle" font-size="12" fill="#6d28d9">与迭代</text>
+  <line x1="847" y1="148" x2="929" y2="148" stroke="#ddd6fe" stroke-width="1"/>
+  <text x="888" y="170" text-anchor="middle" font-size="11" fill="#374151">问题解决？</text>
+  <text x="888" y="190" text-anchor="middle" font-size="11" fill="#374151">→ 固化为模板</text>
+  <text x="888" y="210" text-anchor="middle" font-size="11" fill="#374151">→ 回到第 1 步</text>
+
+  <!-- Back arrow from step 5 to step 1 -->
+  <path d="M 888 245 L 888 275 L 95 275 L 95 245" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+  <text x="491" y="268" text-anchor="middle" font-size="11" fill="#9ca3af">未解决则迭代</text>
+
+  <!-- Bottom legend -->
+  <rect x="160" y="290" width="640" height="22" rx="11" fill="#f3f4f6"/>
+  <text x="480" y="305" text-anchor="middle" font-size="11" fill="#6b7280">技术会变，模型会变，但这个框架不会变</text>
+</svg>

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" font-family="'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif">
+  <!-- Background -->
+  <rect width="800" height="420" fill="#f8f9fa" rx="8"/>
+
+  <!-- Title -->
+  <text x="400" y="32" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">「疏」的决策路径：从表面行为到根本解法</text>
+
+  <!-- Column headers -->
+  <rect x="15" y="56" width="225" height="36" rx="6" fill="#e74c3c"/>
+  <text x="127" y="79" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">🚩 表面行为（你想堵什么）</text>
+
+  <rect x="285" y="56" width="225" height="36" rx="6" fill="#f39c12"/>
+  <text x="397" y="79" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">🔍 根源分析（为什么发生）</text>
+
+  <rect x="555" y="56" width="225" height="36" rx="6" fill="#27ae60"/>
+  <text x="667" y="79" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">🛤️ 铺路方案（疏的解法）</text>
+
+  <!-- Row 1: 拖延 -->
+  <rect x="15" y="106" width="225" height="68" rx="6" fill="#fff" stroke="#e74c3c" stroke-width="1"/>
+  <text x="127" y="132" text-anchor="middle" font-size="13" font-weight="bold" fill="#c0392b">下属反复拖延</text>
+  <text x="127" y="156" text-anchor="middle" font-size="11" fill="#6c757d">「他就是懒」❌</text>
+
+  <rect x="285" y="106" width="225" height="68" rx="6" fill="#fff" stroke="#f39c12" stroke-width="1"/>
+  <text x="397" y="132" text-anchor="middle" font-size="13" font-weight="bold" fill="#e67e22">任务目标模糊</text>
+  <text x="397" y="156" text-anchor="middle" font-size="11" fill="#6c757d">不知道从哪开始，不敢动</text>
+
+  <rect x="555" y="106" width="225" height="68" rx="6" fill="#fff" stroke="#27ae60" stroke-width="1"/>
+  <text x="667" y="132" text-anchor="middle" font-size="13" font-weight="bold" fill="#27ae60">一起拆解任务，设里程碑</text>
+  <text x="667" y="156" text-anchor="middle" font-size="11" fill="#6c757d">把模糊目标变成清晰步骤</text>
+
+  <!-- Row 2: 出错 -->
+  <rect x="15" y="188" width="225" height="68" rx="6" fill="#fff" stroke="#e74c3c" stroke-width="1"/>
+  <text x="127" y="214" text-anchor="middle" font-size="13" font-weight="bold" fill="#c0392b">频繁出低级错误</text>
+  <text x="127" y="238" text-anchor="middle" font-size="11" fill="#6c757d">「他太粗心」❌</text>
+
+  <rect x="285" y="188" width="225" height="68" rx="6" fill="#fff" stroke="#f39c12" stroke-width="1"/>
+  <text x="397" y="214" text-anchor="middle" font-size="13" font-weight="bold" fill="#e67e22">流程复杂，缺检查点</text>
+  <text x="397" y="238" text-anchor="middle" font-size="11" fill="#6c757d">一步出错就全崩</text>
+
+  <rect x="555" y="188" width="225" height="68" rx="6" fill="#fff" stroke="#27ae60" stroke-width="1"/>
+  <text x="667" y="214" text-anchor="middle" font-size="13" font-weight="bold" fill="#27ae60">引入 code review 或自动化检查</text>
+  <text x="667" y="238" text-anchor="middle" font-size="11" fill="#6c757d">在关键节点设置安全网</text>
+
+  <!-- Row 3: 不配合 -->
+  <rect x="15" y="270" width="225" height="68" rx="6" fill="#fff" stroke="#e74c3c" stroke-width="1"/>
+  <text x="127" y="296" text-anchor="middle" font-size="13" font-weight="bold" fill="#c0392b">不愿配合</text>
+  <text x="127" y="320" text-anchor="middle" font-size="11" fill="#6c757d">「他态度有问题」❌</text>
+
+  <rect x="285" y="270" width="225" height="68" rx="6" fill="#fff" stroke="#f39c12" stroke-width="1"/>
+  <text x="397" y="296" text-anchor="middle" font-size="13" font-weight="bold" fill="#e67e22">认为方案有问题，但说了没用</text>
+  <text x="397" y="320" text-anchor="middle" font-size="11" fill="#6c757d">沟通渠道阻塞</text>
+
+  <rect x="555" y="270" width="225" height="68" rx="6" fill="#fff" stroke="#27ae60" stroke-width="1"/>
+  <text x="667" y="296" text-anchor="middle" font-size="13" font-weight="bold" fill="#27ae60">建立真正的双向沟通渠道</text>
+  <text x="667" y="320" text-anchor="middle" font-size="11" fill="#6c757d">让他参与决策，听见他的声音</text>
+
+  <!-- Bottom: core principle -->
+  <rect x="80" y="362" width="640" height="32" rx="6" fill="#ebf5fb" stroke="#3498db" stroke-width="1.5"/>
+  <text x="400" y="383" text-anchor="middle" font-size="13" fill="#2c3e50">
+    好的管理不是把人掰成你要的样子，而是找到他本来的样子，让他的力量为团队所用
+  </text>
+</svg>

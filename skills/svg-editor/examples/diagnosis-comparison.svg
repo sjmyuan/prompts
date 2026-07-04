@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fef2f2"/>
+      <stop offset="100%" stop-color="#fee2e2"/>
+    </linearGradient>
+    <linearGradient id="arrowGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#6366f1"/>
+    </marker>
+    <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="400" y="36" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">遇到问题，先判断类型</text>
+
+  <!-- Left: 缺失 -->
+  <rect x="30" y="55" width="300" height="390" rx="12" fill="url(#blueGrad)" stroke="#93c5fd" stroke-width="2"/>
+  <rect x="30" y="55" width="300" height="52" rx="12" fill="#3b82f6"/>
+  <rect x="30" y="95" width="300" height="12" fill="#3b82f6"/>
+  <text x="180" y="88" text-anchor="middle" font-size="22" font-weight="700" fill="#ffffff">缺失</text>
+  <text x="180" y="130" text-anchor="middle" font-size="14" fill="#6b7280">该做的没做</text>
+
+  <!-- 缺失条目 -->
+  <rect x="55" y="155" width="250" height="44" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <circle cx="75" cy="177" r="10" fill="#dbeafe"/>
+  <text x="75" y="182" text-anchor="middle" font-size="12" fill="#3b82f6">✕</text>
+  <text x="95" y="177" font-size="14" fill="#374151" dominant-baseline="middle">没写测试</text>
+  <text x="270" y="177" font-size="11" fill="#9ca3af" text-anchor="end" dominant-baseline="middle">常见</text>
+
+  <rect x="55" y="210" width="250" height="44" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <circle cx="75" cy="232" r="10" fill="#dbeafe"/>
+  <text x="75" y="237" text-anchor="middle" font-size="12" fill="#3b82f6">✕</text>
+  <text x="95" y="232" font-size="14" fill="#374151" dominant-baseline="middle">跳过了步骤</text>
+  <text x="270" y="232" font-size="11" fill="#9ca3af" text-anchor="end" dominant-baseline="middle">常见</text>
+
+  <rect x="55" y="265" width="250" height="44" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <circle cx="75" cy="287" r="10" fill="#dbeafe"/>
+  <text x="75" y="292" text-anchor="middle" font-size="12" fill="#3b82f6">✕</text>
+  <text x="95" y="287" font-size="14" fill="#374151" dominant-baseline="middle">没按格式输出</text>
+  <text x="270" y="287" font-size="11" fill="#9ca3af" text-anchor="end" dominant-baseline="middle">常见</text>
+
+  <!-- 底部诊断文字 -->
+  <rect x="55" y="340" width="250" height="80" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="180" y="365" text-anchor="middle" font-size="13" fill="#1d4ed8" font-weight="600">输出少了什么？</text>
+  <text x="180" y="388" text-anchor="middle" font-size="13" fill="#1d4ed8" font-weight="600">→ 缺失</text>
+  <text x="180" y="408" text-anchor="middle" font-size="11" fill="#6b7280">你能明确说出"它没做X"</text>
+
+  <!-- Right: 越界 -->
+  <rect x="470" y="55" width="300" height="390" rx="12" fill="url(#redGrad)" stroke="#fecaca" stroke-width="2"/>
+  <rect x="470" y="55" width="300" height="52" rx="12" fill="#ef4444"/>
+  <rect x="470" y="95" width="300" height="12" fill="#ef4444"/>
+  <text x="620" y="88" text-anchor="middle" font-size="22" font-weight="700" fill="#ffffff">越界</text>
+  <text x="620" y="130" text-anchor="middle" font-size="14" fill="#6b7280">不该做的做了</text>
+
+  <!-- 越界条目 -->
+  <rect x="495" y="155" width="250" height="44" rx="8" fill="#ffffff" stroke="#fecaca" stroke-width="1.5"/>
+  <circle cx="515" cy="177" r="10" fill="#fee2e2"/>
+  <text x="515" y="182" text-anchor="middle" font-size="12" fill="#ef4444">⚠</text>
+  <text x="535" y="177" font-size="14" fill="#374151" dominant-baseline="middle">改了无关文件</text>
+  <text x="710" y="177" font-size="11" fill="#9ca3af" text-anchor="end" dominant-baseline="middle">危险</text>
+
+  <rect x="495" y="210" width="250" height="44" rx="8" fill="#ffffff" stroke="#fecaca" stroke-width="1.5"/>
+  <circle cx="515" cy="232" r="10" fill="#fee2e2"/>
+  <text x="515" y="237" text-anchor="middle" font-size="12" fill="#ef4444">⚠</text>
+  <text x="535" y="232" font-size="14" fill="#374151" dominant-baseline="middle">擅自扩大范围</text>
+  <text x="710" y="232" font-size="11" fill="#9ca3af" text-anchor="end" dominant-baseline="middle">危险</text>
+
+  <rect x="495" y="265" width="250" height="44" rx="8" fill="#ffffff" stroke="#fecaca" stroke-width="1.5"/>
+  <circle cx="515" cy="287" r="10" fill="#fee2e2"/>
+  <text x="515" y="292" text-anchor="middle" font-size="12" fill="#ef4444">⚠</text>
+  <text x="535" y="287" font-size="14" fill="#374151" dominant-baseline="middle">输出幻觉内容</text>
+  <text x="710" y="287" font-size="11" fill="#9ca3af" text-anchor="end" dominant-baseline="middle">危险</text>
+
+  <!-- 底部诊断文字 -->
+  <rect x="495" y="340" width="250" height="80" rx="8" fill="#fef2f2" stroke="#fecaca" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="620" y="365" text-anchor="middle" font-size="13" fill="#b91c1c" font-weight="600">输出多了什么？</text>
+  <text x="620" y="388" text-anchor="middle" font-size="13" fill="#b91c1c" font-weight="600">→ 越界</text>
+  <text x="620" y="408" text-anchor="middle" font-size="11" fill="#6b7280">包含从未要求的东西</text>
+
+</svg>

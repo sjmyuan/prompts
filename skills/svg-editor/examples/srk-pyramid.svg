@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 500" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <linearGradient id="skillGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0fdf4"/>
+      <stop offset="100%" stop-color="#dcfce7"/>
+    </linearGradient>
+    <linearGradient id="ruleGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff7ed"/>
+      <stop offset="100%" stop-color="#ffedd5"/>
+    </linearGradient>
+    <linearGradient id="knowledgeGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fef2f2"/>
+      <stop offset="100%" stop-color="#fee2e2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Title -->
+  <text x="360" y="36" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">SRK 行为模型：AI 错误的三个层级</text>
+
+  <!-- Pyramid base - Skill layer (bottom, widest) -->
+  <polygon points="60,420 660,420 560,300 160,300" fill="url(#skillGrad)" stroke="#86efac" stroke-width="2"/>
+  <polygon points="60,420 660,420 658,418 62,418" fill="#22c55e" opacity="0.15"/>
+
+  <!-- Skill label -->
+  <text x="360" y="385" text-anchor="middle" font-size="20" font-weight="700" fill="#166534">Skill（技能）</text>
+  <text x="360" y="408" text-anchor="middle" font-size="14" fill="#15803d">靠熟练度和直觉完成的行为</text>
+
+  <!-- Rule layer (middle) -->
+  <polygon points="120,282 600,282 520,170 200,170" fill="url(#ruleGrad)" stroke="#fdba74" stroke-width="2"/>
+
+  <!-- Rule label -->
+  <text x="360" y="250" text-anchor="middle" font-size="20" font-weight="700" fill="#9a3412">Rule（规则）</text>
+  <text x="360" y="273" text-anchor="middle" font-size="14" fill="#c2410c">依据已有规则做出决策并执行</text>
+
+  <!-- Knowledge layer (top, narrowest) -->
+  <polygon points="185,152 535,152 460,50 260,50" fill="url(#knowledgeGrad)" stroke="#fecaca" stroke-width="2"/>
+
+  <!-- Knowledge label -->
+  <text x="360" y="120" text-anchor="middle" font-size="20" font-weight="700" fill="#991b1b">Knowledge（知识）</text>
+  <text x="360" y="143" text-anchor="middle" font-size="14" fill="#b91c1c">需要学习分析才能决策</text>
+
+  <!-- Right side: error type labels -->
+  <!-- Skill error -->
+  <rect x="668" y="350" width="44" height="44" rx="22" fill="#dcfce7" stroke="#86efac" stroke-width="1.5"/>
+  <text x="690" y="375" text-anchor="middle" font-size="11" fill="#166534" font-weight="600">S</text>
+  <text x="690" y="410" text-anchor="middle" font-size="13" font-weight="600" fill="#16a34a">失误</text>
+  <text x="690" y="425" text-anchor="middle" font-size="11" fill="#6b7280">(Slip)</text>
+
+  <!-- Rule error -->
+  <rect x="608" y="215" width="44" height="44" rx="22" fill="#ffedd5" stroke="#fdba74" stroke-width="1.5"/>
+  <text x="630" y="240" text-anchor="middle" font-size="11" fill="#9a3412" font-weight="600">R</text>
+  <text x="630" y="275" text-anchor="middle" font-size="13" font-weight="600" fill="#ea580c">规则错误</text>
+  <text x="630" y="290" text-anchor="middle" font-size="11" fill="#6b7280">(Mistake)</text>
+
+  <!-- Knowledge error -->
+  <rect x="548" y="88" width="44" height="44" rx="22" fill="#fee2e2" stroke="#fecaca" stroke-width="1.5"/>
+  <text x="570" y="113" text-anchor="middle" font-size="11" fill="#991b1b" font-weight="600">K</text>
+  <text x="570" y="148" text-anchor="middle" font-size="13" font-weight="600" fill="#dc2626">知识错误</text>
+  <text x="570" y="163" text-anchor="middle" font-size="11" fill="#6b7280">(Mistake)</text>
+
+  <!-- Left side: cognitive load indicator -->
+  <rect x="10" y="50" width="42" height="370" rx="10" fill="#f3f4f6" stroke="#d1d5db" stroke-width="1"/>
+  <text x="31" y="235" text-anchor="middle" font-size="11" fill="#6b7280" transform="rotate(-90,31,235)">认知负荷</text>
+
+  <!-- Low label at bottom -->
+  <rect x="55" y="375" width="30" height="22" rx="11" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+  <text x="70" y="390" text-anchor="middle" font-size="12" font-weight="600" fill="#166534">低</text>
+
+  <!-- High label at top -->
+  <rect x="55" y="55" width="30" height="22" rx="11" fill="#fee2e2" stroke="#fecaca" stroke-width="1"/>
+  <text x="70" y="70" text-anchor="middle" font-size="12" font-weight="600" fill="#991b1b">高</text>
+
+  <!-- Arrow on left bar -->
+  <polygon points="31,80 23,100 39,100" fill="#9ca3af"/>
+  <polygon points="31,390 23,370 39,370" fill="#9ca3af"/>
+  <line x1="31" y1="100" x2="31" y2="370" stroke="#9ca3af" stroke-width="2"/>
+
+  <!-- Divider lines -->
+  <line x1="120" y1="282" x2="600" y2="282" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="185" y1="152" x2="535" y2="152" stroke="#d1d5db" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- Arrow indicators between layers -->
+  <text x="360" y="296" text-anchor="middle" font-size="11" fill="#9ca3af">▼</text>
+  <text x="360" y="168" text-anchor="middle" font-size="11" fill="#9ca3af">▼</text>
+</svg>

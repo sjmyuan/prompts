@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440">
+  <defs>
+    <!-- Arrow markers: triangle points RIGHT in marker space; orient="auto" rotates to line direction -->
+    <marker id="arrow-supply" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7B1FA2"/>
+    </marker>
+    <marker id="arrow-demand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2E7D32"/>
+    </marker>
+    <marker id="arrow-fail" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#EF5350"/>
+    </marker>
+    <marker id="arrow-success" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#43A047"/>
+    </marker>
+
+    <!-- Person avatar template: circle head + rounded body -->
+    <g id="avatar-ghost">
+      <circle cx="0" cy="-5" r="5" fill="none" stroke="#EF9A9A" stroke-width="1.2" stroke-dasharray="2,2"/>
+      <path d="M -5 1 L -5 10 Q -5 14 0 14 Q 5 14 5 10 L 5 1 Z" fill="none" stroke="#EF9A9A" stroke-width="1" stroke-dasharray="2,2"/>
+    </g>
+    <g id="avatar-customer">
+      <circle cx="0" cy="-5" r="5" fill="#C8E6C9" stroke="#81C784" stroke-width="1.2"/>
+      <path d="M -5 1 L -5 10 Q -5 14 0 14 Q 5 14 5 10 L 5 1 Z" fill="#C8E6C9" stroke="#81C784" stroke-width="1.2"/>
+    </g>
+    <g id="avatar-paying">
+      <circle cx="0" cy="-5" r="5" fill="#A5D6A7" stroke="#66BB6A" stroke-width="1.5"/>
+      <path d="M -5 1 L -5 10 Q -5 14 0 14 Q 5 14 5 10 L 5 1 Z" fill="#A5D6A7" stroke="#66BB6A" stroke-width="1.5"/>
+    </g>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="440" fill="#FFFFFF"/>
+
+  <!-- ===== LEFT COLUMN: 供给思维 ===== -->
+  <rect x="30" y="50" width="350" height="360" rx="8" fill="#F5F0F7" stroke="#E1D5E7" stroke-width="1"/>
+
+  <rect x="30" y="50" width="350" height="40" rx="8" fill="#F3E5F5"/>
+  <rect x="30" y="80" width="350" height="10" fill="#F3E5F5"/>
+  <text x="205" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#6A1B9A">供给思维</text>
+
+  <!-- Step 1 -->
+  <rect x="75" y="110" width="260" height="58" rx="6" fill="#FFFFFF" stroke="#CE93D8" stroke-width="1.5"/>
+  <rect x="95" y="124" width="28" height="20" rx="3" fill="#E1D5E7" stroke="#AB47BC" stroke-width="1.2"/>
+  <rect x="98" y="127" width="22" height="14" rx="2" fill="#F3E5F5"/>
+  <rect x="103" y="131" width="14" height="2" rx="1" fill="#AB47BC"/>
+  <rect x="103" y="135" width="10" height="2" rx="1" fill="#AB47BC"/>
+  <rect x="107" y="141" width="4" height="3" rx="1" fill="#AB47BC"/>
+  <text x="138" y="134" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#212121">我能做出什么</text>
+  <text x="138" y="152" font-family="Arial, sans-serif" font-size="10" fill="#9E9E9E">以自身能力为起点</text>
+
+  <line x1="205" y1="168" x2="205" y2="192" stroke="#AB47BC" stroke-width="2" marker-end="url(#arrow-supply)"/>
+
+  <!-- Step 2 -->
+  <rect x="75" y="200" width="260" height="58" rx="6" fill="#FFFFFF" stroke="#CE93D8" stroke-width="1.5"/>
+  <rect x="95" y="216" width="22" height="18" rx="3" fill="#E1D5E7" stroke="#AB47BC" stroke-width="1.2"/>
+  <line x1="95" y1="223" x2="117" y2="223" stroke="#AB47BC" stroke-width="1.2"/>
+  <rect x="100" y="227" width="5" height="3" rx="1" fill="#AB47BC"/>
+  <rect x="108" y="227" width="5" height="3" rx="1" fill="#AB47BC"/>
+  <text x="138" y="224" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#212121">埋头做产品</text>
+  <text x="138" y="242" font-family="Arial, sans-serif" font-size="10" fill="#9E9E9E">供给驱动 · 先有产品</text>
+
+  <line x1="205" y1="258" x2="205" y2="282" stroke="#EF5350" stroke-width="2" marker-end="url(#arrow-fail)"/>
+
+  <!-- Step 3: Failure -->
+  <rect x="75" y="290" width="260" height="58" rx="6" fill="#FFF5F5" stroke="#EF9A9A" stroke-width="1.5"/>
+  <circle cx="106" cy="319" r="11" fill="#EF5350"/>
+  <text x="106" y="323" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">✕</text>
+  <text x="138" y="315" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#C62828">无人问津</text>
+  <text x="138" y="333" font-family="Arial, sans-serif" font-size="10" fill="#E57373">没有真实市场需求</text>
+
+  <!-- Bottom: ghost avatars (empty audience) -->
+  <use href="#avatar-ghost" x="170" y="380"/>
+  <use href="#avatar-ghost" x="194" y="380"/>
+  <use href="#avatar-ghost" x="218" y="380"/>
+  <use href="#avatar-ghost" x="242" y="380"/>
+  <use href="#avatar-ghost" x="266" y="380"/>
+
+  <!-- ===== CENTER DIVIDER ===== -->
+  <line x1="400" y1="50" x2="400" y2="410" stroke="#E0E0E0" stroke-width="1.5"/>
+  <rect x="382" y="210" width="36" height="22" rx="11" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1.5"/>
+  <text x="400" y="225" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#BDBDBD">VS</text>
+
+  <!-- ===== RIGHT COLUMN: 需求思维 ===== -->
+  <rect x="420" y="50" width="350" height="360" rx="8" fill="#F2F8F2" stroke="#D0E8D0" stroke-width="1"/>
+
+  <rect x="420" y="50" width="350" height="40" rx="8" fill="#E8F5E9"/>
+  <rect x="420" y="80" width="350" height="10" fill="#E8F5E9"/>
+  <text x="595" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#2E7D32">需求思维</text>
+
+  <!-- Step 1 -->
+  <rect x="465" y="110" width="260" height="58" rx="6" fill="#FFFFFF" stroke="#A5D6A7" stroke-width="1.5"/>
+  <circle cx="496" cy="135" r="11" fill="#D0E8D0" stroke="#66BB6A" stroke-width="1.2"/>
+  <line x1="505" y1="136" x2="513" y2="130" stroke="#66BB6A" stroke-width="2.2" stroke-linecap="round"/>
+  <text x="528" y="134" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#212121">谁需要什么</text>
+  <text x="528" y="152" font-family="Arial, sans-serif" font-size="10" fill="#9E9E9E">以市场需求为起点</text>
+
+  <line x1="595" y1="168" x2="595" y2="192" stroke="#66BB6A" stroke-width="2" marker-end="url(#arrow-demand)"/>
+
+  <!-- Step 2 -->
+  <rect x="465" y="200" width="260" height="58" rx="6" fill="#FFFFFF" stroke="#A5D6A7" stroke-width="1.5"/>
+  <circle cx="496" cy="225" r="11" fill="none" stroke="#A5D6A7" stroke-width="1.8"/>
+  <circle cx="496" cy="225" r="7" fill="none" stroke="#81C784" stroke-width="1.8"/>
+  <circle cx="496" cy="225" r="3" fill="#43A047"/>
+  <circle cx="480" cy="217" r="4" fill="#D0E8D0" stroke="#81C784" stroke-width="0.8"/>
+  <circle cx="512" cy="218" r="4" fill="#D0E8D0" stroke="#81C784" stroke-width="0.8"/>
+  <circle cx="480" cy="233" r="3.5" fill="#D0E8D0" stroke="#81C784" stroke-width="0.8"/>
+  <circle cx="512" cy="232" r="3.5" fill="#D0E8D0" stroke="#81C784" stroke-width="0.8"/>
+  <text x="528" y="224" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#212121">倾听市场</text>
+  <text x="528" y="242" font-family="Arial, sans-serif" font-size="10" fill="#9E9E9E">需求驱动 · 先有受众</text>
+
+  <line x1="595" y1="258" x2="595" y2="282" stroke="#43A047" stroke-width="2" marker-end="url(#arrow-success)"/>
+
+  <!-- Step 3: Success -->
+  <rect x="465" y="290" width="260" height="58" rx="6" fill="#E8F5E9" stroke="#81C784" stroke-width="1.5"/>
+  <circle cx="496" cy="319" r="11" fill="#43A047"/>
+  <text x="496" y="323" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#FFFFFF">✓</text>
+  <text x="528" y="315" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#1B5E20">有人买单</text>
+  <text x="528" y="333" font-family="Arial, sans-serif" font-size="10" fill="#66BB6A">真实需求驱动 · 付费验证</text>
+
+  <!-- Bottom: customer avatars (paying audience) -->
+  <use href="#avatar-customer" x="550" y="380"/>
+  <use href="#avatar-customer" x="572" y="380"/>
+  <use href="#avatar-paying" x="594" y="378"/>
+  <use href="#avatar-customer" x="616" y="380"/>
+  <use href="#avatar-customer" x="638" y="380"/>
+
+  <!-- Dollar sign on the middle paying avatar -->
+  <text x="594" y="384" text-anchor="middle" font-family="Arial, sans-serif" font-size="7" fill="#1B5E20" font-weight="700">$</text>
+
+  <!-- Bottom insight -->
+  <text x="400" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#9E9E9E">商业的本质：先有需求，才有产品</text>
+</svg>

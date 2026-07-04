@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <defs>
+    <!-- All markers: same right-pointing triangle; orient="auto" handles direction -->
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#78909C"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#FF7043"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#43A047"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8E24AA"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="500" fill="#FFFFFF"/>
+
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#212121">一人公司的正确战场：细分市场策略</text>
+
+  <!-- ===== BIG MARKET BOX ===== -->
+  <rect x="50" y="50" width="700" height="310" rx="12" fill="#F5F7FA" stroke="#B0BEC5" stroke-width="2" stroke-dasharray="8,4"/>
+
+  <!-- Market label -->
+  <rect x="320" y="38" width="160" height="26" rx="13" fill="#FFFFFF" stroke="#B0BEC5" stroke-width="1.5"/>
+  <text x="400" y="56" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#546E7A">大 市 场</text>
+
+  <!-- ===== BIG COMPANIES (centered) ===== -->
+  <rect x="170" y="110" width="460" height="180" rx="10" fill="none" stroke="#BBDEFB" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>
+
+  <rect x="190" y="130" width="190" height="56" rx="6" fill="#E3F2FD" stroke="#90CAF9" stroke-width="1.5"/>
+  <text x="285" y="153" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#1565C0">大公司 A</text>
+  <text x="285" y="173" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#64B5F6">投入大 · 覆盖广</text>
+
+  <rect x="420" y="130" width="190" height="56" rx="6" fill="#E8EAF6" stroke="#9FA8DA" stroke-width="1.5"/>
+  <text x="515" y="153" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#283593">大公司 B</text>
+  <text x="515" y="173" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#7986CB">重流程 · 高成本</text>
+
+  <rect x="190" y="215" width="190" height="56" rx="6" fill="#E3F2FD" stroke="#90CAF9" stroke-width="1.5"/>
+  <text x="285" y="238" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#1565C0">大公司 C</text>
+  <text x="285" y="258" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#64B5F6">决策慢 · 看不上小市场</text>
+
+  <rect x="420" y="215" width="190" height="56" rx="6" fill="#E8EAF6" stroke="#9FA8DA" stroke-width="1.5"/>
+  <text x="515" y="238" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#283593">大公司 D</text>
+  <text x="515" y="258" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#7986CB">产出 &lt; 投入则不进入</text>
+
+  <!-- ===== NICHE MARKETS ===== -->
+
+  <!-- Top-Left: arrow upward, crosses border -->
+  <rect x="65" y="75" width="100" height="46" rx="6" fill="#FFF8E1" stroke="#FFB74D" stroke-width="1.5"/>
+  <text x="115" y="94" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="#E65100">细分市场</text>
+  <text x="115" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#FF9800">投入小 · 决策快</text>
+  <line x1="115" y1="75" x2="115" y2="38" stroke="#FF7043" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+
+  <!-- Top-Right: arrow upward, crosses border -->
+  <rect x="635" y="75" width="100" height="46" rx="6" fill="#E8F5E9" stroke="#81C784" stroke-width="1.5"/>
+  <text x="685" y="94" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="#2E7D32">细分市场</text>
+  <text x="685" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#66BB6A">轻量 · 灵活</text>
+  <line x1="685" y1="75" x2="685" y2="38" stroke="#43A047" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <!-- Left-Mid: arrow leftward, crosses border -->
+  <rect x="60" y="180" width="100" height="46" rx="6" fill="#F3E5F5" stroke="#CE93D8" stroke-width="1.5"/>
+  <text x="110" y="199" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="#6A1B9A">细分市场</text>
+  <text x="110" y="215" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#AB47BC">个人影响力驱动</text>
+  <line x1="60" y1="203" x2="35" y2="203" stroke="#8E24AA" stroke-width="1.5" marker-end="url(#arrow-purple)"/>
+
+  <!-- Right-Mid: arrow rightward, crosses border -->
+  <rect x="640" y="180" width="100" height="46" rx="6" fill="#F3E5F5" stroke="#CE93D8" stroke-width="1.5"/>
+  <text x="690" y="199" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="#6A1B9A">细分市场</text>
+  <text x="690" y="215" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#AB47BC">内容获客 · 口碑</text>
+  <line x1="740" y1="203" x2="765" y2="203" stroke="#8E24AA" stroke-width="1.5" marker-end="url(#arrow-purple)"/>
+
+  <!-- Bottom-Left: arrow downward, crosses border -->
+  <rect x="65" y="285" width="100" height="46" rx="6" fill="#FFF8E1" stroke="#FFB74D" stroke-width="1.5"/>
+  <text x="115" y="304" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="#E65100">细分市场</text>
+  <text x="115" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#FF9800">从角落扎根</text>
+  <line x1="115" y1="331" x2="115" y2="372" stroke="#FF7043" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+
+  <!-- Bottom-Right: arrow downward, crosses border -->
+  <rect x="635" y="285" width="100" height="46" rx="6" fill="#E8F5E9" stroke="#81C784" stroke-width="1.5"/>
+  <text x="685" y="304" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="#2E7D32">细分市场</text>
+  <text x="685" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#66BB6A">慢慢拓展版图</text>
+  <line x1="685" y1="331" x2="685" y2="372" stroke="#43A047" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <!-- ===== BOTTOM: STRATEGY FLOW ===== -->
+  <rect x="120" y="385" width="560" height="70" rx="8" fill="#F5F7FA" stroke="#CFD8DC" stroke-width="1"/>
+
+  <text x="150" y="410" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#546E7A">策略路径：</text>
+
+  <rect x="238" y="395" width="105" height="30" rx="15" fill="#E3F2FD" stroke="#90CAF9" stroke-width="1.2"/>
+  <text x="290" y="414" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="#1565C0">切入细分市场</text>
+
+  <line x1="348" y1="410" x2="378" y2="410" stroke="#78909C" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+
+  <rect x="385" y="395" width="85" height="30" rx="15" fill="#E8F5E9" stroke="#A5D6A7" stroke-width="1.2"/>
+  <text x="427" y="414" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="#2E7D32">站稳脚跟</text>
+
+  <line x1="475" y1="410" x2="505" y2="410" stroke="#78909C" stroke-width="1.5" marker-end="url(#arrow-gray)"/>
+
+  <rect x="512" y="395" width="85" height="30" rx="15" fill="#FFF8E1" stroke="#FFCC80" stroke-width="1.2"/>
+  <text x="554" y="414" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="600" fill="#E65100">逐步扩展</text>
+
+  <text x="400" y="446" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#90A4AE">核心优势：投入小、决策快，聚焦大公司产出 &lt; 投入的角落</text>
+</svg>

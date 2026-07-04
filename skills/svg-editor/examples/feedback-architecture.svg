@@ -1,0 +1,186 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 870" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#6366f1"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#22c55e"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f59e0b"/>
+    </marker>
+    <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ef4444"/>
+    </marker>
+    <marker id="arrowGray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#9ca3af"/>
+    </marker>
+    <marker id="arrowTeal" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#14b8a6"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="550" y="28" text-anchor="middle" font-size="17" font-weight="700" fill="#1f2937">Human in/on Loop 反馈闭环</text>
+
+  <!-- ============================================ -->
+  <!-- START (Top center) -->
+  <!-- ============================================ -->
+  <circle cx="550" cy="55" r="16" fill="#e8f5e9" stroke="#66bb6a" stroke-width="2"/>
+  <text x="550" y="59" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">开始</text>
+
+  <!-- Arrow: START → INPUT -->
+  <line x1="550" y1="71" x2="550" y2="100" stroke="#9ca3af" stroke-width="2" marker-end="url(#arrowGray)"/>
+
+  <!-- ============================================ -->
+  <!-- ROW 1: INPUT -->
+  <!-- ============================================ -->
+  <rect x="420" y="100" width="260" height="44" rx="10" fill="#f8fafc" stroke="#64748b" stroke-width="2.5"/>
+  <text x="550" y="126" text-anchor="middle" font-size="14" font-weight="700" fill="#1e293b">📋 任务需求</text>
+
+  <!-- Arrow: INPUT → CM -->
+  <line x1="550" y1="144" x2="550" y2="190" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#arrowGray)"/>
+  <rect x="565" y="158" width="60" height="16" rx="3" fill="#ffffff" stroke="none"/>
+  <text x="568" y="170" font-size="11" fill="#6b7280">任务输入</text>
+
+  <!-- ============================================ -->
+  <!-- ROW 2: CM (center) + AF (left) -->
+  <!-- ============================================ -->
+  <rect x="420" y="190" width="260" height="50" rx="10" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="2"/>
+  <text x="550" y="212" text-anchor="middle" font-size="13" font-weight="700" fill="#0c4a6e">上下文管理器（被控系统）</text>
+  <text x="550" y="229" text-anchor="middle" font-size="11" fill="#0369a1">Prompt / Skills / Tools / MCP / RAG 等</text>
+
+  <!-- AF (Auto Feedbacker) -->
+  <rect x="20" y="176" width="220" height="78" rx="10" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <circle cx="45" cy="215" r="16" fill="#f59e0b"/>
+  <text x="45" y="215" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="700" fill="#fff">⚖</text>
+  <text x="73" y="209" font-size="14" font-weight="700" fill="#78350f">自动反馈器</text>
+  <text x="73" y="226" font-size="11" fill="#b45309">工具: 硬边界 | AI: 软判断</text>
+
+  <!-- AF→CM (自动更新未来规则) — exits AF upper-right, enters CM upper-left -->
+  <line x1="240" y1="200" x2="419" y2="200" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+  <rect x="246" y="191" width="138" height="18" rx="3" fill="#ffffff" stroke="none"/>
+  <text x="315" y="204" text-anchor="middle" font-size="11" fill="#d97706">自动更新规则/知识/技能</text>
+
+  <!-- AF→CTX (自动补充当前上下文) — exits AF right side (y=220), goes right, down, into CTX upper-left -->
+  <path d="M 240 220 L 355 220 L 355 315 L 419 315" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+  <rect x="338" y="258" width="104" height="18" rx="3" fill="#ffffff" stroke="none"/>
+  <text x="390" y="271" text-anchor="middle" font-size="11" fill="#d97706">自动补充规则/知识</text>
+
+  <!-- Arrow: CM → CTX -->
+  <line x1="550" y1="240" x2="550" y2="290" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#arrowGray)"/>
+  <rect x="565" y="256" width="60" height="16" rx="3" fill="#ffffff" stroke="none"/>
+  <text x="568" y="268" font-size="11" fill="#6b7280">生成上下文</text>
+
+  <!-- ============================================ -->
+  <!-- ROW 3: CTX -->
+  <!-- ============================================ -->
+  <rect x="420" y="290" width="260" height="50" rx="10" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="2"/>
+  <text x="550" y="313" text-anchor="middle" font-size="14" font-weight="700" fill="#065f46">上下文</text>
+  <text x="550" y="330" text-anchor="middle" font-size="11" fill="#047857">Context — 当前任务的全部信息</text>
+
+  <!-- Arrow: CTX → EXEC -->
+  <line x1="550" y1="340" x2="550" y2="390" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#arrowGray)"/>
+  <rect x="565" y="356" width="60" height="16" rx="3" fill="#ffffff" stroke="none"/>
+  <text x="568" y="368" font-size="11" fill="#6b7280">任务执行</text>
+
+  <!-- ============================================ -->
+  <!-- ROW 4: EXEC (center) + HOL (left) -->
+  <!-- ============================================ -->
+  <rect x="420" y="390" width="260" height="50" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+  <circle cx="448" cy="415" r="16" fill="#22c55e" opacity="0.85"/>
+  <text x="448" y="415" text-anchor="middle" dominant-baseline="central" font-size="14" fill="#fff">🤖</text>
+  <text x="476" y="412" font-size="14" font-weight="700" fill="#14532d">执行 AI</text>
+  <text x="476" y="429" font-size="11" fill="#15803d">Executor — 执行任务 · 产生输出</text>
+
+  <!-- HOL (Human on Loop) -->
+  <rect x="20" y="390" width="220" height="50" rx="10" fill="#eef2ff" stroke="#a5b4fc" stroke-width="2"/>
+  <circle cx="45" cy="415" r="16" fill="#6366f1"/>
+  <text x="45" y="415" text-anchor="middle" dominant-baseline="central" font-size="14" fill="#fff">👤</text>
+  <text x="73" y="412" font-size="14" font-weight="700" fill="#1e1b4b">Human on Loop</text>
+  <text x="73" y="429" font-size="11" fill="#4f46e5">建立/维护自动反馈循环</text>
+
+  <!-- HOL→AF — vertical inside left column -->
+  <line x1="130" y1="390" x2="130" y2="254" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+  <rect x="70" y="313" width="120" height="18" rx="3" fill="#ffffff" stroke="none"/>
+  <text x="130" y="326" text-anchor="middle" font-size="11" fill="#d97706">设定规则/知识/技能</text>
+
+  <!-- ============================================ -->
+  <!-- ROW 5: OUTPUT -->
+  <!-- ============================================ -->
+  <!-- Arrow: EXEC → OUTPUT -->
+  <line x1="550" y1="440" x2="550" y2="490" stroke="#9ca3af" stroke-width="2" marker-end="url(#arrowGray)"/>
+  <rect x="565" y="456" width="60" height="16" rx="3" fill="#ffffff" stroke="none"/>
+  <text x="568" y="468" font-size="11" fill="#6b7280">产生输出</text>
+
+  <rect x="420" y="490" width="260" height="50" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="550" y="513" text-anchor="middle" font-size="14" font-weight="600" fill="#475569">系统输出</text>
+  <text x="550" y="530" text-anchor="middle" font-size="10" fill="#64748b">代码 · 配置 · 设计方案 · 任务结果</text>
+
+  <!-- ============================================ -->
+  <!-- Arrow: OUTPUT → HIL (main flow, 40px gap) -->
+  <!-- ============================================ -->
+  <line x1="550" y1="540" x2="550" y2="580" stroke="#9ca3af" stroke-width="2" marker-end="url(#arrowGray)"/>
+  <rect x="565" y="551" width="60" height="16" rx="3" fill="#ffffff" stroke="none"/>
+  <text x="568" y="563" font-size="11" fill="#6b7280">监测输出</text>
+
+  <!-- ============================================ -->
+  <!-- ROW 6: HIL (Human in Loop) — NOW IN CENTER between Output and End -->
+  <!-- ============================================ -->
+  <rect x="420" y="580" width="260" height="55" rx="10" fill="#fef2f2" stroke="#fecaca" stroke-width="2"/>
+  <circle cx="448" cy="607" r="16" fill="#ef4444"/>
+  <text x="448" y="607" text-anchor="middle" dominant-baseline="central" font-size="14" fill="#fff">👤</text>
+  <text x="476" y="603" font-size="14" font-weight="700" fill="#b91c1c">Human in Loop</text>
+  <text x="476" y="621" font-size="11" fill="#dc2626">人工监测 · 判断偏差 · 三种反馈路径</text>
+
+  <!-- ============================================ -->
+  <!-- Arrow: HIL → END (main flow, 37px gap) -->
+  <!-- ============================================ -->
+  <line x1="550" y1="635" x2="550" y2="672" stroke="#9ca3af" stroke-width="2" marker-end="url(#arrowGray)"/>
+  <rect x="565" y="644" width="30" height="16" rx="3" fill="#ffffff" stroke="none"/>
+  <text x="568" y="656" font-size="11" fill="#6b7280">完成</text>
+
+  <!-- END -->
+  <circle cx="550" cy="690" r="18" fill="#e8f5e9" stroke="#66bb6a" stroke-width="2"/>
+  <text x="550" y="694" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">结束</text>
+
+  <!-- ============================================ -->
+  <!-- MEASUREMENT: OUTPUT → AF (enters AF right side at y=240, below 自动补充 at y=220) -->
+  <!-- ============================================ -->
+  <path d="M 420 515 L 300 515 L 300 240 L 241 240" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrowOrange)"/>
+  <rect x="260" y="368" width="80" height="18" rx="3" fill="#ffffff" stroke="none"/>
+  <text x="300" y="381" text-anchor="middle" font-size="11" fill="#d97706">自动监测输出</text>
+
+  <!-- ============================================ -->
+  <!-- FEEDBACK: HIL → CTX (右边 — 手动补充当前上下文) -->
+  <!-- ============================================ -->
+  <!-- Exit HIL right edge (y=600), go right to x=700, up to CTX y-level, left into CTX right edge -->
+  <path d="M 680 600 L 730 600 L 730 315 L 681 315" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,3" marker-end="url(#arrowRed)"/>
+  <rect x="693" y="448" width="165" height="18" rx="3" fill="#ffffff" stroke="none"/>
+  <text x="775" y="461" text-anchor="middle" font-size="11" fill="#dc2626">① 手动补充当前任务规则/知识</text>
+
+  <!-- ============================================ -->
+  <!-- FEEDBACK: HIL → CM (右边 — 手动补充未来规则) -->
+  <!-- ============================================ -->
+  <!-- Exit HIL right edge (y=612), go right to x=740, up to CM y-level, left into CM right edge -->
+  <path d="M 680 612 L 760 612 L 760 215 L 681 215" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowRed)"/>
+  <rect x="733" y="404" width="165" height="18" rx="3" fill="#ffffff" stroke="none"/>
+  <text x="815" y="417" text-anchor="middle" font-size="11" fill="#dc2626">② 手动补充未来任务规则/知识</text>
+
+  <!-- ============================================ -->
+  <!-- FEEDBACK: HIL → HOL (左边 — 案例和 insight) -->
+  <!-- ============================================ -->
+  <!-- Exit HIL left edge (y=608), go left to x=130, then up into HOL bottom -->
+  <path d="M 420 608 L 130 608 L 130 441" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="5,3" marker-end="url(#arrowRed)"/>
+  <rect x="190" y="596" width="120" height="18" rx="3" fill="#ffffff" stroke="none"/>
+  <text x="250" y="609" text-anchor="middle" font-size="11" fill="#dc2626">③ 案例和洞见</text>
+
+  <!-- ============================================ -->
+  <!-- BOTTOM LEGEND -->
+  <!-- ============================================ -->
+  <rect x="60" y="743" width="830" height="72" rx="10" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="505" y="762" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">主流程：开始 → 任务需求 → 上下文管理器 → 上下文 → 执行AI → 系统输出 → Human in Loop → 结束</text>
+  <text x="505" y="780" text-anchor="middle" font-size="11" fill="#6b7280">自动反馈（橙色线）：自动反馈器 → 上下文（自动补充规则/知识/技能） | 自动反馈器 → 上下文管理器（自动更新规则/知识/技能）</text>
+  <text x="505" y="796" text-anchor="middle" font-size="11" fill="#6b7280">人工反馈（红色线）：Human in Loop → 上下文（手动补充规则/知识/技能）</text>
+  <text x="505" y="810" text-anchor="middle" font-size="11" fill="#6b7280">　　　　　　　　　Human in Loop → 上下文管理器（手动补充规则/知识/技能） | Human in Loop → Human on Loop（案例和洞见）</text>
+</svg>
