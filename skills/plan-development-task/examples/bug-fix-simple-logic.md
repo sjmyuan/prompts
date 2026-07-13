@@ -1,15 +1,25 @@
-# Example: Simple Logic Bug Fix
+# Example: Simple Logic Bug Fix — Wrong ID Passed to Publisher
 
-**Scenario**: DataImportedHandler sends incorrect data ID to message publisher
+**Scenario**: `DataImportedHandler` sends an incorrect (transformed) data ID to the message publisher instead of the original source ID.
 
 ---
 
-## Root Cause Identification
+## Change Classification
 
-Applies **identify-bug-root-cause**.
+Applies **classify-change-type**.
 
 **User reports:**
-> “The message publisher is receiving the wrong product ID — downstream consumers see a transformed/modified ID in the outgoing event instead of the original source ID.”
+> "The message publisher is receiving the wrong product ID — downstream consumers see a transformed/modified ID in the outgoing event instead of the original source ID."
+
+**Agent classifies** — keywords: "wrong", "incorrect", "instead of original" → **Bug Fix**.
+
+*User confirms classification: ✅*
+
+---
+
+## Bug Scope Definition
+
+Applies **define-bug-scope**.
 
 **Agent gathers information** — reads `DataImportedHandler.java` and the event publishing tests. Finds: the handler calls `dataTransformer.transform(record)` and then passes `transformedData.getId()` (the transformed ID) to the publisher instead of the original `record.getId()`.
 
@@ -33,10 +43,9 @@ Applies **plan-bug-fix**.
 
 **Root Cause**: Using transformed ID instead of original ID in the outgoing message
 
-**Bug-Fixing Plan**:
+**TDD Approach**: Full TDD cycle (simple logic error — test-first provides safety for data correctness)
 
-## Steps
-
+**Steps:**
 - **Step 1**: Validate Baseline (run tests, Spotless, Checkstyle)
 - **Step 2**: Write Tests for correct ID handling in DataImportedHandler
 - **Step 3**: Confirm Test Failure
@@ -53,3 +62,4 @@ Applies **plan-bug-fix**.
 - **Approach**: Full TDD cycle
 - **Focus**: Logic correctness and data mapping
 - **Test Coverage**: ID transformation scenarios and edge cases
+- **Total Steps**: 9

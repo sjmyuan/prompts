@@ -1,16 +1,25 @@
-# Service Splitting Example
+# Example: Refactor — Split Large Handler into Focused Services
 
-## Objective
-Split large DataImportedHandler into smaller, focused service classes following Single Responsibility Principle
+**Scenario**: Split a large `DataImportedHandler` into smaller, focused service classes following Single Responsibility Principle.
 
 ---
 
-## Refactor Request Definition
+## Change Classification
 
-Applies **define-refactor-request**.
+Applies **classify-change-type**.
 
 **User request:**
 > "DataImportedHandler is getting too big — it handles category mapping, price transformation, and localization all in one class. We want to split it up."
+
+**Agent classifies** — keywords: "split", "refactor without behavior change" → **Refactor** (internal restructuring, no new behavior).
+
+*User confirms classification: ✅*
+
+---
+
+## Refactor Scope Definition
+
+Applies **define-refactor-scope**.
 
 **Agent asks clarifying questions:**
 > 1. Should the extracted services be stateless utilities or Spring-managed beans injected into the handler?
@@ -30,7 +39,11 @@ Applies **define-refactor-request**.
 
 ## Refactoring Plan
 
-### Steps
+Applies **plan-refactor**.
+
+**TDD Approach**: Full TDD cycle for each service extraction — preserving existing behavior requires thorough test coverage
+
+**Steps:**
 - Step 1: Validate Baseline (run tests, mvn spotless:check, mvn checkstyle:check, mvn compile)
 - Step 2: Write Tests for CategoryMappingService
 - Step 3: Confirm Test Failure
@@ -39,7 +52,7 @@ Applies **define-refactor-request**.
 - Step 6: Clean Up unused code in DataImportedHandler
 - Step 7: Clean Up Tests
 - Step 8: Verify Cleanup
-- Step 9: Validate Linting, Formatting and Type Checking (mvn spotless:check, mvn checkstyle:check, mvn compile)
+- Step 9: Validate Linting, Formatting and Type Checking
 - Step 10: Write Tests for PriceTransformationService
 - Step 11: Confirm Test Failure
 - Step 12: Extract PriceTransformationService from DataImportedHandler
@@ -47,11 +60,12 @@ Applies **define-refactor-request**.
 - Step 14: Clean Up unused code in DataImportedHandler
 - Step 15: Clean Up Tests
 - Step 16: Verify Cleanup
-- Step 17: Validate Linting, Formatting and Type Checking (mvn spotless:check, mvn checkstyle:check, mvn compile)
+- Step 17: Validate Linting, Formatting and Type Checking
 
 ## Key Characteristics
 
-- **Complexity**: Medium - involves extracting business logic into new services
-- **TDD Approach**: Full cycle for each service extraction (Steps 2–9, then 10–17)
+- **Complexity**: Medium — involves extracting business logic into new services
+- **TDD Approach**: Full cycle for each service extraction
 - **Focus**: Single Responsibility Principle, service layer separation
 - **Testing Strategy**: Independent test cycles per extracted service; existing handler tests stay green throughout
+- **Total Steps**: 17
