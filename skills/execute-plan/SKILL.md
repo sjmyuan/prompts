@@ -1,11 +1,11 @@
 ---
-name: plan-executor
-description: Execute structured plans step-by-step with progress tracking, validation checkpoints, and error recovery. Works with plans from bug-fix-planner, feature-implementation-planner, or refactor-planner. Runs tests, validates changes, and handles failures systematically. Use after generating an implementation, refactor, or bug-fix plan that needs execution.
+name: execute-plan
+description: Execute structured plans step-by-step with progress tracking, validation checkpoints, and error recovery. Works with plans from plan-development-task. Runs tests, validates changes, and handles failures systematically. Use after generating a plan that needs execution.
 ---
 
 <when-to-use-this-skill>
 - You need to execute an outlined plan (implementation plan, refactoring plan, or bug-fix plan)
-- A structured plan from bug-fix-planner, feature-implementation-planner, or refactor-planner needs to be carried out with progress tracking and validation checkpoints
+- A structured plan from plan-development-task needs to be carried out with progress tracking and validation checkpoints
 </when-to-use-this-skill>
 
 <knowledge>

@@ -63,7 +63,7 @@ Load only the examples directly relevant to the current change type to minimize 
 </context-loading-guide>
 
 <skill-boundary>
-This skill produces a **plan** but does not execute changes. Pair with **plan-executor** for implementation.
+This skill produces a **plan** but does not execute changes. Pair with **execute-plan** for implementation.
 </skill-boundary>
 
 </knowledge>
