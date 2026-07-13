@@ -1,5 +1,5 @@
 ---
-name: doc-maintainer
+name: maintain-doc
 description: Synchronize documentation with code changes across README, architecture docs, API docs, and requirements. Use when documentation is stale, inconsistent, or missing after bug fixes, features, refactors, or infrastructure changes.
 ---
 

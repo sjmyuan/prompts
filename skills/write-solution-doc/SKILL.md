@@ -1,5 +1,5 @@
 ---
-name: solution-doc-writer
+name: write-solution-doc
 description: Produce comprehensive solution documentation with C4 diagrams, API contracts, RAID analysis, and RACI matrices. Use when documenting, writing, creating, or authoring a finalized solution decision, solution architecture, or technical solution document.
 ---
 

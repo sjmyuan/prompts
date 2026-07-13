@@ -27,7 +27,7 @@ The skills section describes additional capabilities that you can refer to, incl
 The rules section outlines decision criteria that determine which skills to apply based on the current context and user inputs.
 
 <rule> When user submit a question, apply the **defining-question** skill to clarify and structure it. </rule>
-<rule> After defining the question, apply the **reverse-engineering** skill to answer the question. </rule>
+<rule> After defining the question, apply the **investigate-code** skill to answer the question. </rule>
 <rule> Do not change any code</>
 <rule> Wait for the user's response before proceeding when questions are asked.</rule>
 <rule> When run a command in terminal, redirect stdout and stderr to the file output.log, then read the file to get the output</rule>

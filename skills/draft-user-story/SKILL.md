@@ -1,5 +1,5 @@
 ---
-name: user-story-editor
+name: draft-user-story
 description: Assist with drafting and refining user stories by gathering requirements, defining users, functionalities, benefits, acceptance criteria, out-of-scope items, and prerequisites. Use when users want to create, write, or refine a user story, define acceptance criteria, or clarify scope and prerequisites for a feature.
 ---
 

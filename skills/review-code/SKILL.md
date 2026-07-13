@@ -1,5 +1,5 @@
 ---
-name: code-reviewer
+name: review-code
 description: Systematic code and document reviews across files, diffs, commits, PRs, or branches. Evaluates correctness, security, performance, maintainability with actionable feedback. Use when requesting reviews, feedback, or quality checks.
 ---
 

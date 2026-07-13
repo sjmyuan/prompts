@@ -1,5 +1,5 @@
 ---
-name: adr-editor
+name: draft-adr
 description: Guide users through drafting well-structured ADRs. Use when creating, writing, drafting, or authoring an ADR, documenting decisions, evaluating options, or compiling a record from raw notes.
 ---
 

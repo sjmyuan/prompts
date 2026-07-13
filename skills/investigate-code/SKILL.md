@@ -1,5 +1,5 @@
 ---
-name: reverse-engineer
+name: investigate-code
 description: Investigate codebases to answer questions about functionality, implementation, design decisions, and architecture. Analyzes code structure, traces control/data flow, and examines dependencies to provide comprehensive answers. Use when users ask "what", "how", "why", "where", or "when" questions about existing code. Does not modify code.
 ---
 

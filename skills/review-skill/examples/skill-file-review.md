@@ -1,13 +1,13 @@
 ````markdown
 # Example: Skill File Review
 
-**Scenario**: Review of `skills/miniprogram/SKILL.md` — a copilot skill that guides an AI agent on WeChat Miniprogram development.
+**Scenario**: Review of `skills/develop-miniprogram/SKILL.md` — a copilot skill that guides an AI agent on WeChat Miniprogram development.
 
 **Review Focus**: Skill structure correctness — whether `<knowledge>`, `<capabilities>`, `<rules>`, and `<examples>` sections each serve their intended purpose and are free of duplication.
 
 ## Code Review Summary
 
-**Scope**: `skills/miniprogram/SKILL.md` — full skill file
+**Scope**: `skills/develop-miniprogram/SKILL.md` — full skill file
 **Focus Areas**: Section purpose compliance, duplication, information placement
 **Overall Assessment**: Functional but requires restructuring — knowledge and capabilities are conflated, and rules repeat content already stated in capabilities.
 
@@ -39,7 +39,7 @@
 #### `<typescript-patterns>` and `<styling-conventions>` read as bullet-point knowledge, not capabilities
 - **File**: [SKILL.md](SKILL.md#L95-L120)
 - **Issue**: Both sections list facts and constraints (`"strict": true`, `rpx` for sizing) rather than describing a procedure to follow. A capability should answer "how do I apply TypeScript/styling in this project?", not just enumerate settings.
-- **Recommendation**: Convert to step-by-step procedures ("How to type a miniprogram codebase: 1. … 2. …") or, for purely factual entries (tsconfig flags, forbidden units), move them to `<knowledge>`.
+- **Recommendation**: Convert to step-by-step procedures ("How to type a develop-miniprogram codebase: 1. … 2. …") or, for purely factual entries (tsconfig flags, forbidden units), move them to `<knowledge>`.
 
 #### `<examples>` section is standalone instead of nested inside `<knowledge>`
 - **File**: [SKILL.md](SKILL.md#L162-L175)
@@ -70,7 +70,7 @@
 - `<when-to-use-this-skill>` correctly limits skill activation to relevant scenarios.
 - `<examples>` section properly defers to separate files and instructs the agent to load only the relevant one — good for context efficiency.
 - Arrow references (`→ See examples/...`) at the end of each capability correctly point to the concrete code template without embedding it inline.
-- The capability set covers the full miniprogram development surface (pages, components, canvas, storage, navigation, styling, TypeScript, subpackages).
+- The capability set covers the full develop-miniprogram development surface (pages, components, canvas, storage, navigation, styling, TypeScript, subpackages).
 
 ---
 

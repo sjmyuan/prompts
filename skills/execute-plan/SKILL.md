@@ -44,7 +44,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 | Executing a plan that spans multiple files and architectural layers | Output model: execution tracking across multiple files and layers | [examples/multi-file-implementation.md](examples/multi-file-implementation.md) |
 | A step fails with compilation errors or unexpected output | Output model: error recovery, ❌→✅ status transitions, and retry patterns | [examples/handling-failed-steps.md](examples/handling-failed-steps.md) |
 | Executing a plan with 10+ steps requiring context preservation | Output model: long plan progress tracking and context continuity | [examples/long-plan-execution.md](examples/long-plan-execution.md) |
-| All plan steps are complete and post-execution review is needed | Output model: applying code-reviewer after completion, adding fix steps, deleting PLAN.md | [examples/post-execution-review.md](examples/post-execution-review.md) |
+| All plan steps are complete and post-execution review is needed | Output model: applying review-code after completion, adding fix steps, deleting PLAN.md | [examples/post-execution-review.md](examples/post-execution-review.md) |
 | A step is ambiguous, requires user input, or cannot proceed due to a missing dependency or external blocker | Output model: pausing execution at a blocked step, informing the user, and resuming after input | [examples/handling-failed-steps.md](examples/handling-failed-steps.md) |
 </context-loading-guide>
 
@@ -97,12 +97,12 @@ Load only the example most relevant to the current execution scenario to minimiz
 </run-validation-checkpoints>
 
 <review-post-execution>
-1. After ALL plan steps are marked ✅ completed, apply the **code-reviewer** skill on all files changed or created during execution.
+1. After ALL plan steps are marked ✅ completed, apply the **review-code** skill on all files changed or created during execution.
 2. Evaluate correctness, security, performance, maintainability, and test coverage.
 3. If 🚫 Blocker or 🔴 Major issues are found:
    1. Record each finding as a new fix step in PLAN.md with ⏳ pending status.
    2. Apply **execute-step** for each fix step.
-   3. Re-run the **code-reviewer** skill on the affected files.
+   3. Re-run the **review-code** skill on the affected files.
    4. Repeat until no 🚫 Blockers or 🔴 Majors remain.
 4. If only 🟡 Minor and 🟢 Nit findings remain, document them in the final summary without blocking completion.
 5. Proceed to **clean-up-plan** only when the review passes.

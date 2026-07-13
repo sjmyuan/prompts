@@ -1,5 +1,5 @@
 ---
-name: skill-reviewer
+name: review-skill
 description: Review SKILL.md files for correct structure, section-purpose compliance, naming convention adherence, and absence of duplication. Evaluates whether knowledge, capabilities, rules, and examples sections each serve their intended purpose and whether names follow action-verb conventions. Use when users request feedback, a quality assessment, or want to improve, fix, or ensure a copilot skill file triggers correctly.
 ---
 
