@@ -42,11 +42,15 @@ description: Create SVG diagrams with professional PPT-quality layout, clear con
 
 **Multi-lane corridor strategy**: When multiple feedback edges share the same gap corridor between columns, assign each edge its own x-lane in the corridor (e.g., `lane_c`, `lane_r`, `lane_l`, `lane_rr` with 18px spacing). Also stagger the y-levels of horizontal segments exiting from shared source nodes (e.g., use `0.5×height` and `0.85×height` for different edges from the same node side).
 
-**Turning point clearance**: Turning points (waypoints that are not connection endpoints) must NOT share x with any node's left/right edge nor y with any node's top/bottom edge. Otherwise the line visually overlaps the element border. After routing use _short approach segments_ (6-10px) to enter/exit node edges: route the final horizontal segment at `edge_y - 8`, then drop vertically into the edge. Validate with:
+**Turning point clearance**: Turning points (waypoints that are not connection endpoints) must NOT share x with any node's left/right edge nor y with any node's top/bottom edge. Otherwise the line visually overlaps the element border. After routing use _short approach segments_ (≥15px, validated by `endpoint_valid()`) to enter/exit node edges: route the final horizontal segment at `edge_y - 16`, then drop vertically into the edge. Validate with:
   ```
   for each turning point (tx, ty), for each node (nx, ny, nw, nh):
     assert not (abs(tx-(nx))<2 or abs(tx-(nx+nw))<2 or abs(ty-ny)<2 or abs(ty-(ny+nh))<2)
   ```
+
+**Side-entry through-node problem**: When edges enter wide nodes from LEFT/RIGHT sides, the horizontal approach segment passes through the node interior. Avoid side-entry — route to a point above/below the target and drop in with a ≥15px vertical approach. See [reference/diagram-workflow.md](reference/diagram-workflow.md) for the pattern.
+
+**Column gap enforcement**: `flow_layout()` may not provide sufficient inter-column gap. After layout, compute the actual gap and manually shift the side column if below minimum (140–160px for corridor-routed diagrams). Recompute `corridor_x` after shifting.
 
 **Label placement**: For complex diagrams with long CJK labels, prefer explicit position assignment after analyzing the diagram layout. Place labels on horizontal segments when possible (natural left-to-right reading). On vertical segments, offset right. Ensure minimum 8px clearance from all node edges. When automated placement is needed, try all segments and pick the one where push-down displacement is smallest.
 
@@ -100,12 +104,15 @@ Generate a PPT-quality diagram for script-based types (flowchart, architecture, 
 8. **Generate defs and decorations**: Call `get_shadow_filter()`, `get_gradient_defs()`, `generate_arrow_marker()`, `generate_title_bar()`.
 9. **Write SVG and run**: Assemble fragments following the **SVG assembly pattern**. Save to `.svg` file. Run `python3 generate_diagram.py`.
 10. **Visually validate and iterate**: Open in browser. Check:
+    - **Line-node overlap**: No edge path segment passes through the interior of any node. For side-entry edges, verify that horizontal approach segments do not intersect node bodies. If they do, re-route to enter from top/bottom with approach segments.
     - **Line overlap**: No two lines share the same corridor x-position. Parallel edges must be staggered.
     - **Turning point clearance**: No turning point aligns with any node's edge.
     - **Connection sides**: Edges enter/exit from correct sides of nodes.
     - **Row alignment**: All same-row nodes have identical center_y; all same-column nodes have identical center_x.
-    - **Label overlap**: Labels do not overlap with nodes or each other.
+    - **Column gap**: Inter-column gap is ≥140px for corridor-routed diagrams. Manually enforce if needed.
+    - **Label overlap**: Labels do not overlap with nodes or each other. Prefer manual position assignment for cross-column edges.
     - **Port allocation**: No two lines converge at the same spot on a node edge; parallel edges spread apart.
+    - **Approach segments**: Entry segments into nodes are ≥15px (validated by `endpoint_valid()`).
     Fix issues in script and re-run until all criteria are met.
 11. **Compute viewBox**: Call `compute_viewbox()` with all bounding boxes. For tall diagrams (8+ rows, portrait orientation), pass `target_aspect=None` to let the viewBox match content proportions rather than enforcing 16:9.
 12. **Assemble and output**: Follow the **SVG assembly pattern**. Return raw, valid SVG code.
@@ -144,9 +151,13 @@ Modify, fix, or upgrade an existing SVG diagram. All new geometry MUST be comput
 <rule>When creating hand-crafted types (comparison, pyramid, step-flow, container, donut) → apply **create-handcrafted-diagram**.</rule>
 <rule>When fixing, modifying, or upgrading an existing SVG → apply **modify-existing-svg**. All new geometry must use scripts.</rule>
 <rule>When the request spans multiple types → apply capabilities sequentially and compose into one SVG.</rule>
-<rule>**Turning point clearance**: After routing any edge, verify that no turning point (non-endpoint waypoint) shares an x-coordinate with any node's left/right edge or a y-coordinate with any node's top/bottom edge. Use short approach segments (6-10px) if needed.</rule>
+<rule>**Turning point clearance**: After routing any edge, verify that no turning point (non-endpoint waypoint) shares an x-coordinate with any node's left/right edge or a y-coordinate with any node's top/bottom edge. Use short approach segments (≥15px, validated by `endpoint_valid()`) to disconnect horizontal/vertical segments from element edges.</rule>
 <rule>**Column/row centering**: Always position nodes by center_x (within column) and center_y (within row), not by top/left edges. Same-column nodes must share center_x; same-row nodes must share center_y.</rule>
 <rule>**Multi-lane corridors**: When multiple edges traverse a gap corridor between columns, assign each edge a distinct x-lane (≥18px spacing) and stagger horizontal exit y-levels from shared source nodes.</rule>
 <rule>**Skip-based edge routing**: For same-column forward edges, detect intermediate nodes. No intermediate + same center_x → straight line. No intermediate + different center_x → L-shape (1 turn). Has intermediate → Z-shape (2+ turns).</rule>
 <rule>**CJK text in SVG**: For multi-line CJK text in `<tspan>` elements, use `dy`-based positioning with baseline offset ≈ 0.32×font_size. Avoid `dominant-baseline` on `<tspan>` due to inconsistent browser support.</rule>
+<rule>**Side-entry avoidance**: When routing edges that enter a wide node from the LEFT or RIGHT side, the horizontal approach segment may pass through the node body (because `refX=arrow_width` places the arrow tip — and therefore the line endpoint — on the node edge, drawing the line through the node). Avoid side-entry for wide target nodes. Instead, route to a point ABOVE/BELOW the target and drop in with a ≥15px vertical approach segment. This guarantees the line never intersects the node interior. See [reference/diagram-workflow.md](reference/diagram-workflow.md) for the full pattern.</rule>
+<rule>**Column gap enforcement**: `flow_layout()` may place columns closer together than expected. After layout, compute the actual inter-column gap and if it is less than a minimum (e.g., 140–160px for diagrams with corridor-routed edges), manually shift the side column rightward. Recompute corridor_x after shifting.</rule>
+<rule>**Manual label placement for complex edges**: For cross-column feedback edges, backward edges, and edges with long CJK labels, automatic label placement frequently produces overlaps with nodes. Prefer explicit per-edge label position assignment based on path waypoint analysis and node-bbox overlap checking. On vertical corridor segments, place labels offset to the right (midpoint + label_width/2 + 8px). On horizontal segments, place labels offset above (midpoint − 10px).</rule>
+<rule>**API return types**: `connection_endpoints()` returns a **tuple** `(start_pt, end_pt, src_side, dst_side)`, not a dict. Destructure with `sp, ep, ss, ds = connection_endpoints(...)`. `generate_label_svg()` accepts `text_color` (not `color`) for the text fill. `generate_edge_svg()` hardcodes `marker-end="url(#arrow)"` — only ONE marker definition with `id="arrow"` should be in `<defs>`. See [reference/computation-snippets.md](reference/computation-snippets.md).</rule>
 </rules>

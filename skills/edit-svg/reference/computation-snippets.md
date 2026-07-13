@@ -142,7 +142,27 @@ print(result)
 
 ## Arrow Marker Geometry (Critical for Correct Connections)
 
-**Understanding the arrow marker is essential to avoid misaligned arrowheads.** The marker is a triangle drawn in its own coordinate system and placed at the end of a `<path>` via `marker-end="url(#arrow)"`.
+**Understanding the arrow marker is essential to avoid misaligned arrowheads and line-through-node defects.** The marker is a triangle drawn in its own coordinate system and placed at the end of a `<path>` via `marker-end="url(#arrow)"`.
+
+### Critical: generate_edge_svg() Marker Limitation
+
+`generate_edge_svg()` **hardcodes** `marker-end="url(#arrow)"`. This means:
+- Only **one** arrow marker definition with `id="arrow"` should exist in `<defs>`.
+- All edges share the same arrow color and style.
+- Do NOT generate multiple markers with different IDs — they will be ignored.
+- Use a neutral arrow color (e.g., `#475569`) that works with all edge colors.
+
+```python
+# CORRECT: single marker
+arrow = generate_arrow_marker('arrow', '#475569', arrow_width=10, arrow_height=10, tip_ref=True)
+
+# WRONG: multiple markers with different IDs won't be referenced
+# generate_edge_svg always uses marker-end="url(#arrow)"
+```
+
+### Side-Entry Implication of tip_ref=True
+
+With `refX=arrow_width` (tip_ref=True) and `generate_edge_svg()`, the arrow tip is placed at the path endpoint (on the node edge), and the line is drawn all the way to that endpoint. **For edges entering from LEFT/RIGHT sides of wide nodes, the horizontal approach segment will pass through the node interior.** See [reference/diagram-workflow.md](diagram-workflow.md) for the side-entry avoidance pattern.
 
 ### Marker Coordinate System
 
@@ -199,7 +219,7 @@ print(generate_arrow_marker('arrow', '#555555', arrow_width=10, arrow_height=10,
 "
 ```
 
-When using `generate_edge_svg()`, the arrow marker `#arrow` is automatically referenced via `marker_end="url(#arrow)"`. The edge path's last point should be on the **edge of the target shape** — the arrow tip will be placed exactly there.
+When using `generate_edge_svg()`, the arrow marker `#arrow` is automatically referenced via `marker_end="url(#arrow)"`. The edge path's last point should be on the **edge of the target shape** — the arrow tip will be placed exactly there. **Do not create multiple arrow markers with different IDs** — `generate_edge_svg()` only references `#arrow`.
 
 ### Verifying Arrow Alignment
 
@@ -221,6 +241,53 @@ print(f'Target entry: {dst_pt}, side={dst_side}')
 print(f'Arrow tip will be at: {dst_pt}')
 "
 ```
+
+## API Signature Reference
+
+Critical function signatures that are easy to misuse:
+
+### `connection_endpoints(src_bbox, dst_bbox, flow_direction)`
+
+**Returns**: `(start_pt, end_pt, src_side, dst_side)` — a **4-tuple**, NOT a dict.
+
+```python
+# CORRECT: destructure as tuple
+start_pt, end_pt, src_side, dst_side = connection_endpoints(src_box, dst_box, 'top-to-bottom')
+
+# WRONG: treating as dict
+# ep['start']  ← TypeError: tuple indices must be integers or slices
+```
+
+### `generate_label_svg(label, x, y, font_size=12, bg_color='#FFFFFF', text_color='#333333')`
+
+The text fill color parameter is **`text_color`**, not `color`.
+
+```python
+# CORRECT
+generate_label_svg('任务输入', 312.5, 359.0, font_size=11, text_color='#475569')
+
+# WRONG
+# generate_label_svg('任务输入', 312.5, 359.0, color='#475569')
+# ← TypeError: got unexpected keyword argument 'color'
+```
+
+### `endpoint_valid(waypoints, dst_bbox)`
+
+Returns a dict with `'valid'` (bool) and `'issues'` (list). **Entry segments must be ≥15px** or validation will warn `'Entry segment too short: X.Xpx (need >=15px)'`.
+
+```python
+result = endpoint_valid(edge['path'], dst['bbox'])
+if not result['valid']:
+    print(f"WARN: {result['issues']}")  # e.g., ['Entry segment too short: 10.0px (need >=15px)']
+```
+
+### `generate_edge_svg(edge_id, path_d, color='#555555', stroke_width=2.0, dashed=False)`
+
+Always uses `marker-end="url(#arrow)"`. Only ONE `<marker id="arrow">` in `<defs>`. Multi-color arrows are not supported through this function.
+
+### `flow_layout(nodes, direction, node_gap, branch_gap, start_offset)`
+
+The `branch_gap` parameter may not produce sufficient inter-column gap. Always verify and manually enforce a minimum gap (see [diagram-workflow.md](diagram-workflow.md) "Column Gap Enforcement").
 
 ## Common Script Calls
 

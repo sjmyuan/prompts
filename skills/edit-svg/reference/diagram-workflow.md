@@ -40,14 +40,95 @@ for each turning point (tx, ty), for each node (nx, ny, nw, nh):
     assert tx != nx and tx != nx+nw  # not on left/right edge
     assert ty != ny and ty != ny+nh  # not on top/bottom edge
 ```
-If a turning point aligns with a node edge, add a **short approach segment** (6-10px) to offset the horizontal/vertical segment away from the edge. For example, to enter a node's bottom edge cleanly:
+If a turning point aligns with a node edge, add a **short approach segment** (≥15px, validated by `endpoint_valid()`) to offset the horizontal/vertical segment away from the edge. For example, to enter a node's bottom edge cleanly:
 ```
 # Bad: horizontal at y=bottom runs along node's bottom edge
 (sx, sy) → (corridor, sy) → (corridor, bottom) → (target_x, bottom)
 
-# Good: horizontal offset by 8px, short vertical approach
-(sx, sy) → (corridor, sy) → (corridor, bottom-8) → (target_x, bottom-8) → (target_x, bottom)
+# Good: horizontal offset by 16px, short vertical approach
+(sx, sy) → (corridor, sy) → (corridor, bottom-16) → (target_x, bottom-16) → (target_x, bottom)
 ```
+
+## Side-Entry Through-Node Problem (Critical)
+
+**When an edge enters a wide target node from the LEFT or RIGHT side, the horizontal approach segment will pass THROUGH the node interior.** This is a common and serious defect that is easy to miss during code review.
+
+### Root Cause
+
+`generate_edge_svg()` uses `marker-end="url(#arrow)"` with `refX=arrow_width` (tip_ref=True). The arrow TIP is placed at the path endpoint, which must be on the node edge for the tip to touch the shape. However, the path line itself is drawn all the way to that endpoint. For side-entry edges, this means the last horizontal segment goes from the corridor (or previous turn) all the way to the node's far-side edge — passing through the entire node width.
+
+**With `refX=10, stroke-width=2`**: the arrow is 20 units long. The line is drawn 20 units into the node before the arrowhead covers it. The rest of the approach segment is visible line passing through the node body.
+
+```
+# PROBLEMATIC: line passes through CM (x=160-485) at y=418
+(565, 418) → (160, 418)
+# The horizontal segment from x=565 to x=160 goes right through CM (160-485)
+```
+
+### Solution: Top/Bottom Entry with Approach Segment
+
+Instead of entering from the side, route the edge to a point **above or below** the target node, then drop in with a short vertical approach segment:
+
+```
+# FIXED: route above CM (y=400), then 16px vertical approach into CM top
+(565, 572) → (565, 384) → (322.5, 384) → (322.5, 400)
+# Horizontal at y=384 is above CM; vertical from 384→400 is a clean 16px approach
+```
+
+The approach segment must be ≥15px (enforced by `endpoint_valid()`). Use 16px as a safe minimum.
+
+### When Side-Entry Is Unavoidable
+
+If an edge MUST enter from the side (e.g., same-row cross-column connection), route the approach point to a y-level that is NOT at the node's top/bottom edge. Enter at mid-height instead:
+
+```
+# OK: enters CTX at mid-height (y=560), not at bottom edge (y=584)
+(553, 606) → (553, 560) → (372.5, 560)
+# Horizontal at y=560 stops at CTX right edge (372.5)
+# The line approaches from outside CTX's x-range, only touching at the edge
+```
+
+Verify with: for each node the last horizontal segment enters, the segment's y must either be outside the node's y-range, or the segment's x-range must not overlap the node's x-range (except at the endpoint).
+
+## Column Gap Enforcement
+
+`flow_layout()` computes column positions based on `branch_gap` but the resulting gap may be insufficient for corridor-routed diagrams. Always verify and enforce a minimum gap:
+
+```python
+col0_right = max(n['x'] + n['width'] for n in col0_nodes)
+col1_left = min(n['x'] for n in col1_nodes)
+MIN_GAP = 140  # Minimum for corridor routing with labels
+if col1_left - col0_right < MIN_GAP:
+    shift = MIN_GAP - (col1_left - col0_right)
+    for n in col1_nodes:
+        n['x'] += shift
+        n['bbox'] = (n['x'], n['y'], n['width'], n['height'])
+# Recompute corridor_x AFTER shifting
+col0_right = max(n['x'] + n['width'] for n in col0_nodes)
+col1_left = min(n['x'] for n in col1_nodes)
+corridor_x = (col0_right + col1_left) / 2
+```
+
+Use 140–160px for diagrams with corridor-routed edges and CJK labels; use 100–120px for diagrams with only forward edges.
+
+## Manual Label Placement for Complex Edges
+
+For cross-column feedback edges, backward edges, and edges with long labels, automatic label placement via `labeling.py` frequently produces node overlaps. Prefer explicit per-edge position computation:
+
+```python
+# For labels on vertical corridor segments (most reliable):
+wps = edge['path']
+my = (wps[1][1] + wps[2][1]) / 2  # midpoint of vertical segment
+lw, lh = est_label_dims(label, fs=11)
+mx = wps[1][0] + lw/2 + 8  # offset right of the vertical line
+
+# For labels on horizontal segments below/above nodes:
+hy = wps[2][1]  # y of the horizontal segment
+hx_mid = (wps[1][0] + wps[2][0]) / 2
+label_y = hy - 10  # above the horizontal line
+```
+
+After placing each label, verify it doesn't overlap any node bbox. For labels on the same row as nodes, ensure the label y-range is entirely above or below all nodes in that row.
 
 ## Connection Port Allocation (Multi-Port Connection System)
 
