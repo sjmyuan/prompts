@@ -32,6 +32,20 @@ description: Create SVG diagrams with professional PPT-quality layout, clear con
 
 **Key conventions**: `text-anchor="middle"` + `dominant-baseline="middle"` for centered text. Panel headers: full-width `<rect>` with same `rx` at panel top. Color-code semantically (red=problems, green=success, blue=info, orange=warnings).
 
+**Edge routing patterns for multi-column layouts**:
+
+For flowcharts with multiple columns (branches, side panels, feedback loops), edges fall into distinct categories that require different routing strategies:
+
+| Edge type | Direction | Strategy | Example |
+|---|---|---|---|
+| Forward main chain | top→bottom | Default `connection_endpoints()` with flow direction | Start → Step1 → Step2 |
+| Feed sideways | left→right | Default for nodes in different columns, same row | Main → SidePanel |
+| Horizontal feedback (right-to-left) | right→left | Manual side spec: `src_side='right', dst_side='left'` | SidePanel → Main |
+| Reverse upward (bottom-to-top) | bottom→top | Manual side spec: `src_side='top', dst_side='bottom'` | BottomNode → TopNode |
+| Cross-column upward | bottom-right → top-left | **Corridor strategy** — route via gap between columns | BottomRight → TopLeft |
+
+**Corridor strategy**: When feedback edges must go from bottom of one column back to top of another column, identify the x-coordinate of the gap between the main column and branch column(s). Route all such edges through this shared vertical corridor: exit source node horizontally to corridor x → go vertically along corridor → enter target node from below. This produces clean 4-waypoint paths that avoid intermediate nodes.
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -63,7 +77,26 @@ Generate a PPT-quality diagram for script-based types (flowchart, architecture, 
 3. **Load computation-snippets.md**: Read [reference/computation-snippets.md](reference/computation-snippets.md) for the zero-tolerance rule, calling convention, and snippet patterns.
 4. **Build node/edge data**: Construct `nodes[]` (with `id`, `type`, `text`, `row`, `col` for grid types) and `edges[]` (with `from`, `to`, optional `label` and `branch`) as appropriate for the diagram type.
 5. **Compute positions via script**: Run the **Compute node positions** snippet from `computation-snippets.md` with your node data. For concept diagrams, use `distribute_along_circle()`. For charts, skip to step 8.
-6. **Route connections via script**: For each edge, run the **Route connection** snippet using source/target bounding boxes. For concept diagrams, use `routing.bezier_path()`. Do NOT construct path `d` strings manually.
+   - **Alignment for multi-column layouts**: Nodes in the same column should share the same width for proper visual alignment. Before layout, normalize widths: identify the widest node in each column and set all nodes in that column to the same width. For nodes with short text (≤3 chars), set a minimum width of 120px to avoid visual disproportion.
+   - Adjust `branch_gap` (horizontal spacing between columns) based on the widest node in the branch column to ensure adequate space for both columns.
+
+6. **Route connections via script with routing strategy**: Classify each edge by type and apply the appropriate strategy. Do NOT construct path `d` strings manually.
+
+   a. **Classify edges**: Separate into **forward edges** (same direction as flow) and **feedback/cross edges** (reverse direction, crossing columns, or skipping rows).
+
+   b. **Route forward edges**: Run the **Route connection** snippet using `connection_endpoints()` with default `flow_direction`. Forward edges typically produce clean 2–3 waypoint paths. Verify path has ≤4 waypoints.
+
+   c. **Route feedback/cross edges with side specification**: For edges going upward (bottom→top) or crossing columns (right→left):
+      - First compute a test path using default `connection_endpoints()`.
+      - If the path has >4 waypoints or produces visually messy routing (e.g., wraps around multiple nodes), manually specify `src_side` and `dst_side` using `routing.orthogonal_path()` with `clearance=25` and the full `obstacles` list.
+      - Example: for right-to-left feedback, specify `src_side='right', dst_side='left'`; for bottom-to-top feedback, specify `src_side='top', dst_side='bottom'`.
+
+   d. **Corridor-based routing**: If side specification still produces paths with >4 waypoints (common for cross-column upward edges that must navigate around intermediate nodes), use the **corridor strategy**:
+      - Identify the x-coordinate between the main column and branch column(s) that forms a clear vertical corridor free of nodes.
+      - Construct a 4-waypoint path: source exit point → (corridor_x, source_y) → (corridor_x, target_entry_y) → target entry point.
+      - This produces clean, minimal paths that avoid wrapping around nodes.
+
+   For concept diagrams, use `routing.bezier_path()`.
 7. **Generate SVG elements via script**: Run the **Generate SVG elements** snippet for each node and edge. For charts, call `chart_builder.render_bar_chart()`, `render_line_chart()`, or `render_pie_chart()` — these return complete SVG.
 8. **Generate defs and decorations via script**: Call `colors.get_shadow_filter()` + `colors.get_gradient_defs()` + `svg_builder.generate_arrow_marker()` for `<defs>`. Call `svg_builder.generate_title_bar()` for the title bar.
 9. **Validate via script**: Run overlap detection (`geometry.find_overlapping()`) and contrast checks (`colors.wcag_aa_check()`). Fix issues by adjusting row/col and re-running scripts.

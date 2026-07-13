@@ -159,14 +159,54 @@ for n in nodes: print(f\"{n['id']}: x={n['x']:.0f} y={n['y']:.0f}\")
 "
 ```
 
-**Route connection:**
+**Route connection (default — forward edges):**
 ```bash
 python3 -c "
 import sys; sys.path.insert(0, 'scripts')
 from routing import connection_endpoints, orthogonal_path, path_to_svg_d
-src_pt, dst_pt, src_side, dst_side = connection_endpoints(src_bbox, dst_bbox)
-waypoints = orthogonal_path(src_pt, dst_pt, src_side, dst_side)
+src_pt, dst_pt, src_side, dst_side = connection_endpoints(src_bbox, dst_bbox, 'top-to-bottom')
+waypoints = orthogonal_path(src_pt, dst_pt, src_side, dst_side, clearance=25, obstacles=obs_bboxes)
 print(path_to_svg_d(waypoints))
+"
+```
+
+**Route connection with manual side specification (feedback/cross edges):**
+```bash
+python3 -c "
+import sys; sys.path.insert(0, 'scripts')
+from routing import orthogonal_path, path_to_svg_d
+from geometry import connection_point
+# Specify sides manually: e.g., right-to-left or bottom-to-top
+src_pt = connection_point(src_bbox, 'right')   # exit from right side
+dst_pt = connection_point(dst_bbox, 'left')    # enter from left side
+waypoints = orthogonal_path(src_pt, dst_pt, 'right', 'left', clearance=25, obstacles=obs_bboxes)
+print(f'Waypoints: {len(waypoints)}')
+print(path_to_svg_d(waypoints))
+"
+```
+
+**Corridor-based routing for cross-column feedback edges:**
+```bash
+python3 -c "
+import sys; sys.path.insert(0, 'scripts')
+from geometry import connection_point
+
+# corridor_x = midpoint between main column right edge and branch column left edge
+corridor_x = 530
+src = node_map['HIL']  # bottom of diagram
+dst = node_map['CTX']  # top of diagram
+
+source_exit = connection_point(src['bbox'], 'top-right')
+target_entry = connection_point(dst['bbox'], 'bottom')
+
+# Clean 4-waypoint path through shared corridor
+path = [
+    source_exit,
+    (corridor_x, source_exit[1]),   # horizontal to corridor
+    (corridor_x, target_entry[1]),  # vertical along corridor
+    target_entry,                    # horizontal to target
+]
+print(' '.join([f'M {path[0][0]:.1f} {path[0][1]:.1f}'] + [f'L {p[0]:.1f} {p[1]:.1f}' for p in path[1:]]))
 "
 ```
 
