@@ -14,8 +14,8 @@
 | `svg_builder.py` | **svgwrite** | SVG elements for nodes, edges, labels, markers, title bars | `generate_node_svg()`, `generate_edge_svg()`, `generate_label_svg()`, `generate_title_bar()`, `generate_arrow_marker()`, `get_shape_dimensions()`, `get_node_type_colors()` |
 | `graph_layout.py` | **networkx** | Grid/auto layout, viewBox, overlap resolution | `flow_layout()`, `auto_layout()`, `decision_branch_positions()`, `resolve_overlaps()`, `compute_viewbox()`, `distribute_along_circle()` |
 | `chart_builder.py` | **matplotlib** | Complete chart SVG strings | `render_bar_chart()`, `render_line_chart()`, `render_pie_chart()` |
-| `routing.py` | custom | Orthogonal/bezier path computation, endpoint validation | `orthogonal_path()`, `connection_endpoints()`, `path_to_svg_d()`, `bezier_path()`, `detect_intersections()`, `endpoint_valid()` |
-| `geometry.py` | custom | Bounding box math, overlap detection, intersections | `overlap()`, `find_overlapping()`, `connection_point()`, `center()`, `distance()`, `segment_line_intersection()` |
+| `routing.py` | custom | Orthogonal/bezier path computation, endpoint validation, multi-port routing | `orthogonal_path()`, `connection_endpoints()`, `path_to_svg_d()`, `bezier_path()`, `detect_intersections()`, `endpoint_valid()`, `route_with_port_allocation()` |
+| `geometry.py` | custom | Bounding box math, overlap detection, intersections, multi-port allocation | `overlap()`, `find_overlapping()`, `connection_point()`, `center()`, `distance()`, `segment_line_intersection()`, `get_side_ports()`, `find_closest_port()`, `allocate_ports_for_edges()` |
 | `labeling.py` | custom | Label placement on connection paths | `label_position()`, `compute_all_labels()`, `label_overlap_check()` |
 | `colors.py` | custom | WCAG contrast, PPT palette, gradient/shadow defs | `contrast_ratio()`, `wcag_aa_check()`, `get_gradient_defs()`, `get_shadow_filter()`, `PPT_PALETTE` |
 
@@ -35,8 +35,8 @@ import os
 sys.path.insert(0, '/Users/ganggang/work/prompts/skills/edit-svg/scripts')
 
 from graph_layout import flow_layout, compute_viewbox
-from routing import orthogonal_path, connection_endpoints, path_to_svg_d, endpoint_valid, detect_intersections
-from geometry import connection_point, find_overlapping, BBox
+from routing import orthogonal_path, connection_endpoints, path_to_svg_d, endpoint_valid, detect_intersections, route_with_port_allocation
+from geometry import connection_point, find_overlapping, BBox, get_side_ports, find_closest_port, allocate_ports_for_edges
 from svg_builder import (
     generate_node_svg, generate_edge_svg, generate_label_svg,
     generate_title_bar, generate_arrow_marker, get_shape_dimensions
@@ -66,35 +66,28 @@ def build_diagram():
             n['y'] = base_y + (max_h - n['height']) / 2
             n['bbox'] = (n['x'], n['y'], n['width'], n['height'])
 
-    # ── Step 3: Route connections ──
+    # ── Step 3: Route connections with port allocation ──
     node_map = {n['id']: n for n in nodes}
     obstacles = [n['bbox'] for n in nodes]
-    connections = []
 
-    for e in edges:
-        src = node_map[e['from']]
-        dst = node_map[e['to']]
-
-        # Determine correct sides based on spatial relationship
-        # (see Side Specification Rules in SKILL.md knowledge)
-        src_pt = connection_point(src['bbox'], src_side)
-        dst_pt = connection_point(dst['bbox'], dst_side)
-        waypoints = orthogonal_path(src_pt, dst_pt, src_side, dst_side, clearance=25, obstacles=obstacles)
-        connections.append(waypoints)
+    # Use route_with_port_allocation() — allocates distinct ports per side per node,
+    # routes orthogonal paths, and applies mid-offsets for parallel edge pairs.
+    # Each edge must have: 'from', 'to', 'src_side', 'dst_side'
+    edges = route_with_port_allocation(edges, node_map, ports_per_side=3, clearance=25, obstacles=obstacles)
 
     # ── Step 4: Validate connections ──
-    for i, wps in enumerate(connections):
-        result = endpoint_valid(wps, node_map[edges[i]['to']]['bbox'])
+    for i, e in enumerate(edges):
+        wps = e['waypoints']
+        result = endpoint_valid(wps, node_map[e['to']]['bbox'])
         assert result['valid'], f"Edge {i} invalid: {result['issues']}"
 
     # ── Step 5: Generate SVG elements ──
     svg_fragments = []
     for n in nodes:
         svg_fragments.append(generate_node_svg(n['id'], n['type'], n['text'], n['x'], n['y'], n['width'], n['height']))
-    for i, wps in enumerate(connections):
-        d = path_to_svg_d(wps)
-        edge = edges[i]
-        svg_fragments.append(generate_edge_svg(edge.get('id', f'e{i}'), d))
+    for i, e in enumerate(edges):
+        d = e['path_d']  # Already computed by route_with_port_allocation
+        svg_fragments.append(generate_edge_svg(e.get('id', f'e{i}'), d, color=e.get('color', '#555555')))
 
     # ── Step 6: Generate defs and assemble ──
     viewbox = compute_viewbox([n['bbox'] for n in nodes], padding=40, target_aspect=16/9, title_bar_height=70)

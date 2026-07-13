@@ -7,7 +7,7 @@ Points are (x, y) tuples.
 """
 
 import math
-from typing import Tuple, List, Optional
+from typing import Tuple, List, Optional, Dict, Any
 
 # Type aliases
 BBox = Tuple[float, float, float, float]  # (x, y, w, h)
@@ -101,6 +101,198 @@ def connection_point(bbox: BBox, side: str) -> Point:
     if side not in side_map:
         raise ValueError(f"Unknown side: {side}. Valid: {list(side_map.keys())}")
     return side_map[side]
+
+
+# ---------------------------------------------------------------------------
+# Multi-port connection point allocation
+# ---------------------------------------------------------------------------
+
+
+def get_side_ports(bbox: BBox, side: str, count: int = 3) -> List[Point]:
+    """Return N evenly distributed connection ports on a given edge of a bounding box.
+
+    Ports are distributed from edge-start to edge-end (inclusive of both ends
+    when count >= 2). This gives lines multiple fixed attachment points to
+    choose from instead of all converging at the center.
+
+    Args:
+        bbox: (x, y, w, h)
+        side: 'top', 'bottom', 'left', 'right'
+        count: Number of ports to distribute (default 3). Must be >= 1.
+
+    Returns:
+        List of (x, y) port points, ordered from left/top to right/bottom.
+    """
+    x, y, w, h = bbox
+    count = max(1, count)
+    ports: List[Point] = []
+
+    if side == "top":
+        for i in range(count):
+            frac = i / (count - 1) if count > 1 else 0.5
+            ports.append((x + w * frac, y))
+    elif side == "bottom":
+        for i in range(count):
+            frac = i / (count - 1) if count > 1 else 0.5
+            ports.append((x + w * frac, y + h))
+    elif side == "left":
+        for i in range(count):
+            frac = i / (count - 1) if count > 1 else 0.5
+            ports.append((x, y + h * frac))
+    elif side == "right":
+        for i in range(count):
+            frac = i / (count - 1) if count > 1 else 0.5
+            ports.append((x + w, y + h * frac))
+    else:
+        raise ValueError(f"Unknown side for ports: {side}")
+
+    return ports
+
+
+def find_closest_port(
+    ports: List[Point],
+    target_point: Point,
+    used_indices: set,
+    prefer_side: Optional[str] = None,
+) -> int:
+    """Find the closest unused port index to a target point.
+
+    Among all unused ports, returns the index of the port closest to
+    target_point. The prefer_side hint biases selection: for 'left'/'right'
+    sides, ports closer to the target's y-coordinate are preferred (minimizing
+    vertical turns); for 'top'/'bottom' sides, ports closer to the target's
+    x-coordinate are preferred (minimizing horizontal turns).
+
+    Args:
+        ports: List of port (x, y) points
+        target_point: (x, y) reference point (typically the other endpoint)
+        used_indices: Set of already-allocated port indices
+        prefer_side: Optional side hint to minimize turning points:
+                     'left'/'right' → prefer y-aligned ports
+                     'top'/'bottom' → prefer x-aligned ports
+                     None → use pure Euclidean distance
+
+    Returns:
+        Index of the closest unused port.
+    """
+    candidates = [i for i in range(len(ports)) if i not in used_indices]
+    if not candidates:
+        raise RuntimeError("All ports on this side are already allocated")
+
+    tx, ty = target_point
+
+    def _distance(idx: int) -> float:
+        px, py = ports[idx]
+        if prefer_side in ("left", "right"):
+            # Prefer ports whose y is closest to target y (horizontal alignment)
+            return abs(py - ty) + abs(px - tx) * 0.1
+        elif prefer_side in ("top", "bottom"):
+            # Prefer ports whose x is closest to target x (vertical alignment)
+            return abs(px - tx) + abs(py - ty) * 0.1
+        else:
+            return math.hypot(px - tx, py - ty)
+
+    return min(candidates, key=_distance)
+
+
+def allocate_ports_for_edges(
+    edges: List[Dict[str, Any]],
+    node_map: Dict[str, Dict[str, Any]],
+    ports_per_side: int = 3,
+) -> List[Dict[str, Any]]:
+    """Allocate connection ports for all edges to minimize overlap.
+
+    Each edge dict must have: 'from', 'to', 'src_side', 'dst_side'.
+    Each edge dict will be updated with 'src_port' and 'dst_port' (x, y points).
+
+    Port allocation rules:
+    1. Each port can be used by at most one edge (per node per side).
+    2. An edge picks the closest unused port on the source side to the target,
+       and the closest unused port on the destination side to the source.
+    3. Ports are distributed evenly along each edge: ports[0] and ports[-1]
+       are at the edge ends, interior ports are evenly spaced.
+    4. For multi-edge feedback (same source & destination), offsets are applied
+       to the second+ edges to split them vertically/horizontally.
+
+    Args:
+        edges: List of edge dicts with 'from', 'to', 'src_side', 'dst_side'
+        node_map: Dict mapping node id → node dict with 'bbox'
+        ports_per_side: Number of ports to generate per side (default 3)
+
+    Returns:
+        The same edge list, each augmented with 'src_port', 'dst_port' (Point).
+    """
+    # Track used ports per (node_id, side)
+    used_ports: Dict[str, Dict[str, set]] = {}
+
+    def _get_used(node_id: str, side: str) -> set:
+        return used_ports.setdefault(node_id, {}).setdefault(side, set())
+
+    # Group edges by (from_node, to_node) pairs to detect parallel feedback
+    pair_groups: Dict[Tuple[str, str], List[int]] = {}
+    for i, e in enumerate(edges):
+        pair_groups.setdefault((e["from"], e["to"]), []).append(i)
+
+    # Count how many edges share the same ordered pair
+    pair_counts: Dict[Tuple[str, str], int] = {
+        pair: len(indices) for pair, indices in pair_groups.items()
+    }
+
+    for i, e in enumerate(edges):
+        src_id = e["from"]
+        dst_id = e["to"]
+        src_side = e.get("src_side", "bottom")
+        dst_side = e.get("dst_side", "top")
+
+        src_node = node_map[src_id]
+        dst_node = node_map[dst_id]
+
+        # Get all ports
+        src_ports = get_side_ports(src_node["bbox"], src_side, ports_per_side)
+        dst_ports = get_side_ports(dst_node["bbox"], dst_side, ports_per_side)
+
+        # Determine target reference points for closest-port selection
+        # Source port should be close to the destination (minimize path length)
+        dst_center = center(dst_node["bbox"])
+        src_center = center(src_node["bbox"])
+
+        # Allocate source port: closest unused to destination center
+        src_used = _get_used(src_id, src_side)
+        src_idx = find_closest_port(
+            src_ports, dst_center, src_used, prefer_side=src_side
+        )
+        src_used.add(src_idx)
+
+        # Allocate destination port: closest unused to source center
+        dst_used = _get_used(dst_id, dst_side)
+        dst_idx = find_closest_port(
+            dst_ports, src_center, dst_used, prefer_side=dst_side
+        )
+        dst_used.add(dst_idx)
+
+        e["src_port"] = src_ports[src_idx]
+        e["dst_port"] = dst_ports[dst_idx]
+        e["src_port_idx"] = src_idx
+        e["dst_port_idx"] = dst_idx
+
+        # Handle parallel edges (same from→to): offset intermediate edges
+        pair_key = (src_id, dst_id)
+        pair_indices = pair_groups[pair_key]
+        if len(pair_indices) > 1:
+            offset_count = len(pair_indices)
+            pair_pos = pair_indices.index(i)
+            # Offset the middle segments of parallel edges
+            # Determine offset direction based on sides
+            if src_side in ("bottom", "top"):
+                # Vertical exit/entry → offset horizontally
+                total_offset = (pair_pos - (offset_count - 1) / 2.0) * 20.0
+                e["mid_offset"] = (total_offset, 0.0)
+            else:
+                # Horizontal exit/entry → offset vertically
+                total_offset = (pair_pos - (offset_count - 1) / 2.0) * 20.0
+                e["mid_offset"] = (0.0, total_offset)
+
+    return edges
 
 
 def closest_edge_point(bbox: BBox, target_point: Point) -> Point:

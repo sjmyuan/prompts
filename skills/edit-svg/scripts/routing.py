@@ -18,6 +18,7 @@ from geometry import (
     inflate_bbox,
     center,
     distance,
+    allocate_ports_for_edges,
 )
 
 
@@ -28,6 +29,7 @@ def orthogonal_path(
     dst_side: str,
     clearance: float = 25.0,
     obstacles: Optional[List[BBox]] = None,
+    mid_offset: Optional[Tuple[float, float]] = None,
 ) -> List[Point]:
     """Compute an orthogonal path (horizontal/vertical segments only) from src to dst.
 
@@ -42,6 +44,8 @@ def orthogonal_path(
         dst_side: Which side of dst shape ('top' means entering from above)
         clearance: Minimum distance from turn points to obstacle edges
         obstacles: List of bounding boxes to avoid
+        mid_offset: Optional (dx, dy) offset applied to middle horizontal/vertical
+                    segments to spread parallel edges apart (edge overlap avoidance).
 
     Returns:
         List of (x, y) waypoints forming the path.
@@ -64,44 +68,84 @@ def orthogonal_path(
     # --- Case 1: Same axis alignment ---
     if abs(sx - dx) < 1e-6:
         # Vertically aligned - direct vertical line
-        if sy < dy:
-            return [src, dst]  # Going down
-        else:
-            return [src, dst]  # Going up
+        if mid_offset:
+            offset_x = mid_offset[0]
+            # Create a Z-shape: vertical → horizontal → vertical
+            # Offset the middle horizontal segment to spread parallel edges
+            return [src, (sx + offset_x, sy), (dx + offset_x, dy), dst]
+        return [src, dst]
 
     if abs(sy - dy) < 1e-6:
         # Horizontally aligned - direct horizontal line
+        if mid_offset:
+            offset_y = mid_offset[1]
+            # Create a Z-shape: horizontal → vertical → horizontal
+            # Offset the middle vertical segment to spread parallel edges
+            return [src, (sx, sy + offset_y), (dx, dy + offset_y), dst]
         return [src, dst]
 
     # --- Case 2: L-shape (single turn) ---
     # Try turn at src-x, dst-y first
     turn1 = (sx, dy)
     if _turn_clear(turn1, obstacles):
-        path = [src, turn1, dst]
+        waypoints = [src, turn1, dst]
     else:
         # Try turn at dst-x, src-y
         turn2 = (dx, sy)
         if _turn_clear(turn2, obstacles):
-            path = [src, turn2, dst]
+            waypoints = [src, turn2, dst]
         else:
             # --- Case 3: Z-shape or C-shape ---
             # Route through a midpoint
             mid_x = (sx + dx) / 2.0
             mid_y = (sy + dy) / 2.0
 
+            # Apply mid_offset to spread parallel edges
+            ox, oy = mid_offset if mid_offset else (0.0, 0.0)
+
             # Try stepping out from source first, then crossing, then entering
             if src_side in ("bottom", "top"):
                 # Exit vertically first, then horizontal, then vertical
                 mid_y1 = sy + (40 if src_side == "bottom" else -40)
                 mid_y2 = dy + (40 if dst_side == "bottom" else -40)
-                path = [src, (sx, mid_y1), (dx, mid_y1), (dx, mid_y2), dst]
+                # Apply offset to the horizontal segment only
+                waypoints = [
+                    src,
+                    (sx + ox, mid_y1),
+                    (dx + ox, mid_y1),
+                    (dx + ox, mid_y2),
+                    dst,
+                ]
             else:
                 # Exit horizontally first
                 mid_x1 = sx + (40 if src_side == "right" else -40)
                 mid_x2 = dx + (40 if dst_side == "right" else -40)
-                path = [src, (mid_x1, sy), (mid_x1, dy), (mid_x2, dy), dst]
+                # Apply offset to the vertical segment only
+                waypoints = [
+                    src,
+                    (mid_x1, sy + oy),
+                    (mid_x1, dy + oy),
+                    (mid_x2, dy + oy),
+                    dst,
+                ]
 
-    return _simplify_path(path)
+        return _simplify_path(waypoints)
+
+    # Apply mid_offset to L-shape if needed
+    if mid_offset and len(waypoints) == 3:
+        # Insert offset points to split the path: src → offset_mid → offset_mid2 → dst
+        ox, oy = mid_offset
+        mid = waypoints[1]
+        if abs(waypoints[0][0] - waypoints[2][0]) < abs(
+            waypoints[0][1] - waypoints[2][1]
+        ):
+            # Vertical-dominant L: offset the horizontal segment
+            waypoints = [src, (mid[0], mid[1] + oy), (mid[0] + ox, mid[1] + oy), dst]
+        else:
+            # Horizontal-dominant L: offset the vertical segment
+            waypoints = [src, (mid[0] + ox, mid[1]), (mid[0] + ox, mid[1] + oy), dst]
+
+    return _simplify_path(waypoints)
 
 
 def _simplify_path(waypoints: List[Point]) -> List[Point]:
@@ -399,3 +443,62 @@ def endpoint_valid(
         issues.append(f"Entry segment too short: {entry_len:.1f}px (need >=15px)")
 
     return {"valid": len(issues) == 0, "gap": 0, "penetration": 0, "issues": issues}
+
+
+def route_with_port_allocation(
+    edges: List[Dict[str, Any]],
+    node_map: Dict[str, Dict[str, Any]],
+    ports_per_side: int = 3,
+    clearance: float = 25.0,
+    obstacles: Optional[List[BBox]] = None,
+) -> List[Dict[str, Any]]:
+    """Route all edges using multi-port allocation to avoid connection overlap.
+
+    This is a convenience function that combines port allocation and orthogonal
+    routing in a single call. Use this instead of manually calling
+    allocate_ports_for_edges() + orthogonal_path() for each edge.
+
+    The function:
+    1. Allocates distinct ports on source/destination sides for each edge,
+       ensuring no two edges share the same port on the same node side.
+    2. Routes each edge as an orthogonal path using the allocated port positions.
+    3. For parallel edges (same from→to pair), applies mid-path offsets to
+       spread them visually apart.
+
+    Each edge dict must have: 'from', 'to', 'src_side', 'dst_side'.
+    Each edge will be augmented with:
+        - 'src_port', 'dst_port': allocated connection points
+        - 'waypoints': list of (x, y) path waypoints
+        - 'path_d': SVG path 'd' attribute string
+
+    Args:
+        edges: List of edge dicts with routing info
+        node_map: Dict mapping node id → node dict with 'bbox'
+        ports_per_side: Number of ports to generate per side (default 3)
+        clearance: Obstacle clearance in px (default 25)
+        obstacles: Optional list of bboxes to avoid (defaults to all node bboxes)
+
+    Returns:
+        The same edge list, each augmented with routing data.
+    """
+    obstacles = obstacles or [n["bbox"] for n in node_map.values()]
+
+    # Step 1: Allocate ports
+    edges = allocate_ports_for_edges(edges, node_map, ports_per_side)
+
+    # Step 2: Route each edge using allocated ports
+    for e in edges:
+        mid_offset = e.get("mid_offset")
+        waypoints = orthogonal_path(
+            e["src_port"],
+            e["dst_port"],
+            e["src_side"],
+            e["dst_side"],
+            clearance=clearance,
+            obstacles=obstacles,
+            mid_offset=mid_offset,
+        )
+        e["waypoints"] = waypoints
+        e["path_d"] = path_to_svg_d(waypoints)
+
+    return edges

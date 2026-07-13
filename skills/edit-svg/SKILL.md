@@ -34,6 +34,8 @@ description: Create SVG diagrams with professional PPT-quality layout, clear con
 
 **Diagram workflow reference**: See [reference/diagram-workflow.md](reference/diagram-workflow.md) for edge routing patterns, corridor strategy, standalone script file approach, iterative validation loop, row alignment rules, and connection side specification rules.
 
+**Multi-port connection system**: Each edge of a node has multiple fixed connection ports (default 3 per side: left, center, right for top/bottom; top, center, bottom for left/right). When allocating edges to ports, each port can be used by at most one line per node per side. Lines pick the closest unused port to minimize turning points. See [reference/diagram-workflow.md](reference/diagram-workflow.md) for detailed port allocation rules and API reference.
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -66,11 +68,11 @@ Generate a PPT-quality diagram for script-based types (flowchart, architecture, 
 3. **Create standalone script file**: Generate a `.py` file (e.g., `generate_diagram.py`). Read [reference/computation-snippets.md](reference/computation-snippets.md) for script patterns. See [reference/diagram-workflow.md](reference/diagram-workflow.md) for the standalone script approach.
 4. **Build node/edge data**: Construct `nodes[]` and `edges[]` in the script.
 5. **Compute positions**: Call `flow_layout()`. Normalize column widths (min 120px for short text). Apply **row alignment** rules (see [reference/diagram-workflow.md](reference/diagram-workflow.md)). Adjust `branch_gap` for column spacing.
-6. **Route connections with strict side specification**: Classify each edge by spatial relationship. Determine `src_side`/`dst_side` using the table in [reference/diagram-workflow.md](reference/diagram-workflow.md). Build obstacles list. Route via `orthogonal_path()`. Verify with `endpoint_valid()` on every edge. Run `detect_intersections()` and switch to **corridor strategy** for cross-column feedback intersections.
-7. **Generate SVG elements**: Call `generate_node_svg()` and `generate_edge_svg()`. For charts, use `chart_builder.render_*_chart()`.
+6. **Route connections with multi-port allocation and strict side specification**: Classify each edge by spatial relationship. Determine `src_side`/`dst_side` using the table in [reference/diagram-workflow.md](reference/diagram-workflow.md). Build the obstacles list. Call `route_with_port_allocation()` (from `routing.py`) — this function automatically allocates distinct ports on each side for every edge, applies mid-path offsets for parallel edge pairs, and routes orthogonal paths. Never call `orthogonal_path()` per-edge manually unless you need custom port assignment. After routing, verify with `endpoint_valid()` on every edge. Run `detect_intersections()` and switch to **corridor strategy** for cross-column feedback intersections.
+7. **Generate SVG elements**: Call `generate_node_svg()` for each node. Call `generate_edge_svg()` for each edge — use the edge's `path_d` field (already computed by `route_with_port_allocation()`). For charts, use `chart_builder.render_*_chart()`.
 8. **Generate defs and decorations**: Call `get_shadow_filter()`, `get_gradient_defs()`, `generate_arrow_marker()`, `generate_title_bar()`.
 9. **Write SVG and run**: Assemble fragments following the **SVG assembly pattern**. Save to `.svg` file. Run `python3 generate_diagram.py`.
-10. **Visually validate and iterate**: Open in browser. Check line overlap, connection sides, row alignment, label overlap (see [reference/diagram-workflow.md](reference/diagram-workflow.md)). Fix issues in script and re-run until quality criteria are met.
+10. **Visually validate and iterate**: Open in browser. Check line overlap, connection sides, row alignment, label overlap (see [reference/diagram-workflow.md](reference/diagram-workflow.md)). **Check port allocation**: verify that no two lines converge at the same spot on a node edge, and that parallel edges are visibly spread apart via mid-path offsets. Fix issues in script and re-run until quality criteria are met.
 11. **Compute viewBox**: Call `compute_viewbox()` with all bounding boxes.
 12. **Assemble and output**: Follow the **SVG assembly pattern**. Return raw, valid SVG code.
 </create-scripted-diagram>
@@ -83,7 +85,7 @@ Generate a PPT-quality diagram for hand-crafted types (comparison, pyramid, step
 3. **Determine viewBox and layout dimensions**: Use the dimension guidelines from the reference file. Follow the visual pattern (panel layout, trapezoid geometry, step spacing, boundary zones, or donut center).
 4. **Build panel/layer/step structure**: Create the outer container(s) — panel backgrounds, pyramid trapezoids, step boxes, boundary rectangles, or donut ring. Apply gradient fills per the reference color table.
 5. **Add items, labels, and annotations**: Place headers, text labels, bullets, badges, and annotation boxes. Use `text-anchor="middle"` + `dominant-baseline="middle"`. Align same-row items across columns to identical y-coordinates.
-6. **Add connections and markers**: Draw arrows, lifelines, dashed boundaries, or connecting lines between elements. Use correct `refX`/`refY` for arrow markers (tip-reference: `refX=arrow_width, refY=half_h`).
+6. **Add connections and markers**: Draw arrows, lifelines, dashed boundaries, or connecting lines between elements. Use correct `refX`/`refY` for arrow markers (tip-reference: `refX=arrow_width, refY=half_h`). When multiple lines connect to the same edge of a panel or container, distribute the connection points evenly along that edge (left/center/right or top/center/bottom) to avoid overlap.
 7. **Verify and output**: Check that no elements overlap, text fits within containers, and the viewBox is adequate. Return raw, valid SVG code.
 </create-handcrafted-diagram>
 
@@ -94,7 +96,7 @@ Modify, fix, or upgrade an existing SVG diagram. All new geometry MUST be comput
 2. **Classify the change type**: Style, content, structural, layout/connection fixes, or PPT upgrade.
 3. **Create standalone script**: Create a `.py` file (e.g., `fix_diagram.py`). Plan modifications. Load [reference/diagram-workflow.md](reference/diagram-workflow.md) for routing rules.
 4. **Apply modifications via the script**:
-   - For layout fixes: Run `find_overlapping()`, `resolve_overlaps()`, `orthogonal_path()`, `compute_viewbox()`. Use strict side specification rules from [reference/diagram-workflow.md](reference/diagram-workflow.md).
+   - For layout fixes: Run `find_overlapping()`, `resolve_overlaps()`, `route_with_port_allocation()`, `compute_viewbox()`. Use strict side specification rules from [reference/diagram-workflow.md](reference/diagram-workflow.md). When fixing connection overlap, re-allocate ports via `allocate_ports_for_edges()`.
    - For PPT upgrade: Generate defs, title bar, offset y-coords, switch to 960×540, re-run with `ppt_mode=True`.
    - Preserve existing `<defs>` and `<g>` groupings. Use `PPT_PALETTE` consistently. Remove orphaned connections.
 5. **Write SVG and run**: Save modified SVG to file. Run `python3 fix_diagram.py`.
