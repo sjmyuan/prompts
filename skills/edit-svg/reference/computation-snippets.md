@@ -4,7 +4,7 @@
 
 ## Scripts Directory
 
-`skills/svg-editor/scripts/` — standalone `.py` files, no package, no orchestrator.
+`skills/edit-svg/scripts/` — standalone `.py` files, no package, no orchestrator.
 
 **Dependencies**: `pip install svgwrite networkx matplotlib`  
 (`pygraphviz` optional — enables Graphviz hierarchical layout)

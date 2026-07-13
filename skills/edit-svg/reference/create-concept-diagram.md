@@ -1,6 +1,6 @@
 # Create Concept Diagram — Detailed Steps
 
-Applies **create-concept-diagram** in the svg-editor skill.
+Applies **create-concept-diagram** in the edit-svg skill.
 
 **🔴 Before starting**: Read the zero-tolerance rule in [reference/computation-snippets.md](computation-snippets.md). No manual coordinate math is permitted.
 

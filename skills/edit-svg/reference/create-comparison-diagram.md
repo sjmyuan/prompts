@@ -1,6 +1,6 @@
 # Create Comparison Diagram — Detailed Steps
 
-Applies **create-comparison-diagram** in the svg-editor skill.
+Applies **create-comparison-diagram** in the edit-svg skill.
 
 Before starting, examine the example SVGs in `examples/` for visual reference:
 - `examples/diagnosis-comparison.svg` — Two-column comparison (missing vs overstepping)

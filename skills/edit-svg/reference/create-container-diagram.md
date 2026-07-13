@@ -1,6 +1,6 @@
 # Create Container/Boundary Diagram — Detailed Steps
 
-Applies **create-container-diagram** in the svg-editor skill.
+Applies **create-container-diagram** in the edit-svg skill.
 
 Before starting, examine the example SVGs in `examples/` for visual reference:
 - `examples/niche-market-strategy.svg` — Dashed boundary container with niche markets around edges

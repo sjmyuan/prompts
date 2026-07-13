@@ -1,6 +1,6 @@
 # Create Pyramid Diagram — Detailed Steps
 
-Applies **create-pyramid-diagram** in the svg-editor skill.
+Applies **create-pyramid-diagram** in the edit-svg skill.
 
 Before starting, examine the example SVG in `examples/srk-pyramid.svg` for visual reference.
 

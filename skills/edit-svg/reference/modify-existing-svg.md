@@ -1,6 +1,6 @@
 # Modify Existing SVG — Detailed Steps
 
-Applies **modify-existing-svg** and **upgrade-to-ppt-quality** in the svg-editor skill.
+Applies **modify-existing-svg** and **upgrade-to-ppt-quality** in the edit-svg skill.
 
 Before starting, load [reference/design-standards.md](design-standards.md) for PPT/layout standards. Read the zero-tolerance rule in [reference/computation-snippets.md](computation-snippets.md) — no manual coordinate math.
 

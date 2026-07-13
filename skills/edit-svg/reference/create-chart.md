@@ -1,6 +1,6 @@
 # Create Chart — Detailed Steps
 
-Applies **create-chart** in the svg-editor skill.
+Applies **create-chart** in the edit-svg skill.
 
 **Steps**:
 0. **Use `chart_builder` — do NOT write chart SVG manually.** `chart_builder` (backed by matplotlib) generates a complete, PPT-styled SVG for bar, line, and pie charts in one call.

@@ -1,6 +1,6 @@
 # Create Flowchart — Detailed Steps
 
-Applies **create-flowchart** in the svg-editor skill.
+Applies **create-flowchart** in the edit-svg skill.
 
 Before starting, load the following from [reference/computation-snippets.md](computation-snippets.md):
 - Script calling guide and snippet patterns — **Read the zero-tolerance rule at the top.**

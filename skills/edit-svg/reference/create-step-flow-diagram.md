@@ -1,6 +1,6 @@
 # Create Step-Flow Diagram — Detailed Steps
 
-Applies **create-step-flow-diagram** in the svg-editor skill.
+Applies **create-step-flow-diagram** in the edit-svg skill.
 
 Before starting, examine the example SVG in `examples/five-step-flow.svg` for visual reference.
 

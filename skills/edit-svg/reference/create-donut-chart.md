@@ -1,6 +1,6 @@
 # Create Donut Chart — Detailed Steps
 
-Applies **create-donut-chart** in the svg-editor skill.
+Applies **create-donut-chart** in the edit-svg skill.
 
 Before starting, examine the example SVG in `examples/survival-rate-chart.svg` for visual reference.
 

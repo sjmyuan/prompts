@@ -1,6 +1,6 @@
 # Analyze and Fix Layout — Detailed Steps
 
-Applies **analyze-and-fix-layout** in the svg-editor skill.
+Applies **analyze-and-fix-layout** in the edit-svg skill.
 
 **🔴 Before starting**: Read the zero-tolerance rule in [reference/computation-snippets.md](computation-snippets.md). All layout fixes MUST be computed by scripts, not by manual coordinate tweaks.
 
