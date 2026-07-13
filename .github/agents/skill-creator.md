@@ -12,7 +12,7 @@ A well-formed copilot skill file uses these sections with distinct, non-overlapp
 | Frontmatter `description:` | Skill-load decision | Plain-language summary used by VS Code/Copilot to decide whether to load this skill; must cover **all** activation scenarios |
 | `<when-to-use-this-skill>` | Post-load scope check | Bullet list of user-facing scenarios that confirm this skill applies; must align with the frontmatter `description` |
 | `<knowledge>` | Facts the agent recalls | Reference tables, directory layouts, API signatures, platform constraints, banned practices, selection guides; large rubrics extracted to `reference/` files and loaded on demand |
-| `<capabilities>` | Procedures the agent executes | Ordered step-by-step instructions for *how* to accomplish a task; named with an action verb |
+| `<capabilities>` | Procedures the agent executes | Ordered step-by-step instructions for *how* to accomplish a task; named following the **action-verb naming convention** |
 | `<rules>` | Internal routing triggers | "When [scenario] → use [capability]"; must not repeat what the capability already says; **may be omitted in single-capability skills** |
 | `<context-loading-guide>` in `<knowledge>` | On-demand context router | Condition-first table (`Load when` \| `Provides` \| `File`) that states the exact condition under which each file (examples, references, rubrics) should be loaded; loaded on demand |
 </skill-file-required-sections>
@@ -49,17 +49,28 @@ Score each dimension 0–2 and sum for a total out of 10:
 - **≤5**: Likely to mis-fire or fail to load — rework required
 </description-scoring>
 
-<capability-naming-rules>
-- Capability section names **must use action verbs** (`<manage-storage>`, not `<storage-management>`)
-- `<knowledge>` subsection names must use **descriptive noun phrases** (`<storage-patterns>`, not `<define-storage>`)
-- A subsection named with an action verb in `<knowledge>` signals that procedural content has leaked into knowledge
-</capability-naming-rules>
+<action-verb-naming-convention>
+Both the **skill name** and its **capability names** in created skills **must** follow the **action-verb naming convention**:
+
+**Skill name** (kebab-case):
+- Must start with an imperative action verb: `edit-svg`, `validate-data`, `generate-diagram`, `review-code`, `create-flowchart`
+- NOT noun phrases: `svg-editor`, `data-validator`, `diagram-generator`, `code-reviewer`, `flowchart-creator`
+
+**Capability section names** (inside `<capabilities>`):
+- Must start with an imperative action verb: `<manage-storage>`, not `<storage-management>`; `<generate-report>`, not `<report-generation>`
+- Good patterns: `validate-`, `generate-`, `create-`, `analyze-`, `calculate-`, `collect-`, `transform-`, `review-`
+- Bad patterns: `validation`, `generation`, `creation`, `analysis`, `calculation`, `collection`, `transformation`, `review`
+
+**`<knowledge>` subsection names**:
+- Must use **descriptive noun phrases** (`<storage-patterns>`, not `<define-storage>`)
+- A subsection named with an action verb inside `<knowledge>` signals that procedural content has leaked into knowledge — this is a structural violation
+</action-verb-naming-convention>
 
 <common-structural-violations>
 - Knowledge embedded in capabilities (lookup tables, API lists, constraint bullets inside a capability section)
 - Rules that re-state capability content instead of routing to it
 - Capabilities written as bullet-point fact lists instead of ordered procedural steps
-- Capabilities named as nouns instead of action verbs
+- Capabilities named as nouns instead of action verbs (violates the **action-verb naming convention**)
 - A bare `<examples>` section used instead of a `<context-loading-guide>` entry inside `<knowledge>`
 - Large reference rubrics embedded inline in SKILL.md instead of extracted to `reference/` files
 - Examples embedded inline rather than referenced by file path for on-demand loading
@@ -114,10 +125,10 @@ The skills section describes the capabilities you can use to create a skill.
 
 **Steps**:
 1. Ask the user targeted questions to understand:
-   - **Skill name**: What should the skill be called? (e.g., `svg-editor`, `data-validator`)
+   - **Skill name**: What should the skill be called? Use the **action-verb naming convention** — start with an imperative verb (e.g., `edit-svg`, `validate-data`, `generate-diagram`, `review-code`), not a noun phrase (e.g., `svg-editor`, `data-validator`, `diagram-generator`, `code-reviewer`).
    - **Skill description**: What does this skill do? What domain does it apply to?
    - **When to use**: What specific user scenarios should trigger this skill? List 3-7 concrete scenarios.
-   - **Core capabilities**: What are the key procedures the agent needs to execute? For each capability, describe what it does and list the ordered steps.
+   - **Core capabilities**: What are the key procedures the agent needs to execute? For each capability, describe what it does and list the ordered steps. **Important**: Capability names must follow the action-verb naming convention — use imperative verbs like `validate-`, `generate-`, `calculate-`, `analyze-`, not noun forms like `validation`, `generation`, `calculation`, `analysis`.
    - **Knowledge requirements**: What reference information does the agent need to recall? (tables, API signatures, directory layouts, constraints, etc.)
    - **Rules**: When should each capability be used? Are there routing decisions to encode?
    - **Example scenarios**: What realistic examples would demonstrate the capabilities? List at least one per capability.
@@ -130,9 +141,9 @@ The skills section describes the capabilities you can use to create a skill.
 **Objective**: Generate a complete SKILL.md file that meets all skill-reviewer quality requirements.
 
 **Steps**:
-1. **Create the directory structure**: Create `skills/<skill-name>/` directory, and `skills/<skill-name>/examples/` and `skills/<skill-name>/reference/` subdirectories if needed.
+1. **Create the directory structure**: Create `skills/<skill-name>/` directory (where `<skill-name>` follows the **action-verb naming convention**), and `skills/<skill-name>/examples/` and `skills/<skill-name>/reference/` subdirectories if needed.
 2. **Write the frontmatter**:
-   - Set `name:` to the skill name (use kebab-case).
+   - Set `name:` to the skill name (use kebab-case). Ensure it follows the **action-verb naming convention** — starts with an imperative verb (e.g., `edit-svg`, not `svg-editor`).
    - Write `description:` following the **description-template**: one-sentence domain summary + "Use when [intent-verbs] [object/scope]."
    - Self-score the description against **description-scoring** (aim for 9–10).
 3. **Write `<when-to-use-this-skill>`**: List 3-7 concrete user scenarios as bullet points. Ensure each bullet's intent verb appears in the `description` trigger phrase.
@@ -140,7 +151,7 @@ The skills section describes the capabilities you can use to create a skill.
    - If a knowledge entry is large (e.g., full rubric, complex criteria table), extract it to a `reference/<topic>.md` file and include a `<context-loading-guide>` entry instead of embedding it inline.
    - Create the `<context-loading-guide>` table with columns: `Load when` | `Provides` | `File`. The first column must state a decision condition, not describe content.
 5. **Write `<capabilities>`**: For each identified capability:
-   - Name it with an action verb (e.g., `<validate-data>` not `<data-validation>`).
+   - Name it following the **action-verb naming convention**: start with an imperative action verb (e.g., `<validate-data>` not `<data-validation>`; `<generate-report>` not `<report-generation>`).
    - Write ordered step-by-step instructions. Each step should begin with an action verb.
    - Do **not** embed reference tables, API lists, or constraint bullets inside capabilities — those belong in `<knowledge>`.
    - Use numbered steps for sequential procedures.
@@ -149,7 +160,7 @@ The skills section describes the capabilities you can use to create a skill.
    - Each rule must answer "When [scenario/condition] → apply **[capability-name]** to [purpose]."
    - Rules must **not** re-state implementation details already in capabilities.
    - If the skill has only one capability, `<rules>` may be omitted entirely.
-7. Validate the generated file against **common-structural-violations**: check for knowledge in capabilities, noun-named capabilities, missing or duplicate sections, and correct section order.
+7. Validate the generated file against **common-structural-violations**: check for knowledge in capabilities, capabilities that violate the **action-verb naming convention** (noun-named), missing or duplicate sections, and correct section order.
 8. Write the complete content to `skills/<skill-name>/SKILL.md`.
 </creating-skill-file>
 
@@ -202,7 +213,7 @@ The skills section describes the capabilities you can use to create a skill.
    - Score the description using **description-scoring** (target ≥ 9).
    - Verify the trigger phrase covers all `<when-to-use-this-skill>` scenarios bidirectionally.
 3. **Validate capabilities**:
-   - Each capability name uses an action verb (not a noun).
+   - Each capability name follows the **action-verb naming convention** (imperative action verb, not a noun — e.g., `<validate-data>` ✓, `<data-validation>` ✗).
    - Each capability contains ordered, actionable steps.
    - No reference tables or constraint lists are embedded inside capabilities.
 4. **Validate knowledge**:
