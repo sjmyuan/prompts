@@ -16,6 +16,7 @@ A well-formed copilot skill file uses these sections with distinct, non-overlapp
 - Rules that re-state capability content instead of routing to it
 - Capabilities written as bullet-point fact lists instead of ordered procedural steps
 - Capabilities named as nouns (`<storage-management>`) instead of action verbs (`<manage-storage>`)
+- Skill name (frontmatter `name:`) is a noun phrase (`svg-editor`) instead of an action verb (`edit-svg`)
 - A bare `<examples>` section used instead of a `<context-loading-guide>` entry inside `<knowledge>` (the preferred pattern consolidates all on-demand context — examples, references, rubrics — in one place)
 - `<context-loading-guide>` written as a bullet list, or as a two-column **Scenario | Reference** table — the first column must be a decision condition ("Load when…"), not a content description
 - `<context-loading-guide>` first column describes *what the file contains* instead of *when to load it* — forces the agent to infer the loading condition, leading to missed or wrong loads

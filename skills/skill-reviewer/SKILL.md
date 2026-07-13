@@ -1,6 +1,6 @@
 ---
 name: skill-reviewer
-description: Review SKILL.md files for correct structure, section-purpose compliance, and absence of duplication. Evaluates whether knowledge, capabilities, rules, and examples sections each serve their intended purpose. Use when users request feedback, a quality assessment, or want to improve, fix, or ensure a copilot skill file triggers correctly.
+description: Review SKILL.md files for correct structure, section-purpose compliance, naming convention adherence, and absence of duplication. Evaluates whether knowledge, capabilities, rules, and examples sections each serve their intended purpose and whether names follow action-verb conventions. Use when users request feedback, a quality assessment, or want to improve, fix, or ensure a copilot skill file triggers correctly.
 ---
 
 <when-to-use-this-skill>
@@ -9,6 +9,7 @@ description: Review SKILL.md files for correct structure, section-purpose compli
 - User asks whether a SKILL.md is correctly structured
 - User asks for feedback on section placement, duplication, or capability format in a skill file
 - User asks whether a skill will trigger or activate correctly
+- User asks whether a skill's name or capability names follow naming conventions
 </when-to-use-this-skill>
 
 <knowledge>
@@ -61,6 +62,24 @@ Flag the absence of any evaluation mechanism as follows:
 - No evaluation step AND no examples demonstrating output validation → 🔴 Major (no way to verify output correctness).
 </evaluation-process>
 
+<action-verb-naming-convention>
+Both the **skill name** and its **capability names** in the skill under review must follow the action-verb naming convention:
+
+**Skill name** (frontmatter `name:` field, kebab-case):
+- Must start with an imperative action verb: `edit-svg`, `validate-data`, `generate-diagram`, `review-code`, `create-flowchart`
+- NOT noun phrases: `svg-editor`, `data-validator`, `diagram-generator`, `code-reviewer`, `flowchart-creator`
+- Example: a skill named `form-validator` should be named `validate-form`
+
+**Capability section names** (inside `<capabilities>`):
+- Must start with an imperative action verb: `<manage-storage>`, not `<storage-management>`; `<generate-report>`, not `<report-generation>`
+- Good patterns: `validate-`, `generate-`, `create-`, `analyze-`, `calculate-`, `collect-`, `transform-`, `review-`
+- Bad patterns: `validation`, `generation`, `creation`, `analysis`, `calculation`, `collection`, `transformation`, `review`
+
+**`<knowledge>` subsection names**:
+- Must use **descriptive noun phrases** (`<storage-patterns>`, not `<define-storage>`)
+- A subsection named with an action verb inside `<knowledge>` signals that procedural content has leaked into knowledge — this is a structural violation
+</action-verb-naming-convention>
+
 <conciseness-check>
 Criteria for identifying unnecessary content across SKILL.md, reference files, and example files. Load **reference/conciseness-check.md** for the full rubric.
 </conciseness-check>
@@ -79,6 +98,7 @@ Criteria for identifying unnecessary content across SKILL.md, reference files, a
 | Trigger-correctness failures are the primary or dominant finding | Output model for a review focused on description/when-to-use mismatches | [examples/trigger-correctness-violation.md](examples/trigger-correctness-violation.md) |
 | Executing step 10 (example coverage assessment) | Coverage gap criteria and severity table | [reference/example-coverage-criteria.md](reference/example-coverage-criteria.md) |
 | Executing step 11 (individual example file review) | Quality criteria checklist for example files | [reference/example-quality-criteria.md](reference/example-quality-criteria.md) |
+| Checking naming conventions for skill name and capability names (step 8) | Action-verb naming convention rules for skill name, capability names, and knowledge subsection names | See `<action-verb-naming-convention>` in `<knowledge>` |
 | Checking file size and line count (step 1c) | Size limit thresholds (150/300 lines) and severity guidance | See `<skill-size-limit>` in `<knowledge>` |
 | Checking for output evaluation process (step 4) | Evaluation process patterns, common checklist patterns, and severity guidance | See `<evaluation-process>` in `<knowledge>` |
 | Checking conciseness across all files (step 5) | Unnecessary-content patterns per file type and severity guidance | [reference/conciseness-check.md](reference/conciseness-check.md) |
@@ -113,7 +133,10 @@ Criteria for identifying unnecessary content across SKILL.md, reference files, a
     - 🔴 Major if the skill could be cut by >30% without losing meaning.
 6. For each rule, verify it answers "when scenario X → use capability Y" — flag any rule that re-states content already in a capability (duplication). If the skill has only one capability and no `<rules>` section, do not flag its absence.
 7. Check that a `<knowledge>` section exists and contains all reference material (tables, layouts, API signatures, platform constraints) that capabilities currently cite inline. Also check that large reference rubrics are not embedded directly in SKILL.md — they should be in `reference/` files loaded on demand; flag inline rubrics as 🔴 Major.
-8. Check capability section names use action verbs; flag noun-named sections. Also verify that `<knowledge>` subsection names use descriptive noun phrases — a subsection named with an action verb (e.g., `<check-constraints>`) signals that procedural content has leaked into `<knowledge>`.
+8. **Check naming conventions** — load `<action-verb-naming-convention>` in `<knowledge>` for the full rubric:
+   a. Check the skill's frontmatter `name:` field follows the action-verb naming convention (imperative verb + noun in kebab-case, e.g., `edit-svg`, `validate-data`); flag noun-phrase names (e.g., `svg-editor`, `data-validator`) as 🔴 Major.
+   b. Check each capability section name uses an action verb; flag noun-named sections as 🔴 Major.
+   c. Verify that `<knowledge>` subsection names use descriptive noun phrases — a subsection named with an action verb (e.g., `<check-constraints>`) signals that procedural content has leaked into `<knowledge>`; flag as 🟡 Minor.
 9. Check that on-demand context (examples, reference rubrics) is exposed via a `<context-loading-guide>` entry inside `<knowledge>` (preferred) rather than a standalone `<examples>` section. If a bare `<examples>` section exists instead, flag it as 🟡 Minor. If a `<context-loading-guide>` exists but uses a description-first **Scenario | Reference** format instead of a condition-first **Load when | Provides | File** format, flag it as 🟡 Minor — the first column must state the decision condition, not describe the file's content. If the guide is written as a bullet list, flag it as 🟡 Minor. Either way, verify that all referenced content is linked by file path — not embedded inline — and flag inline content as 🔴 Major.
 10. Assess example coverage: cross-reference each named capability against the linked examples. Flag capabilities with no corresponding example as 🔴 Major; flag skills where examples cover only a subset of scenarios as 🟡 Minor. Load **reference/example-coverage-criteria.md** for the full rubric.
 11. Load and review each linked example file:
