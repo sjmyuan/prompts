@@ -19,7 +19,7 @@ from colors import PPT_PALETTE, get_gradient_defs, get_shadow_filter
 # Internal helpers
 # ---------------------------------------------------------------------------
 
-_FONT_FAMILY = "Segoe UI, -apple-system, Helvetica Neue, Arial, sans-serif"
+_FONT_FAMILY = "Segoe UI, -apple-system, Helvetica Neue, Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif"
 
 
 def _to_str(element) -> str:
@@ -37,21 +37,43 @@ def _dwg() -> svgwrite.Drawing:
 # ---------------------------------------------------------------------------
 
 
+def _effective_line_len(text: str) -> int:
+    """Compute effective length of text counting CJK chars as double width."""
+    count = 0
+    for c in text:
+        if ord(c) > 0x2E80:
+            count += 2
+        else:
+            count += 1
+    return count
+
+
 def get_shape_dimensions(
     text: str,
     shape_type: str = "process",
     ppt_mode: bool = True,
-    char_width: float = 10.0,
+    char_width: float = 9.0,
     min_width: float = 100.0,
     min_height: float = 48.0,
+    line_height: float = 22.0,
+    padding_x: float = 28.0,
+    padding_y: float = 16.0,
 ) -> Dict[str, float]:
-    """Compute shape dimensions based on text content and shape type."""
+    """Compute shape dimensions based on text content and shape type.
+
+    Supports multi-line text (\n-separated) and CJK characters.
+    CJK characters count as double width for accurate dimension calculation.
+    """
+    lines = text.split("\n")
+    max_eff = max(_effective_line_len(line) for line in lines) if lines else 1
+    num_lines = len(lines)
+
     if ppt_mode:
-        h = min_height
-        w = max(min_width, len(text) * char_width + 32)
+        h = max(min_height, num_lines * line_height + padding_y)
+        w = max(min_width, max_eff * char_width + padding_x)
     else:
-        h = 40.0
-        w = max(80.0, len(text) * 9 + 24)
+        h = max(40.0, num_lines * 18 + 12)
+        w = max(80.0, max_eff * 8 + 20)
 
     if shape_type == "decision":
         w = max(w, 80.0)
@@ -194,6 +216,47 @@ def get_node_type_colors(shape_type: str, ppt_mode: bool = True) -> Dict[str, st
 # ---------------------------------------------------------------------------
 
 
+def _generate_text_svg(
+    text: str,
+    cx: float,
+    cy: float,
+    font_family: str,
+    font_size: float,
+    fill: str,
+) -> str:
+    """Generate SVG text element, supporting multi-line via dy-based tspan.
+
+    Uses alignment-baseline for single-line text (widely supported on <text>).
+    For multi-line text, uses dy offsets on <tspan> with baseline offset
+    ~0.32*font_size for visual centering (avoids dominant-baseline on tspan
+    which has inconsistent browser support).
+    """
+    lines = text.split("\n")
+    if len(lines) == 1:
+        return (
+            f'<text x="{cx}" y="{cy}" text-anchor="middle" '
+            f'alignment-baseline="middle" font-family="{font_family}" '
+            f'font-size="{font_size}" fill="{fill}">{text}</text>'
+        )
+
+    num_lines = len(lines)
+    line_h = font_size + 7  # line height = font_size + interline spacing
+    total_text_h = num_lines * line_h
+    first_line_center = cy - total_text_h / 2 + line_h / 2
+    base_off = font_size * 0.32  # baseline-to-visual-center offset
+    text_y = first_line_center + base_off
+
+    tspans = [f'<tspan x="{cx}">{lines[0]}</tspan>']
+    for line in lines[1:]:
+        tspans.append(f'<tspan x="{cx}" dy="{line_h}">{line}</tspan>')
+
+    return (
+        f'<text x="{cx}" y="{text_y}" text-anchor="middle" '
+        f'font-family="{font_family}" font-size="{font_size}" fill="{fill}">'
+        f'{"".join(tspans)}</text>'
+    )
+
+
 def generate_node_svg(
     node_id: str,
     shape_type: str,
@@ -269,19 +332,28 @@ def generate_node_svg(
             )
         )
 
-    g.add(
-        d.text(
-            text,
-            insert=(x + width / 2, y + height / 2),
-            text_anchor="middle",
-            dominant_baseline="central",
-            font_family=_FONT_FAMILY,
-            font_size=14,
-            fill=tc,
-        )
-    )
+    cx, cy = x + width / 2, y + height / 2
+    num_lines = len(text.split("\n"))
+    font_size = 13 if num_lines > 1 else 14
 
-    return _to_str(g)
+    if num_lines == 1:
+        g.add(
+            d.text(
+                text,
+                insert=(cx, cy),
+                text_anchor="middle",
+                alignment_baseline="middle",
+                font_family=_FONT_FAMILY,
+                font_size=font_size,
+                fill=tc,
+            )
+        )
+        return _to_str(g)
+
+    # Multi-line: build shape via svgwrite, text via raw SVG string
+    shape_svg = _to_str(g)
+    text_svg = _generate_text_svg(text, cx, cy, _FONT_FAMILY, font_size, tc)
+    return shape_svg.replace("</g>", text_svg + "</g>")
 
 
 def generate_edge_svg(
@@ -396,10 +468,14 @@ def generate_label_svg(
     bg_color: str = "#FFFFFF",
     text_color: str = "#333333",
 ) -> str:
-    """Generate an edge label SVG element with background via svgwrite."""
+    """Generate an edge label SVG element with background via svgwrite.
+
+    Accounts for CJK characters (double width) in label width calculation.
+    """
     d = _dwg()
     pad = 4
-    w = len(label) * 7 + pad * 2
+    eff_len = sum(2 if ord(c) > 0x2E80 else 1 for c in label)
+    w = max(20, eff_len * 7 + pad * 2)
     h = font_size + pad * 2
     g = d.g(class_="edge-label")
     g.add(

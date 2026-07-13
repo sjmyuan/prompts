@@ -502,3 +502,155 @@ def route_with_port_allocation(
         e["path_d"] = path_to_svg_d(waypoints)
 
     return edges
+
+
+def validate_turning_points(
+    edges: List[Dict[str, Any]],
+    node_bboxes: List[BBox],
+    tolerance: float = 2.0,
+) -> List[Dict[str, Any]]:
+    """Validate that no turning point or segment aligns with any node edge.
+
+    Checks:
+    1. Turning points (non-endpoint waypoints) must not lie on any node edge.
+    2. Segments must not run along a node edge (same x for vertical, same y
+       for horizontal) where they overlap the node's range.
+
+    Args:
+        edges: List of edge dicts, each with 'id' and 'waypoints'
+        node_bboxes: List of node bounding boxes (x, y, w, h)
+        tolerance: Max distance to consider as "on the edge" (default 2)
+
+    Returns:
+        List of issue dicts: [{'edge_id': str, 'type': str, 'point': (x,y),
+                               'node': int, 'side': str}, ...]
+    """
+    issues = []
+    for e in edges:
+        wps = e.get("waypoints", [])
+        if len(wps) < 2:
+            continue
+        eid = e.get("id", "?")
+
+        for j, (nx, ny, nw, nh) in enumerate(node_bboxes):
+            left, right = nx, nx + nw
+            top, bottom = ny, ny + nh
+
+            # Check each segment for overlap with node edges
+            for i in range(len(wps) - 1):
+                ax, ay = wps[i]
+                bx, by = wps[i + 1]
+                is_horiz = abs(ay - by) < tolerance
+                is_vert = abs(ax - bx) < tolerance
+
+                if is_horiz:
+                    seg_x_min, seg_x_max = min(ax, bx), max(ax, bx)
+                    # Horizontal segment overlaps node top/bottom edge?
+                    if (
+                        abs(ay - top) <= tolerance
+                        and seg_x_min < right
+                        and seg_x_max > left
+                    ):
+                        issues.append(
+                            {
+                                "edge_id": eid,
+                                "type": "segment-on-edge",
+                                "point": ((ax + bx) / 2, ay),
+                                "node": j,
+                                "side": "TOP",
+                                "detail": f"horiz segment at y={ay} runs along node top",
+                            }
+                        )
+                    if (
+                        abs(ay - bottom) <= tolerance
+                        and seg_x_min < right
+                        and seg_x_max > left
+                    ):
+                        issues.append(
+                            {
+                                "edge_id": eid,
+                                "type": "segment-on-edge",
+                                "point": ((ax + bx) / 2, ay),
+                                "node": j,
+                                "side": "BOTTOM",
+                                "detail": f"horiz segment at y={ay} runs along node bottom",
+                            }
+                        )
+                elif is_vert:
+                    seg_y_min, seg_y_max = min(ay, by), max(ay, by)
+                    # Vertical segment overlaps node left/right edge?
+                    if (
+                        abs(ax - left) <= tolerance
+                        and seg_y_min < bottom
+                        and seg_y_max > top
+                    ):
+                        issues.append(
+                            {
+                                "edge_id": eid,
+                                "type": "segment-on-edge",
+                                "point": (ax, (ay + by) / 2),
+                                "node": j,
+                                "side": "LEFT",
+                                "detail": f"vert segment at x={ax} runs along node left",
+                            }
+                        )
+                    if (
+                        abs(ax - right) <= tolerance
+                        and seg_y_min < bottom
+                        and seg_y_max > top
+                    ):
+                        issues.append(
+                            {
+                                "edge_id": eid,
+                                "type": "segment-on-edge",
+                                "point": (ax, (ay + by) / 2),
+                                "node": j,
+                                "side": "RIGHT",
+                                "detail": f"vert segment at x={ax} runs along node right",
+                            }
+                        )
+
+            # Check turning points (not first/last waypoint)
+            for i in range(1, len(wps) - 1):
+                tx, ty = wps[i]
+                if abs(tx - left) <= tolerance and top <= ty <= bottom:
+                    issues.append(
+                        {
+                            "edge_id": eid,
+                            "type": "turn-on-edge",
+                            "point": (tx, ty),
+                            "node": j,
+                            "side": "LEFT",
+                        }
+                    )
+                if abs(tx - right) <= tolerance and top <= ty <= bottom:
+                    issues.append(
+                        {
+                            "edge_id": eid,
+                            "type": "turn-on-edge",
+                            "point": (tx, ty),
+                            "node": j,
+                            "side": "RIGHT",
+                        }
+                    )
+                if abs(ty - top) <= tolerance and left <= tx <= right:
+                    issues.append(
+                        {
+                            "edge_id": eid,
+                            "type": "turn-on-edge",
+                            "point": (tx, ty),
+                            "node": j,
+                            "side": "TOP",
+                        }
+                    )
+                if abs(ty - bottom) <= tolerance and left <= tx <= right:
+                    issues.append(
+                        {
+                            "edge_id": eid,
+                            "type": "turn-on-edge",
+                            "point": (tx, ty),
+                            "node": j,
+                            "side": "BOTTOM",
+                        }
+                    )
+    return issues
