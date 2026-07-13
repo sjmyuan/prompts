@@ -4,7 +4,7 @@
 
 **Trigger**: "Create a sequence diagram for user registration: Client → Auth Service → validate input → DB (check if email exists) → DB (create user) → Email Service (send verification email) → return success."
 
-**Applies**: **create-sequence-diagram**
+**Applies**: **create-scripted-diagram** (sequence variant)
 
 ---
 

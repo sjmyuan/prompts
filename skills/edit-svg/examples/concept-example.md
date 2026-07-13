@@ -4,7 +4,7 @@
 
 **Trigger**: "Create a concept diagram for a machine learning pipeline showing Data Collection → Data Preprocessing → Feature Engineering → Model Training → Model Evaluation → Model Deployment, with the central concept being 'ML Pipeline'."
 
-**Applies**: **create-concept-diagram**
+**Applies**: **create-scripted-diagram** (concept variant)
 
 ---
 

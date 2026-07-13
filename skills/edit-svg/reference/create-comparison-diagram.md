@@ -1,16 +1,17 @@
-# Create Comparison Diagram — Detailed Steps
+# Comparison Diagram — Visual Pattern & Dimensions
 
-Applies **create-comparison-diagram** in the edit-svg skill.
+Applies **create-handcrafted-diagram** in the edit-svg skill.
 
-Before starting, examine the example SVGs in `examples/` for visual reference:
-- `examples/diagnosis-comparison.svg` — Two-column comparison (missing vs overstepping)
+## Example SVGs
+
+- `examples/diagnosis-comparison.svg` — Two-column comparison
 - `examples/supply-vs-demand-thinking.svg` — Two-column with step flow inside each column
-- `examples/channel-better-than-block-decision-flow.svg` — Three-column comparison with rows
+- `examples/channel-better-than-block-decision-flow.svg` — Three-column comparison
 - `examples/solve-vs-align-decision-mode.svg` — Two-panel with complex internal flows
 
-## Visual Patterns from Examples
+## Visual Patterns
 
-### Two-column comparison (diagnosis-comparison pattern)
+### Two-column comparison
 ```
 ┌─────────────────────────┐ ┌─────────────────────────┐
 │  Panel Header (colored) │ │  Panel Header (colored) │

@@ -4,7 +4,7 @@
 
 **Trigger**: "The SVG diagram I have has overlapping boxes and the connection lines go through the middle of other boxes. Can you fix the layout?"
 
-**Applies**: **analyze-and-fix-layout**
+**Applies**: **modify-existing-svg** (layout fix variant)
 
 ---
 

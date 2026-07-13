@@ -1,8 +1,8 @@
-# Create Donut Chart — Detailed Steps
+# Donut Chart — Visual Pattern & Dimensions
 
-Applies **create-donut-chart** in the edit-svg skill.
+Applies **create-handcrafted-diagram** in the edit-svg skill.
 
-Before starting, examine the example SVG in `examples/survival-rate-chart.svg` for visual reference.
+See example: `examples/survival-rate-chart.svg`
 
 ## Visual Pattern
 
@@ -28,11 +28,10 @@ Before starting, examine the example SVG in `examples/survival-rate-chart.svg` f
 | Stroke width | 40 |
 | ViewBox | 800×470 |
 
-**Stroke-dasharray calculation:**
-- Total circumference = `2 * PI * r = 2 * 3.14159 * 80 = 502.65`
+**Stroke-dasharray calculation** (r=80 → circumference=502.65):
 - Segment length = `percentage * 502.65 / 100`
-- First segment: `stroke-dasharray="segment_len (total - segment_len)" stroke-dashoffset="0"`
-- Second segment: `stroke-dasharray="segment2_len (total - segment2_len)" stroke-dashoffset="-(segment1_len)"`
+- First: `stroke-dasharray="seg_len 502.65" stroke-dashoffset="0"`
+- Second: `stroke-dasharray="seg2_len 502.65" stroke-dashoffset="-seg1_len"`
 
 ## Key SVG Elements Reference
 

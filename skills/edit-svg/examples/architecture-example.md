@@ -4,7 +4,7 @@
 
 **Trigger**: "Create an architecture diagram for a three-tier web app: Browser → CDN → Load Balancer → API Gateway → Auth Service + Business Service → PostgreSQL Database + Redis Cache."
 
-**Applies**: **create-architecture-diagram**
+**Applies**: **create-scripted-diagram** (architecture variant)
 
 ---
 

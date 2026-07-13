@@ -4,7 +4,7 @@
 
 **Trigger**: "Create a bar chart showing quarterly sales for 2025: Q1=120, Q2=195, Q3=165, Q4=210 for Product A and Q1=80, Q2=110, Q3=145, Q4=170 for Product B."
 
-**Applies**: **create-chart**
+**Applies**: **create-scripted-diagram** (chart variant)
 
 ---
 

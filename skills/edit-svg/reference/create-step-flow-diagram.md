@@ -1,8 +1,8 @@
-# Create Step-Flow Diagram — Detailed Steps
+# Step-Flow Diagram — Visual Pattern & Dimensions
 
-Applies **create-step-flow-diagram** in the edit-svg skill.
+Applies **create-handcrafted-diagram** in the edit-svg skill.
 
-Before starting, examine the example SVG in `examples/five-step-flow.svg` for visual reference.
+See example: `examples/five-step-flow.svg`
 
 ## Visual Pattern
 

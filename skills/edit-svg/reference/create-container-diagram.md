@@ -1,12 +1,13 @@
-# Create Container/Boundary Diagram — Detailed Steps
+# Container/Boundary Diagram — Visual Pattern & Dimensions
 
-Applies **create-container-diagram** in the edit-svg skill.
+Applies **create-handcrafted-diagram** in the edit-svg skill.
 
-Before starting, examine the example SVGs in `examples/` for visual reference:
+## Example SVGs
+
 - `examples/niche-market-strategy.svg` — Dashed boundary container with niche markets around edges
 - `examples/feedback-architecture.svg` — Complex container with side panels and flow lines
 
-## Visual Pattern (niche-market-strategy)
+## Visual Pattern
 
 ```
                                       ╔══════════════╗

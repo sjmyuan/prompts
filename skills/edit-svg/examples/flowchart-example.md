@@ -4,7 +4,7 @@
 
 **Trigger**: "Create a flowchart showing the user login process: user enters email and password, validate inputs, check credentials in database, redirect to dashboard on success, or show error on failure."
 
-**Applies**: **create-flowchart**
+**Applies**: **create-scripted-diagram** (flowchart variant)
 
 ---
 

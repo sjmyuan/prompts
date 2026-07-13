@@ -4,7 +4,7 @@
 
 **Trigger**: "I have this CI/CD pipeline SVG. Can you change the colors to teal and purple, update 'Deploy' to say 'Deploy & Release', and add a 'Security Scan' step between Test and Deploy?"
 
-**Applies**: **modify-existing-svg**
+**Applies**: **modify-existing-svg** (style + content update variant)
 
 ---
 

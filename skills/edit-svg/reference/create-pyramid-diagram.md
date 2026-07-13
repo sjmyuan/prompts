@@ -1,8 +1,8 @@
-# Create Pyramid Diagram — Detailed Steps
+# Pyramid Diagram — Visual Pattern & Dimensions
 
-Applies **create-pyramid-diagram** in the edit-svg skill.
+Applies **create-handcrafted-diagram** in the edit-svg skill.
 
-Before starting, examine the example SVG in `examples/srk-pyramid.svg` for visual reference.
+See example: `examples/srk-pyramid.svg`
 
 ## Visual Pattern
 
