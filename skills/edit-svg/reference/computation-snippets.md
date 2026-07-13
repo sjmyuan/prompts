@@ -21,7 +21,110 @@
 
 ## Calling Convention
 
-Always use `python3 -c` with `sys.path.insert`:
+### Preferred: Standalone Python Script
+
+For ALL diagram generation, create a dedicated `.py` file in the workspace. This enables iterative refinement without re-typing full commands.
+
+**Script template**: Start every script with this structure:
+
+```python
+import sys
+import os
+
+# Add the skill scripts directory to the import path
+sys.path.insert(0, '/Users/ganggang/work/prompts/skills/edit-svg/scripts')
+
+from graph_layout import flow_layout, compute_viewbox
+from routing import orthogonal_path, connection_endpoints, path_to_svg_d, endpoint_valid, detect_intersections
+from geometry import connection_point, find_overlapping, BBox
+from svg_builder import (
+    generate_node_svg, generate_edge_svg, generate_label_svg,
+    generate_title_bar, generate_arrow_marker, get_shape_dimensions
+)
+from colors import get_shadow_filter, get_gradient_defs, wcag_aa_check
+
+
+def build_diagram():
+    # ── Step 1: Define node/edge data ──
+    nodes = [...]
+    edges = [...]
+
+    # ── Step 2: Compute dimensions and positions ──
+    for n in nodes:
+        dims = get_shape_dimensions(n['text'], n['type'], ppt_mode=True)
+        n.update(dims)
+    nodes = flow_layout(nodes, 'top-to-bottom', node_gap=130, branch_gap=260, start_offset=(100, 140))
+
+    # Align same-row nodes to the same y-coordinate
+    rows = {}
+    for n in nodes:
+        rows.setdefault(n['row'], []).append(n)
+    for row_nodes in rows.values():
+        max_h = max(n['height'] for n in row_nodes)
+        base_y = min(n['y'] for n in row_nodes)
+        for n in row_nodes:
+            n['y'] = base_y + (max_h - n['height']) / 2
+            n['bbox'] = (n['x'], n['y'], n['width'], n['height'])
+
+    # ── Step 3: Route connections ──
+    node_map = {n['id']: n for n in nodes}
+    obstacles = [n['bbox'] for n in nodes]
+    connections = []
+
+    for e in edges:
+        src = node_map[e['from']]
+        dst = node_map[e['to']]
+
+        # Determine correct sides based on spatial relationship
+        # (see Side Specification Rules in SKILL.md knowledge)
+        src_pt = connection_point(src['bbox'], src_side)
+        dst_pt = connection_point(dst['bbox'], dst_side)
+        waypoints = orthogonal_path(src_pt, dst_pt, src_side, dst_side, clearance=25, obstacles=obstacles)
+        connections.append(waypoints)
+
+    # ── Step 4: Validate connections ──
+    for i, wps in enumerate(connections):
+        result = endpoint_valid(wps, node_map[edges[i]['to']]['bbox'])
+        assert result['valid'], f"Edge {i} invalid: {result['issues']}"
+
+    # ── Step 5: Generate SVG elements ──
+    svg_fragments = []
+    for n in nodes:
+        svg_fragments.append(generate_node_svg(n['id'], n['type'], n['text'], n['x'], n['y'], n['width'], n['height']))
+    for i, wps in enumerate(connections):
+        d = path_to_svg_d(wps)
+        edge = edges[i]
+        svg_fragments.append(generate_edge_svg(edge.get('id', f'e{i}'), d))
+
+    # ── Step 6: Generate defs and assemble ──
+    viewbox = compute_viewbox([n['bbox'] for n in nodes], padding=40, target_aspect=16/9, title_bar_height=70)
+    shadow = get_shadow_filter()
+    gradients = get_gradient_defs()
+    arrow = generate_arrow_marker('arrow', '#555555', arrow_width=10, arrow_height=10, tip_ref=True)
+    title_svg = generate_title_bar('Diagram Title', viewbox[2])
+
+    # Assemble final SVG
+    svg_parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{viewbox[0]} {viewbox[1]} {viewbox[2]} {viewbox[3]}" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">',
+        '<defs>', shadow, gradients, arrow, '</defs>',
+        title_svg,
+        *svg_fragments,
+        '</svg>',
+    ]
+    return '\n'.join(svg_parts)
+
+
+if __name__ == '__main__':
+    svg = build_diagram()
+    output_path = os.path.join(os.path.dirname(__file__), 'diagram.svg')
+    with open(output_path, 'w') as f:
+        f.write(svg)
+    print(f'SVG saved to {output_path}')
+```
+
+### Alternative: Inline `python3 -c` (for one-off validation only)
+
+Use inline calls only for quick validation checks after the main script has been written:
 
 ```bash
 python3 -c "
@@ -128,6 +231,8 @@ print(f'Arrow tip will be at: {dst_pt}')
 
 ## Common Script Calls
 
+> **Prefer the standalone script template above** over inline calls. The snippets below show the API signatures for individual function calls — use them as reference when writing your script, not as standalone commands for complex diagrams.
+
 **Compute node positions (grid layout):**
 ```bash
 python3 -c "
@@ -185,19 +290,20 @@ print(path_to_svg_d(waypoints))
 "
 ```
 
-**Corridor-based routing for cross-column feedback edges:**
-```bash
-python3 -c "
-import sys; sys.path.insert(0, 'scripts')
+**Corridor-based routing for cross-column feedback edges** (use inside a standalone script):
+
+```python
 from geometry import connection_point
 
 # corridor_x = midpoint between main column right edge and branch column left edge
 corridor_x = 530
-src = node_map['HIL']  # bottom of diagram
-dst = node_map['CTX']  # top of diagram
 
-source_exit = connection_point(src['bbox'], 'top-right')
-target_entry = connection_point(dst['bbox'], 'bottom')
+# For each feedback edge going from bottom of branch column to top of main column
+src = node_map['BRANCH_BOTTOM_NODE']  # bottom of branch column
+dst = node_map['MAIN_TOP_NODE']       # top of main column
+
+source_exit = connection_point(src['bbox'], 'top-right')  # exit from top-right of source
+target_entry = connection_point(dst['bbox'], 'bottom')     # enter from bottom of target
 
 # Clean 4-waypoint path through shared corridor
 path = [
@@ -206,8 +312,10 @@ path = [
     (corridor_x, target_entry[1]),  # vertical along corridor
     target_entry,                    # horizontal to target
 ]
-print(' '.join([f'M {path[0][0]:.1f} {path[0][1]:.1f}'] + [f'L {p[0]:.1f} {p[1]:.1f}' for p in path[1:]]))
-"
+
+# All feedback edges share the same corridor_x for visual consistency
+from routing import path_to_svg_d
+d = path_to_svg_d(path)
 ```
 
 **Generate SVG elements:**

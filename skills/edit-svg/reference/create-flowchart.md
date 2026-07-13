@@ -43,15 +43,36 @@ When a flowchart has a main column and a branch/side column, edges between colum
 - Set `branch_gap` wide enough (≥400px for wide labels) so feedback paths between columns have room for labels.
 - Use `start_offset` to leave room for the title bar (y-offset ≥ 140 if title bar is 44px).
 
+### Row Alignment
+- All nodes in the same row must share the same y-coordinate for horizontal center alignment.
+- After `flow_layout()`, group nodes by row and for each row:
+  1. Find the tallest node height in that row.
+  2. Vertically center each node: `node['y'] = row_base_y + (max_row_height - node['height']) / 2`
+- Example:
+  ```python
+  rows = {}
+  for n in nodes:
+      rows.setdefault(n['row'], []).append(n)
+  for row_nodes in rows.values():
+      max_h = max(n['height'] for n in row_nodes)
+      base_y = min(n['y'] for n in row_nodes)
+      for n in row_nodes:
+          n['y'] = base_y + (max_h - n['height']) / 2
+          n['bbox'] = (n['x'], n['y'], n['width'], n['height'])
+  ```
+
 ### Edge Routing Strategy
 
-| Edge direction | Method | Example |
-|---|---|---|
-| Same column, forward | Default `connection_endpoints()` | Start → Step1 → Step2 |
-| Across columns, same direction | Default `connection_endpoints()` | Main → Side |
-| Across columns, opposite direction | Manual sides: `src_side='right', dst_side='left'` | Side → Main (leftwards) |
-| Same column, backward (up) | Manual sides: `src_side='top', dst_side='bottom'` | Bottom → Top |
-| Cross-column upward (feedback) | **Corridor strategy** (see below) | Bottom-Right → Top-Left |
+| Edge direction | src_side | dst_side | Method | Example |
+|---|---|---|---|---|
+| Same column, forward (top→bottom) | bottom | top | `connection_endpoints(src, dst, 'top-to-bottom')` | Start → Step1 |
+| Same column, forward (left→right) | right | left | `connection_endpoints(src, dst, 'left-to-right')` | Step1 → Step2 |
+| Across columns, same row (left→right) | right | left | `orthogonal_path()` with explicit sides | Main → Side |
+| Across columns, opposite direction (right→left) | **left** | **right** | `orthogonal_path()` with explicit sides | Side → Main (feedback) |
+| Same column, backward (bottom→top) | **top** | **bottom** | `orthogonal_path()` with explicit sides | Bottom → Top |
+| Cross-column upward (feedback) | **top-right** | **bottom** | **Corridor strategy** (see below) | Bottom-Right → Top-Left |
+
+> **Critical**: For right→left feedback edges, the source exits from its **left** side and the target enters from its **right** side. This is opposite to what intuition suggests — the left side of the source faces the right side of the target when going backwards across columns. Always verify with `routing.endpoint_valid()` after routing.
 
 ### Corridor Strategy for Feedback Edges
 
