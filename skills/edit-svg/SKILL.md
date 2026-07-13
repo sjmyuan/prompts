@@ -30,7 +30,27 @@ description: Create SVG diagrams with professional PPT-quality layout, clear con
 
 **SVG assembly pattern**: `<svg viewBox="..." font-family="...">` → `<defs>` (shadow + gradients + arrow markers) → background → title → layers → connections → shapes → labels → `</svg>`.
 
-**Key conventions**: `text-anchor="middle"` + `dominant-baseline="middle"` for centered text. Panel headers: full-width `<rect>` with same `rx` at panel top. Color-code semantically (red=problems, green=success, blue=info, orange=warnings).
+**Key conventions**: `text-anchor="middle"` + `alignment-baseline="middle"` for centered text in single-line nodes. For multi-line CJK text with `<tspan>`, use `dy`-based positioning instead of `dominant-baseline` (which has inconsistent browser support on `<tspan>`). Baseline offset ≈ 0.32×font_size for visual centering. Panel headers: full-width `<rect>` with same `rx` at panel top. Color-code semantically (red=problems, green=success, blue=info, orange=warnings).
+
+**Column/Row centering**: All nodes in the same column must share the same `center_x` (not just the same left edge). Compute `col_center_x = col_left + max_width_in_col / 2`, then set each node's `x = col_center_x - node_width / 2`. All nodes in the same row must share the same `center_y`. Compute `center_y = start_y + row * node_gap`, then set `y = center_y - height / 2`. This gives both perfect horizontal and vertical alignment.
+
+**Edge routing by skip detection**: When routing same-column forward edges, detect whether intermediate nodes exist between source and destination:
+  - **No intermediate** + same center_x → straight line (0 turns)
+  - **No intermediate** + different center_x → L-shape (1 turn, horizontal-first)
+  - **Has intermediate** → Z-shape (2+ turns) with clearance from intermediate nodes
+  Compute `skip_count = number of nodes in same column with row between src and dst`.
+
+**Multi-lane corridor strategy**: When multiple feedback edges share the same gap corridor between columns, assign each edge its own x-lane in the corridor (e.g., `lane_c`, `lane_r`, `lane_l`, `lane_rr` with 18px spacing). Also stagger the y-levels of horizontal segments exiting from shared source nodes (e.g., use `0.5×height` and `0.85×height` for different edges from the same node side).
+
+**Turning point clearance**: Turning points (waypoints that are not connection endpoints) must NOT share x with any node's left/right edge nor y with any node's top/bottom edge. Otherwise the line visually overlaps the element border. After routing use _short approach segments_ (6-10px) to enter/exit node edges: route the final horizontal segment at `edge_y - 8`, then drop vertically into the edge. Validate with:
+  ```
+  for each turning point (tx, ty), for each node (nx, ny, nw, nh):
+    assert not (abs(tx-(nx))<2 or abs(tx-(nx+nw))<2 or abs(ty-ny)<2 or abs(ty-(ny+nh))<2)
+  ```
+
+**Label placement**: For complex diagrams with long CJK labels, prefer explicit position assignment after analyzing the diagram layout. Place labels on horizontal segments when possible (natural left-to-right reading). On vertical segments, offset right. Ensure minimum 8px clearance from all node edges. When automated placement is needed, try all segments and pick the one where push-down displacement is smallest.
+
+**ViewBox**: For tall diagrams (portrait orientation with 8+ rows), do NOT enforce 16:9 aspect ratio. Pass `target_aspect=None` to `compute_viewbox()` so the viewBox matches content proportions.
 
 **Diagram workflow reference**: See [reference/diagram-workflow.md](reference/diagram-workflow.md) for edge routing patterns, corridor strategy, standalone script file approach, iterative validation loop, row alignment rules, and connection side specification rules.
 
@@ -67,13 +87,27 @@ Generate a PPT-quality diagram for script-based types (flowchart, architecture, 
 2. **Load the type-specific reference**: Load the corresponding file from `<context-loading-guide>`.
 3. **Create standalone script file**: Generate a `.py` file (e.g., `generate_diagram.py`). Read [reference/computation-snippets.md](reference/computation-snippets.md) for script patterns. See [reference/diagram-workflow.md](reference/diagram-workflow.md) for the standalone script approach.
 4. **Build node/edge data**: Construct `nodes[]` and `edges[]` in the script.
-5. **Compute positions**: Call `flow_layout()`. Normalize column widths (min 120px for short text). Apply **row alignment** rules (see [reference/diagram-workflow.md](reference/diagram-workflow.md)). Adjust `branch_gap` for column spacing.
-6. **Route connections with multi-port allocation and strict side specification**: Classify each edge by spatial relationship. Determine `src_side`/`dst_side` using the table in [reference/diagram-workflow.md](reference/diagram-workflow.md). Build the obstacles list. Call `route_with_port_allocation()` (from `routing.py`) — this function automatically allocates distinct ports on each side for every edge, applies mid-path offsets for parallel edge pairs, and routes orthogonal paths. Never call `orthogonal_path()` per-edge manually unless you need custom port assignment. After routing, verify with `endpoint_valid()` on every edge. Run `detect_intersections()` and switch to **corridor strategy** for cross-column feedback intersections.
-7. **Generate SVG elements**: Call `generate_node_svg()` for each node. Call `generate_edge_svg()` for each edge — use the edge's `path_d` field (already computed by `route_with_port_allocation()`). For charts, use `chart_builder.render_*_chart()`.
+5. **Compute positions**: Compute node dimensions first (handle multi-line text by measuring the longest line). Position all nodes by **center_x per column** and **center_y per row**:
+   - For each column, find `max_width`. Compute `col_center_x = col_left + max_width / 2`. Set each node's `x = col_center_x - node_width / 2`.
+   - For each row, compute `center_y = start_y + row * node_gap`. Set each node's `y = center_y - node_height / 2`.
+   - This ensures both horizontal (within column) and vertical (within row) center alignment.
+6. **Route connections**: Classify each edge by spatial relationship.
+   - **Same column, forward**: Detect intermediate nodes with `skip_count`. Use straight line (no intermediates, same center_x), L-shape (1 turn, no intermediates, different center_x), or Z-shape (2+ turns, has intermediates).
+   - **Cross-column feedback**: Use **multi-lane corridor strategy** — assign each edge its own x-lane in the gap corridor (18px spacing between lanes) and stagger y-levels when multiple edges exit from the same node side.
+   - After routing, verify **turning point clearance**: no turning point should share x with any node's left/right edge nor y with any node's top/bottom edge. Add short approach segments (6-10px) to disconnect horizontal segments from element edges.
+   - Verify with `endpoint_valid()` on every edge. Run `detect_intersections()`. See [reference/diagram-workflow.md](reference/diagram-workflow.md) for side specification rules.
+7. **Generate SVG elements**: Call `generate_node_svg()` for each node (or custom multi-line node SVG with `dy`-based `<tspan>` positioning). Call `generate_edge_svg()` for each edge. For charts, use `chart_builder.render_*_chart()`.
 8. **Generate defs and decorations**: Call `get_shadow_filter()`, `get_gradient_defs()`, `generate_arrow_marker()`, `generate_title_bar()`.
 9. **Write SVG and run**: Assemble fragments following the **SVG assembly pattern**. Save to `.svg` file. Run `python3 generate_diagram.py`.
-10. **Visually validate and iterate**: Open in browser. Check line overlap, connection sides, row alignment, label overlap (see [reference/diagram-workflow.md](reference/diagram-workflow.md)). **Check port allocation**: verify that no two lines converge at the same spot on a node edge, and that parallel edges are visibly spread apart via mid-path offsets. Fix issues in script and re-run until quality criteria are met.
-11. **Compute viewBox**: Call `compute_viewbox()` with all bounding boxes.
+10. **Visually validate and iterate**: Open in browser. Check:
+    - **Line overlap**: No two lines share the same corridor x-position. Parallel edges must be staggered.
+    - **Turning point clearance**: No turning point aligns with any node's edge.
+    - **Connection sides**: Edges enter/exit from correct sides of nodes.
+    - **Row alignment**: All same-row nodes have identical center_y; all same-column nodes have identical center_x.
+    - **Label overlap**: Labels do not overlap with nodes or each other.
+    - **Port allocation**: No two lines converge at the same spot on a node edge; parallel edges spread apart.
+    Fix issues in script and re-run until all criteria are met.
+11. **Compute viewBox**: Call `compute_viewbox()` with all bounding boxes. For tall diagrams (8+ rows, portrait orientation), pass `target_aspect=None` to let the viewBox match content proportions rather than enforcing 16:9.
 12. **Assemble and output**: Follow the **SVG assembly pattern**. Return raw, valid SVG code.
 </create-scripted-diagram>
 
@@ -110,4 +144,9 @@ Modify, fix, or upgrade an existing SVG diagram. All new geometry MUST be comput
 <rule>When creating hand-crafted types (comparison, pyramid, step-flow, container, donut) → apply **create-handcrafted-diagram**.</rule>
 <rule>When fixing, modifying, or upgrading an existing SVG → apply **modify-existing-svg**. All new geometry must use scripts.</rule>
 <rule>When the request spans multiple types → apply capabilities sequentially and compose into one SVG.</rule>
+<rule>**Turning point clearance**: After routing any edge, verify that no turning point (non-endpoint waypoint) shares an x-coordinate with any node's left/right edge or a y-coordinate with any node's top/bottom edge. Use short approach segments (6-10px) if needed.</rule>
+<rule>**Column/row centering**: Always position nodes by center_x (within column) and center_y (within row), not by top/left edges. Same-column nodes must share center_x; same-row nodes must share center_y.</rule>
+<rule>**Multi-lane corridors**: When multiple edges traverse a gap corridor between columns, assign each edge a distinct x-lane (≥18px spacing) and stagger horizontal exit y-levels from shared source nodes.</rule>
+<rule>**Skip-based edge routing**: For same-column forward edges, detect intermediate nodes. No intermediate + same center_x → straight line. No intermediate + different center_x → L-shape (1 turn). Has intermediate → Z-shape (2+ turns).</rule>
+<rule>**CJK text in SVG**: For multi-line CJK text in `<tspan>` elements, use `dy`-based positioning with baseline offset ≈ 0.32×font_size. Avoid `dominant-baseline` on `<tspan>` due to inconsistent browser support.</rule>
 </rules>

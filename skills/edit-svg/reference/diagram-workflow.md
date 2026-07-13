@@ -14,7 +14,40 @@ Applies **create-scripted-diagram** and **modify-existing-svg** in the edit-svg 
 
 ### Corridor Strategy
 
-When feedback edges must go from bottom of one column back to top of another column, identify the x-coordinate of the gap between the main column and branch column(s). Route all such edges through this shared vertical corridor: exit source node horizontally to corridor x → go vertically along corridor → enter target node from below. This produces clean 4-waypoint paths that avoid intermediate nodes.
+When feedback edges must go from bottom of one column back to top of another column, identify the x-coordinate of the gap between the main column and branch column(s).
+
+### Single edge
+Route through the corridor: exit source node horizontally to corridor x → go vertically along corridor → enter target node from below. This produces clean 4-waypoint paths.
+
+### Multiple edges (multi-lane)
+When multiple distinct feedback edges traverse the same gap corridor, they MUST use **offset lanes** to avoid overlapping:
+
+1. Compute the gap corridor x as `(col0_max_right + col1_min_left) / 2`.
+2. Create 3-4 lanes with 18px spacing:
+   ```
+   lane_c  = gap_corridor       # center lane
+   lane_l  = gap_corridor - 18  # left lane
+   lane_r  = gap_corridor + 18  # right lane
+   lane_rr = gap_corridor + 36  # far right lane
+   ```
+3. Assign each edge to a unique lane.
+4. **Stagger horizontal exit segments** from shared source nodes: use different y-levels for different edges exiting from the same node side. For example, use `node_center_y` for one edge and `node_bottom - 0.15*height` for another.
+
+### Turning point clearance
+**Critical**: After routing, verify that NO turning point (waypoint that is not a connection endpoint) shares an x or y coordinate with any node's edge:
+```
+for each turning point (tx, ty), for each node (nx, ny, nw, nh):
+    assert tx != nx and tx != nx+nw  # not on left/right edge
+    assert ty != ny and ty != ny+nh  # not on top/bottom edge
+```
+If a turning point aligns with a node edge, add a **short approach segment** (6-10px) to offset the horizontal/vertical segment away from the edge. For example, to enter a node's bottom edge cleanly:
+```
+# Bad: horizontal at y=bottom runs along node's bottom edge
+(sx, sy) → (corridor, sy) → (corridor, bottom) → (target_x, bottom)
+
+# Good: horizontal offset by 8px, short vertical approach
+(sx, sy) → (corridor, sy) → (corridor, bottom-8) → (target_x, bottom-8) → (target_x, bottom)
+```
 
 ## Connection Port Allocation (Multi-Port Connection System)
 
@@ -120,13 +153,68 @@ After creating the script, run it, then open the generated SVG in browser for vi
 
 Fix issues in the script and re-run. Repeat until all visual quality criteria are met.
 
-## Row Alignment Rules
+## Column & Row Center Alignment
 
-All nodes in the same row must share the same y-coordinate for proper horizontal center alignment. After `flow_layout()`, group nodes by row and for each row:
-1. Find the tallest node height in that row.
-2. Center each node vertically within the row: `node['y'] = row_base_y + (max_row_height - node['height']) / 2`.
+All nodes must be centered both **horizontally (within column)** and **vertically (within row)**. Do NOT position by top/left edges — position by centers.
 
-For single-column layouts (all nodes in col=0), the same logic applies — all nodes must share the same horizontal center x-coordinate.
+### Per-column horizontal centering
+1. Compute dimensions for all nodes first.
+2. For each column, find the maximum node width.
+3. Compute column center x: `col_center_x = col_left + max_width_in_col / 2`.
+4. Set each node's x: `node['x'] = col_center_x - node['width'] / 2`.
+
+This ensures all nodes in the same column share an identical `center_x` regardless of their individual widths.
+
+### Per-row vertical centering
+1. For each row, compute `center_y = start_y + row * node_gap`.
+2. Set each node's y: `node['y'] = center_y - node['height'] / 2`.
+
+This ensures all nodes in the same row share an identical `center_y`. Nodes with different heights (e.g., 48px single-line vs 60px multi-line) are automatically centered.
+
+### Combined result
+```python
+col_max_width = {}
+for n in nodes:
+    col_max_width[n['col']] = max(col_max_width.get(n['col'], 0), n['width'])
+
+for n in nodes:
+    col_left = start_offset[0] + n['col'] * branch_gap
+    col_center_x = col_left + col_max_width[n['col']] / 2
+    n['x'] = col_center_x - n['width'] / 2
+    center_y = start_offset[1] + n['row'] * node_gap
+    n['y'] = center_y - n['height'] / 2
+    n['bbox'] = (n['x'], n['y'], n['width'], n['height'])
+```
+
+### Edge routing for same-column forward edges
+After centering, same-column nodes have identical `center_x`. This means forward edges between adjacent rows can be **straight vertical lines** (no turns needed). However, when nodes in the same column have differing `center_x` due to previous non-centered layouts, apply **skip detection**:
+
+```python
+def route_same_column(src_node, dst_node, skip_count=0):
+    sx = src_node['x'] + src_node['width'] / 2
+    sy = src_node['y'] + src_node['height']
+    dx = dst_node['x'] + dst_node['width'] / 2
+    dy = dst_node['y']
+    if abs(sx - dx) < 2:
+        if skip_count > 0:
+            # Has intermediate nodes → Z-shape with 2 turns
+            off = 25
+            mid_y = (sy + dy) / 2
+            return [(sx, sy), (sx+off, sy), (sx+off, mid_y), (sx-off, mid_y), (sx-off, dy), (sx, dy)]
+        else:
+            # No intermediate → straight line
+            return [(sx, sy), (dx, dy)]
+    else:
+        if skip_count > 0:
+            # Has intermediate → Z-shape at clearance
+            mid_y = sy + 20
+            return [(sx, sy), (sx, mid_y), (dx, mid_y), (dx, dy)]
+        else:
+            # No intermediate → L-shape (1 turn), horizontal first
+            return [(sx, sy), (dx, sy), (dx, dy)]
+```
+
+`skip_count` = number of nodes in the same column whose rows lie between source and destination rows.
 
 ## Edge Connection Routing — Side Specification Rules
 
