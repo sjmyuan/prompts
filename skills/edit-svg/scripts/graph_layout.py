@@ -14,6 +14,9 @@ from typing import Tuple, List, Dict, Any, Optional
 
 import networkx as nx
 
+from collections import deque
+from typing import Dict
+
 from geometry import (
     BBox,
     Point,
@@ -257,3 +260,139 @@ def compute_viewbox(
         vh = int(math.ceil(vh / 50.0) * 50)
 
     return (0, 0, max(vw, 400), max(vh, 300))
+
+
+# ---------------------------------------------------------------------------
+# Topological sort — auto row/col assignment from edge dependencies
+# ---------------------------------------------------------------------------
+
+
+def topological_sort(
+    nodes: List[Dict[str, Any]], edges: List[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
+    """Assign row numbers via Kahn's topological sort.
+
+    Returns nodes with 'row' and 'col' added. Skips if already assigned.
+    Handles cycles (falls back to input order) and disconnected subgraphs.
+    """
+    if all("row" in n for n in nodes):
+        return nodes
+
+    adj: Dict[str, List[str]] = {n["id"]: [] for n in nodes}
+    in_deg: Dict[str, int] = {n["id"]: 0 for n in nodes}
+    for e in edges:
+        adj.setdefault(e["from"], []).append(e["to"])
+        in_deg[e["to"]] = in_deg.get(e["to"], 0) + 1
+
+    q = deque([nid for nid, d in in_deg.items() if d == 0])
+    level: Dict[str, int] = {nid: 0 for nid in q}
+    while q:
+        u = q.popleft()
+        for v in adj.get(u, []):
+            in_deg[v] -= 1
+            if in_deg[v] == 0:
+                level[v] = level[u] + 1
+                q.append(v)
+
+    col_counter: Dict[int, int] = {}
+    for n in nodes:
+        row = level.get(n["id"], 0)
+        n["row"] = row
+        n["col"] = col_counter.get(row, 0)
+        col_counter[row] = col_counter.get(row, 0) + 1
+    return nodes
+
+
+# ---------------------------------------------------------------------------
+# Grid cell layout — compute cell sizes, position elements centered
+# ---------------------------------------------------------------------------
+
+
+def compute_grid_cells(
+    nodes: List[Dict[str, Any]], padding_x: float = 40, padding_y: float = 60
+) -> Tuple[Dict[int, float], Dict[int, float]]:
+    """Compute cell dimensions (w, h) from max width/height per column/row."""
+    col_max_w: Dict[int, float] = {}
+    row_max_h: Dict[int, float] = {}
+    for n in nodes:
+        c, r = n.get("col", 0), n.get("row", 0)
+        col_max_w[c] = max(col_max_w.get(c, 0), n["width"])
+        row_max_h[r] = max(row_max_h.get(r, 0), n["height"])
+    return (
+        {c: w + padding_x for c, w in col_max_w.items()},
+        {r: h + padding_y for r, h in row_max_h.items()},
+    )
+
+
+def position_elements(
+    nodes: List[Dict[str, Any]],
+    cell_w: Dict[int, float],
+    cell_h: Dict[int, float],
+    start_offset: Tuple[float, float] = (120, 140),
+) -> List[Dict[str, Any]]:
+    """Center each element within its grid cell. Adds 'x', 'y', 'bbox'."""
+    ox, oy = start_offset
+    for n in nodes:
+        col, row = n.get("col", 0), n.get("row", 0)
+        gx = ox + sum(cell_w.get(c, 0) for c in range(col))
+        gy = oy + sum(cell_h.get(r, 0) for r in range(row))
+        n["x"] = gx + (cell_w[col] - n["width"]) / 2
+        n["y"] = gy + (cell_h[row] - n["height"]) / 2
+        n["bbox"] = (n["x"], n["y"], n["width"], n["height"])
+    return nodes
+
+
+def align_rows(nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Vertically center all nodes in each row to the same y."""
+    rows: Dict[int, List[Dict[str, Any]]] = {}
+    for n in nodes:
+        rows.setdefault(n["row"], []).append(n)
+    for rn in rows.values():
+        max_h = max(n["height"] for n in rn)
+        base_y = min(n["y"] for n in rn)
+        for n in rn:
+            n["y"] = base_y + (max_h - n["height"]) / 2
+            n["bbox"] = (n["x"], n["y"], n["width"], n["height"])
+    return nodes
+
+
+def center_align_nodes(
+    nodes: List[Dict[str, Any]],
+    start_offset: Tuple[float, float] = (120, 140),
+    branch_gap: float = 240,
+    node_gap: float = 120,
+) -> List[Dict[str, Any]]:
+    """Position nodes by center_x per column and center_y per row."""
+    ox, oy = start_offset
+    col_mw: Dict[int, float] = {}
+    for n in nodes:
+        col_mw[n["col"]] = max(col_mw.get(n["col"], 0), n["width"])
+    for n in nodes:
+        cl = ox + n["col"] * branch_gap
+        n["x"] = cl + col_mw[n["col"]] / 2 - n["width"] / 2
+        n["y"] = oy + n["row"] * node_gap - n["height"] / 2
+        n["bbox"] = (n["x"], n["y"], n["width"], n["height"])
+    return nodes
+
+
+def enforce_column_gap(
+    nodes: List[Dict[str, Any]], min_gap: float = 140
+) -> float:
+    """Ensure minimum gap between col 0 and col 1. Shifts col 1 if needed.
+
+    Returns corridor_x (midpoint between the two columns).
+    """
+    c0 = [n for n in nodes if n.get("col") == 0]
+    c1 = [n for n in nodes if n.get("col") == 1]
+    if not c0 or not c1:
+        return 0
+    c0r = max(n["x"] + n["width"] for n in c0)
+    c1l = min(n["x"] for n in c1)
+    if c1l - c0r < min_gap:
+        shift = min_gap - (c1l - c0r)
+        for n in c1:
+            n["x"] += shift
+            n["bbox"] = (n["x"], n["y"], n["width"], n["height"])
+    c0r = max(n["x"] + n["width"] for n in c0)
+    c1l = min(n["x"] for n in c1)
+    return (c0r + c1l) / 2

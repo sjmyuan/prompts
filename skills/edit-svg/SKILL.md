@@ -60,6 +60,16 @@ description: Create SVG diagrams with professional PPT-quality layout, clear con
 
 **Multi-port connection system**: Each edge of a node has multiple fixed connection ports (default 3 per side: left, center, right for top/bottom; top, center, bottom for left/right). When allocating edges to ports, each port can be used by at most one line per node per side. Lines pick the closest unused port to minimize turning points. See [reference/diagram-workflow.md](reference/diagram-workflow.md) for detailed port allocation rules and API reference.
 
+**12-point connection system (flowchart routing)**: For precise edge routing, use **12 fixed connection points** — 3 per side named `<Side>-<SubPos>` (e.g., `B-L`, `B-C`, `B-R` for bottom; `R-T`, `R-C`, `R-B` for right). StepX = width/4, StepY = height/4. See [reference/create-flowchart.md](reference/create-flowchart.md) for the full geometry and naming convention.
+
+**8-scenario edge routing**: Classify each edge into one of 8 spatial scenarios based on relative row/col positions. Each scenario has a **primary** (preferred) and **secondary** (fallback) connection scheme. See [reference/create-flowchart.md](reference/create-flowchart.md) Phase 4 for the complete routing table with path patterns.
+
+**Path selection scoring**: When generating connection paths for flowcharts, generate candidates in priority order: straight (0 turns) → L1 path (1 turn, primary) → L2 path (1 turn, alternate) → Z-shape (2 turns) → perimeter (fallback). Score each candidate by: **(1) element obstacle** → disqualify if path passes through any node; **(2) parallel line overlap** → count overlaps with placed edges; **(3) turn count** → prefer fewer turns. Select the lowest-scored passable path. See [reference/create-flowchart.md](reference/create-flowchart.md) Phase 5 for the detailed algorithm.
+
+**Topological sort for auto row assignment**: When `row`/`col` values are not provided, use **Kahn's algorithm** to auto-assign rows based on the dependency graph. Build adjacency from edges, compute in-degree for each node, then BFS from zero-in-degree nodes, assigning each successive level as the next row. Same-level nodes get sequential columns by input order. See [reference/create-flowchart.md](reference/create-flowchart.md) Phase 1 for the implementation.
+
+**Overlap detection and resolution**: After routing each edge, register its segments in an **OccupiedLanes** table (horizontal segments keyed by y, vertical by x). When a candidate path has parallel overlaps with placed edges, apply **micro-offset** (10px shift in a free direction) with vertical transition segments. See [reference/create-flowchart.md](reference/create-flowchart.md) Phase 6.
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -78,6 +88,7 @@ description: Create SVG diagrams with professional PPT-quality layout, clear con
 | Creating or modifying a scripted diagram | Edge routing, corridor strategy, standalone scripts, validation, row alignment, side specs | [reference/diagram-workflow.md](reference/diagram-workflow.md) |
 | Modifying or upgrading an existing SVG | Modification workflow, PPT upgrade steps | [reference/modify-existing-svg.md](reference/modify-existing-svg.md) |
 | Need design standards or example output | PPT design rules and diagram examples | [reference/design-standards.md](reference/design-standards.md) and [examples/](examples/) |
+| Creating a complex multi-branch flowchart with feedback loops | Topological sort, 8-scenario routing, path selection scoring, corridor strategy, overlap resolution | [reference/create-flowchart.md](reference/create-flowchart.md) and [examples/flowchart-algorithm-example.md](examples/flowchart-algorithm-example.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -90,16 +101,19 @@ Generate a PPT-quality diagram for script-based types (flowchart, architecture, 
 1. **Identify diagram type and extract content**: Determine type and extract nodes, connections, etc. Determine a diagram title.
 2. **Load the type-specific reference**: Load the corresponding file from `<context-loading-guide>`.
 3. **Create standalone script file**: Generate a `.py` file (e.g., `generate_diagram.py`). Read [reference/computation-snippets.md](reference/computation-snippets.md) for script patterns. See [reference/diagram-workflow.md](reference/diagram-workflow.md) for the standalone script approach.
-4. **Build node/edge data**: Construct `nodes[]` and `edges[]` in the script.
+4. **Build node/edge data**: Construct `nodes[]` and `edges[]` in the script. If `row`/`col` values are not explicitly provided, apply **topological sort** (Kahn's algorithm) to auto-assign rows based on edge dependency graph. See [reference/create-flowchart.md](reference/create-flowchart.md) Phase 1.
 5. **Compute positions**: Compute node dimensions first (handle multi-line text by measuring the longest line). Position all nodes by **center_x per column** and **center_y per row**:
    - For each column, find `max_width`. Compute `col_center_x = col_left + max_width / 2`. Set each node's `x = col_center_x - node_width / 2`.
    - For each row, compute `center_y = start_y + row * node_gap`. Set each node's `y = center_y - node_height / 2`.
    - This ensures both horizontal (within column) and vertical (within row) center alignment.
-6. **Route connections**: Classify each edge by spatial relationship.
-   - **Same column, forward**: Detect intermediate nodes with `skip_count`. Use straight line (no intermediates, same center_x), L-shape (1 turn, no intermediates, different center_x), or Z-shape (2+ turns, has intermediates).
-   - **Cross-column feedback**: Use **multi-lane corridor strategy** — assign each edge its own x-lane in the gap corridor (18px spacing between lanes) and stagger y-levels when multiple edges exit from the same node side.
-   - After routing, verify **turning point clearance**: no turning point should share x with any node's left/right edge nor y with any node's top/bottom edge. Add short approach segments (6-10px) to disconnect horizontal segments from element edges.
-   - Verify with `endpoint_valid()` on every edge. Run `detect_intersections()`. See [reference/diagram-workflow.md](reference/diagram-workflow.md) for side specification rules.
+6. **Route connections**: Classify each edge into one of **8 spatial scenarios** by relative row/col position (SAME_COL_DOWN, SAME_COL_UP, SAME_ROW_RIGHT, SAME_ROW_LEFT, DIAG_DOWN_RIGHT, DIAG_DOWN_LEFT, DIAG_UP_RIGHT, DIAG_UP_LEFT). Apply **path selection scoring**:
+   - Generate candidates in priority: straight (0 turns) → L1 primary (1 turn) → L2 alternate (1 turn) → Z-shape (2 turns) → perimeter (fallback).
+   - Score each candidate: disqualify if path passes through any node; count parallel overlaps with placed edges; prefer fewer turns.
+   - Select the lowest-scored valid path.
+   - For cross-column feedback, use **multi-lane corridor strategy** — assign each edge its own x-lane in the gap corridor (18px spacing between lanes) and stagger y-levels when multiple edges exit from the same node side.
+   - After routing, verify **turning point clearance**: no turning point should share x with any node's left/right edge nor y with any node's top/bottom edge. Use short approach segments (≥15px, validated by `endpoint_valid()`) to disconnect horizontal segments from element edges.
+   - Register each placed edge's segments in an **OccupiedLanes** table. Resolve parallel overlaps with **micro-offset** (10px shift).
+   - Verify with `endpoint_valid()` on every edge. Run `detect_intersections()`. See [reference/diagram-workflow.md](reference/diagram-workflow.md) for side specification rules. See [reference/create-flowchart.md](reference/create-flowchart.md) for the complete routing algorithm.
 7. **Generate SVG elements**: Call `generate_node_svg()` for each node (or custom multi-line node SVG with `dy`-based `<tspan>` positioning). Call `generate_edge_svg()` for each edge. For charts, use `chart_builder.render_*_chart()`.
 8. **Generate defs and decorations**: Call `get_shadow_filter()`, `get_gradient_defs()`, `generate_arrow_marker()`, `generate_title_bar()`.
 9. **Write SVG and run**: Assemble fragments following the **SVG assembly pattern**. Save to `.svg` file. Run `python3 generate_diagram.py`.

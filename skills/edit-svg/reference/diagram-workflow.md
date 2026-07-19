@@ -92,43 +92,74 @@ Verify with: for each node the last horizontal segment enters, the segment's y m
 
 ## Column Gap Enforcement
 
-`flow_layout()` computes column positions based on `branch_gap` but the resulting gap may be insufficient for corridor-routed diagrams. Always verify and enforce a minimum gap:
+`flow_layout()` may place columns too close. Enforce a minimum gap for corridor routing.
 
 ```python
-col0_right = max(n['x'] + n['width'] for n in col0_nodes)
-col1_left = min(n['x'] for n in col1_nodes)
-MIN_GAP = 140  # Minimum for corridor routing with labels
-if col1_left - col0_right < MIN_GAP:
-    shift = MIN_GAP - (col1_left - col0_right)
-    for n in col1_nodes:
-        n['x'] += shift
-        n['bbox'] = (n['x'], n['y'], n['width'], n['height'])
-# Recompute corridor_x AFTER shifting
-col0_right = max(n['x'] + n['width'] for n in col0_nodes)
-col1_left = min(n['x'] for n in col1_nodes)
-corridor_x = (col0_right + col1_left) / 2
+from graph_layout import enforce_column_gap
+
+corridor_x = enforce_column_gap(nodes, min_gap=140)  # Returns corridor_x
 ```
 
-Use 140–160px for diagrams with corridor-routed edges and CJK labels; use 100–120px for diagrams with only forward edges.
+Use 140–160px for corridor-routed diagrams with CJK labels; use 100–120px for forward-only diagrams.
 
 ## Manual Label Placement for Complex Edges
 
-For cross-column feedback edges, backward edges, and edges with long labels, automatic label placement via `labeling.py` frequently produces node overlaps. Prefer explicit per-edge position computation:
+For cross-column feedback edges, prefer explicit position computation over automatic placement.
 
 ```python
-# For labels on vertical corridor segments (most reliable):
-wps = edge['path']
-my = (wps[1][1] + wps[2][1]) / 2  # midpoint of vertical segment
-lw, lh = est_label_dims(label, fs=11)
-mx = wps[1][0] + lw/2 + 8  # offset right of the vertical line
+from labeling import compute_label_position, label_overlaps_node
 
-# For labels on horizontal segments below/above nodes:
-hy = wps[2][1]  # y of the horizontal segment
-hx_mid = (wps[1][0] + wps[2][0]) / 2
-label_y = hy - 10  # above the horizontal line
+lx, ly, lw, lh = compute_label_position(edge['waypoints'], label, font_size=11)
+if not label_overlaps_node((lx, ly, lw, lh), all_nodes):
+    # Safe to place label at (lx, ly)
 ```
 
-After placing each label, verify it doesn't overlap any node bbox. For labels on the same row as nodes, ensure the label y-range is entirely above or below all nodes in that row.
+The function places labels on vertical corridor segments (offset right) or horizontal segments (offset above).
+
+## 12-Point Connection System (Flowchart Routing)
+
+Each node has **12 fixed connection points** — 3 per side with standardized naming. This enables fine-grained port allocation for multi-edge scenarios.
+
+### Naming Convention
+
+```
+      T-L      T-C      T-R
+       ┌─────────────────┐
+  L-T  │                 │  R-T
+  L-C  │    Element      │  R-C
+  L-B  │    Center       │  R-B
+       └─────────────────┘
+      B-L      B-C      B-R
+```
+
+Format: `<Side>-<SubPos>` where:
+- **Side**: T (top), B (bottom), L (left), R (right)
+- **SubPos**: L/C/R for top/bottom edges; T/C/B for left/right edges
+
+### Geometry
+
+```python
+stepX = node_width / 4   # horizontal thirds on top/bottom
+stepY = node_height / 4  # vertical thirds on left/right
+cx, cy = node_center
+
+T-L = (cx - stepX, y),     T-C = (cx, y),      T-R = (cx + stepX, y)
+B-L = (cx - stepX, y+height), B-C = (cx, y+height), B-R = (cx + stepX, y+height)
+L-T = (x, cy - stepY),     L-C = (x, cy),      L-B = (x, cy + stepY)
+R-T = (x+width, cy - stepY), R-C = (x+width, cy), R-B = (x+width, cy + stepY)
+```
+
+### Port Allocation Priority
+
+When multiple edges share the same side:
+1. **1 edge** → center port (B-C, T-C, L-C, R-C)
+2. **2 edges** → center + left/top (B-C+B-L, T-C+T-L, L-C+L-T, R-C+R-T)
+3. **3 edges** → left/top + center + right/bottom (all three ports used)
+4. **4+ edges** → interpolate between existing ports
+
+See [reference/create-flowchart.md](reference/create-flowchart.md) for the **8-scenario routing table** and **path selection algorithm**.
+
+---
 
 ## Connection Port Allocation (Multi-Port Connection System)
 
@@ -236,66 +267,30 @@ Fix issues in the script and re-run. Repeat until all visual quality criteria ar
 
 ## Column & Row Center Alignment
 
-All nodes must be centered both **horizontally (within column)** and **vertically (within row)**. Do NOT position by top/left edges — position by centers.
-
-### Per-column horizontal centering
-1. Compute dimensions for all nodes first.
-2. For each column, find the maximum node width.
-3. Compute column center x: `col_center_x = col_left + max_width_in_col / 2`.
-4. Set each node's x: `node['x'] = col_center_x - node['width'] / 2`.
-
-This ensures all nodes in the same column share an identical `center_x` regardless of their individual widths.
-
-### Per-row vertical centering
-1. For each row, compute `center_y = start_y + row * node_gap`.
-2. Set each node's y: `node['y'] = center_y - node['height'] / 2`.
-
-This ensures all nodes in the same row share an identical `center_y`. Nodes with different heights (e.g., 48px single-line vs 60px multi-line) are automatically centered.
-
-### Combined result
-```python
-col_max_width = {}
-for n in nodes:
-    col_max_width[n['col']] = max(col_max_width.get(n['col'], 0), n['width'])
-
-for n in nodes:
-    col_left = start_offset[0] + n['col'] * branch_gap
-    col_center_x = col_left + col_max_width[n['col']] / 2
-    n['x'] = col_center_x - n['width'] / 2
-    center_y = start_offset[1] + n['row'] * node_gap
-    n['y'] = center_y - n['height'] / 2
-    n['bbox'] = (n['x'], n['y'], n['width'], n['height'])
-```
-
-### Edge routing for same-column forward edges
-After centering, same-column nodes have identical `center_x`. This means forward edges between adjacent rows can be **straight vertical lines** (no turns needed). However, when nodes in the same column have differing `center_x` due to previous non-centered layouts, apply **skip detection**:
+All nodes must be centered both **horizontally (within column)** and **vertically (within row)**.
 
 ```python
-def route_same_column(src_node, dst_node, skip_count=0):
-    sx = src_node['x'] + src_node['width'] / 2
-    sy = src_node['y'] + src_node['height']
-    dx = dst_node['x'] + dst_node['width'] / 2
-    dy = dst_node['y']
-    if abs(sx - dx) < 2:
-        if skip_count > 0:
-            # Has intermediate nodes → Z-shape with 2 turns
-            off = 25
-            mid_y = (sy + dy) / 2
-            return [(sx, sy), (sx+off, sy), (sx+off, mid_y), (sx-off, mid_y), (sx-off, dy), (sx, dy)]
-        else:
-            # No intermediate → straight line
-            return [(sx, sy), (dx, dy)]
-    else:
-        if skip_count > 0:
-            # Has intermediate → Z-shape at clearance
-            mid_y = sy + 20
-            return [(sx, sy), (sx, mid_y), (dx, mid_y), (dx, dy)]
-        else:
-            # No intermediate → L-shape (1 turn), horizontal first
-            return [(sx, sy), (dx, sy), (dx, dy)]
+from graph_layout import center_align_nodes
+
+nodes = center_align_nodes(nodes, start_offset=(120, 140), branch_gap=240, node_gap=120)
 ```
 
-`skip_count` = number of nodes in the same column whose rows lie between source and destination rows.
+All same-column nodes get identical `center_x`; all same-row nodes get identical `center_y`.
+
+### Edge routing for same-column forward edges (skip detection)
+
+After centering, same-column nodes share `center_x` so forward edges are straight vertical lines. When nodes differ or have intermediates, apply skip detection:
+
+```python
+from flowchart_routing import route_same_column
+
+# skip_count = number of nodes in same column with row between src and dst
+path = route_same_column(src_node, dst_node, skip_count=skip_count)
+```
+
+- **No intermediate + same center_x** → straight line (0 turns)
+- **No intermediate + different center_x** → L-shape (1 turn, horizontal-first)
+- **Has intermediate** → Z-shape (2+ turns) with clearance from intermediate nodes
 
 ## Edge Connection Routing — Side Specification Rules
 

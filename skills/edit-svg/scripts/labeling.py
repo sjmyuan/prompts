@@ -227,3 +227,48 @@ def compute_all_labels(
         placed_label_bboxes.append(result["bg_rect"])
 
     return labels
+
+
+# ---------------------------------------------------------------------------
+# Quick label dimension estimation & manual placement (for cross-column edges)
+# ---------------------------------------------------------------------------
+
+
+def est_label_dims(label: str, font_size: float = 11) -> Tuple[float, float]:
+    """Estimate label (width, height) from text length. CJK = double width."""
+    eff = sum(2 if ord(c) > 0x2E80 else 1 for c in label)
+    return (eff * 7 + 8, font_size + 8)
+
+
+def compute_label_position(
+    waypoints: List[Tuple[float, float]],
+    label: str,
+    font_size: float = 11,
+) -> Tuple[float, float, float, float]:
+    """Compute label (x, y, w, h) on a path, avoiding node overlap.
+
+    Places on the vertical corridor segment (waypoints[1]→[2]) offset right,
+    or on the last horizontal segment offset above as fallback.
+    """
+    lw, lh = est_label_dims(label, font_size)
+    if len(waypoints) >= 3:
+        my = (waypoints[1][1] + waypoints[2][1]) / 2
+        return (waypoints[1][0] + lw / 2 + 8, my - lh / 2, lw, lh)
+    if len(waypoints) >= 2:
+        mx = (waypoints[-2][0] + waypoints[-1][0]) / 2
+        my = (waypoints[-2][1] + waypoints[-1][1]) / 2
+        return (mx - lw / 2, my - 10 - lh, lw, lh)
+    return (0, 0, lw, lh)
+
+
+def label_overlaps_node(
+    label_bbox: Tuple[float, float, float, float],
+    nodes: List[Dict[str, Any]],
+) -> bool:
+    """Check if label bbox overlaps any node bbox."""
+    lx, ly, lw, lh = label_bbox
+    for n in nodes:
+        nx, ny, nw, nh = n["bbox"]
+        if not (lx + lw < nx or lx > nx + nw or ly + lh < ny or ly > ny + nh):
+            return True
+    return False
