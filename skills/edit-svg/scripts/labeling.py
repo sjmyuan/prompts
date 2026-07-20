@@ -13,12 +13,8 @@ from geometry import (
     Point,
     overlap_with_margin,
     find_overlapping,
-    overlap,
-    bbox_to_rect,
-    center,
 )
 from routing import (
-    longest_straight_segment,
     midpoint_of_segment,
     segment_is_horizontal,
 )

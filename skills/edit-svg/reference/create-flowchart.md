@@ -6,7 +6,7 @@ Load [reference/computation-snippets.md](reference/computation-snippets.md) and 
 
 Also load [reference/diagram-workflow.md](reference/diagram-workflow.md) for routing rules, multi-port allocation, and side-entry avoidance.
 
-The full algorithm code is in [scripts/flowchart_routing.py](scripts/flowchart_routing.py) (path selection, obstacle detection, overlap tracking) and [scripts/graph_layout.py](scripts/graph_layout.py) (topological sort, grid layout, column gap). Import functions from these into your standalone scripts.
+The full algorithm code is in [scripts/routing.py](scripts/routing.py) (scenario classification, path selection, obstacle detection, overlap tracking) and [scripts/graph_layout.py](scripts/graph_layout.py) (topological sort, grid layout, column gap). Import functions from these into your standalone scripts.
 
 ## Node Types & Colors
 
@@ -84,11 +84,11 @@ Each element has **12 fixed connection points** — 3 per side:
 
 ---
 
-## Phase 4: 8-Scenario Edge Routing
+## Phase 4: 16-Scenario Edge Routing (8 Base + 8 Obstacle Variants)
 
-Classify each edge into one of 8 spatial scenarios using `classify_edge(src_node, dst_node)` from `scripts/flowchart_routing.py`.
+Classify each edge into one of 8 spatial scenarios using `classify_edge(src_node, dst_node)` from `scripts/routing.py`. The obstacle-aware path selection in `generate_candidates()` then detects intermediate nodes and upgrades the path if needed — producing 8 additional obstacle variants automatically.
 
-### Scenario Routing Table
+### Base Scenario Routing Table (No Obstacles)
 
 | # | Scenario | Primary src→dst | Turns | Secondary src→dst | Turns |
 |---|---|---|---|---|---|
@@ -100,6 +100,21 @@ Classify each edge into one of 8 spatial scenarios using `classify_edge(src_node
 | 6 | DIAG_DOWN_LEFT | L-C → T-C | 1 | B-C → R-C | 1 |
 | 7 | DIAG_UP_RIGHT | R-C → B-C | 1 | T-C → L-C | 1 |
 | 8 | DIAG_UP_LEFT | L-C → B-C | 1 | T-C → R-C | 1 |
+
+### Obstacle Variant Routing (Intermediate Nodes Detected)
+
+When intermediate nodes (elements strictly between src and dst in the grid) block the base path, the path is upgraded automatically by `generate_candidates()`:
+
+| Base # | Original Path | Obstacle Behavior | Upgraded To | Turns |
+|--------|-------------|-------------------|-------------|-------|
+| 1, 2 | Straight (0 turns) | Intermediate node blocks direct vertical line | Z-shape via RIGHT or LEFT bypass | 2 |
+| 3, 4 | Straight (0 turns) | Intermediate node blocks direct horizontal line | Z-shape via BOTTOM or TOP bypass | 2 |
+| 5–8 | L1/L2 (1 turn) | L1 blocked by node at (src.row, dst.col) or (dst.row, src.col) | Try L2; if both blocked → Z-shape | 1→2 |
+| 5–8 | Both L1+L2 blocked | Obstacles in both intermediate grid cells | Z-shape extending past obstacles | 2 |
+
+**Key principle for straight-line scenarios**: When a same-column/same-row edge is blocked by an intermediate node, the path **skips L-shape** and goes directly to Z-shape (2 turns). A 1-turn L-shape cannot resolve collinear blocking because both the exit and entry sides are on the same axis — there is no orthogonal axis to route through in a single turn without passing through the blocker.
+
+**Key principle for diagonal scenarios**: Follow L1→L2→Z→perimeter escalation. `generate_candidates()` automatically includes all options; `select_best_path()` disqualifies blocked ones.
 
 **Sub-point hint**: For diagonals, prefer the sub-point closest to target (e.g., R-B+T-R for DIAG_DOWN_RIGHT).
 
@@ -123,11 +138,25 @@ SAME_COL_DOWN    SAME_ROW_RIGHT    DIAG_DOWN_RIGHT    DIAG_DOWN_LEFT
 ### Candidate Priority
 Use `generate_candidates(scenario, src, dst, all_nodes)` to produce paths in this priority order:
 
-1. **Straight** (0 turns) — only for same-row/same-col scenarios
+1. **Straight** (0 turns) — only for same-row/same-col scenarios; detected as blocked → skip to Z-shape
 2. **L1 primary** (1 turn) — primary L-shape for diagonals
 3. **L2 alternate** (1 turn) — secondary L-shape for diagonals
-4. **Z-shape** (2 turns) — navigates around obstacles via extension
+4. **Z-shape** (2 turns) — for straight-line obstacles; or diagonal obstacles after L1/L2 fail
 5. **Perimeter** (fallback) — routes around all nodes
+
+### Obstacle Detection Flow
+
+For each candidate path, `generate_candidates()` checks if intermediate nodes exist between src and dst:
+
+- **Straight-line scenarios** (SAME_COL_DOWN/UP, SAME_ROW_RIGHT/LEFT):
+  - Build the straight path, then `segment_intersects_element()` against all intermediate nodes
+  - If ANY intermediate node blocks → disqualify straight, `build_Z_path_for_straight()` generates right/left bypass (col) or bottom/top bypass (row)
+  - L-shape is NOT attempted because 1 turn cannot resolve collinear blocking
+
+- **Diagonal scenarios** (DIAG_DOWN_RIGHT/LEFT, DIAG_UP_RIGHT/LEFT):
+  - L1 and L2 are both generated as candidates
+  - `select_best_path()` disqualifies any that hit obstacles
+  - If both blocked → Z-shape is selected (or perimeter as fallback)
 
 ### Scoring
 Use `select_best_path(candidates, all_nodes, src, dst, placed_edges)`:
@@ -140,9 +169,11 @@ Use `select_best_path(candidates, all_nodes, src, dst, placed_edges)`:
 | Function | Purpose |
 |---|---|
 | `segment_intersects_element(seg_start, seg_end, bbox)` | Check if a path segment crosses any node interior |
+| `_detect_intermediate_nodes(src_node, dst_node, all_nodes)` | Find all nodes strictly between src and dst in the grid |
 | `select_best_path(candidates, all_nodes, src, dst, placed_edges)` | Score and pick the best path |
-| `generate_candidates(scenario, src, dst, all_nodes)` | Generate paths in priority order |
-| `build_Z_path(src, dst, scenario, all_nodes)` | Z-shaped 2-turn path around obstacles |
+| `generate_candidates(scenario, src, dst, all_nodes)` | Generate paths in priority order (obstacle-aware) |
+| `build_Z_path(src, dst, scenario, all_nodes)` | Z-shaped 2-turn path around diagonal obstacles |
+| `build_Z_path_for_straight(src, dst, scenario, all_nodes)` | Z-shaped 2-turn path for straight-line obstacles (same-col/row) |
 | `build_perimeter_path(src, dst, all_nodes)` | Fallback routing around all nodes |
 
 ---
@@ -156,7 +187,7 @@ Track placed edge segments to detect parallel overlaps. Create an `OccupiedLanes
 Overlap types: **parallel** (same y/x with overlapping range → resolve with micro-offset), **vertical cross** (allowed), **tight parallel** (avoid or merge).
 
 ```python
-from flowchart_routing import OccupiedLanes, compute_segments
+from routing import OccupiedLanes, compute_segments
 
 lanes = OccupiedLanes()
 for edge in routed_edges:

@@ -63,6 +63,11 @@ def find_overlapping(
     ]
 
 
+def cjk_len(text: str) -> int:
+    """Compute effective length of text counting CJK chars as double width."""
+    return sum(2 if ord(c) > 0x2E80 else 1 for c in text)
+
+
 def distance(p1: Point, p2: Point) -> float:
     """Euclidean distance between two points."""
     return math.hypot(p2[0] - p1[0], p2[1] - p1[1])
@@ -111,9 +116,13 @@ def connection_point(bbox: BBox, side: str) -> Point:
 def get_side_ports(bbox: BBox, side: str, count: int = 3) -> List[Point]:
     """Return N evenly distributed connection ports on a given edge of a bounding box.
 
-    Ports are distributed from edge-start to edge-end (inclusive of both ends
-    when count >= 2). This gives lines multiple fixed attachment points to
-    choose from instead of all converging at the center.
+    Ports are inset from corners using (i+1)/(count+1) distribution, matching
+    the 25%/50%/75% positions described in the flowchart algorithm (flowchart.md
+    \u00a73.2). This avoids placing ports at element corners (where they would
+    visually overlap with border lines).
+
+    For count=3, ports are at 25%, 50%, 75% of the edge length.
+    For count=1, the single port is at 50% (center) of the edge.
 
     Args:
         bbox: (x, y, w, h)
@@ -129,19 +138,19 @@ def get_side_ports(bbox: BBox, side: str, count: int = 3) -> List[Point]:
 
     if side == "top":
         for i in range(count):
-            frac = i / (count - 1) if count > 1 else 0.5
+            frac = (i + 1) / (count + 1)
             ports.append((x + w * frac, y))
     elif side == "bottom":
         for i in range(count):
-            frac = i / (count - 1) if count > 1 else 0.5
+            frac = (i + 1) / (count + 1)
             ports.append((x + w * frac, y + h))
     elif side == "left":
         for i in range(count):
-            frac = i / (count - 1) if count > 1 else 0.5
+            frac = (i + 1) / (count + 1)
             ports.append((x, y + h * frac))
     elif side == "right":
         for i in range(count):
-            frac = i / (count - 1) if count > 1 else 0.5
+            frac = (i + 1) / (count + 1)
             ports.append((x + w, y + h * frac))
     else:
         raise ValueError(f"Unknown side for ports: {side}")
@@ -181,7 +190,7 @@ def find_closest_port(
 
     tx, ty = target_point
 
-    def _distance(idx: int) -> float:
+    def _port_cost(idx: int) -> float:
         px, py = ports[idx]
         if prefer_side in ("left", "right"):
             # Prefer ports whose y is closest to target y (horizontal alignment)
@@ -192,7 +201,7 @@ def find_closest_port(
         else:
             return math.hypot(px - tx, py - ty)
 
-    return min(candidates, key=_distance)
+    return min(candidates, key=_port_cost)
 
 
 def allocate_ports_for_edges(
@@ -296,18 +305,27 @@ def allocate_ports_for_edges(
 
 
 def closest_edge_point(bbox: BBox, target_point: Point) -> Point:
-    """Find the closest point on the edges of bbox to target_point."""
+    """Find the closest point on the edges of bbox to target_point.
+
+    Projects the target point onto each of the four edges and returns
+    the projected point with the smallest Euclidean distance.
+    """
     x, y, w, h = bbox
     tx, ty = target_point
-    # Clamp the target point to the bounding box edges
-    clamped_x = max(x, min(tx, x + w))
-    clamped_y = max(y, min(ty, y + h))
 
-    # Determine which edge the clamped point is on
-    if clamped_x == x or clamped_x == x + w:
-        return (clamped_x, clamped_y)
-    else:
-        return (clamped_x, clamped_y)
+    candidates = [
+        (tx, y),  # top edge (clamped horizontally)
+        (tx, y + h),  # bottom edge
+        (x, ty),  # left edge (clamped vertically)
+        (x + w, ty),  # right edge
+    ]
+    # Clamp each candidate to the extent of its edge
+    candidates[0] = (max(x, min(tx, x + w)), y)
+    candidates[1] = (max(x, min(tx, x + w)), y + h)
+    candidates[2] = (x, max(y, min(ty, y + h)))
+    candidates[3] = (x + w, max(y, min(ty, y + h)))
+
+    return min(candidates, key=lambda pt: (pt[0] - tx) ** 2 + (pt[1] - ty) ** 2)
 
 
 def segment_line_intersection(

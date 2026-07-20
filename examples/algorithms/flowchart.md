@@ -476,6 +476,364 @@ L2 方案（备选）:
 
 ---
 
+#### 场景 9~12：直线场景 + 中间有障碍元素
+
+当场景 1~4（同列/同排）的直线路径上存在其他元素时，直线路径被阻断，需要升级为 **Z 型路径（2 转折点）** 绕过障碍物。
+
+> **适用原则**：Straight → Z 型跳跃。不再试用 L 型（1 转折），因为直线场景的 A 和 B 在同列/同排，1 转折无法同时满足正交约束并从另一侧回到目标。
+
+#### 场景 9：同列_下 + 中间有障碍元素 O
+
+```
+A.row < B.row, A.col == B.col, ∃O 满足 A.row < O.row < B.row 且 O.col == A.col
+
+直线路径 (A.B-C → B.T-C) 被 O 阻挡
+
+Z1 方案（右绕，推荐优先）:
+  默认连接点: A.R-C → B.R-C
+  路径:  A.R-C → (O_right + margin, cy_A) → (O_right + margin, cy_B) → B.R-C
+  转折点: 2
+  说明: A 向右出 → 延伸到 O 右侧 → 向下到 B 行 → 从右侧进入 B
+
+Z2 方案（左绕，备选）:
+  默认连接点: A.L-C → B.L-C
+  路径:  A.L-C → (O.x - margin, cy_A) → (O.x - margin, cy_B) → B.L-C
+  转折点: 2
+  说明: A 向左出 → 延伸到 O 左侧 → 向下到 B 行 → 从左侧进入 B
+
+  示意图（Z1 右绕）:
+  ┌───┐
+  │ A │───┐
+  └───┘   │
+          │
+      ┌───┤        ← 障碍元素 O
+      │ O │
+      └───┤
+          │
+        ┌─┴───┐
+        │  B  │
+        └──┬──┘
+           │
+           ← 从右侧进入 B.R
+
+  简化 Z 型路径（Z1 的 2 转折变体，当 A 与 O 之间有足够空间）:
+  若 A 与 O 之间的垂直空间不足以容纳两条垂直段，
+  则合并为标准的 Z 型（2 转折）:
+  A.R-C → (O_right + margin, cy_A) → (O_right + margin, cy_B) → B.R-C
+  转折点: 2
+```
+
+#### 场景 10：同列_上 + 中间有障碍元素 O
+
+```
+A.row > B.row, A.col == B.col, ∃O 满足 B.row < O.row < A.row 且 O.col == A.col
+
+直线路径 (A.T-C → B.B-C) 被 O 阻挡
+
+Z1 方案（右绕）:
+  默认连接点: A.R-C → B.R-C
+  路径:  A.R-C → (O_right + margin, cy_A) → (O_right + margin, cy_B) → B.R-C
+  转折点: 2
+  说明: A 向右出 → 向上延伸到 O 右侧 → 向上到 B 行 → 从右侧进入 B
+
+Z2 方案（左绕）:
+  默认连接点: A.L-C → B.L-C
+  路径:  A.L-C → (O.x - margin, cy_A) → (O.x - margin, cy_B) → B.L-C
+  转折点: 2
+  说明: A 向左出 → 向上延伸到 O 左侧 → 向上到 B 行 → 从左侧进入 B
+
+  示意图（Z1 右绕）:
+        ┌───┐
+        │ B │
+        └─┬─┘
+          │
+          │
+    ├───┐ │              ← 障碍元素 O
+    │ O │ │
+    ├───┘ │
+          │
+  ┌─┴───┐ │
+  │ A───┼─┘
+  └─────┘
+```
+
+#### 场景 11：同排_右 + 中间有障碍元素 O
+
+```
+A.row == B.row, A.col < B.col, ∃O 满足 O.row == A.row 且 A.col < O.col < B.col
+
+直线路径 (A.R-C → B.L-C) 被 O 阻挡
+
+Z1 方案（下绕，推荐优先）:
+  默认连接点: A.B-C → B.T-C
+  路径:  A.B-C → (cx_A, O_bottom + margin) → (cx_B, O_bottom + margin) → B.T-C
+  转折点: 2
+  说明: A 向下出 → 向右延伸到 O 下方 → 向右到 B 列 → 向上进入 B
+
+Z2 方案（上绕，备选）:
+  默认连接点: A.T-C → B.T-C
+  路径:  A.T-C → (cx_A, O.y - margin) → (cx_B, O.y - margin) → B.T-C
+  转折点: 2
+  说明: A 向上出 → 向右延伸到 O 上方 → 向右到 B 列 → 从上方进入 B
+
+  示意图（Z1 下绕）:
+  ┌───┐    ┌───┐    ┌───┐
+  │ A │    │ O │    │ B │
+  └─┬─┘    └───┘    ┌─┴─┐
+    │               │   │
+    └───────────────┘   │
+                        │
+                    ← 从下方进入 B.T
+```
+
+#### 场景 12：同排_左 + 中间有障碍元素 O
+
+```
+A.row == B.row, A.col > B.col, ∃O 满足 O.row == A.row 且 B.col < O.col < A.col
+
+直线路径 (A.L-C → B.R-C) 被 O 阻挡
+
+Z1 方案（下绕）:
+  默认连接点: A.B-C → B.T-C
+  路径:  A.B-C → (cx_A, O_bottom + margin) → (cx_B, O_bottom + margin) → B.T-C
+  转折点: 2
+
+Z2 方案（上绕）:
+  默认连接点: A.T-C → B.T-C
+  路径:  A.T-C → (cx_A, O.y - margin) → (cx_B, O.y - margin) → B.T-C
+  转折点: 2
+  说明: A 向上出 → 向左延伸到 O 上方 → 向左到 B 列 → 从上方进入 B
+
+  示意图（Z1 下绕）:
+  ┌───┐    ┌───┐    ┌───┐
+  │ B │    │ O │    │ A │
+  ┌─┴─┐    └───┘    └─┬─┘
+  │   │               │
+  │   └───────────────┘
+  │
+  ← 从下方进入 B.T
+```
+
+---
+
+#### 场景 13~16：对角场景 + 中间有障碍元素
+
+当场景 5~8（对角方向）的 L 型路径被阻挡时，先尝试备选 L 型方案，若仍被阻挡则升级为 Z 型绕行。
+
+> **适用原则**：L1 → L2 → Z 型 → 绕边保底（逐级升级）
+
+#### 场景 13：右下 + 中间有障碍元素 O
+
+```
+A.row < B.row, A.col < B.col
+
+L1 路径 (A.R → B.T)：当 O 位于 (A.row, B.col) 格（即 A 行 B 列）时被阻挡
+  此时 L1 的水平段 (A.R → (cx_B, cy_A)) 穿过 O
+  解决方案：切换到 L2 方案 (A.B → B.L)
+
+L2 路径 (A.B → B.L)：当 O 位于 (B.row, A.col) 格（即 B 行 A 列）时被阻挡
+  此时 L2 的垂直段 (A.B → (cx_A, cy_B)) 穿过 O
+  解决方案：切换到 L1 方案 (A.R → B.T)
+
+L1 与 L2 均被阻挡：
+  升级为 Z 型绕行（参考 5.5 节）
+
+  Z1（先右再下再右）: A.R → (extend_x, cy_A) → (extend_x, cy_B) → B.R
+    extend_x = max(O_right) + margin  // 绕过所有障碍物右侧，从右侧进入 B
+
+  Z2（先下再右再下）: A.B → (cx_A, extend_y) → (cx_B, extend_y) → B.B
+    extend_y = max(O_bottom) + margin  // 绕过所有障碍物底部，从底部进入 B
+
+  示意图（L1 被挡 → 切换到 L2）:
+    初始 L1 被挡：
+    ┌───┐
+    │ A │───┐
+    └───┘   │
+            │
+      ┌─────┴─┐      ← O 在 (A.row, B.col) 阻挡了 L1
+      │   O   │
+      └───────┘
+          ┌───┐
+          │ B │
+          └───┘
+
+    切换到 L2：
+    ┌─────┐
+    │  A  │
+    └──┬──┘
+       │
+       │          ← L2 路径避开 O，走 A.B → (cx_A, cy_B) → B.L
+       └──────────┐
+             ┌────┤
+             │ B  │
+             └────┘
+```
+
+#### 场景 14：左下 + 中间有障碍元素 O
+
+```
+A.row < B.row, A.col > B.col
+
+L1 路径 (A.L → B.T)：当 O 位于 (A.row, B.col) 格时被阻挡
+  → 切换到 L2 方案 (A.B → B.R)
+
+L2 路径 (A.B → B.R)：当 O 位于 (B.row, A.col) 格时被阻挡
+  → 切换到 L1 方案 (A.L → B.T)
+
+L1 与 L2 均被阻挡：
+  Z1（先左再下再左）: A.L → (extend_x, cy_A) → (extend_x, cy_B) → B.L
+    extend_x = O.x - margin  // 绕过所有障碍物左侧，从左侧进入 B
+  
+  Z2（先下再左再下）: A.B → (cx_A, extend_y) → (cx_B, extend_y) → B.B
+    extend_y = max(O_bottom) + margin  // 绕过所有障碍物底部，从底部进入 B
+```
+
+#### 场景 15：右上 + 中间有障碍元素 O
+
+```
+A.row > B.row, A.col < B.col
+
+L1 路径 (A.R → B.B)：当 O 位于 (A.row, B.col) 格时被阻挡
+  → 切换到 L2 方案 (A.T → B.L)
+
+L2 路径 (A.T → B.L)：当 O 位于 (B.row, A.col) 格时被阻挡
+  → 切换到 L1 方案 (A.R → B.B)
+
+L1 与 L2 均被阻挡：
+  Z1（先右再上再右）: A.R → (extend_x, cy_A) → (extend_x, cy_B) → B.R
+    extend_x = max(O_right) + margin  // 绕过所有障碍物右侧，从右侧进入 B
+  
+  Z2（先上再右再上）: A.T → (cx_A, extend_y) → (cx_B, extend_y) → B.T
+    extend_y = O.y - margin  // 绕过所有障碍物顶部，从顶部进入 B
+```
+
+#### 场景 16：左上 + 中间有障碍元素 O
+
+```
+A.row > B.row, A.col > B.col
+
+L1 路径 (A.L → B.B)：当 O 位于 (A.row, B.col) 格时被阻挡
+  → 切换到 L2 方案 (A.T → B.R)
+
+L2 路径 (A.T → B.R)：当 O 位于 (B.row, A.col) 格时被阻挡
+  → 切换到 L1 方案 (A.L → B.B)
+
+L1 与 L2 均被阻挡：
+  Z1（先左再上再左）: A.L → (extend_x, cy_A) → (extend_x, cy_B) → B.L
+    extend_x = O.x - margin  // 绕过所有障碍物左侧，从左侧进入 B
+  
+  Z2（先上再左再上）: A.T → (cx_A, extend_y) → (cx_B, extend_y) → B.T
+    extend_y = O.y - margin  // 绕过所有障碍物顶部，从顶部进入 B
+```
+
+---
+
+### 4.4 多障碍物场景
+
+当 A 与 B 之间存在**多个障碍元素**时，路径选择策略如下：
+
+```
+function RouteWithMultipleObstacles(A, B, allElements, placedLines):
+    obstacles = FindElementsBetween(A, B, allElements)
+    
+    if obstacles is empty:
+        return RouteConnection(A, B, allElements, placedLines)  // 无障碍，走标准路径
+    
+    if IsStraightLineScenario(A, B):
+        // 场景 1~4 直线场景 → 直接升级到 Z 型绕行
+        return BuildZPathAroundAll(A, B, obstacles, placedLines)
+    
+    // 对角场景 → 先试 L1/L2，再升级
+    l1Path = BuildLPath(A, B, scenario, primary=true)
+    if not PathHasElementObstacle(l1Path, allElements, A, B):
+        return l1Path
+    
+    l2Path = BuildLPath(A, B, scenario, primary=false)
+    if not PathHasElementObstacle(l2Path, allElements, A, B):
+        return l2Path
+    
+    // L1/L2 均被挡 → Z 型绕行
+    zPath = BuildZPathAroundAll(A, B, obstacles, placedLines)
+    if zPath != null:
+        return zPath
+    
+    // 保底：绕边路由
+    return BuildPerimeterPath(A, B, allElements, placedLines)
+
+
+function FindElementsBetween(A, B, allElements):
+    // 找出所有位于 A 和 B 之间的元素
+    // 判断标准：元素完全或部分位于 A→B 的矩形区域内
+    between = []
+    minRow = min(A.row, B.row)
+    maxRow = max(A.row, B.row)
+    minCol = min(A.col, B.col)
+    maxCol = max(A.col, B.col)
+    
+    for each elem in allElements:
+        if elem == A or elem == B:
+            continue
+        if minRow <= elem.row <= maxRow and minCol <= elem.col <= maxCol:
+            between.push(elem)
+    
+    return between
+
+
+function BuildZPathAroundAll(A, B, obstacles, placedLines):
+    // 收集所有障碍物的边界信息
+    leftMost = min(obstacles[i].x)
+    rightMost = max(obstacles[i].x + obstacles[i].w)
+    topMost = min(obstacles[i].y)
+    bottomMost = max(obstacles[i].y + obstacles[i].h)
+    
+    // 生成四个方向的候选路径
+    candidates = []
+    
+    // 1. 向右绕过
+    if B.cx >= A.cx:  // B 在右侧或正下方
+        rightPath = BuildRightBypass(A, B, rightMost, obstacles)
+        candidates.push(rightPath)
+    
+    // 2. 向左绕过
+    if B.cx <= A.cx:  // B 在左侧或正下方
+        leftPath = BuildLeftBypass(A, B, leftMost, obstacles)
+        candidates.push(leftPath)
+    
+    // 3. 向下绕过
+    if B.cy >= A.cy:  // B 在下侧或正右方
+        downPath = BuildDownBypass(A, B, bottomMost, obstacles)
+        candidates.push(downPath)
+    
+    // 4. 向上绕过
+    if B.cy <= A.cy:  // B 在上侧或正左方
+        upPath = BuildUpBypass(A, B, topMost, obstacles)
+        candidates.push(upPath)
+    
+    // 选转折最少的路径
+    return SelectBestBypass(candidates)
+```
+
+**多障碍物绕行示意图（右下场景，中间有多个障碍块）**:
+
+```
+  ┌─────┐
+  │  A  │────────────────┐
+  └─────┘                │
+                         │
+  ┌─────┐  ┌─────┐       │     ← 多个障碍物阻挡了 L1/L2
+  │ O1  │  │ O2  │       │
+  └─────┘  └─────┘       │
+                         │
+                    ┌────┴────┐
+                    │    B    │←─── 从右侧绕入
+                    └─────────┘
+  
+  路径: A.R → (rightMost + margin, cy_A) → (rightMost + margin, cy_B) → B.L
+  绕过所有障碍物的最右侧边缘
+```
+
+---
+
 ## 五、障碍检测与路径升级
 
 ### 5.1 路径段定义
@@ -537,31 +895,47 @@ function PathHasObstacle(pathSegments, allElements, sourceElem, targetElem):
 ```
 function RouteConnection(A, B, allElements, placedLines, cellOccupancy):
     scenario = Classify(A, B)
+    isStraight = scenario in ["同列_下", "同列_上", "同排_右", "同排_左"]
+    isDiagonal = scenario in ["右下", "左下", "右上", "左上"]
     
     // 收集所有候选路径，按优先级排序
     candidates = []
     
-    // Step 1: 直线连接（0 转折）
-    if scenario in ["同列_下", "同列_上", "同排_右", "同排_左"]:
-        path = BuildStraightPath(A, B, scenario)
-        candidates.push((path, 0))  // (path, 优先级分: 越小越优先)
+    // Step 1: 直线连接（0 转折）— 仅用于无障碍的直线场景
+    if isStraight:
+        straightPath = BuildStraightPath(A, B, scenario)
+        if not PathHasElementObstacle(straightPath, allElements, A, B):
+            candidates.push((straightPath, 0))  // 无阻挡，0 转折最优
+        else:
+            // 直线有障碍 → 跳过直线方案，直接准备 Z 型绕行（跳过 L 型）
+            // 因为直线场景的 1 转折路径无法同时满足正交约束
+            zPath = BuildZPathForStraight(A, B, scenario, allElements, cellOccupancy)
+            if zPath != null:
+                candidates.push((zPath, 1))  // Z 型绕行作为首选
     
-    // Step 2: L 型（1 转折）
-    if scenario in ["右下", "左下", "右上", "左上"]:
+    // Step 2: L 型（1 转折）— 仅用于对角场景
+    if isDiagonal:
         l1Path = BuildLPath(A, B, scenario, primary=true)
         candidates.push((l1Path, 1))
         
         l2Path = BuildLPath(A, B, scenario, primary=false)
         candidates.push((l2Path, 2))
     
-    // Step 3: Z 型（2 转折）
-    zPath = BuildZPath(A, B, scenario, allElements, cellOccupancy)
-    if zPath != null:
-        candidates.push((zPath, 3))
+    // Step 3: Z 型（2 转折）— 对角场景的备选 + 直线场景无直线时的补充
+    if isDiagonal:
+        zPath = BuildZPath(A, B, scenario, allElements, cellOccupancy)
+        if zPath != null:
+            candidates.push((zPath, 3))
     
-    // Step 4: 保底 — 绕边路由
-    perimeterPath = BuildPerimeterPath(A, B, allElements)
-    candidates.push((perimeterPath, 4))
+    if not isStraight:
+        // 对角场景还有保底的 Z 型
+        perimeterPath = BuildPerimeterPath(A, B, allElements)
+        candidates.push((perimeterPath, 4))
+    else:
+        // 直线场景若尚未加入 Z 型（或 Z 型也无效），加绕边保底
+        if not any candidate is Z or perimeter:
+            perimeterPath = BuildPerimeterPath(A, B, allElements)
+            candidates.push((perimeterPath, 5))
     
     // 评分排序：元素阻挡一票否决，再按重叠数 + 优先级排序
     scored = []
@@ -629,6 +1003,70 @@ function BuildZPath(A, B, scenario, allElements, occupancy):
     
     // 其他场景类似处理...
     // 核心原则：在无障碍的方向上延伸出去，绕到障碍物外侧，再折回目标
+
+
+function BuildZPathForStraight(A, B, scenario, allElements, occupancy):
+    // 直线场景（同列/同排）中间有障碍物时的 Z 型绕行
+    // 与对角场景不同，直线场景没有 L 型过渡方案，直接从直线跳 Z 型
+    // 接入原则：从哪侧绕过障碍物，就从 B 的同一侧进入
+    
+    if scenario == "同列_下":
+        obstacles = FindElementsBetween(A, B, allElements)
+        if obstacles not empty:
+            // Z1（右绕）: A.R → (ex, cy_A) → (ex, cy_B) → B.R
+            // 从右侧绕过 O，从右侧进入 B
+            rightMost = max(obs.x + obs.w for obs in obstacles)
+            ex = rightMost + margin
+            return [A.R, (ex, cy_A), (ex, cy_B), B.R]
+        
+        // Z2（左绕）: A.L → (ex, cy_A) → (ex, cy_B) → B.L
+        // 从左侧绕过 O，从左侧进入 B
+        leftMost = min(obs.x for obs in obstacles)
+        ex = leftMost - margin
+        return [A.L, (ex, cy_A), (ex, cy_B), B.L]
+    
+    if scenario == "同列_上":
+        obstacles = FindElementsBetween(A, B, allElements)
+        if obstacles not empty:
+            // Z1（右绕）: A.R → (ex, cy_A) → (ex, cy_B) → B.R
+            rightMost = max(obs.x + obs.w for obs in obstacles)
+            ex = rightMost + margin
+            return [A.R, (ex, cy_A), (ex, cy_B), B.R]
+        
+            // Z2（左绕）: A.L → (ex, cy_A) → (ex, cy_B) → B.L
+            leftMost = min(obs.x for obs in obstacles)
+            ex = leftMost - margin
+            return [A.L, (ex, cy_A), (ex, cy_B), B.L]
+    
+    if scenario == "同排_右":
+        obstacles = FindElementsBetween(A, B, allElements)
+        if obstacles not empty:
+            // Z1（下绕）: A.B → (cx_A, ey) → (cx_B, ey) → B.T
+            // 从下方绕过 O，从上方进入 B（向上进入 B.T）
+            bottomMost = max(obs.y + obs.h for obs in obstacles)
+            ey = bottomMost + margin
+            return [A.B, (cx_A, ey), (cx_B, ey), B.T]
+        
+        // Z2（上绕）: A.T → (cx_A, ey) → (cx_B, ey) → B.T
+        // 从上方绕过 O，从上方进入 B（向下进入 B.T）
+        topMost = min(obs.y for obs in obstacles)
+        ey = topMost - margin
+        return [A.T, (cx_A, ey), (cx_B, ey), B.T]
+    
+    if scenario == "同排_左":
+        obstacles = FindElementsBetween(A, B, allElements)
+        if obstacles not empty:
+            // Z1（下绕）: A.B → (cx_A, ey) → (cx_B, ey) → B.T
+            bottomMost = max(obs.y + obs.h for obs in obstacles)
+            ey = bottomMost + margin
+            return [A.B, (cx_A, ey), (cx_B, ey), B.T]
+        
+        // Z2（上绕）: A.T → (cx_A, ey) → (cx_B, ey) → B.T
+        topMost = min(obs.y for obs in obstacles)
+        ey = topMost - margin
+        return [A.T, (cx_A, ey), (cx_B, ey), B.T]
+    
+    return null  // 无障碍或无法绕行
 ```
 
 ### 5.6 多连接并排处理
@@ -831,8 +1269,29 @@ flowchart TD
     NextConn -->|是| GetConn[取下一条连接 A → B]
     NextConn -->|否| Output([输出元素坐标 + 路径点序列])
     
-    GetConn --> Collect[收集所有候选路径<br>直线/L1/L2/Z/绕边]
-    Collect --> Filter[过滤: 排除穿过元素的路径]
+    GetConn --> Classify{分类相对位置}
+    Classify -->|同列/同排| Straight[尝试直线路径 0 转]
+    Classify -->|对角| Diagonal[尝试 L1 路径 1 转]
+    
+    Straight --> StraightCheck{直线被元素阻挡?}
+    StraightCheck -->|无阻挡| StraightOK[直线路径可用]
+    StraightCheck -->|有阻挡| StraightZ[升级为 Z 型绕行<br>2 转折]
+    StraightZ --> CandidatePool
+    
+    Diagonal --> L1Check{L1 被元素阻挡?}
+    L1Check -->|无阻挡| L1OK[L1 路径可用]
+    L1Check -->|有阻挡| TryL2[尝试 L2 路径 1 转]
+    
+    TryL2 --> L2Check{L2 被元素阻挡?}
+    L2Check -->|无阻挡| L2OK[L2 路径可用]
+    L2Check -->|有阻挡| DiagonalZ[升级为 Z 型绕行<br>2~3 转折]
+    DiagonalZ --> CandidatePool
+    
+    StraightOK --> CandidatePool[(候选路径池)]
+    L1OK --> CandidatePool
+    L2OK --> CandidatePool
+    
+    CandidatePool --> Filter[过滤: 排除穿过元素的路径]
     Filter --> Score[评分: 优先级×100 + 重叠数]
     Score --> Select[选评分最低的路径]
     
@@ -887,6 +1346,10 @@ flowchart TD
 | 多条连线共用通道 | 自动并排到相近的 y/x 通道，保持间距一致性 |
 | 菱形判断框 | 通常在右下角或左下角出线，视分支方向而定 |
 | 跨多行/列的长连接 | 直接使用 Z 型绕行，避免逐格检测 |
+| 同列/同排直线被中间元素阻挡 | 直线路径不可用 → 直接升级为 Z 型绕行（右/左 或 下/上） |
+| 对角 L1/L2 被中间元素阻挡 | L1 被挡切换到 L2（反之亦然），均被挡升级为 Z 型 |
+| 多个障碍物连续阻挡 | 计算障碍物集合的联合边界（rightMost/leftMost/bottomMost/topMost），统一绕行 |
+| 障碍物占据多个行列 | 按网格区域判断阻挡关系，合并障碍物边界后统一绕行 |
 
 ### 8.3 箭头处理
 
@@ -905,16 +1368,16 @@ flowchart TD
 
 ## 九、场景汇总表
 
-| 序号 | 场景 | 相对位置 | 默认连接点 | 备选连接点 | 可选子点 | 首选转折数 | 路径形状 |
-|------|------|---------|-----------|-----------|---------|-----------|---------|
-| 1 | 同列_下 | B 在 A 正下方 | A.B-C → B.T-C | - | B-L+L/B-R+R | 0 | `│` |
-| 2 | 同列_上 | B 在 A 正上方 | A.T-C → B.B-C | - | T-L+L/T-R+R | 0 | `│` |
-| 3 | 同排_右 | B 在 A 正右方 | A.R-C → B.L-C | - | R-T+T/R-B+B | 0 | `─` |
-| 4 | 同排_左 | B 在 A 正左方 | A.L-C → B.R-C | - | L-T+T/L-B+B | 0 | `─` |
-| 5 | 右下 | B 右下角 | A.R-C → B.T-C | A.B-C → B.L-C | R-B+T-R / B-R+L-T | 1 | `┐└` 型 |
-| 6 | 左下 | B 左下角 | A.L-C → B.T-C | A.B-C → B.R-C | L-B+T-L / B-L+R-T | 1 | `┌┘` 型 |
-| 7 | 右上 | B 右上角 | A.R-C → B.B-C | A.T-C → B.L-C | R-T+B-R / T-R+L-B | 1 | `┘┌` 型 |
-| 8 | 左上 | B 左上角 | A.L-C → B.B-C | A.T-C → B.R-C | L-T+B-L / T-L+R-B | 1 | `└┐` 型 |
+| 序号 | 场景 | 相对位置 | 默认连接点 | 备选连接点 | 可选子点 | 首选转折数 | 路径形状 | 有障碍时升级路径 |
+|------|------|---------|-----------|-----------|---------|-----------|---------|----------------|
+| 1 | 同列_下 | B 在 A 正下方 | A.B-C → B.T-C | - | B-L+L/B-R+R | 0 | `│` | Z 型（右绕/左绕，2~3 转折） |
+| 2 | 同列_上 | B 在 A 正上方 | A.T-C → B.B-C | - | T-L+L/T-R+R | 0 | `│` | Z 型（右绕/左绕，2~3 转折） |
+| 3 | 同排_右 | B 在 A 正右方 | A.R-C → B.L-C | - | R-T+T/R-B+B | 0 | `─` | Z 型（下绕/上绕，2 转折） |
+| 4 | 同排_左 | B 在 A 正左方 | A.L-C → B.R-C | - | L-T+T/L-B+B | 0 | `─` | Z 型（下绕/上绕，2 转折） |
+| 5 | 右下 | B 右下角 | A.R-C → B.T-C | A.B-C → B.L-C | R-B+T-R / B-R+L-T | 1 | `┐└` 型 | L1 被挡→L2，均被挡→Z 型 |
+| 6 | 左下 | B 左下角 | A.L-C → B.T-C | A.B-C → B.R-C | L-B+T-L / B-L+R-T | 1 | `┌┘` 型 | L1 被挡→L2，均被挡→Z 型 |
+| 7 | 右上 | B 右上角 | A.R-C → B.B-C | A.T-C → B.L-C | R-T+B-R / T-R+L-B | 1 | `┘┌` 型 | L1 被挡→L2，均被挡→Z 型 |
+| 8 | 左上 | B 左上角 | A.L-C → B.B-C | A.T-C → B.R-C | L-T+B-L / T-L+R-B | 1 | `└┐` 型 | L1 被挡→L2，均被挡→Z 型 |
 
 ---
 

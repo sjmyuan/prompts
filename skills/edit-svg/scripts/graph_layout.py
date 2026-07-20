@@ -10,21 +10,16 @@ because they are simpler than the equivalent networkx primitives.
 """
 
 import math
+from collections import deque
 from typing import Tuple, List, Dict, Any, Optional
 
 import networkx as nx
 
-from collections import deque
-from typing import Dict
-
 from geometry import (
     BBox,
     Point,
-    overlap_with_margin,
     find_overlapping,
     union_bbox,
-    inflate_bbox,
-    center,
 )
 
 # ---------------------------------------------------------------------------
@@ -66,7 +61,6 @@ def decision_branch_positions(
     decision_node: Dict[str, Any],
     yes_node: Dict[str, Any],
     no_node: Dict[str, Any],
-    branch_offset: float = 120.0,
     node_gap: float = 120.0,
 ) -> Dict[str, Any]:
     """Position yes/no branch nodes relative to a decision diamond."""
@@ -196,24 +190,23 @@ def resolve_overlaps(
     max_iterations: int = 20,
 ) -> BBox:
     """Find a non-overlapping position for new_bbox by pushing away from overlaps."""
-    result = list(new_bbox)
+    rx, ry, rw, rh = new_bbox
     for _ in range(max_iterations):
-        overlapping = find_overlapping(placed_bboxes, tuple(result), min_gap)
+        overlapping = find_overlapping(placed_bboxes, (rx, ry, rw, rh), min_gap)
         if not overlapping:
             break
         for idx in overlapping:
             ob = placed_bboxes[idx]
             ox, oy, ow, oh = ob
-            rx, ry, rw, rh = result
             ocx, ocy = ox + ow / 2.0, oy + oh / 2.0
             rcx, rcy = rx + rw / 2.0, ry + rh / 2.0
             ddx = rcx - ocx
             ddy = rcy - ocy
             if abs(ddx) * oh > abs(ddy) * ow:
-                result[0] = ox + ow + min_gap if ddx > 0 else ox - rw - min_gap
+                rx = ox + ow + min_gap if ddx > 0 else ox - rw - min_gap
             else:
-                result[1] = oy + oh + min_gap if ddy > 0 else oy - rh - min_gap
-    return tuple(result)
+                ry = oy + oh + min_gap if ddy > 0 else oy - rh - min_gap
+    return (rx, ry, rw, rh)
 
 
 # ---------------------------------------------------------------------------
@@ -263,8 +256,53 @@ def compute_viewbox(
 
 
 # ---------------------------------------------------------------------------
-# Topological sort — auto row/col assignment from edge dependencies
+# Topological sort helpers
 # ---------------------------------------------------------------------------
+
+
+def _kahn_levels(adj: Dict[str, List[str]], in_deg: Dict[str, int]) -> Dict[str, int]:
+    """Run Kahn's algorithm to compute topological levels.
+
+    Returns dict mapping node id → level (0-based). Nodes in cycles
+    or unreachable are assigned level 0.
+    """
+    q = deque([nid for nid, d in in_deg.items() if d == 0])
+    level: Dict[str, int] = {nid: 0 for nid in q}
+    while q:
+        u = q.popleft()
+        for v in adj.get(u, []):
+            in_deg[v] -= 1
+            if in_deg[v] == 0:
+                level[v] = level[u] + 1
+                q.append(v)
+    return level
+
+
+def _kahn_levels_with_cycles(
+    adj: Dict[str, List[str]], in_deg: Dict[str, int], node_ids: List[str]
+) -> Dict[str, int]:
+    """Run Kahn's algorithm with cycle resolution via BFS fallback."""
+    level = _kahn_levels(adj, in_deg)
+
+    # BFS from processed nodes to assign levels to cycle nodes
+    processed = set(level.keys())
+    remaining = [nid for nid in node_ids if nid not in level]
+    if remaining:
+        bfs_q: deque = deque(processed)
+        visited = set(processed)
+        bfs_level = dict(level)
+        while bfs_q:
+            u = bfs_q.popleft()
+            for v in adj.get(u, []):
+                if v not in visited:
+                    visited.add(v)
+                    bfs_level[v] = bfs_level.get(u, 0) + 1
+                    bfs_q.append(v)
+        for nid in node_ids:
+            if nid not in bfs_level:
+                bfs_level[nid] = 0
+        level = bfs_level
+    return level
 
 
 def topological_sort(
@@ -284,15 +322,7 @@ def topological_sort(
         adj.setdefault(e["from"], []).append(e["to"])
         in_deg[e["to"]] = in_deg.get(e["to"], 0) + 1
 
-    q = deque([nid for nid, d in in_deg.items() if d == 0])
-    level: Dict[str, int] = {nid: 0 for nid in q}
-    while q:
-        u = q.popleft()
-        for v in adj.get(u, []):
-            in_deg[v] -= 1
-            if in_deg[v] == 0:
-                level[v] = level[u] + 1
-                q.append(v)
+    level = _kahn_levels(adj, in_deg)
 
     col_counter: Dict[int, int] = {}
     for n in nodes:
@@ -375,9 +405,7 @@ def center_align_nodes(
     return nodes
 
 
-def enforce_column_gap(
-    nodes: List[Dict[str, Any]], min_gap: float = 140
-) -> float:
+def enforce_column_gap(nodes: List[Dict[str, Any]], min_gap: float = 140) -> float:
     """Ensure minimum gap between col 0 and col 1. Shifts col 1 if needed.
 
     Returns corridor_x (midpoint between the two columns).
@@ -396,3 +424,316 @@ def enforce_column_gap(
     c0r = max(n["x"] + n["width"] for n in c0)
     c1l = min(n["x"] for n in c1)
     return (c0r + c1l) / 2
+
+
+# ---------------------------------------------------------------------------
+# Edge classification — separate forward from feedback edges by topology
+# ---------------------------------------------------------------------------
+
+
+def classify_edges_by_topology(
+    nodes: List[Dict[str, Any]],
+    edges: List[Dict[str, Any]],
+) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """Classify edges into forward, feedback, and same-row categories.
+
+    Uses a two-pass approach:
+    1. First, compute a rough topological level for each node using ALL edges.
+       Nodes stuck in cycles get estimated levels via BFS from zero-in-degree nodes.
+    2. Then classify each edge by comparing source vs destination levels:
+       - forward:  src_level < dst_level  (goes downstream)
+       - feedback: src_level > dst_level  (goes upstream, against flow)
+       - same-row: src_level == dst_level (horizontal connection)
+
+    Returns:
+        (forward_edges, feedback_edges, same_row_edges)
+    """
+    # Build adjacency and in-degree
+    adj: Dict[str, List[str]] = {n["id"]: [] for n in nodes}
+    in_deg: Dict[str, int] = {n["id"]: 0 for n in nodes}
+    for e in edges:
+        f, t = e["from"], e["to"]
+        if f in adj and t in adj:
+            adj[f].append(t)
+            in_deg[t] = in_deg.get(t, 0) + 1
+
+    # Compute topological levels with cycle resolution
+    level = _kahn_levels_with_cycles(adj, in_deg, [n["id"] for n in nodes])
+
+    # Classify edges
+    forward: List[Dict[str, Any]] = []
+    feedback: List[Dict[str, Any]] = []
+    same_row: List[Dict[str, Any]] = []
+
+    for e in edges:
+        sl = level.get(e["from"], 0)
+        dl = level.get(e["to"], 0)
+        if sl < dl:
+            e["_topo_type"] = "forward"
+            forward.append(e)
+        elif sl > dl:
+            e["_topo_type"] = "feedback"
+            feedback.append(e)
+        else:
+            e["_topo_type"] = "same-row"
+            same_row.append(e)
+
+    return forward, feedback, same_row
+
+
+# ---------------------------------------------------------------------------
+# Auto layout — assign row/col from edge topology, then compute positions
+# ---------------------------------------------------------------------------
+
+
+def dag_layout(
+    nodes: List[Dict[str, Any]],
+    edges: List[Dict[str, Any]],
+    flow_direction: str = "top-to-bottom",
+    node_gap: float = 120.0,
+    branch_gap: float = 260.0,
+    start_offset: Tuple[float, float] = (100, 100),
+    col_gap_min: float = 150.0,
+) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """One-shot layout for pure DAGs (no feedback loops).
+
+    A convenience wrapper around ``assign_flow_layout()`` that marks **all**
+    edges as ``'forward'`` — suitable when the graph is a true directed
+    acyclic graph with no backward connections.
+
+    If your graph has feedback loops, use ``assign_flow_layout()`` directly
+    with explicit ``_topo_type='feedback'`` on backward edges.
+
+    Example::
+
+        nodes, edges = dag_layout(nodes, edges)
+    """
+    for e in edges:
+        e.setdefault("_topo_type", "forward")
+    return assign_flow_layout(
+        nodes,
+        edges,
+        flow_direction=flow_direction,
+        node_gap=node_gap,
+        branch_gap=branch_gap,
+        start_offset=start_offset,
+        col_gap_min=col_gap_min,
+    )
+
+
+def assign_flow_layout(
+    nodes: List[Dict[str, Any]],
+    edges: List[Dict[str, Any]],
+    flow_direction: str = "top-to-bottom",
+    node_gap: float = 120.0,
+    branch_gap: float = 260.0,
+    start_offset: Tuple[float, float] = (100, 100),
+    col_gap_min: float = 150.0,
+    edge_type_key: str = "_topo_type",
+    feedback_types: Tuple[str, ...] = ("feedback", "same-row"),
+) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """Auto-assign row/col from edge topology, then compute pixel positions.
+
+    This is the primary entry point for diagram layout. It replaces the manual
+    ``row``/``col`` specification pattern — just pass nodes and edges, and this
+    function figures out the grid placement automatically.
+
+    **How it works**:
+    1. Collects edges whose ``edge_type_key`` value is **not** in
+       ``feedback_types`` — these are treated as **topology edges** that define
+       the flow direction. Edges with ``"feedback"`` or ``"same-row"`` type are
+       excluded from topology and only used for visual routing.
+    2. Runs **Kahn's topological sort** on topology edges to assign rows.
+    3. Assigns columns by detecting **parallel branches**: within each row,
+       nodes that descend from different parent branches get separate columns.
+    4. Computes pixel positions, aligns rows, centers columns, enforces gaps.
+
+    **Pre-classifying edges**: If your graph contains feedback loops, mark
+    feedback edges explicitly so they don't distort the topology::
+
+        edges = [
+            {'from': 'a', 'to': 'b'},                          # auto → forward
+            {'from': 'z', 'to': 'a', '_topo_type': 'feedback'}, # excluded
+        ]
+
+    If ``edge_type_key`` is not set on an edge, ``classify_edges_by_topology()``
+    is called to auto-detect forward/feedback/same-row. This works well for
+    DAGs but may misclassify edges in graphs with complex feedback loops.
+    For such cases, pre-set the type key explicitly.
+
+    Nodes that already have ``'row'`` and ``'col'`` set are preserved as-is
+    and will not be repositioned by this function.
+
+    Args:
+        nodes: List of node dicts. Each must have ``'id'`` and ``'text'``.
+               ``'width'`` and ``'height'`` should be pre-computed via
+               ``get_shape_dimensions()``. If ``'row'`` and ``'col'`` are
+               already set, they are preserved.
+        edges: List of edge dicts. Each must have ``'from'`` and ``'to'``.
+               Optionally set ``edge_type_key`` (default ``'_topo_type'``)
+               to ``'feedback'`` or ``'same-row'`` to exclude from topology.
+        flow_direction: ``'top-to-bottom'`` (default) or ``'left-to-right'``.
+        node_gap: Vertical (or horizontal) spacing between rows in px.
+        branch_gap: Horizontal (or vertical) spacing between columns in px.
+        start_offset: ``(x_offset, y_offset)`` for the first node.
+        col_gap_min: Min px gap between columns. 0 to skip enforcement.
+        edge_type_key: Dict key used to look up an edge's pre-set type.
+        feedback_types: Tuple of type values that should be excluded from
+                        topology (default ``("feedback", "same-row")``).
+
+    Returns:
+        ``(nodes, edges)`` — the input lists, each augmented:
+        - ``nodes``: each node gets ``row``, ``col``, ``x``, ``y``, ``bbox``.
+        - ``edges``: each edge gets ``_topo_type``.
+
+    Example with pre-classified edges::
+
+        edges = [
+            {'from': 'a', 'to': 'b'},
+            {'from': 'b', 'to': 'c'},
+            {'from': 'c', 'to': 'a', '_topo_type': 'feedback'},  # excluded
+        ]
+        nodes, edges = assign_flow_layout(nodes, edges)
+        # a→b→c gets rows 0→1→2; feedback edge ignored for topology
+    """
+    # Preserve nodes that already have row/col
+    has_explicit = all("row" in n and "col" in n for n in nodes)
+    if has_explicit:
+        # Already set — just compute positions
+        nodes = flow_layout(nodes, flow_direction, node_gap, branch_gap, start_offset)
+        nodes = align_rows(nodes)
+        cols: Dict[int, List[Dict[str, Any]]] = {}
+        for n in nodes:
+            cols.setdefault(n["col"], []).append(n)
+        for col_nodes in cols.values():
+            max_w = max(n["width"] for n in col_nodes)
+            col_left = min(n["x"] for n in col_nodes)
+            col_center_x = col_left + max_w / 2
+            for n in col_nodes:
+                n["x"] = col_center_x - n["width"] / 2
+                n["bbox"] = (n["x"], n["y"], n["width"], n["height"])
+        if col_gap_min > 0:
+            enforce_column_gap(nodes, col_gap_min)
+        return nodes, edges
+
+    # --- Step 1: Separate topology edges from non-topology edges ---
+    topo_edges: List[Dict[str, Any]] = []
+    non_topo_edges: List[Dict[str, Any]] = []
+
+    for e in edges:
+        etype = e.get(edge_type_key)
+        if etype is None:
+            topo_edges.append(e)  # auto-classify later
+        elif etype in feedback_types:
+            non_topo_edges.append(e)
+            e["_topo_type"] = etype
+        else:
+            topo_edges.append(e)
+            e["_topo_type"] = etype
+
+    # Auto-classify remaining topology edges (only if there are any untyped)
+    untyped = [e for e in topo_edges if e.get(edge_type_key) is None]
+    if untyped:
+        # Save any pre-set types to restore after auto-classification
+        saved_types = {
+            id(e): e.get(edge_type_key)
+            for e in edges
+            if e.get(edge_type_key) is not None
+        }
+        # Run classification on all edges
+        fwd, fb, sr = classify_edges_by_topology(nodes, edges)
+        # Restore pre-set types that should have been preserved
+        for e in edges:
+            saved = saved_types.get(id(e))
+            if saved is not None:
+                e[edge_type_key] = saved
+        # Assign any still-untyped edges as forward
+        for e in topo_edges:
+            if e.get(edge_type_key) is None:
+                e[edge_type_key] = "forward"
+    else:
+        # All topology edges already have types; just run a quick forward set
+        fwd = topo_edges
+        fb = [e for e in edges if e.get("_topo_type") == "feedback"]
+        sr = [e for e in edges if e.get("_topo_type") == "same-row"]
+
+    # --- Step 2: Topological sort on topology edges only ---
+    adj: Dict[str, List[str]] = {n["id"]: [] for n in nodes}
+    in_deg: Dict[str, int] = {n["id"]: 0 for n in nodes}
+    for e in topo_edges:
+        f, t = e["from"], e["to"]
+        if f in adj and t in adj:
+            adj[f].append(t)
+            in_deg[t] = in_deg.get(t, 0) + 1
+
+    level = _kahn_levels(adj, in_deg)
+    for n in nodes:
+        level.setdefault(n["id"], 0)
+
+    # --- Step 3: Assign columns based on branch detection ---
+    parent: Dict[str, Optional[str]] = {n["id"]: None for n in nodes}
+    for e in topo_edges:
+        parent[e["to"]] = e["from"]
+
+    roots = [nid for nid, p in parent.items() if p is None]
+    branch_id: Dict[str, int] = {}
+    for root in roots:
+        branch_id[root] = 0
+
+    topo_adj: Dict[str, List[str]] = {n["id"]: [] for n in nodes}
+    for e in topo_edges:
+        topo_adj.setdefault(e["from"], []).append(e["to"])
+
+    processed = set()
+    bfs_q = deque(roots)
+    for r in roots:
+        if r not in branch_id:
+            branch_id[r] = 0
+    next_branch = 1
+
+    while bfs_q:
+        u = bfs_q.popleft()
+        if u in processed:
+            continue
+        processed.add(u)
+        children = topo_adj.get(u, [])
+        if len(children) <= 1:
+            for v in children:
+                branch_id[v] = branch_id.get(u, 0)
+                bfs_q.append(v)
+        else:
+            for i, v in enumerate(children):
+                if i == 0:
+                    branch_id[v] = branch_id.get(u, 0)
+                else:
+                    branch_id[v] = next_branch
+                    next_branch += 1
+                bfs_q.append(v)
+
+    for n in nodes:
+        if n["id"] not in branch_id:
+            branch_id[n["id"]] = 0
+
+    for n in nodes:
+        n["row"] = level.get(n["id"], 0)
+        n["col"] = branch_id.get(n["id"], 0)
+
+    # --- Step 4: Compute positions ---
+    nodes = flow_layout(nodes, flow_direction, node_gap, branch_gap, start_offset)
+    nodes = align_rows(nodes)
+
+    cols_map: Dict[int, List[Dict[str, Any]]] = {}
+    for n in nodes:
+        cols_map.setdefault(n["col"], []).append(n)
+    for col_nodes in cols_map.values():
+        max_w = max(n["width"] for n in col_nodes)
+        col_left = min(n["x"] for n in col_nodes)
+        col_center_x = col_left + max_w / 2
+        for n in col_nodes:
+            n["x"] = col_center_x - n["width"] / 2
+            n["bbox"] = (n["x"], n["y"], n["width"], n["height"])
+
+    if col_gap_min > 0:
+        enforce_column_gap(nodes, col_gap_min)
+
+    return nodes, edges

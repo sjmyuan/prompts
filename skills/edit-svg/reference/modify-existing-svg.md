@@ -26,6 +26,24 @@ When upgrading an existing SVG to PPT quality:
 6. Switch to 16:9 viewBox (960×540) if needed
 7. Verify contrast: `colors.wcag_aa_check()`
 
+## Detection & Correction Functions
+
+| Area | Detection | Correction |
+|---|---|---|
+| Element overlap | `geometry.find_overlapping(bboxes, margin=10)` | `graph_layout.resolve_overlaps(nodes, margin=20)` |
+| Path intersections | `routing.detect_intersections(paths, obstacles)` | `routing.orthogonal_path()` with obstacle avoidance |
+| Endpoint validity | `routing.endpoint_valid(src_pt, dst_pt, src_bbox, dst_bbox)` | Re-route via `route_with_port_allocation()` |
+| ViewBox clipping | — | `graph_layout.compute_viewbox(bboxes, padding=40)` |
+
+## Workflow
+
+1. Parse SVG → extract bounding boxes and paths
+2. Detect overlaps and issues via detection functions
+3. Fix issues via correction functions
+4. Re-generate SVG fragments with corrected positions
+5. Re-validate until clean
+6. Assemble and output
+
 ## Verification Checklist
 
 - [ ] No overlaps: `geometry.overlap()`

@@ -12,14 +12,25 @@ import xml.etree.ElementTree as ET
 from typing import Dict, Any, Optional
 
 import svgwrite
+from svgwrite.text import TSpan
 
-from colors import PPT_PALETTE, get_gradient_defs, get_shadow_filter
+from colors import PPT_PALETTE, get_shadow_filter
 
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
 
 _FONT_FAMILY = "Segoe UI, -apple-system, Helvetica Neue, Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif"
+
+
+# ---------------------------------------------------------------------------
+# CJK width helper (shared across this module)
+# ---------------------------------------------------------------------------
+
+
+def _cjk_len(text: str) -> int:
+    """Effective length of text counting CJK chars as double width."""
+    return sum(2 if ord(c) > 0x2E80 else 1 for c in text)
 
 
 def _to_str(element) -> str:
@@ -35,17 +46,6 @@ def _dwg() -> svgwrite.Drawing:
 # ---------------------------------------------------------------------------
 # Shape dimensions (pure math — no library needed)
 # ---------------------------------------------------------------------------
-
-
-def _effective_line_len(text: str) -> int:
-    """Compute effective length of text counting CJK chars as double width."""
-    count = 0
-    for c in text:
-        if ord(c) > 0x2E80:
-            count += 2
-        else:
-            count += 1
-    return count
 
 
 def get_shape_dimensions(
@@ -65,7 +65,7 @@ def get_shape_dimensions(
     CJK characters count as double width for accurate dimension calculation.
     """
     lines = text.split("\n")
-    max_eff = max(_effective_line_len(line) for line in lines) if lines else 1
+    max_eff = max(_cjk_len(line) for line in lines) if lines else 1
     num_lines = len(lines)
 
     if ppt_mode:
@@ -216,45 +216,57 @@ def get_node_type_colors(shape_type: str, ppt_mode: bool = True) -> Dict[str, st
 # ---------------------------------------------------------------------------
 
 
-def _generate_text_svg(
+def _add_text_to_group(
+    g,
     text: str,
     cx: float,
     cy: float,
     font_family: str,
     font_size: float,
     fill: str,
-) -> str:
-    """Generate SVG text element, supporting multi-line via dy-based tspan.
+) -> None:
+    """Add a text element (single or multi-line) to an svgwrite group.
 
-    Uses alignment-baseline for single-line text (widely supported on <text>).
-    For multi-line text, uses dy offsets on <tspan> with baseline offset
-    ~0.32*font_size for visual centering (avoids dominant-baseline on tspan
-    which has inconsistent browser support).
+    For single-line text, uses ``alignment-baseline="middle"`` on ``<text>``.
+    For multi-line text, uses ``dy``-based ``<tspan>`` elements with a baseline
+    offset of ~0.32\\ *font\\_size for visual centering.
     """
+    d = _dwg()
     lines = text.split("\n")
-    if len(lines) == 1:
-        return (
-            f'<text x="{cx}" y="{cy}" text-anchor="middle" '
-            f'alignment-baseline="middle" font-family="{font_family}" '
-            f'font-size="{font_size}" fill="{fill}">{text}</text>'
-        )
-
     num_lines = len(lines)
-    line_h = font_size + 7  # line height = font_size + interline spacing
+
+    if num_lines == 1:
+        g.add(
+            d.text(
+                text,
+                insert=(cx, cy),
+                text_anchor="middle",
+                alignment_baseline="middle",
+                font_family=font_family,
+                font_size=font_size,
+                fill=fill,
+            )
+        )
+        return
+
+    line_h = font_size + 7
     total_text_h = num_lines * line_h
     first_line_center = cy - total_text_h / 2 + line_h / 2
-    base_off = font_size * 0.32  # baseline-to-visual-center offset
+    base_off = font_size * 0.32
     text_y = first_line_center + base_off
 
-    tspans = [f'<tspan x="{cx}">{lines[0]}</tspan>']
-    for line in lines[1:]:
-        tspans.append(f'<tspan x="{cx}" dy="{line_h}">{line}</tspan>')
-
-    return (
-        f'<text x="{cx}" y="{text_y}" text-anchor="middle" '
-        f'font-family="{font_family}" font-size="{font_size}" fill="{fill}">'
-        f'{"".join(tspans)}</text>'
+    text_elem = d.text(
+        "",
+        insert=(cx, text_y),
+        text_anchor="middle",
+        font_family=font_family,
+        font_size=font_size,
+        fill=fill,
     )
+    text_elem.add(TSpan(lines[0], x=[cx]))
+    for line in lines[1:]:
+        text_elem.add(TSpan(line, x=[cx], dy=[line_h]))
+    g.add(text_elem)
 
 
 def generate_node_svg(
@@ -333,27 +345,10 @@ def generate_node_svg(
         )
 
     cx, cy = x + width / 2, y + height / 2
-    num_lines = len(text.split("\n"))
-    font_size = 13 if num_lines > 1 else 14
+    font_size = 13 if len(text.split("\n")) > 1 else 14
 
-    if num_lines == 1:
-        g.add(
-            d.text(
-                text,
-                insert=(cx, cy),
-                text_anchor="middle",
-                alignment_baseline="middle",
-                font_family=_FONT_FAMILY,
-                font_size=font_size,
-                fill=tc,
-            )
-        )
-        return _to_str(g)
-
-    # Multi-line: build shape via svgwrite, text via raw SVG string
-    shape_svg = _to_str(g)
-    text_svg = _generate_text_svg(text, cx, cy, _FONT_FAMILY, font_size, tc)
-    return shape_svg.replace("</g>", text_svg + "</g>")
+    _add_text_to_group(g, text, cx, cy, _FONT_FAMILY, font_size, tc)
+    return _to_str(g)
 
 
 def generate_edge_svg(
@@ -440,26 +435,6 @@ def generate_arrow_marker(
     return _to_str(marker)
 
 
-def generate_arrow_marker_reverse(
-    marker_id: str = "arrow-reverse",
-    color: str = "#555555",
-    arrow_width: float = 10.0,
-    arrow_height: float = 10.0,
-) -> str:
-    """Generate an arrow marker where the line endpoint connects to the
-    **center of the base** (arrow tip extends forward from the line end).
-
-    Convenience wrapper — equivalent to generate_arrow_marker(tip_ref=False).
-    """
-    return generate_arrow_marker(
-        marker_id=marker_id,
-        color=color,
-        arrow_width=arrow_width,
-        arrow_height=arrow_height,
-        tip_ref=False,
-    )
-
-
 def generate_label_svg(
     label: str,
     x: float,
@@ -474,8 +449,7 @@ def generate_label_svg(
     """
     d = _dwg()
     pad = 4
-    eff_len = sum(2 if ord(c) > 0x2E80 else 1 for c in label)
-    w = max(20, eff_len * 7 + pad * 2)
+    w = max(20, _cjk_len(label) * 7 + pad * 2)
     h = font_size + pad * 2
     g = d.g(class_="edge-label")
     g.add(

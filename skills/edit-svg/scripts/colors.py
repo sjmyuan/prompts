@@ -5,7 +5,6 @@ Includes WCAG contrast ratio computation, color palette definitions,
 and validation functions.
 """
 
-import math
 from typing import Tuple, Dict
 
 
