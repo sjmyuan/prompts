@@ -135,46 +135,51 @@ SAME_COL_DOWN    SAME_ROW_RIGHT    DIAG_DOWN_RIGHT    DIAG_DOWN_LEFT
 
 ## Phase 5: Obstacle Detection & Path Selection
 
+### Obstacle Detection (Pixel-Based)
+
+`_detect_intermediate_nodes()` now uses **pixel bounding-box overlap** (not grid row/col) to find nodes between src and dst. This aligns with `segment_intersects_element()` and eliminates grid/pixel inconsistency. A 2px `MARGIN` prevents edge-contact false positives.
+
+`segment_intersects_element()` uses a 1px `_SEG_EPSILON` tolerance on element boundaries, so connection points on element edges are not falsely flagged as intersecting adjacent elements.
+
 ### Candidate Priority
+
 Use `generate_candidates(scenario, src, dst, all_nodes)` to produce paths in this priority order:
 
 1. **Straight** (0 turns) — only for same-row/same-col scenarios; detected as blocked → skip to Z-shape
 2. **L1 primary** (1 turn) — primary L-shape for diagonals
 3. **L2 alternate** (1 turn) — secondary L-shape for diagonals
-4. **Z-shape** (2 turns) — for straight-line obstacles; or diagonal obstacles after L1/L2 fail
+4. **Z-shape** (2 turns) — generates BOTH Z1+Z2 bypasses, filters by element obstacle, selects shortest valid path
 5. **Perimeter** (fallback) — routes around all nodes
 
-### Obstacle Detection Flow
+### Z-Path Self-Validation
 
-For each candidate path, `generate_candidates()` checks if intermediate nodes exist between src and dst:
-
-- **Straight-line scenarios** (SAME_COL_DOWN/UP, SAME_ROW_RIGHT/LEFT):
-  - Build the straight path, then `segment_intersects_element()` against all intermediate nodes
-  - If ANY intermediate node blocks → disqualify straight, `build_Z_path_for_straight()` generates right/left bypass (col) or bottom/top bypass (row)
-  - L-shape is NOT attempted because 1 turn cannot resolve collinear blocking
-
-- **Diagonal scenarios** (DIAG_DOWN_RIGHT/LEFT, DIAG_UP_RIGHT/LEFT):
-  - L1 and L2 are both generated as candidates
-  - `select_best_path()` disqualifies any that hit obstacles
-  - If both blocked → Z-shape is selected (or perimeter as fallback)
+`build_Z_path()` and `build_Z_path_for_straight()` now:
+1. Generate all candidate Z-paths (Z1 + Z2)
+2. Filter each through `_filter_valid_candidates()` against ALL elements (not just original obstacles)
+3. Return the shortest valid path via `_select_shortest_path()`
 
 ### Scoring
+
 Use `select_best_path(candidates, all_nodes, src, dst, placed_edges)`:
 - **Element obstacle** → DISQUALIFIED (path passes through any node)
 - **Turn count** → `×100` weight (primary sorting axis)
 - **Parallel overlaps** → added to score (secondary axis)
+- **Sub-point switching** → if best path has overlaps, `_try_switch_sub_points()` tries different sub-points on the same sides to avoid overlaps without adding turns
 
 ### Key Functions
 
 | Function | Purpose |
 |---|---|
-| `segment_intersects_element(seg_start, seg_end, bbox)` | Check if a path segment crosses any node interior |
-| `_detect_intermediate_nodes(src_node, dst_node, all_nodes)` | Find all nodes strictly between src and dst in the grid |
-| `select_best_path(candidates, all_nodes, src, dst, placed_edges)` | Score and pick the best path |
+| `segment_intersects_element(seg_start, seg_end, bbox)` | Check if a path segment crosses any node interior (with EPSILON tolerance) |
+| `_detect_intermediate_nodes(src_node, dst_node, all_nodes)` | Pixel-based detection of nodes between src and dst |
+| `select_best_path(candidates, all_nodes, src, dst, placed_edges)` | Score, pick best path, attempt sub-point switching |
 | `generate_candidates(scenario, src, dst, all_nodes)` | Generate paths in priority order (obstacle-aware) |
-| `build_Z_path(src, dst, scenario, all_nodes)` | Z-shaped 2-turn path around diagonal obstacles |
-| `build_Z_path_for_straight(src, dst, scenario, all_nodes)` | Z-shaped 2-turn path for straight-line obstacles (same-col/row) |
+| `build_Z_path(src, dst, scenario, all_nodes)` | Z-shaped 2-turn path around diagonal obstacles (self-validating) |
+| `build_Z_path_for_straight(src, dst, scenario, all_nodes)` | Z-shaped 2-turn path for straight-line obstacles (self-validating) |
 | `build_perimeter_path(src, dst, all_nodes)` | Fallback routing around all nodes |
+| `_filter_valid_candidates(candidates, all_nodes, src, dst)` | Filter Z-paths that pass through any element |
+| `_select_shortest_path(candidates)` | Select the candidate with shortest total path length |
+| `_try_switch_sub_points(path, placed_edges, src, dst, src_side, dst_side, scenario)` | Try different sub-points to avoid overlap without adding turns |
 
 ---
 
@@ -182,17 +187,32 @@ Use `select_best_path(candidates, all_nodes, src, dst, placed_edges)`:
 
 ### OccupiedLanes
 
-Track placed edge segments to detect parallel overlaps. Create an `OccupiedLanes` instance, call `.register(edge)` after each edge is placed. Before selecting a path, call `count_parallel_overlaps(path, placed_edges)`.
+Track placed edge segments to detect parallel overlaps. Create an `OccupiedLanes` instance, call `.register(edge)` after each edge is placed. Before selecting a path, call `_count_parallel_overlaps(path, placed_edges)`.
 
-Overlap types: **parallel** (same y/x with overlapping range → resolve with micro-offset), **vertical cross** (allowed), **tight parallel** (avoid or merge).
+Overlap types: **parallel** (same y/x with overlapping range → resolve with sub-point switch or micro-offset), **vertical cross** (allowed), **tight parallel** (avoid or merge).
+
+**Tolerance**: Uses 5px `_LANE_TOLERANCE` for near-miss lane detection — segments within 5px of an existing lane are counted as overlaps, encouraging clearly separated lanes.
+
+### Overlap Resolution Priority
+
+1. **Sub-point switching** (`_try_switch_sub_points`) — tries different sub-points on the same exit/entry sides (e.g., R-C→R-T). Keeps path shape unchanged (0 extra turns). This is the preferred approach from flowchart.md §5.7.4.
+
+2. **Accept as-is** — if no sub-point combination avoids overlap, the best path is used directly. Micro-offset (adding turns) is reserved as a last resort.
+
+### Global Refinement (Phase 7)
+
+After all edges are routed, call `global_refine_pass(placed_edges, all_nodes, node_map)` to iteratively re-route edges. Each edge is temporarily removed and re-routed with updated lane occupancy. If the new route has fewer turns (or same turns but fewer overlaps), it replaces the old route. Runs up to 3 iterations or until convergence.
 
 ```python
-from routing import OccupiedLanes, compute_segments
+from routing import OccupiedLanes, compute_segments, global_refine_pass
 
 lanes = OccupiedLanes()
 for edge in routed_edges:
     edge['_segments'] = compute_segments(edge['waypoints'])
     lanes.register(edge)
+
+# After all edges are placed, run global optimization
+routed_edges = global_refine_pass(routed_edges, nodes, node_map)
 ```
 
 ---

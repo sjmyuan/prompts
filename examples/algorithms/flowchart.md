@@ -763,17 +763,23 @@ function RouteWithMultipleObstacles(A, B, allElements, placedLines):
 
 function FindElementsBetween(A, B, allElements):
     // 找出所有位于 A 和 B 之间的元素
-    // 判断标准：元素完全或部分位于 A→B 的矩形区域内
-    between = []
-    minRow = min(A.row, B.row)
-    maxRow = max(A.row, B.row)
-    minCol = min(A.col, B.col)
-    maxCol = max(A.col, B.col)
+    // 使用像素坐标判断：元素的 bounding box 与 A→B 的包围矩形有交集
+    // 注意：这里与 PathHasElementObstacle 统一使用像素坐标，避免网格/像素不一致
     
+    // 计算 A→B 形成的包围矩形（扩展 margin 避免贴边误判）
+    MARGIN = 2  // 像素容差，防止刚好贴边的元素被误判为障碍
+    rectLeft   = min(A.x, B.x) - MARGIN
+    rectRight  = max(A.x + A.w, B.x + B.w) + MARGIN
+    rectTop    = min(A.y, B.y) - MARGIN
+    rectBottom = max(A.y + A.h, B.y + B.h) + MARGIN
+    
+    between = []
     for each elem in allElements:
         if elem == A or elem == B:
             continue
-        if minRow <= elem.row <= maxRow and minCol <= elem.col <= maxCol:
+        // 检查 elem 的 bounding box 是否与 A→B 包围矩形重叠
+        if elem.x + elem.w > rectLeft and elem.x < rectRight and
+           elem.y + elem.h > rectTop and elem.y < rectBottom:
             between.push(elem)
     
     return between
@@ -851,29 +857,40 @@ Segment = {
 ### 5.2 线段-矩形相交检测
 
 ```
+EPSILON = 1  // 像素容差，避免线段端点刚好在元素边界上时误判为相交
+
 function SegmentIntersectsElement(seg, elem):
-    // seg 是水平或垂直线段
+    // seg 是水平或垂直线段，端点为 (x1,y1) → (x2,y2)
     // elem 是有 (x, y, w, h) 的矩形
-    
-    // 先将线段裁剪到 elem 的 AABB 范围内
-    // 如果线段（上的任何点）在 elem 内部，则相交
+    // 返回：线段是否有任何内部点（不含端点本身）落在 elem 内部
     
     if seg.isHorizontal:
         y = seg.y1
-        if y < elem.y or y > elem.y + elem.h:
+        // 线段 y 必须在 elem 内部（排除边界接触）
+        if y <= elem.y + EPSILON or y >= elem.y + elem.h - EPSILON:
             return false
-        // 线段与 elem 的水平跨度有重叠？
-        x_min = max(seg.x1, seg.x2 中较小的, elem.x)
-        x_max = min(seg.x1, seg.x2 中较大的, elem.x + elem.w)
-        return x_min < x_max
+        // 计算水平重叠区间：线段 x 区间 与 elem x 区间的交集
+        segLeft  = min(seg.x1, seg.x2)
+        segRight = max(seg.x1, seg.x2)
+        overlapLeft  = max(segLeft, elem.x + EPSILON)
+        overlapRight = min(segRight, elem.x + elem.w - EPSILON)
+        return overlapLeft < overlapRight
     else:  // 垂直
         x = seg.x1
-        if x < elem.x or x > elem.x + elem.w:
+        // 线段 x 必须在 elem 内部（排除边界接触）
+        if x <= elem.x + EPSILON or x >= elem.x + elem.w - EPSILON:
             return false
-        y_min = max(seg.y1, seg.y2 中较小的, elem.y)
-        y_max = min(seg.y1, seg.y2 中较大的, elem.y + elem.h)
-        return y_min < y_max
+        // 计算垂直重叠区间
+        segTop    = min(seg.y1, seg.y2)
+        segBottom = max(seg.y1, seg.y2)
+        overlapTop    = max(segTop, elem.y + EPSILON)
+        overlapBottom = min(segBottom, elem.y + elem.h - EPSILON)
+        return overlapTop < overlapBottom
 ```
+
+**关键改进**：
+- 使用 `EPSILON` 排除端点刚好在元素边界上的情况（如连接点从元素边缘出发，不应被紧邻元素阻挡）
+- 明确了 `min(seg.x1, seg.x2)` / `max(seg.x1, seg.x2)` 的意图，消除了原伪代码的歧义
 
 ### 5.3 整体路径障碍检测
 
@@ -898,69 +915,95 @@ function RouteConnection(A, B, allElements, placedLines, cellOccupancy):
     isStraight = scenario in ["同列_下", "同列_上", "同排_右", "同排_左"]
     isDiagonal = scenario in ["右下", "左下", "右上", "左上"]
     
-    // 收集所有候选路径，按优先级排序
-    candidates = []
+    // 收集所有候选路径，每个候选带有：路径、优先级、出口/入口信息
+    candidates = []  // 元素: (path, priority, exitSide, exitSub, entrySide, entrySub)
     
     // Step 1: 直线连接（0 转折）— 仅用于无障碍的直线场景
     if isStraight:
-        straightPath = BuildStraightPath(A, B, scenario)
+        (exitSide, exitSub) = GetDefaultConnection(A, B, scenario, "exit")
+        (entrySide, entrySub) = GetDefaultConnection(A, B, scenario, "entry")
+        straightPath = BuildStraightPath(A, B, scenario, exitSub, entrySub)
         if not PathHasElementObstacle(straightPath, allElements, A, B):
-            candidates.push((straightPath, 0))  // 无阻挡，0 转折最优
+            candidates.push((straightPath, 0, exitSide, exitSub, entrySide, entrySub))
         else:
-            // 直线有障碍 → 跳过直线方案，直接准备 Z 型绕行（跳过 L 型）
-            // 因为直线场景的 1 转折路径无法同时满足正交约束
+            // 直线有障碍 → 跳过直线方案，直接准备 Z 型绕行
             zPath = BuildZPathForStraight(A, B, scenario, allElements, cellOccupancy)
             if zPath != null:
-                candidates.push((zPath, 1))  // Z 型绕行作为首选
+                candidates.push((zPath, 1, null, null, null, null))
     
     // Step 2: L 型（1 转折）— 仅用于对角场景
     if isDiagonal:
         l1Path = BuildLPath(A, B, scenario, primary=true)
-        candidates.push((l1Path, 1))
+        candidates.push((l1Path, 1, l1Path.exitSide, l1Path.exitSub,
+                          l1Path.entrySide, l1Path.entrySub))
         
         l2Path = BuildLPath(A, B, scenario, primary=false)
-        candidates.push((l2Path, 2))
+        candidates.push((l2Path, 2, l2Path.exitSide, l2Path.exitSub,
+                          l2Path.entrySide, l2Path.entrySub))
     
-    // Step 3: Z 型（2 转折）— 对角场景的备选 + 直线场景无直线时的补充
+    // Step 3: Z 型（2 转折）— 对角场景的备选
     if isDiagonal:
         zPath = BuildZPath(A, B, scenario, allElements, cellOccupancy)
         if zPath != null:
-            candidates.push((zPath, 3))
+            candidates.push((zPath, 3, null, null, null, null))
     
+    // 保底路径
     if not isStraight:
-        // 对角场景还有保底的 Z 型
         perimeterPath = BuildPerimeterPath(A, B, allElements)
-        candidates.push((perimeterPath, 4))
+        candidates.push((perimeterPath, 4, null, null, null, null))
     else:
-        // 直线场景若尚未加入 Z 型（或 Z 型也无效），加绕边保底
         if not any candidate is Z or perimeter:
             perimeterPath = BuildPerimeterPath(A, B, allElements)
-            candidates.push((perimeterPath, 5))
+            candidates.push((perimeterPath, 5, null, null, null, null))
     
     // 评分排序：元素阻挡一票否决，再按重叠数 + 优先级排序
     scored = []
-    for (path, priority) in candidates:
+    for (path, priority, exitSide, exitSub, entrySide, entrySub) in candidates:
         if PathHasElementObstacle(path, allElements, A, B):
             continue  // 穿过元素 → 不可用
         
         overlapCount = CountLineOverlaps(path, placedLines)
-        score = priority * 100 + overlapCount  // 优先级优先，同优先级比重叠数
-        scored.push((path, score, overlapCount))
+        score = priority * 100 + overlapCount
+        scored.push((path, score, overlapCount,
+                      exitSide, exitSub, entrySide, entrySub))
     
     if scored is empty:
-        return BuildPerimeterPath(A, B, allElements, placedLines)  // 强制绕行
+        return BuildPerimeterPath(A, B, allElements, placedLines)
     
-    scored.sort(key=(path, score, overlap) => score)
+    scored.sort(key=(_, score, _) => score)
     
-    bestPath = scored[0].path
-    bestOverlap = scored[0].overlapCount
+    bestPath     = scored[0][0]
+    bestOverlap  = scored[0][2]
+    exitSide     = scored[0][3]
+    exitSub      = scored[0][4]
+    entrySide    = scored[0][5]
+    entrySub     = scored[0][6]
     
     if bestOverlap > 0:
-        // 仍有重叠，尝试微偏移来解决
-        resolvedPath = TryResolveOverlap(bestPath, placedLines)
+        // 阶段 1：子点切换（保持路径形状）
+        // 阶段 2：微偏移（会增加转折点，兜底）
+        resolvedPath = TryResolveOverlap(bestPath, placedLines, A, B,
+                                          exitSide, exitSub, entrySide, entrySub)
         return resolvedPath
     
     return bestPath
+
+
+// 全局入口：处理所有连接，含迭代优化
+function RouteAllConnections(connections, allElements):
+    placedLines = []
+    
+    for each conn in connections:
+        path = RouteConnection(conn.source, conn.target, allElements,
+                                placedLines, /* cellOccupancy */)
+        path.id = conn.id
+        placedLines.push(path)
+        RegisterPlacedLine(path, occupiedLanes)
+    
+    // 全局迭代优化（见 5.8 节）
+    placedLines = GlobalRefinePass(placedLines, allElements)
+    
+    return placedLines
 ```
 
 ### 5.5 Z 型绕行策略（2 转折点）
@@ -988,85 +1031,115 @@ Z 型方案 2（先下、再右、再下）:
 
 ```
 function BuildZPath(A, B, scenario, allElements, occupancy):
-    if scenario == "右下":
-        // 尝试 Z1: A.R → (ex, cy_A) → (ex, cy_B) → B.L
-        obstacleRight = FindRightmostObstacleBetween(A, B, allElements)
-        if obstacleRight:
-            ex = obstacleRight.x + obstacleRight.w + margin
-            return [A.R, (ex, cy_A), (ex, cy_B), B.L]
-        
-        // 尝试 Z2: A.B → (cx_A, ey) → (cx_B, ey) → B.T
-        obstacleBelow = FindLowestObstacleBetween(A, B, allElements)
-        if obstacleBelow:
-            ey = obstacleBelow.y + obstacleBelow.h + margin
-            return [A.B, (cx_A, ey), (cx_B, ey), B.T]
+    obstacles = FindElementsBetween(A, B, allElements)
+    if obstacles is empty:
+        return null
     
-    // 其他场景类似处理...
-    // 核心原则：在无障碍的方向上延伸出去，绕到障碍物外侧，再折回目标
+    rightMost  = max(obs.x + obs.w for obs in obstacles)
+    leftMost   = min(obs.x for obs in obstacles)
+    topMost    = min(obs.y for obs in obstacles)
+    bottomMost = max(obs.y + obs.h for obs in obstacles)
+    
+    // 收集所有候选 Z 路径
+    candidates = []
+    
+    if scenario == "右下":
+        // Z1（先右再下再右）: A.R → (ex, cy_A) → (ex, cy_B) → B.L
+        candidates.push([A.R, (rightMost + margin, A.cy),
+                         (rightMost + margin, B.cy), B.L])
+        // Z2（先下再右再下）: A.B → (cx_A, ey) → (cx_B, ey) → B.T
+        candidates.push([A.B, (A.cx, bottomMost + margin),
+                         (B.cx, bottomMost + margin), B.T])
+    
+    elif scenario == "左下":
+        // Z1（先左再下再左）: A.L → (ex, cy_A) → (ex, cy_B) → B.R
+        candidates.push([A.L, (leftMost - margin, A.cy),
+                         (leftMost - margin, B.cy), B.R])
+        // Z2（先下再左再下）: A.B → (cx_A, ey) → (cx_B, ey) → B.T
+        candidates.push([A.B, (A.cx, bottomMost + margin),
+                         (B.cx, bottomMost + margin), B.T])
+    
+    elif scenario == "右上":
+        // Z1（先右再上再右）: A.R → (ex, cy_A) → (ex, cy_B) → B.L
+        candidates.push([A.R, (rightMost + margin, A.cy),
+                         (rightMost + margin, B.cy), B.L])
+        // Z2（先上再右再上）: A.T → (cx_A, ey) → (cx_B, ey) → B.B
+        candidates.push([A.T, (A.cx, topMost - margin),
+                         (B.cx, topMost - margin), B.B])
+    
+    elif scenario == "左上":
+        // Z1（先左再上再左）: A.L → (ex, cy_A) → (ex, cy_B) → B.R
+        candidates.push([A.L, (leftMost - margin, A.cy),
+                         (leftMost - margin, B.cy), B.R])
+        // Z2（先上再左再上）: A.T → (cx_A, ey) → (cx_B, ey) → B.B
+        candidates.push([A.T, (A.cx, topMost - margin),
+                         (B.cx, topMost - margin), B.B])
+    
+    // 过滤：排除穿过任何元素的候选路径（不仅是原始障碍物）
+    validCandidates = []
+    for each candidate in candidates:
+        segments = PointsToSegments(candidate)
+        if not PathHasElementObstacle(segments, allElements, A, B):
+            validCandidates.push(candidate)
+    
+    if validCandidates is empty:
+        return null
+    
+    return SelectShortestPath(validCandidates)
 
 
 function BuildZPathForStraight(A, B, scenario, allElements, occupancy):
     // 直线场景（同列/同排）中间有障碍物时的 Z 型绕行
-    // 与对角场景不同，直线场景没有 L 型过渡方案，直接从直线跳 Z 型
     // 接入原则：从哪侧绕过障碍物，就从 B 的同一侧进入
     
+    obstacles = FindElementsBetween(A, B, allElements)
+    if obstacles is empty:
+        return null
+    
+    rightMost  = max(obs.x + obs.w for obs in obstacles)
+    leftMost   = min(obs.x for obs in obstacles)
+    topMost    = min(obs.y for obs in obstacles)
+    bottomMost = max(obs.y + obs.h for obs in obstacles)
+    
+    // 收集所有候选 Z 路径（同时生成 Z1/Z2，不再提前 return）
+    candidates = []
+    
     if scenario == "同列_下":
-        obstacles = FindElementsBetween(A, B, allElements)
-        if obstacles not empty:
-            // Z1（右绕）: A.R → (ex, cy_A) → (ex, cy_B) → B.R
-            // 从右侧绕过 O，从右侧进入 B
-            rightMost = max(obs.x + obs.w for obs in obstacles)
-            ex = rightMost + margin
-            return [A.R, (ex, cy_A), (ex, cy_B), B.R]
-        
+        // Z1（右绕）: A.R → (ex, cy_A) → (ex, cy_B) → B.R
+        candidates.push([A.R, (rightMost + margin, A.cy), (rightMost + margin, B.cy), B.R])
         // Z2（左绕）: A.L → (ex, cy_A) → (ex, cy_B) → B.L
-        // 从左侧绕过 O，从左侧进入 B
-        leftMost = min(obs.x for obs in obstacles)
-        ex = leftMost - margin
-        return [A.L, (ex, cy_A), (ex, cy_B), B.L]
+        candidates.push([A.L, (leftMost - margin, A.cy), (leftMost - margin, B.cy), B.L])
     
-    if scenario == "同列_上":
-        obstacles = FindElementsBetween(A, B, allElements)
-        if obstacles not empty:
-            // Z1（右绕）: A.R → (ex, cy_A) → (ex, cy_B) → B.R
-            rightMost = max(obs.x + obs.w for obs in obstacles)
-            ex = rightMost + margin
-            return [A.R, (ex, cy_A), (ex, cy_B), B.R]
-        
-            // Z2（左绕）: A.L → (ex, cy_A) → (ex, cy_B) → B.L
-            leftMost = min(obs.x for obs in obstacles)
-            ex = leftMost - margin
-            return [A.L, (ex, cy_A), (ex, cy_B), B.L]
+    elif scenario == "同列_上":
+        // Z1（右绕）: A.R → (ex, cy_A) → (ex, cy_B) → B.R
+        candidates.push([A.R, (rightMost + margin, A.cy), (rightMost + margin, B.cy), B.R])
+        // Z2（左绕）: A.L → (ex, cy_A) → (ex, cy_B) → B.L
+        candidates.push([A.L, (leftMost - margin, A.cy), (leftMost - margin, B.cy), B.L])
     
-    if scenario == "同排_右":
-        obstacles = FindElementsBetween(A, B, allElements)
-        if obstacles not empty:
-            // Z1（下绕）: A.B → (cx_A, ey) → (cx_B, ey) → B.T
-            // 从下方绕过 O，从上方进入 B（向上进入 B.T）
-            bottomMost = max(obs.y + obs.h for obs in obstacles)
-            ey = bottomMost + margin
-            return [A.B, (cx_A, ey), (cx_B, ey), B.T]
-        
+    elif scenario == "同排_右":
+        // Z1（下绕）: A.B → (cx_A, ey) → (cx_B, ey) → B.T
+        candidates.push([A.B, (A.cx, bottomMost + margin), (B.cx, bottomMost + margin), B.T])
         // Z2（上绕）: A.T → (cx_A, ey) → (cx_B, ey) → B.T
-        // 从上方绕过 O，从上方进入 B（向下进入 B.T）
-        topMost = min(obs.y for obs in obstacles)
-        ey = topMost - margin
-        return [A.T, (cx_A, ey), (cx_B, ey), B.T]
+        candidates.push([A.T, (A.cx, topMost - margin), (B.cx, topMost - margin), B.T])
     
-    if scenario == "同排_左":
-        obstacles = FindElementsBetween(A, B, allElements)
-        if obstacles not empty:
-            // Z1（下绕）: A.B → (cx_A, ey) → (cx_B, ey) → B.T
-            bottomMost = max(obs.y + obs.h for obs in obstacles)
-            ey = bottomMost + margin
-            return [A.B, (cx_A, ey), (cx_B, ey), B.T]
-        
+    elif scenario == "同排_左":
+        // Z1（下绕）: A.B → (cx_A, ey) → (cx_B, ey) → B.T
+        candidates.push([A.B, (A.cx, bottomMost + margin), (B.cx, bottomMost + margin), B.T])
         // Z2（上绕）: A.T → (cx_A, ey) → (cx_B, ey) → B.T
-        topMost = min(obs.y for obs in obstacles)
-        ey = topMost - margin
-        return [A.T, (cx_A, ey), (cx_B, ey), B.T]
+        candidates.push([A.T, (A.cx, topMost - margin), (B.cx, topMost - margin), B.T])
     
-    return null  // 无障碍或无法绕行
+    // 过滤：排除穿过任何元素（不仅是原始障碍物）的候选路径
+    validCandidates = []
+    for each candidate in candidates:
+        segments = PointsToSegments(candidate)
+        if not PathHasElementObstacle(segments, allElements, A, B):
+            validCandidates.push(candidate)
+    
+    if validCandidates is empty:
+        return null
+    
+    // 选路径总长度最短的
+    return SelectShortestPath(validCandidates)
 ```
 
 ### 5.6 多连接并排处理
@@ -1169,6 +1242,10 @@ function RegisterPlacedLine(line, occupiedLanes):
 function rangesOverlap(a1, a2, b1, b2):
     return max(a1, b1) < min(a2, b2)
 
+LINE_THICKNESS = 2   // 默认线宽（px）
+Y_TOLERANCE = LINE_THICKNESS + 2  // 水平线 y 容差 = 4px
+X_TOLERANCE = LINE_THICKNESS + 2  // 垂直线 x 容差 = 4px
+
 function CountLineOverlaps(pathSegments, placedLines):
     overlapCount = 0
     
@@ -1176,27 +1253,86 @@ function CountLineOverlaps(pathSegments, placedLines):
         if seg.isHorizontal:
             for each placed in placedLines:
                 for each pSeg in placed.segments:
-                    if pSeg.isHorizontal and seg.y1 == pSeg.y1:
-                        if rangesOverlap(seg.x1, seg.x2, pSeg.x1, pSeg.x2):
-                            overlapCount++
+                    if pSeg.isHorizontal:
+                        // 使用容差而非精确相等：线宽范围内的 y 都算重叠
+                        if abs(seg.y1 - pSeg.y1) <= Y_TOLERANCE:
+                            if rangesOverlap(seg.x1, seg.x2, pSeg.x1, pSeg.x2):
+                                overlapCount++
         else:  // vertical
             for each placed in placedLines:
                 for each pSeg in placed.segments:
-                    if not pSeg.isHorizontal and seg.x1 == pSeg.x1:
-                        if rangesOverlap(seg.y1, seg.y2, pSeg.y1, pSeg.y2):
-                            overlapCount++
+                    if not pSeg.isHorizontal:
+                        // 使用容差而非精确相等
+                        if abs(seg.x1 - pSeg.x1) <= X_TOLERANCE:
+                            if rangesOverlap(seg.y1, seg.y2, pSeg.y1, pSeg.y2):
+                                overlapCount++
     
     return overlapCount
 ```
 
-#### 5.7.4 重叠解决：微偏移
+#### 5.7.4 重叠解决：子点切换优先，微偏移兜底
 
-当候选路径与已有连线有平行重叠时，通过**微偏移**解决，即在重叠位置插入一段垂直/水平段来错开：
+**核心原则**：能保持路径形状不变就不改形状。先尝试换连接点子点（改变出口 y/x 但保持直线/L 型），只有子点全部不可用时才用微偏移（会增加转折点）。
 
 ```
 OFFSET_DISTANCE = 10  // 偏移间距，px
 
-function TryResolveOverlap(path, placedLines):
+function TryResolveOverlap(path, placedLines, sourceElem, targetElem,
+                            exitSide, exitSub, entrySide, entrySub):
+    // === 阶段 1：子点切换（不增加转折点） ===
+    subPointPath = TrySwitchSubPoints(path, placedLines, sourceElem, targetElem,
+                                       exitSide, exitSub, entrySide, entrySub)
+    if subPointPath != null:
+        return subPointPath  // 换子点成功，路径形状不变
+    
+    // === 阶段 2：微偏移（会增加 2 个转折点） ===
+    return ApplyOffsetToPath(path, placedLines)
+
+
+function TrySwitchSubPoints(path, placedLines, sourceElem, targetElem,
+                             exitSide, exitSub, entrySide, entrySub):
+    // exitSide/exitSub 是当前路径的出口方位/子点（如 "R"/"C"）
+    // entrySide/entrySub 是当前路径的入口方位/子点（如 "L"/"C"）
+    
+    // 枚举同边的所有子点，按与原位置的距离排序（最小变动优先）
+    allExitSubs = GetSubPointsByDistance(exitSide, exitSub)
+    allEntrySubs = GetSubPointsByDistance(entrySide, entrySub)
+    
+    for each newExitSub in allExitSubs:
+        for each newEntrySub in allEntrySubs:
+            if newExitSub == exitSub and newEntrySub == entrySub:
+                continue  // 跳过原组合
+            
+            // 用新子点重新生成路径（保持相同的路径类型：直线/L型/Z型）
+            newPath = BuildPathWithSubPoints(sourceElem, targetElem,
+                                              exitSide, newExitSub,
+                                              entrySide, newEntrySub,
+                                              path.type)
+            if newPath == null:
+                continue
+            
+            // 检查新路径是否无重叠
+            if CountLineOverlaps(newPath.segments, placedLines) == 0:
+                return newPath  // 找到无重叠的子点组合
+    
+    return null  // 所有子点组合都有重叠，进入阶段 2
+
+
+function GetSubPointsByDistance(side, preferredSub):
+    // 返回该边的子点列表，按与 preferredSub 的距离排序
+    // 例：side="R", preferredSub="C" → ["C", "T", "B"]
+    if side == "R" or side == "L":
+        if preferredSub == "C": return ["C", "T", "B"]
+        if preferredSub == "T": return ["T", "C", "B"]
+        if preferredSub == "B": return ["B", "C", "T"]
+    if side == "T" or side == "B":
+        if preferredSub == "C": return ["C", "L", "R"]
+        if preferredSub == "L": return ["L", "C", "R"]
+        if preferredSub == "R": return ["R", "C", "L"]
+    return ["C"]
+
+
+function ApplyOffsetToPath(path, placedLines):
     newSegments = copy(path.segments)
     
     for i = 0 to len(newSegments) - 1:
@@ -1205,8 +1341,6 @@ function TryResolveOverlap(path, placedLines):
         if seg.isHorizontal:
             overlaps = FindParallelOverlaps(seg, placedLines.horizontal)
             if overlaps not empty:
-                // 将当前水平段向上或向下偏移
-                // 选择偏移方向：检测上下方是否被其他连线或元素占据
                 shiftUp = CanShiftTo(seg.y1 - OFFSET_DISTANCE, seg, placedLines)
                 shiftDown = CanShiftTo(seg.y1 + OFFSET_DISTANCE, seg, placedLines)
                 
@@ -1215,9 +1349,6 @@ function TryResolveOverlap(path, placedLines):
                 else:
                     newY = seg.y1 + OFFSET_DISTANCE
                 
-                // 在原位置和新位置之间插入垂直过渡段
-                // 原: ... → (x1, y) → (x2, y) → ...
-                // 改: ... → (x1, y) → (x1, newY) → (x2, newY) → (x2, y) → ...
                 InsertVerticalTransition(newSegments, i, newY)
         
         else:  // vertical
@@ -1238,8 +1369,25 @@ function TryResolveOverlap(path, placedLines):
 
 #### 5.7.5 重叠解决示例
 
+**子点切换（推荐，不增加转折点）**：
+
 ```
-偏移前（y=300 处重叠）:
+同排场景，线1 已占用 R-C → L-C (y=300)：
+  线1: A.R-C ────────────────→ B.L-C    (y=300)
+
+线2 也是同排，默认也走 R-C → L-C：
+  线2(原始): C.R-C ────────────────→ D.L-C    (y=300)  ← 重叠！
+
+子点切换后（改用 R-T → L-T，y 不同）：
+  线2(切换): C.R-T ────────────────→ D.L-T    (y=287)  ← 仍然是直线！
+```
+
+**微偏移（兜底，会增加转折点）**：
+
+```
+当所有子点都被占用时，才使用微偏移：
+
+偏移前（y=300 处重叠，且所有子点都不可用）:
   线1: A ────────────────────────→ B    (y=300)
   线2: C ────────────────────────→ D    (y=300)  ← 重叠！
 
@@ -1251,7 +1399,86 @@ function TryResolveOverlap(path, placedLines):
             └──────────────────┘──→ D  (y=300)
 ```
 
-**注意**：微偏移会增加 2 个转折点，但保证了连线不重叠。如果微偏移后新的 y/x 位置也与其他线重叠，则递归尝试更大偏移量，或回退到切换 L/L2/Z 方案。
+**注意**：子点切换是首选策略，因为它保持了路径形状（直线还是直线，L 型还是 L 型）。微偏移仅在子点全部不可用时作为兜底手段。
+
+---
+
+### 5.8 全局迭代优化
+
+贪心顺序处理可能导致早期连线"抢占"最优通道，迫使后续连线走折线。全局优化阶段对所有连线进行迭代调整，目标是最小化总转折点数。
+
+```
+MAX_REFINE_ITERATIONS = 3  // 最多迭代次数，防止死循环
+
+function GlobalRefinePass(placedLines, allElements):
+    for iter = 1 to MAX_REFINE_ITERATIONS:
+        improved = false
+        
+        // 重新构建当前占用表
+        occupiedLanes = RebuildOccupiedLanes(placedLines)
+        
+        for i = 0 to len(placedLines) - 1:
+            origLine = placedLines[i]
+            origTurns = CountTurns(origLine)
+            
+            // 临时移除该连线，释放其通道
+            tempPlaced = placedLines without origLine
+            tempOccupied = RebuildOccupiedLanes(tempPlaced)
+            
+            // 用更新后的占用表重新路由该连线
+            newLine = RouteConnection(
+                origLine.source, origLine.target,
+                allElements, tempPlaced, /* cellOccupancy */
+            )
+            newTurns = CountTurns(newLine)
+            
+            if newTurns < origTurns:
+                // 新路径转折更少 → 采纳
+                placedLines[i] = newLine
+                improved = true
+            elif newTurns == origTurns:
+                // 转折数相同 → 选重叠更少的
+                oldOverlap = CountLineOverlaps(origLine, tempPlaced)
+                newOverlap = CountLineOverlaps(newLine, tempPlaced)
+                if newOverlap < oldOverlap:
+                    placedLines[i] = newLine
+                    improved = true
+        
+        if not improved:
+            break  // 收敛，提前退出
+    
+    return placedLines
+
+
+function CountTurns(line):
+    // 统计路径中的转折点数
+    turns = 0
+    for i = 1 to len(line.segments) - 1:
+        if line.segments[i-1].isHorizontal != line.segments[i].isHorizontal:
+            turns++
+    return turns
+
+
+function RebuildOccupiedLanes(placedLines):
+    occupiedLanes = { horizontal: [], vertical: [] }
+    for each line in placedLines:
+        RegisterPlacedLine(line, occupiedLanes)
+    return occupiedLanes
+```
+
+**优化效果示例**：
+
+```
+迭代前（贪心顺序）:
+  连线1: A→B  直线 (y=300)          ← 抢到了最佳通道
+  连线2: C→D  折线 (需要绕开 y=300)  ← 被线1逼迫走折线
+  连线3: E→F  直线 (y=290)
+
+迭代后（全局优化）:
+  连线1: A→B  直线 (y=290)          ← 换到 y=290，与线3位置交换
+  连线2: C→D  直线 (y=300)          ← 获得了最优通道！
+  连线3: E→F  直线 (y=290)          ← 通过子点切换与线1共享通道
+```
 
 ---
 
@@ -1267,7 +1494,7 @@ flowchart TD
     
     Pos --> NextConn{还有未处理的连接?}
     NextConn -->|是| GetConn[取下一条连接 A → B]
-    NextConn -->|否| Output([输出元素坐标 + 路径点序列])
+    NextConn -->|否| GlobalRefine[全局迭代优化<br>最小化总转折点数]
     
     GetConn --> Classify{分类相对位置}
     Classify -->|同列/同排| Straight[尝试直线路径 0 转]
@@ -1297,14 +1524,16 @@ flowchart TD
     
     Select --> CheckOverlap{有连线重叠?}
     CheckOverlap -->|无| Register[登记到线段占用表]
-    CheckOverlap -->|有| Resolve[尝试微偏移解决]
+    CheckOverlap -->|有| SubPoint[子点切换优先<br>保持路径形状]
     
-    Resolve --> Resolved{偏移成功?}
-    Resolved -->|是| Register
-    Resolved -->|否| UseRaw[接受原路径<br>重叠不可避免]
-    UseRaw --> Register
+    SubPoint --> SubOK{切换成功?}
+    SubOK -->|是| Register
+    SubOK -->|否| Offset[微偏移兜底<br>增加2转折点]
+    Offset --> Register
     
     Register --> NextConn
+    
+    GlobalRefine --> Output([输出元素坐标 + 路径点序列])
 ```
 
 ---
@@ -1318,7 +1547,9 @@ flowchart TD
 | 单条连线（无障碍，无重叠） | O(V) | O(1) | 仅检查所有元素是否与路径相交 |
 | 单条连线（Z 型绕行） | O(V²) | O(1) | 需要找到绕行方向和距离 |
 | 单条连线重叠检测 | O(E_path × N_seg) | O(N_seg) | E_path=已有连线数, N_seg=路径段数 |
+| 子点切换解决重叠 | O(9 × E_path) = O(E_path) | O(1) | 最多 3×3=9 种子点组合 |
 | 微偏移解决重叠 | O(N_seg × E_path) | O(1) | 每次偏移需重新检查偏移位置 |
+| 全局迭代优化 | O(R × E × (V + E_path)) | O(E + N_seg) | R≤3 为迭代次数，通常立即收敛 |
 | **整体** | **O(V + E·(V + E_path))** | **O(V + E + N_seg)** | 通常 V ≤ 50，性能充足 |
 
 ---
@@ -1350,6 +1581,8 @@ flowchart TD
 | 对角 L1/L2 被中间元素阻挡 | L1 被挡切换到 L2（反之亦然），均被挡升级为 Z 型 |
 | 多个障碍物连续阻挡 | 计算障碍物集合的联合边界（rightMost/leftMost/bottomMost/topMost），统一绕行 |
 | 障碍物占据多个行列 | 按网格区域判断阻挡关系，合并障碍物边界后统一绕行 |
+| 连线重叠（平行共线） | 优先子点切换保持路径形状 → 子点不可用时微偏移兜底 |
+| 多条连线竞争同一通道 | 全局迭代优化（5.8 节）重新分配通道，最小化总转折点数 |
 
 ### 8.3 箭头处理
 

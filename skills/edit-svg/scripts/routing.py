@@ -848,22 +848,38 @@ def classify_edge(src_node: Dict[str, Any], dst_node: Dict[str, Any]) -> str:
 # =========================================================================
 
 
+_SEG_EPSILON = 1.0  # px — exclude segment endpoints on element boundaries
+
+
 def segment_intersects_element(
     seg_start: Point, seg_end: Point, elem_bbox: BBox
 ) -> bool:
-    """Check if a horizontal/vertical segment crosses a node interior."""
+    """Check if a horizontal/vertical segment crosses a node interior.
+
+    Uses EPSILON tolerance to exclude cases where the segment endpoint
+    merely touches the element boundary (e.g., a connection point on the
+    edge of the element should not count as intersecting).
+    Only the *interior* of the segment (excluding endpoints) is checked.
+    """
     x, y, w, h = elem_bbox
     sx1, sy1 = seg_start
     sx2, sy2 = seg_end
 
     if abs(sy1 - sy2) < 1e-6:  # Horizontal
-        if sy1 < y or sy1 > y + h:
+        # Segment y must be strictly inside the element's vertical range
+        if sy1 <= y + _SEG_EPSILON or sy1 >= y + h - _SEG_EPSILON:
             return False
-        return max(min(sx1, sx2), x) < min(max(sx1, sx2), x + w)
+        seg_left, seg_right = min(sx1, sx2), max(sx1, sx2)
+        overlap_left = max(seg_left, x + _SEG_EPSILON)
+        overlap_right = min(seg_right, x + w - _SEG_EPSILON)
+        return overlap_left < overlap_right
     else:  # Vertical
-        if sx1 < x or sx1 > x + w:
+        if sx1 <= x + _SEG_EPSILON or sx1 >= x + w - _SEG_EPSILON:
             return False
-        return max(min(sy1, sy2), y) < min(max(sy1, sy2), y + h)
+        seg_top, seg_bottom = min(sy1, sy2), max(sy1, sy2)
+        overlap_top = max(seg_top, y + _SEG_EPSILON)
+        overlap_bottom = min(seg_bottom, y + h - _SEG_EPSILON)
+        return overlap_top < overlap_bottom
 
 
 # =========================================================================
@@ -1011,12 +1027,10 @@ def build_Z_path(
 ) -> Optional[List[Point]]:
     """Z-shaped (2-turn) path navigating around obstacles.
 
-    Handles multiple obstacles by computing the combined boundary of all
-    intermediate nodes (flowchart.md \\u00a74.4). Uses sub-port selection
-    for optimal exit/entry points.
-
-    For DIAG_DOWN_RIGHT: extends right past obstacles, then down.
-    For DIAG_DOWN_LEFT:  extends left past obstacles, then down.
+    Generates all candidate Z-paths (Z1+Z2), filters out any that intersect
+    other elements (beyond the originally detected obstacles), and returns
+    the shortest valid path. This implements the updated BuildZPath from
+    flowchart.md §5.5.
     """
     sc = center(src_node["bbox"])
     dc = center(dst_node["bbox"])
@@ -1027,83 +1041,93 @@ def build_Z_path(
     if not obs_boundary:
         return None
 
+    candidates: List[List[Point]] = []
+    r, l, t, b = (
+        obs_boundary["right"],
+        obs_boundary["left"],
+        obs_boundary["top"],
+        obs_boundary["bottom"],
+    )
+
     if scenario == "DIAG_DOWN_RIGHT":
-        # Z1: right-bypass → A.R → (ex, cy_A) → (ex, cy_B) → B.T
-        if obs_boundary["right"] > sc[0]:
-            ex = obs_boundary["right"] + margin
-            return [
+        # Z1: right-bypass
+        candidates.append(
+            [
                 _select_sub_port(src_node["bbox"], "right", dst_center),
-                (ex, sc[1]),
-                (ex, dc[1]),
+                (r + margin, sc[1]),
+                (r + margin, dc[1]),
                 _select_sub_port(dst_node["bbox"], "top", src_center),
             ]
-        # Z2: bottom-bypass → A.B → (cx_A, ey) → (cx_B, ey) → B.T
-        ey = obs_boundary["bottom"] + margin
-        return [
-            _select_sub_port(src_node["bbox"], "bottom", dst_center),
-            (sc[0], ey),
-            (dc[0], ey),
-            _select_sub_port(dst_node["bbox"], "top", src_center),
-        ]
+        )
+        # Z2: bottom-bypass
+        candidates.append(
+            [
+                _select_sub_port(src_node["bbox"], "bottom", dst_center),
+                (sc[0], b + margin),
+                (dc[0], b + margin),
+                _select_sub_port(dst_node["bbox"], "top", src_center),
+            ]
+        )
 
     elif scenario == "DIAG_DOWN_LEFT":
-        # Z1: left-bypass → A.L → (ex, cy_A) → (ex, cy_B) → B.T
-        if obs_boundary["left"] < sc[0]:
-            ex = obs_boundary["left"] - margin
-            return [
+        candidates.append(
+            [
                 _select_sub_port(src_node["bbox"], "left", dst_center),
-                (ex, sc[1]),
-                (ex, dc[1]),
+                (l - margin, sc[1]),
+                (l - margin, dc[1]),
                 _select_sub_port(dst_node["bbox"], "top", src_center),
             ]
-        # Z2: bottom-bypass → A.B → (cx_A, ey) → (cx_B, ey) → B.T
-        ey = obs_boundary["bottom"] + margin
-        return [
-            _select_sub_port(src_node["bbox"], "bottom", dst_center),
-            (sc[0], ey),
-            (dc[0], ey),
-            _select_sub_port(dst_node["bbox"], "top", src_center),
-        ]
+        )
+        candidates.append(
+            [
+                _select_sub_port(src_node["bbox"], "bottom", dst_center),
+                (sc[0], b + margin),
+                (dc[0], b + margin),
+                _select_sub_port(dst_node["bbox"], "top", src_center),
+            ]
+        )
 
     elif scenario == "DIAG_UP_RIGHT":
-        # Z1: right-bypass → A.R → (ex, cy_A) → (ex, cy_B) → B.B
-        if obs_boundary["right"] > sc[0]:
-            ex = obs_boundary["right"] + margin
-            return [
+        candidates.append(
+            [
                 _select_sub_port(src_node["bbox"], "right", dst_center),
-                (ex, sc[1]),
-                (ex, dc[1]),
+                (r + margin, sc[1]),
+                (r + margin, dc[1]),
                 _select_sub_port(dst_node["bbox"], "bottom", src_center),
             ]
-        # Z2: top-bypass → A.T → (cx_A, ey) → (cx_B, ey) → B.B
-        ey = obs_boundary["top"] - margin
-        return [
-            _select_sub_port(src_node["bbox"], "top", dst_center),
-            (sc[0], ey),
-            (dc[0], ey),
-            _select_sub_port(dst_node["bbox"], "bottom", src_center),
-        ]
+        )
+        candidates.append(
+            [
+                _select_sub_port(src_node["bbox"], "top", dst_center),
+                (sc[0], t - margin),
+                (dc[0], t - margin),
+                _select_sub_port(dst_node["bbox"], "bottom", src_center),
+            ]
+        )
 
     elif scenario == "DIAG_UP_LEFT":
-        # Z1: left-bypass → A.L → (ex, cy_A) → (ex, cy_B) → B.B
-        if obs_boundary["left"] < sc[0]:
-            ex = obs_boundary["left"] - margin
-            return [
+        candidates.append(
+            [
                 _select_sub_port(src_node["bbox"], "left", dst_center),
-                (ex, sc[1]),
-                (ex, dc[1]),
+                (l - margin, sc[1]),
+                (l - margin, dc[1]),
                 _select_sub_port(dst_node["bbox"], "bottom", src_center),
             ]
-        # Z2: top-bypass → A.T → (cx_A, ey) → (cx_B, ey) → B.B
-        ey = obs_boundary["top"] - margin
-        return [
-            _select_sub_port(src_node["bbox"], "top", dst_center),
-            (sc[0], ey),
-            (dc[0], ey),
-            _select_sub_port(dst_node["bbox"], "bottom", src_center),
-        ]
+        )
+        candidates.append(
+            [
+                _select_sub_port(src_node["bbox"], "top", dst_center),
+                (sc[0], t - margin),
+                (dc[0], t - margin),
+                _select_sub_port(dst_node["bbox"], "bottom", src_center),
+            ]
+        )
 
-    return None
+    # Filter: exclude candidates that pass through any element
+    valid = _filter_valid_candidates(candidates, all_nodes, src_node, dst_node)
+    if not valid:
+        return None
+    return _select_shortest_path(valid)
 
 
 def build_perimeter_path(
@@ -1144,16 +1168,33 @@ def _detect_intermediate_nodes(
     dst_node: Dict[str, Any],
     all_nodes: List[Dict[str, Any]],
 ) -> List[Dict[str, Any]]:
-    """Return all nodes strictly between src and dst in the grid."""
+    """Return all nodes between src and dst using pixel bounding-box overlap.
+
+    Uses pixel coordinates (not grid row/col) to compute the bounding rectangle
+    of the A→B connection, then returns nodes whose bbox overlaps that rectangle.
+    This aligns with the updated FindElementsBetween in flowchart.md §4.4.
+    """
+    MARGIN = 2  # pixel tolerance to avoid edge-contact false positives
+    sx, sy, sw, sh = src_node["bbox"]
+    dx, dy, dw, dh = dst_node["bbox"]
+
+    rect_left = min(sx, dx) - MARGIN
+    rect_right = max(sx + sw, dx + dw) + MARGIN
+    rect_top = min(sy, dy) - MARGIN
+    rect_bottom = max(sy + sh, dy + dh) + MARGIN
+
     between: List[Dict[str, Any]] = []
-    sr, sc_ = src_node["row"], src_node["col"]
-    dr, dc = dst_node["row"], dst_node["col"]
-    min_r, max_r = min(sr, dr), max(sr, dr)
-    min_c, max_c = min(sc_, dc), max(sc_, dc)
     for n in all_nodes:
         if n["id"] in (src_node["id"], dst_node["id"]):
             continue
-        if min_r <= n["row"] <= max_r and min_c <= n["col"] <= max_c:
+        nx, ny, nw, nh = n["bbox"]
+        # Check if node's bbox overlaps the A→B bounding rectangle
+        if (
+            nx + nw > rect_left
+            and nx < rect_right
+            and ny + nh > rect_top
+            and ny < rect_bottom
+        ):
             between.append(n)
     return between
 
@@ -1168,22 +1209,9 @@ def build_Z_path_for_straight(
 ) -> Optional[List[Point]]:
     """Z-shaped (2-turn) path for straight-line scenarios blocked by obstacles.
 
-    Entry principle: approach from the bypass side, enter B from that same side
-    so the line never crosses B's body. Uses sub-port selection for optimal
-    exit/entry points.
-
-    Same-column scenarios (SAME_COL_DOWN/UP):
-      - Right-bypass (default): exit from RIGHT, route right of obstacles,
-        enter B from RIGHT side.
-      - Left-bypass (use bypass_above=True): exit from LEFT, route left of
-        obstacles, enter B from LEFT side.
-
-    Same-row scenarios (SAME_ROW_RIGHT/LEFT):
-      - Below-bypass (default): exit from BOTTOM, route below obstacles,
-        enter B from TOP side (approach from below, go up into B's top edge).
-      - Above-bypass (use bypass_above=True): exit from TOP, route above
-        obstacles, enter B from TOP side (approach from above, go down into
-        B's top edge).
+    Generates both Z1 and Z2 bypass candidates, filters out any that intersect
+    other elements, and returns the shortest valid path. Implements the updated
+    BuildZPathForStraight from flowchart.md §5.5.
     """
     sc = center(src_node["bbox"])
     dc = center(dst_node["bbox"])
@@ -1193,50 +1221,58 @@ def build_Z_path_for_straight(
     if not intermediates:
         return None
 
+    rightMost = max(n["x"] + n["width"] for n in intermediates)
+    leftMost = min(n["x"] for n in intermediates)
+    topMost = min(n["y"] for n in intermediates)
+    bottomMost = max(n["y"] + n["height"] for n in intermediates)
+
+    candidates: List[List[Point]] = []
+
     if scenario in ("SAME_COL_DOWN", "SAME_COL_UP"):
-        # Column scenarios: bypass right (default) or left
-        if not bypass_above:
-            # Right-bypass: exit RIGHT → enter B from RIGHT
-            obs_right_x = max(n["x"] + n["width"] for n in intermediates)
-            ex = obs_right_x + margin
-            return [
+        # Z1: right-bypass
+        candidates.append(
+            [
                 _select_sub_port(src_node["bbox"], "right", dst_center),
-                (ex, sc[1]),
-                (ex, dc[1]),
+                (rightMost + margin, sc[1]),
+                (rightMost + margin, dc[1]),
                 _select_sub_port(dst_node["bbox"], "right", src_center),
             ]
-        else:
-            # Left-bypass: exit LEFT → enter B from LEFT
-            obs_left_x = min(n["x"] for n in intermediates)
-            ex = obs_left_x - margin
-            return [
+        )
+        # Z2: left-bypass
+        candidates.append(
+            [
                 _select_sub_port(src_node["bbox"], "left", dst_center),
-                (ex, sc[1]),
-                (ex, dc[1]),
+                (leftMost - margin, sc[1]),
+                (leftMost - margin, dc[1]),
                 _select_sub_port(dst_node["bbox"], "left", src_center),
             ]
+        )
 
     else:  # SAME_ROW_RIGHT, SAME_ROW_LEFT
-        if not bypass_above:
-            # Below-bypass: exit BOTTOM → approach from below → enter B from TOP
-            obs_bottom_y = max(n["y"] + n["height"] for n in intermediates)
-            ey = obs_bottom_y + margin
-            return [
+        # Z1: below-bypass
+        candidates.append(
+            [
                 _select_sub_port(src_node["bbox"], "bottom", dst_center),
-                (sc[0], ey),
-                (dc[0], ey),
+                (sc[0], bottomMost + margin),
+                (dc[0], bottomMost + margin),
                 _select_sub_port(dst_node["bbox"], "top", src_center),
             ]
-        else:
-            # Above-bypass: exit TOP → approach from above → enter B from TOP
-            obs_top_y = min(n["y"] for n in intermediates)
-            ey = obs_top_y - margin
-            return [
+        )
+        # Z2: above-bypass
+        candidates.append(
+            [
                 _select_sub_port(src_node["bbox"], "top", dst_center),
-                (sc[0], ey),
-                (dc[0], ey),
+                (sc[0], topMost - margin),
+                (dc[0], topMost - margin),
                 _select_sub_port(dst_node["bbox"], "top", src_center),
             ]
+        )
+
+    # Filter: exclude candidates that pass through any element
+    valid = _filter_valid_candidates(candidates, all_nodes, src_node, dst_node)
+    if not valid:
+        return None
+    return _select_shortest_path(valid)
 
 
 def generate_candidates(
@@ -1274,18 +1310,14 @@ def generate_candidates(
             cand.append((straight, 0))
         else:
             # Obstacle detected → skip L-shape, go directly to Z-shape
-            # (1-turn path can't resolve collinear obstacle blocking)
-            # Generate both Z1 (right/below) and Z2 (left/above) bypasses
-            z1 = build_Z_path_for_straight(
-                src_node, dst_node, scenario, all_nodes, bypass_above=False
+            z_path = build_Z_path_for_straight(
+                src_node,
+                dst_node,
+                scenario,
+                all_nodes,
             )
-            if z1:
-                cand.append((z1, 1))
-            z2 = build_Z_path_for_straight(
-                src_node, dst_node, scenario, all_nodes, bypass_above=True
-            )
-            if z2:
-                cand.append((z2, 1))
+            if z_path:
+                cand.append((z_path, 1))
 
     if scenario in (
         "DIAG_DOWN_RIGHT",
@@ -1314,6 +1346,9 @@ def select_best_path(
     """Score candidates and return the best path.
 
     Scoring: element obstacle → DISQUALIFIED; then turn_count×100 + overlaps.
+    If the best path still has overlaps, tries sub-point switching first
+    (keeps path shape), falls back to accepting the path as-is.
+
     Returns None if all candidates are blocked.
     """
     placed_edges = placed_edges or []
@@ -1334,12 +1369,32 @@ def select_best_path(
             continue
 
         oc = _count_parallel_overlaps(path, placed_edges)
-        scored.append((path, turns * 100 + oc))
+        scored.append((path, turns * 100 + oc, oc))
 
     if not scored:
         return None
     scored.sort(key=lambda x: x[1])
-    return scored[0][0]
+
+    best_path = scored[0][0]
+    best_overlap = scored[0][2]
+
+    if best_overlap > 0:
+        # Try sub-point switching first (keeps path shape)
+        scenario = classify_edge(src_node, dst_node)
+        src_side, dst_side = auto_detect_sides(src_node, dst_node)
+        switched = _try_switch_sub_points(
+            best_path,
+            placed_edges,
+            src_node,
+            dst_node,
+            src_side,
+            dst_side,
+            scenario,
+        )
+        if switched is not None:
+            return switched
+
+    return best_path
 
 
 # =========================================================================
@@ -1444,3 +1499,247 @@ def compute_segments(waypoints: List[Point]) -> List[Dict[str, Any]]:
             }
         )
     return segs
+
+
+# =========================================================================
+# Candidate filtering & selection helpers
+# =========================================================================
+
+
+def _filter_valid_candidates(
+    candidates: List[List[Point]],
+    all_nodes: List[Dict[str, Any]],
+    src_node: Dict[str, Any],
+    dst_node: Dict[str, Any],
+) -> List[List[Point]]:
+    """Filter out candidates whose path segments intersect any element.
+
+    This is the self-validation step from flowchart.md §5.5: Z-paths
+    are checked against ALL elements (not just the originally detected
+    obstacles) before being returned.
+    """
+    valid: List[List[Point]] = []
+    for path in candidates:
+        blocked = False
+        for node in all_nodes:
+            if node["id"] in (src_node["id"], dst_node["id"]):
+                continue
+            for i in range(len(path) - 1):
+                if segment_intersects_element(path[i], path[i + 1], node["bbox"]):
+                    blocked = True
+                    break
+            if blocked:
+                break
+        if not blocked:
+            valid.append(path)
+    return valid
+
+
+def _select_shortest_path(candidates: List[List[Point]]) -> List[Point]:
+    """Return the candidate with the shortest total path length."""
+    best = candidates[0]
+    best_len = _path_length(best)
+    for c in candidates[1:]:
+        cl = _path_length(c)
+        if cl < best_len:
+            best, best_len = c, cl
+    return best
+
+
+def _path_length(path: List[Point]) -> float:
+    """Compute total Euclidean length of a path."""
+    total = 0.0
+    for i in range(len(path) - 1):
+        total += distance(path[i], path[i + 1])
+    return total
+
+
+# =========================================================================
+# Sub-point switching — avoids overlap without adding turns
+# =========================================================================
+
+_SUB_POINT_ORDER = {
+    "right": ["C", "T", "B"],
+    "left": ["C", "T", "B"],
+    "top": ["C", "L", "R"],
+    "bottom": ["C", "L", "R"],
+}
+
+
+def _build_path_with_sub_points(
+    src_node: Dict[str, Any],
+    dst_node: Dict[str, Any],
+    src_side: str,
+    src_sub: str,
+    dst_side: str,
+    dst_sub: str,
+    scenario: str,
+) -> Optional[List[Point]]:
+    """Rebuild a path using specific sub-points instead of the defaults.
+
+    Sub-point letters: 'C' (center), 'T'/'L' (top/left third),
+    'B'/'R' (bottom/right third). Maps to specific port indices
+    on the 3-port-per-side allocation.
+    """
+    sub_to_idx = {"C": 1, "T": 0, "L": 0, "B": 2, "R": 2}
+    ports_per_side = 3
+
+    src_ports = get_side_ports(src_node["bbox"], src_side, ports_per_side)
+    dst_ports = get_side_ports(dst_node["bbox"], dst_side, ports_per_side)
+
+    src_idx = sub_to_idx.get(src_sub, 1)  # default to center
+    dst_idx = sub_to_idx.get(dst_sub, 1)
+    if src_idx >= len(src_ports) or dst_idx >= len(dst_ports):
+        return None
+
+    src_pt = src_ports[src_idx]
+    dst_pt = dst_ports[dst_idx]
+
+    is_straight = scenario in (
+        "SAME_COL_DOWN",
+        "SAME_COL_UP",
+        "SAME_ROW_RIGHT",
+        "SAME_ROW_LEFT",
+    )
+
+    if is_straight:
+        # Check alignment for straight path
+        if abs(src_pt[0] - dst_pt[0]) < 1e-6 or abs(src_pt[1] - dst_pt[1]) < 1e-6:
+            return [src_pt, dst_pt]
+        return [src_pt, (src_pt[0], dst_pt[1]), dst_pt]
+    else:
+        # L1-style: turn at src-side's axis
+        if src_side in ("right", "left"):
+            return [src_pt, (dst_node["x"] + dst_node["width"] / 2, src_pt[1]), dst_pt]
+        else:
+            return [src_pt, (src_pt[0], dst_node["y"] + dst_node["height"] / 2), dst_pt]
+
+
+def _try_switch_sub_points(
+    path: List[Point],
+    placed_edges: List[Dict[str, Any]],
+    src_node: Dict[str, Any],
+    dst_node: Dict[str, Any],
+    src_side: str,
+    dst_side: str,
+    scenario: str,
+) -> Optional[List[Point]]:
+    """Try switching sub-points on the same sides to avoid line overlaps.
+
+    Enumerates all sub-point combinations on the same exit/entry sides,
+    keeping the path shape (straight/L-type) unchanged. Returns the first
+    combination with zero overlaps, or None if all overlap.
+    """
+    exit_subs = _SUB_POINT_ORDER.get(src_side, ["C", "T", "B"])
+    entry_subs = _SUB_POINT_ORDER.get(dst_side, ["C", "L", "R"])
+
+    for esub in exit_subs:
+        for dsub in entry_subs:
+            new_path = _build_path_with_sub_points(
+                src_node,
+                dst_node,
+                src_side,
+                esub,
+                dst_side,
+                dsub,
+                scenario,
+            )
+            if new_path is None:
+                continue
+            if _count_parallel_overlaps(new_path, placed_edges) == 0:
+                return new_path
+    return None
+
+
+# =========================================================================
+# Global iterative refinement
+# =========================================================================
+
+_MAX_REFINE_ITERATIONS = 3
+
+
+def global_refine_pass(
+    placed_edges: List[Dict[str, Any]],
+    all_nodes: List[Dict[str, Any]],
+    node_map: Dict[str, Dict[str, Any]],
+    ports_per_side: int = 3,
+    clearance: float = 25.0,
+) -> List[Dict[str, Any]]:
+    """Iteratively re-route edges to minimize total turn count.
+
+    Implements the GlobalRefinePass from flowchart.md §5.8:
+    1. For each edge, temporarily remove it from placed_edges.
+    2. Re-route it with the updated lane occupancy.
+    3. If the new route has fewer turns (or same turns + fewer overlaps),
+       accept the new route.
+
+    Runs up to _MAX_REFINE_ITERATIONS times or until convergence.
+    """
+    obstacles = [n["bbox"] for n in all_nodes]
+
+    for _ in range(_MAX_REFINE_ITERATIONS):
+        improved = False
+
+        for i, edge in enumerate(placed_edges):
+            orig_turns = _count_turns(edge.get("waypoints", []))
+            if orig_turns == 0:
+                continue  # already optimal
+
+            # Temporarily remove this edge
+            temp_placed = placed_edges[:i] + placed_edges[i + 1 :]
+
+            # Re-route
+            src_node = node_map[edge["from"]]
+            dst_node = node_map[edge["to"]]
+            scenario = classify_edge(src_node, dst_node)
+            candidates = generate_candidates(
+                scenario,
+                src_node,
+                dst_node,
+                all_nodes,
+            )
+            new_path = select_best_path(
+                candidates,
+                all_nodes,
+                src_node,
+                dst_node,
+                temp_placed,
+            )
+            if new_path is None:
+                continue
+
+            new_turns = _count_turns(new_path)
+            if new_turns < orig_turns:
+                edge["waypoints"] = new_path
+                edge["path_d"] = path_to_svg_d(new_path)
+                edge["_segments"] = compute_segments(new_path)
+                improved = True
+            elif new_turns == orig_turns:
+                old_overlap = _count_parallel_overlaps(
+                    edge.get("waypoints", []),
+                    temp_placed,
+                )
+                new_overlap = _count_parallel_overlaps(new_path, temp_placed)
+                if new_overlap < old_overlap:
+                    edge["waypoints"] = new_path
+                    edge["path_d"] = path_to_svg_d(new_path)
+                    edge["_segments"] = compute_segments(new_path)
+                    improved = True
+
+        if not improved:
+            break
+
+    return placed_edges
+
+
+def _count_turns(waypoints: List[Point]) -> int:
+    """Count the number of direction changes in a path."""
+    if len(waypoints) < 3:
+        return 0
+    turns = 0
+    for i in range(1, len(waypoints) - 1):
+        prev_h = abs(waypoints[i - 1][1] - waypoints[i][1]) < 1e-6
+        curr_h = abs(waypoints[i][1] - waypoints[i + 1][1]) < 1e-6
+        if prev_h != curr_h:
+            turns += 1
+    return turns

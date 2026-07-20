@@ -21,6 +21,7 @@ The script must:
 - Define node/edge data structures inline
 - Use `dag_layout()` or `assign_flow_layout()` for auto-layout, or `flow_layout()` + manual centering
 - Route connections via `route_all_edges()` or `route_with_port_allocation()`
+- After routing, run `global_refine_pass()` for iterative optimization
 - Generate SVG elements and save to `.svg` file
 - Be run with `python3 generate_diagram.py`
 
@@ -28,21 +29,22 @@ The script must:
 
 After running the script, open the SVG in the browser and check:
 
-1. **Line-node overlap**: No edge passes through any node interior.
-2. **Line overlap**: No two parallel lines share the same corridor position.
-3. **Turning point clearance**: No turning point aligns with any node's edge (SKILL.md `<rules>` has the algorithm).
+1. **Line-node overlap**: No edge passes through any node interior. Pixel-based obstacle detection with EPSILON tolerance now prevents false positives.
+2. **Line overlap**: No two parallel lines share the same corridor position. Sub-point switching resolves overlaps without adding turns.
+3. **Turning point clearance**: No turning point aligns with any node's edge.
 4. **Connection sides**: Edges enter/exit from correct sides.
 5. **Row alignment**: Same-row nodes share identical `center_y`; same-column nodes share identical `center_x`.
 6. **Column gap**: Inter-column gap ≥140px for corridor-routed diagrams. Enforce via `enforce_column_gap()`.
 7. **Label overlap**: Labels don't overlap nodes. Prefer manual position for cross-column edges.
 8. **Approach segments**: Entry segments into nodes ≥15px (validated by `endpoint_valid()`).
+9. **Minimal turns**: Run `global_refine_pass()` after routing to minimize total turn count.
 
 Fix issues in script and re-run until all criteria are met.
 
 ## Validation API
 
 ```python
-from routing import endpoint_valid, detect_intersections
+from routing import endpoint_valid, detect_intersections, global_refine_pass
 from geometry import find_overlapping
 
 for e in edges:
@@ -51,6 +53,9 @@ for e in edges:
 
 intersections = detect_intersections([e['waypoints'] for e in edges], [n['bbox'] for n in nodes])
 overlaps = find_overlapping([n['bbox'] for n in nodes], margin=10)
+
+# Global optimization — minimize total turns
+edges = global_refine_pass(edges, nodes, node_map)
 ```
 
 ## Side Specification Rules for Manual Routing
