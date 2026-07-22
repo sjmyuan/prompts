@@ -22,3 +22,4 @@ A well-formed copilot skill file uses these sections with distinct, non-overlapp
 - `<context-loading-guide>` first column describes *what the file contains* instead of *when to load it* — forces the agent to infer the loading condition, leading to missed or wrong loads
 - `<examples>` content embedded inline rather than referenced by file path for on-demand loading
 - Large reference rubrics embedded inline in SKILL.md instead of extracted to `reference/` files
+- Using `<knowledge>`, `<capabilities>`, or `<rules>` tag syntax to reference sections in prose (e.g., "put this in `<knowledge>`") — use plain names like "the knowledge section" instead; XML-like syntax may confuse the AI during parsing

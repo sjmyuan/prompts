@@ -79,6 +79,7 @@ Both the **skill name** and its **capability names** in created skills **must** 
 - Large reference rubrics embedded inline in SKILL.md instead of extracted to `reference/` files
 - Examples embedded inline rather than referenced by file path for on-demand loading
 - `<context-loading-guide>` written as a bullet list, or with a description-first format instead of a condition-first format
+- Using `<knowledge>`, `<capabilities>`, or `<rules>` tag syntax to reference sections in prose (e.g., "put this in `<knowledge>`") — use plain names like "the knowledge section" instead; XML-like syntax may confuse the AI during parsing
 </common-structural-violations>
 
 <trigger-correctness-rules>
@@ -103,6 +104,14 @@ Each example file must meet:
 - **Traceable to a named capability**: A reader can identify which capability produced this output
 - **No contradictions with the parent skill**: The example output does not violate any rule or knowledge entry in the same skill
 </example-quality-requirements>
+
+<platform-agnostic-writing>
+Skills should be portable across AI platforms. When creating skills:
+
+- **Avoid platform-specific tool names**: Replace tool names like `vscode_askQuestions` or `run_in_terminal` with generic action descriptions — e.g., "ask the user for confirmation" instead of "use `vscode_askQuestions`", or "run the command" instead of "use `run_in_terminal`"
+- **Use abstract context type descriptions**: Describe persistent context targets by their type (personal persistent notes, project-level persistent notes, session-scoped context) rather than by concrete file paths like `/memories/`. Detect what the platform supports, then map accordingly.
+- **Detect, don't assume**: When a capability needs to interact with platform features (context stores, tools, file structures), first detect what the platform supports, then map to available mechanisms
+</platform-agnostic-writing>
 
 <skill-directory-structure>
 Each skill lives under `skills/<skill-name>/` with the following structure:
