@@ -2,7 +2,7 @@
 
 **Applies**: `detect-learning-signals` (terminates early when quality gate rejects all candidates)
 
-**Scenario**: User asks the AI to learn from a session. The conversation was a routine bug fix with no reusable insights. The quality gate rejects every candidate.
+**Scenario**: User asks to learn from a session. The conversation was a routine bug fix with no reusable insights. The quality gate rejects every candidate.
 
 ---
 
@@ -23,6 +23,8 @@ User: Great. Now, learn from this session and save what's worth keeping.
 ---
 
 ## Step 1: detect-learning-signals
+
+**Source type**: Chat session
 
 **Scan for signals**:
 - No explicit user feedback with rules/preferences (user didn't say "remember this" or "always do X")

@@ -26,6 +26,8 @@ Later, user says: "Learn from this session and save what's worth keeping."
 
 ## Step 1: detect-learning-signals
 
+**Source type**: Chat session
+
 **Signal detected**: Explicit user feedback — the user stated a project-specific rule ("we never expose raw error messages") and explicitly said "Remember this."
 
 **Signal type**: Explicit user feedback

@@ -24,6 +24,8 @@ User: Now learn from this session.
 
 ## Step 1: detect-learning-signals
 
+**Source type**: Chat session
+
 **Signal detected**: Explicit user feedback with target specification — user stated a rule ("always confirm before writing to src/") AND specified the target ("coding-assistant agent instructions").
 
 **Signal type**: Explicit user feedback (with target specified)
@@ -50,9 +52,9 @@ User: Now learn from this session.
 - Found: `prompts/copilot-agents/coding-assistant.agent.md`
 - Or: `prompts/copilot-agents/coding-assistant.md`
 
-**Validate target**: The file exists. It has a `<rules>` section. The rule belongs there.
+**Validate target**: The file exists. It has a rules section. The rule belongs there.
 
-**Target confirmed**: `prompts/copilot-agents/coding-assistant.agent.md` → `<rules>` section.
+**Target confirmed**: `prompts/copilot-agents/coding-assistant.agent.md` → rules section.
 
 ---
 
@@ -60,7 +62,7 @@ User: Now learn from this session.
 
 | # | Lesson Summary | Signal Type | Target File | Section | Content to Add |
 |---|---|---|---|---|---|
-| 1 | Confirm with user before creating files in `src/` | User feedback (target specified) | `prompts/copilot-agents/coding-assistant.agent.md` | `<rules>` | `<rule>When creating or modifying files in the `src/` directory, always ask the user for confirmation before writing.</rule>` |
+| 1 | Confirm with user before creating files in `src/` | User feedback (target specified) | `prompts/copilot-agents/coding-assistant.agent.md` | rules | `<rule>When creating or modifying files in the `src/` directory, always ask the user for confirmation before writing.</rule>` |
 
 **Rationale**: User explicitly directed this rule to the coding-assistant agent. No classification needed — user intent is clear.
 
@@ -74,7 +76,7 @@ Present to user:
 >
 > *Confirm with user before creating files in `src/`.*
 >
-> **Target** (user-specified): `prompts/copilot-agents/coding-assistant.agent.md` → `<rules>`
+> **Target** (user-specified): `prompts/copilot-agents/coding-assistant.agent.md` → rules
 >
 > **Content to add**:
 > ```markdown

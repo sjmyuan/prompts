@@ -28,6 +28,8 @@ User: That's really helpful — can you save that knowledge somewhere?
 
 ## Step 1: detect-learning-signals
 
+**Source type**: Chat session
+
 **Signal detected**: AI self-discovered insight — the AI independently found a version-specific behavior not documented in the loaded context and not in the official docs.
 
 **Signal type**: AI self-discovered insight
@@ -50,9 +52,9 @@ User: That's really helpful — can you save that knowledge somewhere?
 
 **Classification**: Domain-specific knowledge about miniprogram development → `skills/develop-miniprogram/SKILL.md`
 
-**Rationale**: This is platform-specific knowledge that belongs in the miniprogram skill. The skill already has a `<knowledge>` section with platform constraints. This is a known limitation with a workaround.
+**Rationale**: This is platform-specific knowledge that belongs in the miniprogram skill. The skill already has a knowledge section with platform constraints. This is a known limitation with a workaround.
 
-**Target**: `skills/develop-miniprogram/SKILL.md`, `<knowledge>` section, as a new `<wx-api-limitations>` subsection.
+**Target**: `skills/develop-miniprogram/SKILL.md`, knowledge section, as a new `<wx-api-limitations>` subsection.
 
 ---
 
@@ -60,7 +62,7 @@ User: That's really helpful — can you save that knowledge somewhere?
 
 | # | Lesson Summary | Signal Type | Target File | Section | Content to Add |
 |---|---|---|---|---|---|
-| 1 | `wx.getSystemInfoSync()` does not include `safeArea` on WeChat < 8.0; use async version or version check + fallback | AI-discovered | `skills/develop-miniprogram/SKILL.md` | `<knowledge>` → new `<wx-api-limitations>` | Knowledge entry documenting the version constraint and two workarounds |
+| 1 | `wx.getSystemInfoSync()` does not include `safeArea` on WeChat < 8.0; use async version or version check + fallback | AI-discovered | `skills/develop-miniprogram/SKILL.md` | knowledge → new `<wx-api-limitations>` | Knowledge entry documenting the version constraint and two workarounds |
 
 **Rationale**: This is platform-specific domain knowledge. The `develop-miniprogram` skill is the most discoverable place for miniprogram developers. If someone encounters this issue, the skill will provide the answer immediately.
 
@@ -74,7 +76,7 @@ Present to user:
 >
 > *`wx.getSystemInfoSync()` does not include `safeArea` on WeChat < 8.0.*
 >
-> **Target**: `skills/develop-miniprogram/SKILL.md` → `<knowledge>` → `<wx-api-limitations>`
+> **Target**: `skills/develop-miniprogram/SKILL.md` → knowledge → `<wx-api-limitations>`
 >
 > **Content to add**:
 > ```markdown
