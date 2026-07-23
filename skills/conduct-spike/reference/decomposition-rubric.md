@@ -2,6 +2,20 @@
 
 This rubric helps determine whether a spike problem is properly decomposed into investigation areas. Use it during `define-spike-scope` to validate and refine the breakdown.
 
+## Decomposition Heuristics
+
+When breaking down a spike problem into investigation areas, apply these heuristics:
+
+| Heuristic | Description | Example |
+|---|---|---|
+| **Decision independence** | Can this area be decided without knowing the outcome of other areas? | "Database choice" vs. "API framework choice" |
+| **Layer separation** | Different architectural layers often form natural boundaries | "Storage layer", "API layer", "Frontend rendering" |
+| **Risk isolation** | High-uncertainty areas deserve their own investigation | "Migration strategy for legacy data" |
+| **Team/owner boundaries** | Areas owned by different teams may need separate ADRs | "Auth service changes" vs. "Payment service changes" |
+| **Technology domains** | Different tech stacks or domains split naturally | "Mobile client" vs. "Backend services" vs. "Infrastructure" |
+
+Target 2–5 investigation areas. Fewer than 2 means the problem may not need a spike; more than 5 suggests the scope may be too broad and should be narrowed.
+
 ## Decomposition Quality Criteria
 
 | Criterion | Good | Needs Work | Bad |

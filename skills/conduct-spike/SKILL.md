@@ -1,15 +1,15 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations to explore technical problems and produce ADRs with a solution document. Use when conducting, running, or planning a spike, or researching solution feasibility before implementation.
+description: Conduct spike investigations to explore technical problems and produce ADRs with a solution document. Use when conducting, scoping, or planning a spike, evaluating solutions, breaking down problems, or producing formal ADRs from findings.
 ---
 
 <when-to-use-this-skill>
 - User wants to conduct a spike investigation on a technical problem or feature
-- User needs to research and evaluate multiple solution approaches for a complex problem
+- User needs to research, evaluate, and compare solution approaches for a complex problem before committing to one
 - User wants to produce ADRs for each decision area alongside a consolidated solution document
 - User needs to understand current implementation before proposing changes or solutions
-- User wants to explore technical feasibility of different approaches before committing to one
 - User wants to break down a large technical problem into independently decidable investigation areas
+- User has pre-existing investigation findings and wants to formalize them into ADRs and a solution document
 </when-to-use-this-skill>
 
 <knowledge>
@@ -21,6 +21,22 @@ A well-conducted spike produces:
 - **N ADRs** — one Architecture Decision Record per independently decidable investigation area, each evaluating options and recommending a solution
 - **1 Solution Document** — a consolidated document that weaves together the assumed/recommended solutions from all ADRs into a coherent system-level view, with C4 diagrams, API contracts, RAID analysis, and RACI matrix
 </about-spike>
+
+<when-not-to-use-this-skill>
+This skill is NOT appropriate when:
+- The user wants a quick answer or informal recommendation without formal documentation — use a direct conversation instead
+- The problem has already been decided and only needs implementation — skip the spike and proceed to planning
+- The scope is trivial (single well-understood option, no architectural impact) — a spike would be overkill
+- The user wants to write code or build a prototype immediately — spikes produce decisions, not production code
+</when-not-to-use-this-skill>
+
+<greenfield-scenarios>
+When there is no existing implementation to investigate (greenfield), adapt the investigate phase:
+- Research industry approaches, open-source solutions, and similar systems in the organization
+- Study constraints from the operational environment (cloud provider, team expertise, compliance)
+- Build proof-of-concept prototypes instead of tracing existing code
+- The remaining phases (evaluate, draft ADRs, compile solution doc) proceed unchanged
+</greenfield-scenarios>
 
 <spike-workflow-phases>
 The spike workflow proceeds through five sequential phases:
@@ -35,17 +51,9 @@ The spike workflow proceeds through five sequential phases:
 </spike-workflow-phases>
 
 <problem-decomposition-guide>
-When breaking down a spike problem into investigation areas, apply these heuristics:
-
-| Heuristic | Description | Example |
-|---|---|---|
-| **Decision independence** | Can this area be decided without knowing the outcome of other areas? | "Database choice" vs. "API framework choice" |
-| **Layer separation** | Different architectural layers often form natural boundaries | "Storage layer", "API layer", "Frontend rendering" |
-| **Risk isolation** | High-uncertainty areas deserve their own investigation | "Migration strategy for legacy data" |
-| **Team/owner boundaries** | Areas owned by different teams may need separate ADRs | "Auth service changes" vs. "Payment service changes" |
-| **Technology domains** | Different tech stacks or domains split naturally | "Mobile client" vs. "Backend services" vs. "Infrastructure" |
-
-Target 2–5 investigation areas. Fewer than 2 means the problem may not need a spike; more than 5 suggests the scope may be too broad and should be narrowed.
+When breaking down a spike problem into investigation areas, apply the heuristics and patterns in **reference/decomposition-rubric.md**. Key rules:
+- Target 2–5 investigation areas. Fewer than 2 means the problem may not need a spike; more than 5 suggests the scope may be too broad and should be narrowed.
+- Load the full rubric when the problem is complex or the initial breakdown needs validation.
 </problem-decomposition-guide>
 
 <solution-brainstorming-prompts>
@@ -96,6 +104,7 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
 4. Confirm the final list of investigation areas and their order. Record the scope summary:
    - Spike goal (1 sentence)
    - Investigation areas (ordered list with one-line descriptions)
+5. Validate the scope: check that each area is independently decidable, the count is 2–5 (or justified if outside that range), and the goal is clear enough to know when the spike is complete. If this is a greenfield problem, note it — the investigate phase will adapt accordingly (see **greenfield-scenarios**).
 </define-spike-scope>
 
 <investigate-per-area>
@@ -144,7 +153,8 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
    - Each ADR should be self-contained and independently readable.
    - Use the standard ADR template and metadata format.
 2. After all ADRs are drafted, present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?"
-3. Note: The chosen option in each ADR is the **assumed solution**. The solution document will adopt these. If an ADR decision changes later, the solution document should be updated accordingly.
+3. Validate each ADR: confirm the chosen option follows logically from the decision drivers, all evaluated options are fairly represented, consequences include both positive and negative impacts, and the ADR can be understood without reading other ADRs.
+4. Note: The chosen option in each ADR is the **assumed solution**. The solution document will adopt these. If an ADR decision changes later, the solution document should be updated accordingly.
 </draft-area-adrs>
 
 <compile-solution-doc>
@@ -154,13 +164,14 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
    - **Assumed solutions**: The chosen option from each ADR forms the basis of the solution architecture.
    - **Current-state diagrams**: C4/sequence diagrams from the investigation phase, updated to reflect the assumed solutions.
 3. Apply `write-solution-doc` to produce the full solution document:
-   - Walk through its capabilities in sequence: clarify-business-context → draw-c4-topology → draw-sequence-diagrams → design-api-event-schema → list-related-documents → list-external-dependencies → list-maintainers → list-raids → list-raci → structure-solution-doc.
-   - For each capability, use the pre-seeded spike context as the starting point rather than re-gathering from scratch.
+   - Walk through its capabilities in the order defined by that skill (typically: clarify business context, draw C4 topology and sequence diagrams, design API/event schemas, list dependencies/maintainers/RAID/RACI, then structure the final document).
+   - For each step, use the pre-seeded spike context as the starting point rather than re-gathering from scratch.
    - The C4 diagrams should show the **target architecture** (post-solution), not just the current state.
 4. Compile the final output bundle:
-   - **1 Solution Document** (the output of write-solution-doc's structure-solution-doc)
-   - **N ADRs** (the output of draft-area-adrs, one per investigation area)
-5. Present the complete bundle to the user. Remind them:
+   - **1 Solution Document** (the consolidated output from write-solution-doc)
+   - **N ADRs** (the output from draft-area-adrs, one per investigation area)
+5. Validate the bundle: verify every ADR's chosen solution is reflected in the solution document, cross-references between ADRs and the solution doc are consistent, and all diagrams in the solution doc match the assumed solutions.
+6. Present the complete bundle to the user. Remind them:
    - ADRs are formal decision records — they should be reviewed and approved by the team.
    - The solution document adopts the assumed solution from each ADR. If an ADR decision changes, update the solution document accordingly.
    - Consider version-controlling both ADRs and the solution document in the project repository.
@@ -184,9 +195,13 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
 
 <rule>If the spike has only one investigation area, the workflow still applies in full: investigate → evaluate → draft one ADR → compile solution doc. The solution doc will be simpler but still structured.</rule>
 
+<rule>If the problem is greenfield (no existing implementation), adapt **investigate-per-area** per the **greenfield-scenarios** guidance — research industry approaches, study constraints, and prototype instead of tracing code.</rule>
+
 <rule>If the user wants to revise a specific area's assumed solution after ADRs are drafted, re-apply **draft-area-adrs** for that area only, then re-apply **compile-solution-doc** to update the solution document.</rule>
 
 <rule>If the user wants to add a new investigation area mid-spike, apply **define-spike-scope** (step 4 only) to confirm the addition, then apply the remaining capabilities for the new area.</rule>
+
+<rule>If the user asks for a quick recommendation without formal documentation, decline to use this skill — direct them to a regular conversation instead. See **when-not-to-use-this-skill**.</rule>
 
 <rule>After each phase, pause and ask the user to confirm before proceeding. Do not skip phases unless the user explicitly requests it.</rule>
 

@@ -1,6 +1,6 @@
 ---
 name: learn-from-history
-description: Extract reusable knowledge, rules, and capabilities from chat sessions, pull requests, git history, and other historical records, then provision them to persistent context. Use when distilling lessons from conversations, analyzing PRs against user stories, mining git history for patterns, or updating skills, agents, or memory from any historical source.
+description: Extract reusable knowledge, rules, and capabilities from chat sessions, pull requests, git history, Slack/Teams transcripts, and other historical records, then provision them to persistent context. Use when distilling lessons from conversations, analyzing PRs against user stories, mining git history for patterns, mining communication tool chat history for team knowledge, auditing sessions for preservable insights, or updating skills, agents, or memory from any historical source.
 ---
 
 <when-to-use-this-skill>
@@ -10,7 +10,8 @@ description: Extract reusable knowledge, rules, and capabilities from chat sessi
 - User provides a user story and one or more PRs and wants to extract reusable patterns, constraints, or architectural decisions from the implementation
 - User provides git commit history (a range, a branch diff, or specific commits) and wants to identify recurring patterns, convention evolution, or lessons from code changes
 - User wants to update an existing skill, agent file, doc, or memory with insights from any historical source
-- User wants to check whether a conversation, PR, or code history contains anything worth preserving for future work
+- User provides chat history from Slack, Teams, Discord, or other communication tools and wants to extract team knowledge, recurring questions, decisions, or problem-solution patterns from people's conversations
+- User wants to check whether a conversation, PR, code history, or communication tool transcript contains anything worth preserving for future work
 </when-to-use-this-skill>
 
 <knowledge>
@@ -25,6 +26,8 @@ This skill treats lessons seriously. Not every interaction or change yields a le
 |---|---|---|
 | Evaluating whether a candidate lesson is worth preserving | 5-dimension quality rubric (Reusability, Non-obviousness, Actionability, Non-duplication, Specificity) with scoring criteria and rejection thresholds | [reference/quality-rubric.md](reference/quality-rubric.md) |
 | Determining which context target fits a lesson | Catalog of context targets (skills, agents, docs, memory scopes) with suitability criteria, format requirements, and examples for each | [reference/context-target-catalog.md](reference/context-target-catalog.md) |
+| Scanning a chat session or historical source for learning signals | Complete catalog of five signal types (interactive and code-change) with triggers, examples, and anti-signals for each | [reference/signal-detection-catalog.md](reference/signal-detection-catalog.md) |
+| Comparing a user story against its PR implementation | Analysis lens framework with seven comparison dimensions, signal-strength ratings, and guidance on which rows produce the strongest lessons | [reference/story-analysis-framework.md](reference/story-analysis-framework.md) |
 | User gives explicit feedback that should become a rule | Walkthrough of detecting a user feedback signal, extracting the lesson, and provisioning it | [examples/user-feedback-to-rule.md](examples/user-feedback-to-rule.md) |
 | AI independently discovered correct knowledge during the conversation | Walkthrough of detecting an AI-discovered insight, validating it, and provisioning it | [examples/ai-discovered-insight.md](examples/ai-discovered-insight.md) |
 | User asks to learn from a session but nothing qualifies | Walkthrough of scanning a session, applying the quality gate, and reporting no lessons found | [examples/nothing-to-learn.md](examples/nothing-to-learn.md) |
@@ -35,90 +38,22 @@ This skill treats lessons seriously. Not every interaction or change yields a le
 </context-loading-guide>
 
 <signal-detection-knowledge>
-Five signal types indicate a potential lesson — three from interactive sources (chat) and two from code-change sources (PRs, git history):
+Five signal types indicate potential lessons: three from interactive sources (chat sessions) and two from code-change sources (PRs, git history). Each has specific triggers and anti-signals — load the full catalog from [reference/signal-detection-catalog.md](reference/signal-detection-catalog.md) when scanning for signals.
 
-### Interactive Sources (Chat Sessions)
-
-**1. Explicit user feedback** — The user states a preference, rule, or correction:
-- "Remember this for next time…"
-- "Actually, the correct way is…"
-- "From now on, always use X instead of Y…"
-- "This is the pattern we follow…"
-- User corrects the AI and the AI acknowledges the correction
-
-**2. AI self-discovered insight** — The AI independently arrives at correct knowledge not in current context:
-- AI reasons through a problem and discovers a correct approach that contradicts or extends existing context
-- AI identifies a gap in knowledge and fills it through inference or external lookup
-- AI synthesizes multiple pieces of information into a new, reusable rule
-- The insight was NOT already in the loaded skills, agent files, memory, or docs
-
-**3. Future-useful information** — Information surfaced that would benefit future sessions:
-- A non-obvious workaround for a known limitation
-- A project-specific convention discovered through trial and error
-- A configuration detail that took significant effort to determine
-- A dependency or compatibility constraint that isn't documented elsewhere
-
-### Code-Change Sources (PRs, Git History)
-
-**4. Story-implementation gap** — When comparing a user story to its PR implementation, a meaningful divergence emerges:
-- The story assumed a capability that doesn't exist in the codebase and required a workaround
-- A non-obvious architectural decision was made during implementation that future similar stories should follow
-- The implementation surfaced a constraint (library limitation, performance boundary, API restriction) not mentioned in the story
-- A recurring implementation pattern emerged across multiple PRs for the same story type
-- The story was implemented differently than described because of a discovered requirement — this is the most valuable signal
-
-**5. Evolutionary pattern** — When scanning git commit history, recurring themes indicate codified knowledge:
-- A refactoring pattern appears multiple times across different modules (e.g., "extract X to shared utility")
-- Commit messages reveal a convention that evolved over time (e.g., "migrate all X to Y pattern")
-- Bug-fix commits cluster around a specific area or pattern (e.g., repeated null-check additions after API calls)
-- A sequence of commits tells a story of how a particular problem was solved incrementally, with lessons at each step
-
-### Anti-Signals (do NOT treat these as lessons)
-
-From interactive sources:
-- Trivial facts any competent developer would know
-- One-off fixes specific to a single line of code
-- Information already documented in loaded context
-- Session-specific state (e.g., "we're working on file X right now")
-- Temporary workarounds that shouldn't be repeated
-
-From code-change sources:
-- Trivial diff-only changes (typo fixes, formatting, import reordering)
-- A PR that implements the story exactly as described with no surprises or decisions — no gap means no lesson
-- Boilerplate additions (new route with standard CRUD, new component matching existing pattern exactly)
-- Changes that merely replicate an already-documented pattern elsewhere in the codebase
-- Single, isolated commits with no connection to a larger pattern
+Quick reference:
+- **Interactive**: explicit user feedback, AI self-discovered insight, future-useful information
+- **Code-change**: story-implementation gap, evolutionary pattern
+- **Communication tool**: recurring question, decision record, problem-solution pair, knowledge sharing, escalation pattern, onboarding gap
+- **Anti-signals**: trivial facts, one-off fixes, already-documented info, session state, boilerplate changes, casual chat, resolved-once issues
 </signal-detection-knowledge>
 
-<quality-gate-summary>
-Every candidate lesson must pass a 5-dimension quality evaluation. Load [reference/quality-rubric.md](reference/quality-rubric.md) for the full rubric. Summary:
+<quality-gate>
+Every candidate lesson must pass all five dimensions in the quality rubric. Load [reference/quality-rubric.md](reference/quality-rubric.md) for the full rubric with scoring criteria, rejection rules, and decision matrix. A single failure rejects the candidate.
+</quality-gate>
 
-| Dimension | Reject if… |
-|---|---|
-| **Reusability** | Applies to only one specific scenario; won't generalize |
-| **Non-obviousness** | Any competent practitioner would already know this |
-| **Actionability** | Cannot be expressed as a concrete rule, fact, or step |
-| **Non-duplication** | Already exists in current context (skills, memory, docs) |
-| **Specificity** | Too vague to be useful OR too specific to be reusable |
-
-A lesson must pass ALL five dimensions. If any dimension fails, reject the candidate lesson.
-</quality-gate-summary>
-
-<story-analysis-framework>
-When analyzing a user story against PR implementation changes, use this framework to structure the comparison:
-
-| Analysis Lens | What to Look For | Signal Strength |
-|---|---|---|
-| **Missing capability** | Story assumed a library, API, or pattern that doesn't exist → what was built instead? | High — reusable for similar stories |
-| **Architectural decision** | Choice of where code lives, how modules interact, which layer handles what | High — constrains future work |
-| **Discovered constraint** | A limit, restriction, or gotcha found only during implementation | High — prevents repeated discovery cost |
-| **Story ambiguity resolved** | The story was unclear about X; the implementation settled on Y | Medium — captures tribal knowledge |
-| **Unexpected dependency** | The change required touching modules not mentioned in the story | Medium — reveals hidden coupling |
-| **Testing approach** | How the change was validated — especially non-obvious test setups | Medium — reusable test patterns |
-| **Straightforward implementation** | The change matched the story exactly with no gap | None — no lesson to extract |
-
-The strongest lessons come from the top three rows. Focus analysis there.
-</story-analysis-framework>
+<story-analysis>
+When comparing a user story against PR implementation changes, load [reference/story-analysis-framework.md](reference/story-analysis-framework.md) for the full comparison framework with eight analysis lenses (including PR discussion insights), signal strength ratings, and guidance on which rows produce the strongest lessons.
+</story-analysis>
 
 </knowledge>
 
@@ -132,16 +67,17 @@ The strongest lessons come from the top three rows. Focus analysis there.
    - **Chat session**: The current conversation — scan for interactive signals (types 1–3)
    - **PR + user story**: User provided a story and PR reference(s) — apply **analyze-code-change-history** first, then return here with its candidates
    - **Git history**: User provided commit range or references — apply **analyze-code-change-history** first, then return here with its candidates
+   - **Communication tool history**: User provided chat transcripts from Slack, Teams, Discord, etc. — apply **analyze-communication-history** to extract candidate lessons, then return here for quality gating
    - **Mixed**: User provided multiple sources — process each with the appropriate path, then merge candidates
 
-2. For chat sessions, **scan the conversation** for the three interactive signal types defined in **signal-detection-knowledge**:
+2. For chat sessions, load [reference/signal-detection-catalog.md](reference/signal-detection-catalog.md) and **scan the conversation** for the three interactive signal types:
    - Explicit user feedback (corrections, preferences, "remember this" statements)
    - AI self-discovered insights (reasoning that produced correct knowledge not in context)
    - Future-useful information (hard-won configuration, non-obvious workarounds, undocumented constraints)
 
 3. For code-change sources, **delegate to analyze-code-change-history** to produce candidate lessons from the PR/git analysis.
 
-4. **Exclude anti-signals** immediately — for each source type, filter out the anti-signals listed in **signal-detection-knowledge**.
+4. **Exclude anti-signals** immediately — for each source type, filter out the anti-signals listed in the signal detection catalog.
 
 5. For each remaining candidate, **apply the quality gate**. Load [reference/quality-rubric.md](reference/quality-rubric.md) and score each dimension:
    - Reusability — Would this apply across multiple future sessions?
@@ -161,7 +97,9 @@ The strongest lessons come from the top three rows. Focus analysis there.
 **Steps** for PR + user story analysis:
 1. **Gather inputs**: Confirm you have:
    - The user story text (requirements, acceptance criteria, context)
+   - Story comments and discussion threads — clarifications, scope decisions, or assumptions surfaced after the story was written
    - Access to the PR diff(s) — either provided directly, via a PR link, or by running git commands to retrieve the diff
+   - PR review comments and discussion threads — reviewer questions, author replies, and design discussions that capture rationale not visible in the diff
    - Any additional context the user provides about the story (design docs, discussion threads)
 
 2. **Parse the user story**: Extract from the story:
@@ -176,10 +114,11 @@ The strongest lessons come from the top three rows. Focus analysis there.
    - Commit messages — these often contain rationale not visible in the diff alone
    - Lines added vs removed — large deletions may indicate a refactoring or simplification
    - Test files — how was the change validated?
+   - **PR review comments and story comment threads** — reviewer questions ("why not X?") and author replies often surface constraints, architectural reasoning, and unwritten conventions that the diff alone can't reveal
 
-4. **Compare story vs implementation** using the **story-analysis-framework**:
+4. Load [reference/story-analysis-framework.md](reference/story-analysis-framework.md) and **compare story vs implementation** using the framework:
    - For each analysis lens (missing capability, architectural decision, discovered constraint, etc.), ask: "Did the implementation reveal something the story didn't capture?"
-   - Focus especially on the top three lenses (missing capability, architectural decision, discovered constraint) — these produce the strongest lessons
+   - Focus especially on the top four lenses (missing capability, architectural decision, discovered constraint, PR discussion insight) — these produce the strongest lessons
    - For each gap found, draft a candidate lesson: "When implementing stories like [type], be aware that [gap/constraint/decision]"
 
 5. **Extract candidate lessons**: For each meaningful gap or pattern, formulate it as a candidate:
@@ -302,6 +241,64 @@ The strongest lessons come from the top three rows. Focus analysis there.
 7. **Important**: If the user rejects all lessons or no lessons passed the quality gate, acknowledge this explicitly — do not force a lesson.
 </review-and-apply>
 
+<analyze-communication-history>
+**Objective**: Parse chat transcripts from Slack, Teams, Discord, or similar tools to extract reusable team knowledge, decisions, and patterns from people's conversations.
+
+**Steps**:
+1. **Gather inputs**: Confirm you have:
+   - The chat transcript(s) — exported from Slack, Teams, Discord, or copy-pasted threads
+   - Context about the channels or threads (e.g., "#backend channel, last 30 days", "design discussion thread about auth")
+   - Any focus area the user wants to narrow to (e.g., "just look for deployment-related knowledge")
+
+2. Load [reference/signal-detection-catalog.md](reference/signal-detection-catalog.md) and **scan the transcripts** for communication tool signal types:
+
+   **Recurring question pattern** (High signal):
+   - The same question appears multiple times from different people
+   - Answers converge on the same solution each time — this is undocumented knowledge
+   - Ask: "What question keeps getting asked that should have a documented answer?"
+
+   **Decision record** (High signal):
+   - A thread where a technical or process decision was reached ("let's go with X approach")
+   - The decision was never formalized in an ADR, doc, or convention file
+   - Ask: "What decision was made here that future team members won't know about?"
+
+   **Problem-solution pair** (High signal):
+   - Someone reports an issue, someone else provides a fix or workaround
+   - The solution is non-obvious or relies on tribal knowledge
+   - Ask: "Would someone hit this same problem next month and have to rediscover the fix?"
+
+   **Knowledge sharing** (Medium signal):
+   - A team member shares a tip, trick, or "TIL" that isn't documented elsewhere
+   - A non-obvious workaround or best practice is described
+   - Ask: "Is this insight documented anywhere? If not, it's a candidate."
+
+   **Escalation pattern** (Medium signal):
+   - Certain topics or questions always get routed to the same person
+   - Reveals who-knows-what — useful for onboarding and bus-factor reduction
+   - Ask: "Is there a 'goto person' pattern that should be captured as ownership docs?"
+
+   **Onboarding gap** (Medium signal):
+   - New team members consistently ask the same setup, access, or process questions
+   - Indicates missing or stale onboarding documentation
+   - Ask: "What are new people always confused about?"
+
+3. **Exclude anti-signals** — filter out:
+   - Casual conversation, jokes, social chat
+   - One-off issues that were resolved and never recurred
+   - Information already documented in existing context
+   - Status updates, standup notes, meeting scheduling
+   - Purely operational chatter ("deploy is done", "PR merged")
+
+4. **Cluster related signals**: If the same topic surfaces across multiple threads or channels, group them — a pattern seen 5 times is a much stronger candidate than a single mention.
+
+5. **Formulate candidate lessons**: For each signal that survives filtering, draft it as:
+   - **The pattern** (what recurred or was decided)
+   - **Evidence** (excerpts from the transcripts, with thread/channel context)
+   - **The lesson** (what should be documented, where, and for whom)
+
+6. **Return candidates** to **detect-learning-signals** for quality gating, with transcript evidence and the signal type that triggered each candidate.
+</analyze-communication-history>
+
 </capabilities>
 
 <rules>
@@ -321,5 +318,7 @@ The strongest lessons come from the top three rows. Focus analysis there.
 <rule>If no lessons pass the quality gate in **detect-learning-signals**, report "No lessons worth learning from this [source]" and stop. Do not proceed to downstream capabilities.</rule>
 
 <rule>If the user specifies a target context explicitly (e.g., "add this to skill X"), honor that target in **determine-provision-target** step 2.</rule>
+
+<rule>When the user provides chat history from Slack, Teams, Discord, or other communication tools and wants to extract team knowledge, apply **analyze-communication-history** to parse the transcripts and extract candidate lessons, then feed results into **detect-learning-signals** for quality gating.</rule>
 
 </rules>
