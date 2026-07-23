@@ -1,8 +1,8 @@
-# Example: C4 and Sequence Diagrams Focus
+# Example: C4, Sequence, and Flowchart Diagrams Focus
 
-**Scenario**: A user already has the business context documented and only needs help producing C4 topology diagrams and sequence diagrams for a real-time chat platform called "ChatFlow". The user has strong opinions about the architecture and wants to iterate on the diagrams.
+**Scenario**: A user already has the business context documented and only needs help producing C4 topology diagrams, sequence diagrams, and flowcharts for a real-time chat platform called "ChatFlow". The user has strong opinions about the architecture and wants to iterate on the diagrams.
 
-**Applies**: `draw-c4-topology` and `draw-sequence-diagrams` — demonstrates diagram-focused, iterative refinement workflow.
+**Applies**: `draw-c4-topology` and `draw-interaction-diagrams` — demonstrates diagram-focused, iterative refinement workflow covering both sequence diagrams (for runtime message flows) and flowcharts (for process logic and decision branches).
 
 ---
 
@@ -94,9 +94,15 @@ Rel(dm_handler, s3_client, "func call")
 
 ---
 
-## Capability 3: draw-sequence-diagrams
+## Capability 3: draw-interaction-diagrams
 
-**Direct Message Flow**:
+**Based on the diagram-selection-guide, the assistant determines:**
+- **Send DM flow** → Sequence diagram (runtime message passing between participants)
+- **Create group chat flow** → Sequence diagram (runtime message passing between participants)
+- **Message moderation workflow** → Flowchart (decision logic with branching)
+- **Group chat invite acceptance flow** → Flowchart (decision logic with multiple branches)
+
+### Direct Message Flow (Sequence Diagram)
 
 ```plantuml
 @startuml ChatFlow SendDM
@@ -172,3 +178,97 @@ deactivate GW
 ```
 
 > **Group Creation Flow**: Creator sends request via WS → Gateway forwards via gRPC to Chat Service → Chat Service validates, fetches member profiles in batch from User Service, persists group to MongoDB, publishes notifications to each member, and returns group_id to creator.
+
+### Message Moderation Workflow (Flowchart)
+
+**The assistant recognizes this as decision logic with branching — a flowchart is the right choice.**
+
+```plantuml
+@startuml ChatFlow MessageModeration
+start
+:User sends message;
+:Message enters moderation queue;
+if (Contains banned keywords?) then (yes)
+  :Block message;
+  :Notify sender (message rejected);
+  stop
+else (no)
+  if (Sender is flagged user?) then (yes)
+    :Route to manual review queue;
+    if (Moderator approves?) then (yes)
+      :Deliver message;
+      stop
+    else (no)
+      :Block message;
+      :Notify sender (rejected by moderator);
+      stop
+    endif
+  else (no)
+    if (Message contains attachment?) then (yes)
+      :Scan attachment (virus + content);
+      if (Scan passed?) then (yes)
+        :Deliver message;
+        stop
+      else (no)
+        :Block message;
+        :Notify sender (attachment blocked);
+        stop
+      endif
+    else (no)
+      :Deliver message;
+      stop
+    endif
+  endif
+endif
+@enduml
+```
+
+> **Moderation Flowchart**: Every message goes through a multi-stage moderation pipeline. First, a banned-keyword check blocks obvious violations. Then, flagged users are routed to manual review. Messages with attachments undergo virus and content scanning. Only messages that pass all checks are delivered. Each rejection path includes a user notification.
+
+### Group Chat Invite Acceptance Flow (Flowchart)
+
+**The assistant recognizes this as a business workflow with multiple decision points — flowchart is appropriate.**
+
+```plantuml
+@startuml ChatFlow GroupInviteFlow
+start
+:User receives group invite notification;
+if (User is existing ChatFlow user?) then (yes)
+  :Show invite in app;
+  if (User accepts?) then (yes)
+    if (Group is public?) then (yes)
+      :Add user to group immediately;
+      :Notify group members;
+      stop
+    else (no)
+      :Send request to group admin;
+      if (Admin approves?) then (yes)
+        :Add user to group;
+        :Notify user and group;
+        stop
+      else (no)
+        :Notify user (request denied);
+        stop
+      endif
+    endif
+  else (no)
+    :Invite expires after 7 days;
+    stop
+  endif
+else (no)
+  :Send SMS/email invite with signup link;
+  if (User signs up within 7 days?) then (yes)
+    :Create account;
+    :Auto-accept invite;
+    :Add user to group;
+    stop
+  else (no)
+    :Invite expires;
+    stop
+  endif
+endif
+@enduml
+```
+
+> **Group Invite Flowchart**: The invite flow handles two distinct user types (existing vs. new) and two group types (public vs. private). Existing users accepting a public group invite are added immediately. Private groups require admin approval. Non-users are directed to sign up first, after which the invite is auto-accepted. All invite links expire after 7 days.
+

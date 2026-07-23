@@ -2,7 +2,7 @@
 
 **Scenario**: A user has a finalized solution decision for migrating their monolithic e-commerce platform to a microservices architecture and wants to produce a complete solution document covering all nine sections. The user starts from scratch with no pre-existing content.
 
-**Applies**: Capabilities 1, 2, and 10 in detail, with truncated output for capabilities 3–9 — demonstrates the end-to-end sequencing pattern.
+**Applies**: Capabilities 1, 2, and 10 in detail, with truncated output for capabilities 3–9 — demonstrates the end-to-end sequencing pattern including both sequence diagrams and flowcharts where appropriate.
 
 ---
 
@@ -129,6 +129,10 @@ MonolithMart, our legacy e-commerce monolith, can no longer scale to meet 10x or
 ### 3.2 Inventory Sync Flow
 
 [Sequence diagram + explanation]
+
+### 3.3 Refund Process Flow
+
+[Flowchart + explanation — decision logic with branching: partial refund vs. full refund, eligibility checks]
 
 ## 4. API / Event Schema
 

@@ -1,6 +1,6 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations to explore technical problems and produce ADRs with a solution document. Use when conducting, scoping, or planning a spike, evaluating solutions, breaking down problems, or producing formal ADRs from findings.
+description: Conduct spike investigations to explore technical problems and produce ADRs with a solution document. Coordinates sub-agents to parallelize investigation and ADR drafting for heavy spikes. Use when conducting, scoping, or planning a spike, evaluating solutions, breaking down problems, or producing formal ADRs from findings.
 ---
 
 <when-to-use-this-skill>
@@ -10,6 +10,7 @@ description: Conduct spike investigations to explore technical problems and prod
 - User needs to understand current implementation before proposing changes or solutions
 - User wants to break down a large technical problem into independently decidable investigation areas
 - User has pre-existing investigation findings and wants to formalize them into ADRs and a solution document
+- User has a heavy spike with multiple investigation areas and wants to parallelize work across sub-agents for faster completion
 </when-to-use-this-skill>
 
 <knowledge>
@@ -39,16 +40,39 @@ When there is no existing implementation to investigate (greenfield), adapt the 
 </greenfield-scenarios>
 
 <spike-workflow-phases>
-The spike workflow proceeds through five sequential phases:
+The spike workflow proceeds through five sequential phases. Phases 2 and 4 can be parallelized across sub-agents when there are multiple investigation areas:
 
 | Phase | What happens | Leverages |
 |---|---|---|
 | 1. Define scope | Clarify the spike goal and decompose into investigation areas | — |
-| 2. Investigate | Understand the current implementation relevant to each area | `investigate-code` skill |
+| 2. Investigate | Understand the current implementation relevant to each area; dispatch to sub-agents in parallel for multi-area spikes | `investigate-code` skill, code-exploration sub-agents |
 | 3. Evaluate | Brainstorm and evaluate solution options per area | — |
-| 4. Draft ADRs | Produce one formal ADR per investigation area | `draft-adr` skill |
+| 4. Draft ADRs | Produce one formal ADR per investigation area; dispatch to sub-agents in parallel for multi-area spikes | `draft-adr` skill, sub-agents |
 | 5. Compile solution doc | Consolidate all ADRs into a system-level solution document | `write-solution-doc` skill |
 </spike-workflow-phases>
+
+<multi-agent-orchestration>
+Spikes with multiple investigation areas benefit from parallel execution. The orchestrating agent (running this skill) can dispatch independent work units to specialized sub-agents that operate concurrently:
+
+| Phase | Parallelizable? | Mechanism |
+|---|---|---|
+| 2. Investigate | Yes — each area is independent | Dispatch each investigation area to a code-exploration sub-agent with a focused investigation brief |
+| 4. Draft ADRs | Yes — each ADR is independent | Dispatch each area's evaluation results to a sub-agent with instructions to load `draft-adr` and produce a complete ADR |
+
+**Dispatching pattern**:
+1. Identify independent work units (one per investigation area).
+2. For each unit, prepare a focused brief with the area's context, scope, and expected output format.
+3. Dispatch all briefs to sub-agents concurrently. Sub-agents operate independently and do not communicate with each other.
+4. Collect results from all sub-agents when they complete.
+5. Synthesize the collected results into the consolidated format required by the next phase. Review for completeness and consistency across areas.
+
+**When NOT to parallelize**:
+- Single-area spikes: direct execution is simpler and has less coordination overhead.
+- Phases 1 (define scope), 3 (evaluate solutions), and 5 (compile solution doc): these involve user interaction or cross-area synthesis that cannot be parallelized.
+- When suitable sub-agents are not available on the current platform: fall back to sequential execution within the orchestrating agent.
+
+**Platform detection**: Before dispatching, detect what code-exploration and skill-execution agents are available on the current platform. Use the most appropriate agent type for each work unit. If no suitable sub-agents are detected, execute sequentially.
+</multi-agent-orchestration>
 
 <problem-decomposition-guide>
 When breaking down a spike problem into investigation areas, apply the heuristics and patterns in **reference/decomposition-rubric.md**. Key rules:
@@ -68,15 +92,17 @@ When helping the user brainstorm solution options for an investigation area, pro
 </solution-brainstorming-prompts>
 
 <skill-integration-points>
-This skill orchestrates three other skills. Key integration points:
+This skill orchestrates skills and sub-agents. Key integration points:
 
-| Skill | When invoked | What it contributes |
+| Skill / Agent | When invoked | What it contributes |
 |---|---|---|
-| `investigate-code` | During Phase 2 (investigate) | Codebase understanding, C4/sequence diagrams, pattern discovery |
-| `draft-adr` | During Phase 4 (draft ADRs) | Structured ADR per area: problem → drivers → options → evaluation → decision |
+| `investigate-code` | During Phase 2 (investigate) — loaded by orchestrator or sub-agents | Codebase understanding, C4/sequence diagrams, pattern discovery |
+| Code-exploration sub-agents | During Phase 2 (parallel investigation) | Concurrent codebase exploration per investigation area |
+| `draft-adr` | During Phase 4 (draft ADRs) — loaded by orchestrator or sub-agents | Structured ADR per area: problem → drivers → options → evaluation → decision |
+| Sub-agents with `draft-adr` | During Phase 4 (parallel ADR drafting) | Concurrent ADR drafting per investigation area |
 | `write-solution-doc` | During Phase 5 (compile) | Consolidated solution document with topology, contracts, RAID, RACI |
 
-When invoking a sub-skill, load its SKILL.md to access its full capabilities. The spike skill provides the high-level orchestration; the sub-skills handle the detailed execution.
+When invoking a sub-skill, load its SKILL.md to access its full capabilities. The spike skill provides the high-level orchestration; the sub-skills and sub-agents handle the detailed execution.
 </skill-integration-points>
 
 <context-loading-guide>
@@ -87,6 +113,7 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
 | User provides narrow scope (single area) and wants a lightweight spike | Condensed workflow for a single-area spike producing one ADR + solution doc | [examples/single-area-spike.md](examples/single-area-spike.md) |
 | User has existing investigation findings and only needs ADRs + solution doc | Workflow starting from pre-existing investigation results | [examples/from-existing-findings.md](examples/from-existing-findings.md) |
 | Decomposing a complex problem into investigation areas | Decomposition rubric with examples and edge cases | [reference/decomposition-rubric.md](reference/decomposition-rubric.md) |
+| Conducting a heavy multi-area spike that benefits from parallel sub-agent execution | Walkthrough of dispatching investigation and ADR drafting to sub-agents in parallel | [examples/multi-agent-investigation.md](examples/multi-agent-investigation.md) |
 
 </context-loading-guide>
 
@@ -108,7 +135,11 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
 </define-spike-scope>
 
 <investigate-per-area>
-1. For each investigation area (in the order confirmed in define-spike-scope):
+1. Determine the execution strategy based on the number of investigation areas:
+   - **Single area (1 area)**: Investigate directly using the sequential steps below (step 2).
+   - **Multiple areas (2+ areas)**: Dispatch all areas to code-exploration sub-agents in parallel (step 3). See **multi-agent-orchestration** for the dispatch pattern.
+
+2. **For single-area investigation (direct execution)**:
    - Announce: "Investigating area: [area name]"
    - Load the `investigate-code` skill's SKILL.md to access its full capabilities.
    - Apply `investigate-code` to understand the current implementation relevant to this area:
@@ -116,11 +147,23 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
      - Trace control and data flows through the relevant paths.
      - Draw C4 or sequence diagrams if they help clarify the current state.
      - Discover implementation patterns and note any inconsistencies.
-   - Compile findings into a structured summary per area:
+   - Compile findings into a structured summary:
      - **Current state**: What exists today, key components, data flows.
      - **Constraints & pain points**: What's limiting, broken, or hard to change.
      - **Relevant diagrams**: C4/sequence diagrams showing current architecture.
-2. After all areas are investigated, present a consolidated investigation summary and ask the user to confirm before proceeding to evaluation.
+
+3. **For multi-area investigation (parallel dispatch)**:
+   - Announce: "Dispatching investigation of [N] areas to sub-agents in parallel for faster completion."
+   - For each investigation area, prepare a focused brief containing:
+     - The area name and one-line description from the scope definition.
+     - The spike goal for shared context.
+     - Whether this is brownfield (provide guidance on relevant code paths to explore) or greenfield (see **greenfield-scenarios**).
+     - Expected output format: current state, constraints & pain points, relevant diagrams.
+   - Detect what code-exploration agents are available on the current platform, then dispatch all briefs to them concurrently. Sub-agents operate independently.
+   - When all sub-agents complete, collect their findings.
+   - Synthesize findings: review each sub-agent's output for completeness, resolve any cross-area inconsistencies, and compile each area's findings into the structured summary format (current state, constraints & pain points, relevant diagrams).
+
+4. After all areas are investigated (via either method), present a consolidated investigation summary and ask the user to confirm before proceeding to evaluation.
 </investigate-per-area>
 
 <evaluate-solutions-per-area>
@@ -142,9 +185,13 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
 </evaluate-solutions-per-area>
 
 <draft-area-adrs>
-1. For each investigation area, produce a formal ADR:
+1. Determine the execution strategy based on the number of investigation areas:
+   - **Single ADR (1 area)**: Draft directly using the sequential steps below (step 2).
+   - **Multiple ADRs (2+ areas)**: Dispatch all areas' evaluation results to sub-agents in parallel (step 3). See **multi-agent-orchestration** for the dispatch pattern.
+
+2. **For single ADR drafting (direct execution)**:
    - Load the `draft-adr` skill's SKILL.md to access its full capabilities.
-   - Apply `draft-adr` to produce a complete ADR for this area:
+   - Apply `draft-adr` to produce a complete ADR for the area:
      - **Problem statement**: The investigation area's scope, refined from the spike definition.
      - **Decision drivers**: Hard constraints and soft preferences identified during evaluation.
      - **Considered options**: All options brainstormed and evaluated, with pros/cons.
@@ -152,9 +199,19 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
      - **Consequences**: Positive impacts, risks, and mitigation strategies.
    - Each ADR should be self-contained and independently readable.
    - Use the standard ADR template and metadata format.
-2. After all ADRs are drafted, present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?"
-3. Validate each ADR: confirm the chosen option follows logically from the decision drivers, all evaluated options are fairly represented, consequences include both positive and negative impacts, and the ADR can be understood without reading other ADRs.
-4. Note: The chosen option in each ADR is the **assumed solution**. The solution document will adopt these. If an ADR decision changes later, the solution document should be updated accordingly.
+
+3. **For multi-ADR drafting (parallel dispatch)**:
+   - Announce: "Dispatching ADR drafting for [N] areas to sub-agents in parallel."
+   - For each investigation area, prepare a focused brief containing:
+     - The area name and one-line description.
+     - The complete evaluation results: decision drivers, considered options with pros/cons, and the assumed solution.
+     - Instructions to load the `draft-adr` skill and produce a complete, self-contained ADR.
+   - Detect what agents are available on the current platform, then dispatch all briefs to sub-agents concurrently. Each sub-agent loads `draft-adr` independently.
+   - When all sub-agents complete, collect and review each ADR for completeness and consistency.
+
+4. After all ADRs are drafted (via either method), present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?"
+5. Validate each ADR: confirm the chosen option follows logically from the decision drivers, all evaluated options are fairly represented, consequences include both positive and negative impacts, and the ADR can be understood without reading other ADRs.
+6. Note: The chosen option in each ADR is the **assumed solution**. The solution document will adopt these. If an ADR decision changes later, the solution document should be updated accordingly.
 </draft-area-adrs>
 
 <compile-solution-doc>
@@ -183,11 +240,11 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
 
 <rule>When the user initiates a spike investigation, apply **define-spike-scope** to establish the goal and investigation areas. Do not skip to investigation until the scope is confirmed.</rule>
 
-<rule>After scope is confirmed, apply **investigate-per-area** for each investigation area in order. Load the `investigate-code` skill to access its capabilities.</rule>
+<rule>After scope is confirmed, apply **investigate-per-area**. For multi-area spikes, this dispatches investigation to sub-agents in parallel per **multi-agent-orchestration**. For single-area spikes, investigation runs directly.</rule>
 
 <rule>After all areas are investigated and findings confirmed, apply **evaluate-solutions-per-area** for each area to brainstorm, evaluate, and select assumed solutions.</rule>
 
-<rule>After assumed solutions are selected for all areas, apply **draft-area-adrs** to produce one formal ADR per area. Load the `draft-adr` skill to access its capabilities.</rule>
+<rule>After assumed solutions are selected for all areas, apply **draft-area-adrs**. For multi-area spikes, this dispatches ADR drafting to sub-agents in parallel per **multi-agent-orchestration**. For single-area spikes, ADR drafting runs directly.</rule>
 
 <rule>After all ADRs are drafted and confirmed, apply **compile-solution-doc** to produce the consolidated solution document. Load the `write-solution-doc` skill to access its capabilities.</rule>
 
@@ -204,5 +261,11 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
 <rule>If the user asks for a quick recommendation without formal documentation, decline to use this skill — direct them to a regular conversation instead. See **when-not-to-use-this-skill**.</rule>
 
 <rule>After each phase, pause and ask the user to confirm before proceeding. Do not skip phases unless the user explicitly requests it.</rule>
+
+<rule>When dispatching work to sub-agents, prepare focused briefs that are self-contained — each sub-agent must have all the context it needs without depending on other sub-agents' results.</rule>
+
+<rule>If sub-agents are not available on the current platform, fall back to sequential execution within the orchestrating agent. The spike workflow proceeds normally, just without parallelism.</rule>
+
+<rule>After collecting results from parallel sub-agents, always synthesize and review for cross-area consistency before presenting to the user. Sub-agents work independently and may produce overlapping or contradictory findings.</rule>
 
 </rules>

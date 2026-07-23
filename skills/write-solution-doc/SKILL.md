@@ -1,12 +1,12 @@
 ---
 name: write-solution-doc
-description: Produce comprehensive solution documentation with C4 diagrams, API contracts, RAID analysis, and RACI matrices. Use when documenting, writing, creating, or authoring a finalized solution decision, solution architecture, or technical solution document.
+description: Produce comprehensive solution documentation with C4 diagrams, sequence/flowchart diagrams, API contracts, RAID analysis, and RACI matrices. Use when documenting, writing, creating, or authoring a finalized solution decision, solution architecture, or technical solution document.
 ---
 
 <when-to-use-this-skill>
 - User wants to document a finalized solution decision
 - User needs to create a solution architecture document
-- User wants to produce C4 diagrams (C2/C3) or sequence diagrams for a system
+- User wants to produce C4 diagrams (C2/C3), sequence diagrams, or flowcharts for a system
 - User needs to define API/event schemas for a solution's components
 - User wants to perform RAID analysis (Risks, Assumptions, Issues, Dependencies)
 - User wants to create a RACI matrix for solution ownership
@@ -19,7 +19,7 @@ description: Produce comprehensive solution documentation with C4 diagrams, API 
 A complete solution document consists of the following sections, produced in order:
 1. **Business Context & Solution Background** — Why this solution exists, what problem it solves, and the decision rationale.
 2. **System Topology (C4 Model)** — C2 (Container) and C3 (Component) diagrams showing the system landscape.
-3. **Interaction Details** — Sequence diagrams showing runtime interactions between components.
+3. **Interaction Details** — Sequence diagrams (for runtime message flows between components) and/or flowcharts (for process logic, decision branches, and business workflows). Choose the appropriate diagram type per scenario or combine both when needed.
 4. **API / Event Schema** — Contract definitions between components (REST APIs, async events, gRPC, etc.).
 5. **Related Documents** — References to design docs, RFCs, ADRs, or external specifications.
 6. **External Dependencies** — External systems/services, their owning teams, and contact persons.
@@ -36,8 +36,23 @@ The C4 model provides a hierarchical approach to software architecture diagrams:
 Use PlantUML with the C4-PlantUML macros/snippets (`!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml` etc.) for C4 diagrams. Fall back to vanilla PlantUML if C4 macros are not available.
 </c4-model>
 
+<diagram-selection-guide>
+Use the following decision matrix to choose the right diagram type for each interaction scenario:
+
+| Scenario | Recommended Diagram | Rationale |
+|---|---|---|
+| Runtime message passing between services/components (e.g., API calls, event publishing, request-response chains) | **Sequence Diagram** | Shows participants, message ordering, activation bars, and lifelines — best for temporal interaction flows |
+| Business process with decision branches and conditional paths (e.g., order approval workflow, refund eligibility logic, state transitions) | **Flowchart** | Shows decision diamonds, branching paths, and process steps — best for logic and control flow |
+| Data pipeline with transformation stages and branching (e.g., ETL steps, data routing rules, enrichment logic) | **Flowchart** | Pipeline stages are process steps; routing rules are decision nodes — naturally fits flowchart syntax |
+| Multi-participant orchestration with both runtime calls AND decision logic (e.g., saga orchestration with compensating actions, complex checkout flow) | **Both** — sequence diagram for the happy-path call chain + flowchart for the decision/compensation logic | Use sequence to show who-calls-whom, flowchart to show what-decisions-are-made |
+| State machine transitions (e.g., order status lifecycle, user onboarding states) | **Flowchart** (state diagram style) | States as nodes, transitions as arrows with conditions — flowchart is the simplest PlantUML option for this |
+| Algorithm or processing logic within a single component (e.g., rate limiting algorithm, caching strategy) | **Flowchart** | No cross-component participants — purely internal logic flow |
+
+**Decision rule**: If the primary question is "who talks to whom and in what order?" → use a sequence diagram. If the primary question is "what decisions are made and what paths exist?" → use a flowchart. When both questions matter, produce both diagrams.
+</diagram-selection-guide>
+
 <plantuml-standards>
-PlantUML diagram conventions and formatting rules. Load **reference/plantuml-standards.md** for the full standards.
+PlantUML diagram conventions and formatting rules for all diagram types (C4, sequence, flowchart, etc.). Load **reference/plantuml-standards.md** for the full standards.
 </plantuml-standards>
 
 <api-design-standards>
@@ -65,10 +80,10 @@ The assistant supports both English and Chinese (中文) output:
 | Load when | Provides | File |
 |---|---|---|
 | User wants to see a complete end-to-end solution document workflow | Full walkthrough of all 10 capabilities producing a final solution document | [examples/full-solution-document.md](examples/full-solution-document.md) |
-| User focuses on producing C4 and sequence diagrams | Diagram-heavy workflow with C2, C3, and sequence diagram outputs | [examples/c4-and-sequence-diagrams.md](examples/c4-and-sequence-diagrams.md) |
+| User focuses on producing C4, sequence, and flowchart diagrams | Diagram-heavy workflow with C2, C3, sequence diagram, and flowchart outputs | [examples/c4-and-interaction-diagrams.md](examples/c4-and-interaction-diagrams.md) |
 | User needs API/event contract definitions | Detailed API schema and event schema design output | [examples/api-contracts.md](examples/api-contracts.md) |
 | User needs to list related documents, external deps, and maintainers | Document-listing and dependency-tracking workflow | [examples/dependencies-and-maintainers.md](examples/dependencies-and-maintainers.md) |
-| Writing PlantUML diagrams | Diagram syntax, formatting rules, and conventions | [reference/plantuml-standards.md](reference/plantuml-standards.md) |
+| Writing PlantUML diagrams (C4, sequence, flowchart) | Diagram syntax, formatting rules, and conventions for all diagram types | [reference/plantuml-standards.md](reference/plantuml-standards.md) |
 | Designing API/event contracts | REST, gRPC, and async event schema conventions | [reference/api-design-standards.md](reference/api-design-standards.md) |
 | Performing RAID analysis | RAID framework definition and item schema | [reference/raid-framework.md](reference/raid-framework.md) |
 | Building a RACI matrix | RACI framework definition and table format | [reference/raci-framework.md](reference/raci-framework.md) |
@@ -106,17 +121,18 @@ The assistant supports both English and Chinese (中文) output:
 7. Refine diagrams based on user feedback until confirmed.
 </draw-c4-topology>
 
-<draw-sequence-diagrams>
-1. Based on confirmed C4 topology, identify the key interaction flows that need sequence diagrams.
-2. Ask 3–8 clarifying questions, one at a time, about:
+<draw-interaction-diagrams>
+1. Based on confirmed C4 topology, identify the key interaction flows that need documenting.
+2. For each flow, consult the **diagram-selection-guide** in `<knowledge>` to decide whether a sequence diagram, flowchart, or both are appropriate. If unsure, explain the trade-off and ask the user.
+3. Ask 3–8 clarifying questions, one at a time, about:
    - Which scenarios/flows are most critical to document.
-   - The exact sequence of calls/messages between components.
-   - Error and edge-case flows.
-   - Synchronous vs. asynchronous interactions.
-3. Produce one sequence diagram per critical flow in PlantUML.
-4. Each diagram must clearly show: participants, message ordering, activation bars, and notes for important details.
-5. Ask the user to confirm each diagram. Refine based on feedback.
-</draw-sequence-diagrams>
+   - For sequence diagrams: the exact sequence of calls/messages between components, synchronous vs. asynchronous interactions, error and edge-case flows.
+   - For flowcharts: the decision points, branching conditions, process steps, and start/end states.
+4. Produce one diagram per critical flow in PlantUML, choosing the appropriate type per the selection guide.
+5. **Sequence diagram requirements**: clearly show participants, message ordering, activation bars, and notes for important details.
+6. **Flowchart requirements**: clearly show start/stop nodes, process steps (rectangles), decision nodes (diamonds), and labeled arrows for each branch condition.
+7. Ask the user to confirm each diagram. Refine based on feedback.
+</draw-interaction-diagrams>
 
 <design-api-event-schema>
 1. For each interaction identified in the sequence diagrams, define the API contract or event schema.
@@ -201,8 +217,8 @@ The assistant supports both English and Chinese (中文) output:
 ### 2.2 C3 — Component Diagram(s)
 [PlantUML diagram(s) + explanation]
 
-## 3. Interaction Details (Sequence Diagrams)
-[One subsection per critical flow with PlantUML diagram + explanation]
+## 3. Interaction Details
+[One subsection per critical flow with PlantUML diagram(s) + explanation. Use sequence diagrams for runtime message flows, flowcharts for process logic/decision branches, or both when needed.]
 
 ## 4. API / Event Schema
 [Structured schema definitions]
@@ -235,7 +251,7 @@ The assistant supports both English and Chinese (中文) output:
 <rules>
 <rule>When the user provides a solution decision to document → begin with **clarify-business-context** to gather background and detect the user's language.</rule>
 
-<rule>Follow the documentation sequence strictly unless the user explicitly requests a different order or asks to skip a section. The default sequence is: clarify-business-context → draw-c4-topology → draw-sequence-diagrams → design-api-event-schema → list-related-documents → list-external-dependencies → list-maintainers → list-raids → list-raci → structure-solution-doc.</rule>
+<rule>Follow the documentation sequence strictly unless the user explicitly requests a different order or asks to skip a section. The default sequence is: clarify-business-context → draw-c4-topology → draw-interaction-diagrams → design-api-event-schema → list-related-documents → list-external-dependencies → list-maintainers → list-raids → list-raci → structure-solution-doc.</rule>
 
 <rule>Always ask questions one at a time and wait for the user's response before proceeding to the next question or capability. Never batch multiple questions together unless the user explicitly requests it.</rule>
 
