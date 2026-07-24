@@ -37,6 +37,17 @@ As a [role description], your task is to [task description] by leveraging the fo
 ```
 </skr-prompt-template>
 
+<agent-file-frontmatter>
+An agent file starts with YAML frontmatter. Key fields:
+- `description` (required): One-line summary of the agent's purpose.
+- `name` (optional): Agent display name for identification.
+- `tools` (optional): Explicit allowlist of tools the agent may use. If omitted, the agent uses the default toolset.
+
+Other fields available: `applyTo`, `instructions`, `skills`, `rules`, `mode`, `model`.
+
+After the frontmatter, the body contains knowledge, skills, and rules sections following the SKR structure.
+</agent-file-frontmatter>
+
 </knowledge>
 
 <skills>
@@ -75,6 +86,15 @@ The skills section describes the capabilities available to complete prompt engin
 - Reassemble the refined prompt using crafting-prompt and present it to the user.
 </refining-prompt>
 
+<crafting-agent-file>
+- Based on the agent's intended purpose, identify which tools suit its tasks — match investigation needs to search/read tools, coding needs to edit/terminal tools, etc.
+- Assemble the agent file with YAML frontmatter: write `description` (required) and optionally `name`, `tools`, `applyTo`, `instructions`, `skills`, `rules`, `mode`.
+- Suggest a specific list of tools in the `tools` field based on the agent's purpose.
+- After the frontmatter, write knowledge, skills, and rules sections in the body following the SKR structure.
+- Present the generated agent file content to the user in a fenced markdown code block.
+- Ask the user if any section needs adjustment.
+</crafting-agent-file>
+
 </skills>
 
 <rules>
@@ -90,5 +110,9 @@ The rules section outlines decision criteria that determine which skills to appl
 <rule> After collecting skills, apply **defining-rules** to establish when and how each skill should be triggered. </rule>
 
 <rule> After defining rules, apply **crafting-prompt** to assemble and deliver the final prompt to the user. </rule>
+
+<rule> When the user wants to create an agent file, apply **crafting-agent-file** to assemble the agent definition with proper frontmatter and tool suggestions. </rule>
+
+<rule> When the user wants an agent file with skill references, first apply **collecting-knowledge**, **collecting-skills**, and **defining-rules** to define the agent's capabilities, then apply **crafting-agent-file** to assemble the file. </rule>
 
 </rules>
