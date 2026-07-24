@@ -23,7 +23,7 @@ Status emojis used to track each step:
 </step-status-definitions>
 
 <step-tracking-format>
-Record each step in PLAN.md using this format:
+Record each step in the plan file using this format:
 
 ```
 ### Step N: [Step Title] [Status Emoji]
@@ -35,6 +35,22 @@ Record each step in PLAN.md using this format:
 ```
 </step-tracking-format>
 
+<feature-folder-structure>
+Each feature implementation lives in its own folder with two files:
+
+```
+{location}/{feature-name}/
+├── plan.md      # Step-by-step execution plan with live status tracking
+└── context.md   # All context, references, requirements, constraints that define the plan
+```
+
+- **Location**: Ask the user where to store the plan. If not specified, default to `docs/feature-implementations/`.
+- **Feature name**: Derive a short, descriptive kebab-case name from the plan's objective (e.g., `add-auth-system`, `refactor-validation-handler`, `fix-null-pointer-in-transformer`).
+- **Plan file**: Contains the numbered step list with status emojis, updated in real-time as execution progresses. Serves as the live execution dashboard.
+- **Context file**: Captures all background material that informed the plan — requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, and decisions. Written once at plan creation and not modified during execution.
+- Both files are kept as a permanent record after execution completes — they are never deleted.
+</feature-folder-structure>
+
 <context-loading-guide>
 Load only the example most relevant to the current execution scenario to minimize context size.
 
@@ -44,7 +60,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 | Executing a plan that spans multiple files and architectural layers | Output model: execution tracking across multiple files and layers | [examples/multi-file-implementation.md](examples/multi-file-implementation.md) |
 | A step fails with compilation errors or unexpected output | Output model: error recovery, ❌→✅ status transitions, and retry patterns | [examples/handling-failed-steps.md](examples/handling-failed-steps.md) |
 | Executing a plan with 10+ steps requiring context preservation | Output model: long plan progress tracking and context continuity | [examples/long-plan-execution.md](examples/long-plan-execution.md) |
-| All plan steps are complete and post-execution review is needed | Output model: applying review-code after completion, adding fix steps, deleting PLAN.md | [examples/post-execution-review.md](examples/post-execution-review.md) |
+| All plan steps are complete and post-execution review is needed | Output model: applying review-code after completion, adding fix steps, keeping plan as permanent record | [examples/post-execution-review.md](examples/post-execution-review.md) |
 | A step is ambiguous, requires user input, or cannot proceed due to a missing dependency or external blocker | Output model: pausing execution at a blocked step, informing the user, and resuming after input | [examples/handling-failed-steps.md](examples/handling-failed-steps.md) |
 </context-loading-guide>
 
@@ -53,19 +69,24 @@ Load only the example most relevant to the current execution scenario to minimiz
 <capabilities>
 
 <track-plan>
-1. At the start of execution, create `PLAN.md` in the workspace root.
-2. If `PLAN.md` already exists, check for steps with ❌ failed or 🚫 blocked status. If found, ask the user whether to **resume** from the last known state or **start fresh** (overwriting with the new plan).
-3. List each step with its number, title, and initial status ⏳ pending, using the **step-tracking-format** knowledge.
-4. Update step status immediately after each state change (⏳ → 🔄 → ✅, or ❌/🚫 on failure). Refer to **step-status-definitions** knowledge for emoji meanings.
-5. Never modify plan structure, objectives, or steps except to update statuses or add clarifying notes.
-6. Always display the complete step list so progress is visible even across context resets.
+1. Determine where to store the plan. Ask the user where they'd like the plan saved, or default to `doc/feature-implementations/` if not specified.
+2. Derive a descriptive, short name for the feature from the plan's objective (e.g., `add-auth-system`, `refactor-validation-handler`, `fix-null-pointer-in-transformer`). Use kebab-case.
+3. Create the feature folder: `{location}/{feature-name}/`. Inside it, create two files:
+   - `{feature-name}-plan.md` — the step-by-step execution plan with status tracking (see **step-tracking-format**)
+   - `{feature-name}-context.md` — all context, references, requirements, constraints, and decisions that define the plan (captured from the plan source so the reasoning is preserved alongside the plan)
+4. Before creating a new plan, check if the feature folder already exists with a plan file. If a plan file has steps with ❌ failed or 🚫 blocked status, ask the user whether to **resume** from the last known state or **start fresh** (create a new folder/overwrite).
+5. List each step in the plan file with its number, title, and initial status ⏳ pending, using the **step-tracking-format** knowledge.
+6. Populate the context file with all relevant background: requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, and any other material that informed the plan.
+7. Update step status in the plan file immediately after each state change (⏳ → 🔄 → ✅, or ❌/🚫 on failure). Refer to **step-status-definitions** knowledge for emoji meanings.
+8. Never modify plan structure, objectives, or steps except to update statuses or add clarifying notes.
+9. Always display the complete step list so progress is visible even across context resets.
 </track-plan>
 
 <execute-step>
-1. Before starting a step, mark it as 🔄 in-progress in PLAN.md and briefly explain your approach.
+1. Before starting a step, mark it as 🔄 in-progress in the plan file and briefly explain your approach.
 2. Execute the step fully — no partial implementations.
 3. After completing the step, validate the outcome meets the step's objectives.
-4. Mark the step as ✅ completed; document files changed, implementation details, and validation results in PLAN.md.
+4. Mark the step as ✅ completed; document files changed, implementation details, and validation results in the plan file.
 5. Confirm the prerequisite step is fully ✅ completed before starting a step that depends on it.
 6. Display the full updated step list with current statuses after each completion.
 </execute-step>
@@ -79,7 +100,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 </report-progress>
 
 <handle-errors>
-1. Mark the failed step as ❌ with error details in PLAN.md.
+1. Mark the failed step as ❌ with error details in the plan file.
 2. Document the error clearly.
 3. Analyze the root cause.
 4. Attempt to fix and retry the step.
@@ -100,20 +121,15 @@ Load only the example most relevant to the current execution scenario to minimiz
 1. After ALL plan steps are marked ✅ completed, apply the **review-code** skill on all files changed or created during execution.
 2. Evaluate correctness, security, performance, maintainability, and test coverage.
 3. If 🚫 Blocker or 🔴 Major issues are found:
-   1. Record each finding as a new fix step in PLAN.md with ⏳ pending status.
+   1. Record each finding as a new fix step in the plan file with ⏳ pending status.
    2. Apply **execute-step** for each fix step.
    3. Re-run the **review-code** skill on the affected files.
    4. Repeat until no 🚫 Blockers or 🔴 Majors remain.
 4. If only 🟡 Minor and 🟢 Nit findings remain, document them in the final summary without blocking completion.
-5. Proceed to **clean-up-plan** only when the review passes.
+5. Display the final completion summary once the review passes. Keep the plan file and context file as a permanent record of the implementation.
 </review-post-execution>
 
-<clean-up-plan>
-1. Once ALL steps (including any post-execution review fix steps) are marked ✅ completed, display the final completion summary.
-2. Delete the PLAN.md file from the workspace.
-3. Confirm the deletion to the user ("Cleaned up PLAN.md").
-4. Only delete PLAN.md if the entire plan succeeded — keep it if any steps are ❌ failed or 🚫 blocked.
-</clean-up-plan>
+
 
 <manage-user-interaction>
 1. Execute the full plan autonomously without asking for permission at each step.
@@ -128,12 +144,12 @@ Load only the example most relevant to the current execution scenario to minimiz
 
 <rules>
 
-<rule> **At Plan Start**: Apply **track-plan** to initialize PLAN.md with all plan steps before executing any step. </rule>
+<rule> **At Plan Start**: Apply **track-plan** to create the feature folder with plan and context files before executing any step. </rule>
 <rule> **During Each Step**: Apply **execute-step** for every step in the plan. </rule>
 <rule> **Throughout Execution**: Apply **report-progress** — show the full step list with current statuses after every step. </rule>
 <rule> **When a Step Fails**: Apply **handle-errors** immediately. </rule>
 <rule> **At Validation Points**: Apply **run-validation-checkpoints** after code changes and at major milestones. Validate incrementally, not just at the end. </rule>
 <rule> **When Facing Ambiguity or Blockers**: Apply **manage-user-interaction** — pause and ask rather than assuming. </rule>
-<rule> **After All Steps Complete**: Apply **review-post-execution**, then **clean-up-plan** once the review passes. </rule>
+<rule> **After All Steps Complete**: Apply **review-post-execution**. Keep the plan file and context file as a permanent record — do not delete them. </rule>
 
 </rules>

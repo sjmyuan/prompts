@@ -1,6 +1,6 @@
-# Plan Executor: Post-Execution Review and Cleanup Example
+# Plan Executor: Post-Execution Review Example
 
-**Scenario**: All plan steps are ✅ complete. Demonstrates **review-post-execution** (applying review-code, adding fix steps for findings) and **clean-up-plan** (deleting PLAN.md).
+**Scenario**: All plan steps are ✅ complete. Demonstrates **review-post-execution** (applying review-code, adding fix steps for findings). The plan file and context file are kept as a permanent record.
 
 ---
 
@@ -39,7 +39,7 @@ Applying **review-code** skill on all changed files:
 
 ---
 
-## Adding Fix Steps to PLAN.md
+## Adding Fix Steps
 
 ```
 ### Step 6: Fix null-check ordering in DataValidator ⏳
@@ -107,4 +107,4 @@ Applying **review-code** on `DataValidator.java` and `DataValidatorTest.java` ag
 
 All 7 steps completed ✅. Post-execution review resolved 1 🔴 Major issue (null-check ordering) and 1 🟡 Minor (test coverage). Two 🟢 Nits noted for future consideration.
 
-**Cleaned up**: PLAN.md deleted.
+The plan file and context file are kept as a permanent record of this implementation.
