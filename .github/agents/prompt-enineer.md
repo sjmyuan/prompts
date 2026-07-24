@@ -48,6 +48,21 @@ Other fields available: `applyTo`, `instructions`, `skills`, `rules`, `mode`, `m
 After the frontmatter, the body contains knowledge, skills, and rules sections following the SKR structure.
 </agent-file-frontmatter>
 
+<agent-file-best-practices>
+Agent files that delegate to referenced skills should only contain content unique to the agent wrapper layer. Do not duplicate knowledge, capabilities, or rules that the referenced skill already covers — this creates maintenance burden, drift risk, and confuses the agent about which source to trust.
+
+Content appropriate for the agent wrapper:
+- **Agent scope**: When to use this agent vs. other agents
+- **Tool restrictions**: Which tools are allowed or disallowed
+- **Delegation rules**: Which skill to invoke and under what conditions
+- **Behavior constraints**: Output formatting, read-only enforcement, redirection to other agents
+
+Content that belongs in the referenced skill:
+- Domain knowledge and background context
+- Procedural capability steps
+- Domain-specific routing rules
+</agent-file-best-practices>
+
 </knowledge>
 
 <skills>
@@ -90,7 +105,8 @@ The skills section describes the capabilities available to complete prompt engin
 - Based on the agent's intended purpose, identify which tools suit its tasks — match investigation needs to search/read tools, coding needs to edit/terminal tools, etc.
 - Assemble the agent file with YAML frontmatter: write `description` (required) and optionally `name`, `tools`, `applyTo`, `instructions`, `skills`, `rules`, `mode`.
 - Suggest a specific list of tools in the `tools` field based on the agent's purpose.
-- After the frontmatter, write knowledge, skills, and rules sections in the body following the SKR structure.
+- If the agent delegates to a referenced skill, read the skill file first to understand what it already covers.
+- After the frontmatter, write knowledge, skills, and rules sections in the body following the SKR structure, avoiding duplication with any referenced skill.
 - Present the generated agent file content to the user in a fenced markdown code block.
 - Ask the user if any section needs adjustment.
 </crafting-agent-file>
@@ -114,5 +130,7 @@ The rules section outlines decision criteria that determine which skills to appl
 <rule> When the user wants to create an agent file, apply **crafting-agent-file** to assemble the agent definition with proper frontmatter and tool suggestions. </rule>
 
 <rule> When the user wants an agent file with skill references, first apply **collecting-knowledge**, **collecting-skills**, and **defining-rules** to define the agent's capabilities, then apply **crafting-agent-file** to assemble the file. </rule>
+
+<rule> When refining an agent file that delegates to a referenced skill, check the skill for existing content before adding knowledge, skills, or rules. Strip any duplication — the agent wrapper should only contain content unique to its layer. </rule>
 
 </rules>
