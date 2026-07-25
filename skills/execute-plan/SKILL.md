@@ -1,11 +1,15 @@
 ---
 name: execute-plan
-description: Execute structured plans step-by-step with progress tracking, validation checkpoints, and error recovery. Works with plans from plan-development-task. Runs tests, validates changes, and handles failures systematically. Use after generating a plan that needs execution.
+description: Execute structured development plans step-by-step with progress tracking, validation checkpoints, and error recovery. Use when executing / carrying out / resuming / reviewing the execution of a plan from plan-development-task.
 ---
 
 <when-to-use-this-skill>
 - You need to execute an outlined plan (implementation plan, refactoring plan, or bug-fix plan)
 - A structured plan from plan-development-task needs to be carried out with progress tracking and validation checkpoints
+- A previously started plan needs to be resumed after interruption or context reset
+- All plan steps are complete and a post-execution review with the review-code skill is needed
+- A step has failed or is blocked and needs error recovery before proceeding
+- Do NOT load when no plan has been generated yet — if the user describes a problem without referencing an existing plan, let plan-development-task handle it first
 </when-to-use-this-skill>
 
 <knowledge>
@@ -51,6 +55,20 @@ Each feature implementation lives in its own folder with two files:
 - Both files are kept as a permanent record after execution completes — they are never deleted.
 </feature-folder-structure>
 
+<plan-input-schema>
+A plan consumed by this skill consists of numbered steps. Each step must have:
+- **Step number**: Sequential integer starting from 1
+- **Title**: Short descriptive name of the step
+- **Objective** (optional but recommended): What the step achieves
+
+The plan may be provided as:
+- An existing `plan.md` file in a feature folder (created by **export-plan** in plan-development-task, or a previous execution)
+- A plan summarized in the conversation by plan-development-task
+- A plan described ad-hoc by the user
+
+This skill is responsible for materializing the plan into `plan.md` with the **step-tracking-format** if it does not already exist as a file.
+</plan-input-schema>
+
 <context-loading-guide>
 Load only the example most relevant to the current execution scenario to minimize context size.
 
@@ -72,8 +90,8 @@ Load only the example most relevant to the current execution scenario to minimiz
 1. Determine where to store the plan. Ask the user where they'd like the plan saved, or default to `doc/feature-implementations/` if not specified.
 2. Derive a descriptive, short name for the feature from the plan's objective (e.g., `add-auth-system`, `refactor-validation-handler`, `fix-null-pointer-in-transformer`). Use kebab-case.
 3. Create the feature folder: `{location}/{feature-name}/`. Inside it, create two files:
-   - `{feature-name}-plan.md` — the step-by-step execution plan with status tracking (see **step-tracking-format**)
-   - `{feature-name}-context.md` — all context, references, requirements, constraints, and decisions that define the plan (captured from the plan source so the reasoning is preserved alongside the plan)
+   - `plan.md` — the step-by-step execution plan with status tracking (see **step-tracking-format**)
+   - `context.md` — all context, references, requirements, constraints, and decisions that define the plan (captured from the plan source so the reasoning is preserved alongside the plan)
 4. Before creating a new plan, check if the feature folder already exists with a plan file. If a plan file has steps with ❌ failed or 🚫 blocked status, ask the user whether to **resume** from the last known state or **start fresh** (create a new folder/overwrite).
 5. List each step in the plan file with its number, title, and initial status ⏳ pending, using the **step-tracking-format** knowledge.
 6. Populate the context file with all relevant background: requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, and any other material that informed the plan.

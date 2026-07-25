@@ -3,7 +3,7 @@
 1. **Validate Baseline**: Run existing tests, linting, and type-checking to ensure the codebase is in a clean state before implementation begins.
 2. Break down high-level software requirements into specific, independently testable functionalities.
 3. Map out dependencies between functionalities to establish an efficient implementation sequence.
-4. **Consolidate Steps**: Group related functionalities together when they share context or can be tested together, reducing the total step count while maintaining clarity.
+4. **Consolidate Steps**: Group related functionalities together when they share context or can be tested together, reducing the total step count while maintaining clarity. Consolidation strategies: (a) merge test-and-implement steps for simple getters/setters or config properties into a single step, (b) combine Clean Up Unused Code + Clean Up Tests + Verify Cleanup into one cleanup step when changes are small, (c) group Validate Linting, Formatting and Type Checking across multiple functionalities into one final quality gate step.
 5. Load **reference/tdd-approach-selection.md** to select the appropriate TDD variant for each functionality. Document the rationale.
 6. Create a detailed step-by-step implementation plan. For each functionality, include the following steps:
    1. **Write Focused Tests**: Create precise unit tests for a single functionality, task or requirement, ensuring coverage of all possible scenarios, edge cases, and invalid inputs.

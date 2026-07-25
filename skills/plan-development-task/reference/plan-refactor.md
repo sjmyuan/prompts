@@ -3,7 +3,7 @@
 1. **Validate Baseline**: Run existing tests, linting, and type-checking to ensure the codebase is in a clean state before refactoring begins.
 2. Break down the refactor request into specific, measurable objectives and clearly defined constraints.
 3. Identify and map dependencies between objectives to establish an efficient and logical refactoring sequence.
-4. **Consolidate Steps**: Group related objectives together when they share context or can be tested together, reducing the total step count while maintaining clarity.
+4. **Consolidate Steps**: Group related objectives together when they share context or can be tested together, reducing the total step count while maintaining clarity. Consolidation strategies: (a) merge test-and-refactor steps for simple extractions or renames into a single step, (b) combine Clean Up Unused Code + Clean Up Tests + Verify Cleanup into one cleanup step when changes are small, (c) group Validate Linting, Formatting and Type Checking across multiple objectives into one final quality gate step.
 5. Load **reference/tdd-approach-selection.md** to select the appropriate TDD variant for each objective. Document the rationale.
 6. Create a detailed step-by-step refactor plan. For each objective, include the following steps:
    1. **Write Focused Tests**: Create precise unit tests targeting the specific refactoring objective, ensuring comprehensive coverage of all scenarios, edge cases, and invalid inputs.

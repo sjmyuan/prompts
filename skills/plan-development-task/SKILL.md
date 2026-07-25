@@ -1,6 +1,6 @@
 ---
 name: plan-development-task
-description: Classify, clarify, and generate detailed step-by-step TDD-based plans for bug fixes, feature implementations, and refactors. Use when planning / investigating / designing changes for bugs, regressions, failing tests, new features, enhancements, refactoring, code cleanup, or technical debt.
+description: Classify, clarify, and generate TDD-based step-by-step plans for bug fixes, features, and refactors. Use when planning / investigating / designing changes for bugs, regressions, new features, enhancements, refactoring, or technical debt.
 ---
 
 <when-to-use-this-skill>
@@ -18,10 +18,10 @@ description: Classify, clarify, and generate detailed step-by-step TDD-based pla
 - User requests improvements to maintainability, readability, or performance without changing behavior
 
 **Differentiation rules** (when multiple skills could apply):
-- **New behavior being introduced?** → This is a **feature** (plan-feature-implementation)
-- **No new behavior, just restructuring?** → This is a **refactor** (plan-refactor)
-- **Something is broken?** → This is a **bug fix** (plan-bug-fix)
-- **Both restructure AND add new behavior?** → Use plan-refactor first to stabilize, then plan-feature-implementation for the new behavior
+- **New behavior being introduced?** → This is a **feature** — apply **plan-feature-implementation**
+- **No new behavior, just restructuring?** → This is a **refactor** — apply **plan-refactor**
+- **Something is broken?** → This is a **bug fix** — apply **plan-bug-fix**
+- **Both restructure AND add new behavior?** → Apply **plan-refactor** first to stabilize, then **plan-feature-implementation** for the new behavior
 </when-to-use-this-skill>
 
 <knowledge>
@@ -63,7 +63,7 @@ Load only the examples directly relevant to the current change type to minimize 
 </context-loading-guide>
 
 <skill-boundary>
-This skill produces a **plan** but does not execute changes. Pair with **execute-plan** for implementation.
+This skill produces a **plan** but does not execute changes. After the plan is confirmed, use **export-plan** to persist it to a feature folder, then pair with **execute-plan** for implementation.
 </skill-boundary>
 
 </knowledge>
@@ -115,6 +115,16 @@ Load **[reference/plan-feature-implementation.md](reference/plan-feature-impleme
 Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its steps.
 </plan-refactor>
 
+<export-plan>
+1. After the user confirms the plan, ask whether they would like to persist it to a feature folder for later execution by **execute-plan**.
+2. If the user agrees, determine the storage location (ask the user, or default to `docs/feature-implementations/`).
+3. Derive a short kebab-case feature name from the plan's objective (e.g., `fix-null-pointer-in-transformer`).
+4. Create the feature folder: `{location}/{feature-name}/`.
+5. Write `plan.md` — the complete numbered step list with objectives, using the plan's steps as generated.
+6. Write `context.md` — capture all background: the user's original request, the classified change type, root cause or requirement summary, TDD approach rationale, constraints, assumptions, and any codebase references gathered.
+7. Inform the user of the saved location so they can invoke **execute-plan** to carry it out.
+</export-plan>
+
 </capabilities>
 
 <rules>
@@ -124,5 +134,6 @@ Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its
 <rule> If the classified type is **Feature**: apply **define-feature-scope** to clarify the requirement, then apply **plan-feature-implementation** to generate the implementation plan. </rule>
 <rule> If the classified type is **Refactor**: apply **define-refactor-scope** to clarify the scope and constraints, then apply **plan-refactor** to generate the refactoring plan. </rule>
 <rule> When both restructuring and new behavior are needed: apply **plan-refactor** first to stabilize the structure, then apply **plan-feature-implementation** for the new behavior. </rule>
+<rule> After the plan is confirmed by the user: optionally apply **export-plan** to persist the plan to files for later execution by execute-plan. </rule>
 
 </rules>
