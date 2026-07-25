@@ -1,6 +1,6 @@
 # Signal Detection Catalog
 
-Five signal types indicate a potential lesson — three from interactive sources (chat) and two from code-change sources (PRs, git history).
+Signal types span multiple source categories — interactive (chat sessions), code-change (PRs, git history), communication tools (Slack, Teams, Discord), and procedural (any source). Each signal type indicates a potential lesson worth preserving.
 
 ## Interactive Sources (Chat Sessions)
 
@@ -96,6 +96,52 @@ New team members consistently ask the same setup, access, or process questions:
 - "Who do I talk to about X?"
 - **Signal strength**: Medium — indicates stale or missing onboarding docs
 
+## Procedural Sources (Any Source Type)
+
+Procedural signals capture step-by-step knowledge about how to accomplish recurring tasks. Unlike rules (which are single directives) or knowledge (which are facts), procedures are ordered sequences of actions. They can appear in any source: a Slack thread where someone explains how to deploy, a PR whose change pattern reveals how to add a feature, or a chat session where the team discusses their workflow.
+
+### 12. Procedural pattern
+A sequence of steps describing how to accomplish a recurring task is shared or discovered:
+- A team member explains "here's how you deploy a hotfix" in Slack with numbered steps
+- Someone shares a checklist-style guide in a Teams channel: "To onboard a new service: 1) create repo, 2) add CI config, 3) register in service catalog…"
+- During a chat session, the user walks through their workflow step by step and says "this is how we always do it"
+- A PR description includes a detailed "how to test" section that reveals a non-obvious testing procedure
+- An ADR or design doc describes a multi-step process that was decided on but never distilled into a capability
+- **Signal strength**: High — uncodified procedures create inconsistency and slow down newcomers
+
+**What to look for**:
+- Ordered language: "first", "then", "next", "finally", "after that", "step 1/2/3"
+- Imperative instructions: "you need to", "make sure to", "don't forget to", "always"
+- Checklist-style formatting: numbered or bulleted lists of actions
+- Conditional branches: "if this is a hotfix, also…", "for backend services, additionally…"
+- Repo/component references: "touch the auth service", "modify the payment module"
+- Tool or script invocations: "run `deploy.sh`", "call the `/register` endpoint"
+
+**Anti-signals for procedural patterns**:
+- Generic advice without concrete steps ("you should test more thoroughly" — not a procedure)
+- Single-step actions ("run `npm install`" — this is a command, not a procedure; it's a knowledge entry or rule)
+- Procedures that are already documented in the target (check existing skills, project notes, runbooks)
+- Personal workflow preferences that aren't team conventions ("I like to open VS Code first, then terminal")
+
+### 13. Implementation recipe
+A task's PR(s) reveal a pattern of which repos, components, and change sequences are involved — indicating an unwritten recipe. A single task can suggest a tentative recipe; confidence increases as more instances confirm it. When a task spans multiple repos, the recipe works at two levels: per-repo change patterns and cross-repo orchestration:
+- A single task with PRs in 3 repos (API, frontend, infra) reveals both per-repo steps and the cross-repo order — both are worth capturing (confidence: tentative)
+- Multiple tasks of the same type follow the same multi-repo pattern — the full recipe is confirmed at both levels (confidence: high)
+- A code review comment says "follow the same pattern as the X feature" — the pattern exists but isn't captured anywhere
+- **Signal strength**: Medium for single instance (tentative recipe), High for 2+ instances (confirmed recipe)
+
+**What to look for**:
+- **Repo map**: Which repos are touched? Single repo or multiple? If multiple, what's the dependency order between them?
+- **Per-repo component map**: Within each repo, which files or directories are modified?
+- **Per-repo change sequence**: Within each repo, what is created, modified, or configured, and in what order?
+- **Cross-repo orchestration**: What is the end-to-end sequence across repos? (e.g., "1) API repo: add endpoint → 2) Frontend repo: add UI → 3) Infra repo: update config")
+
+**Anti-signals for implementation recipes**:
+- PRs that follow a framework's standard scaffolding (e.g., Rails generators, NestJS CLI) — these aren't team conventions, they're framework defaults
+- PRs for entirely different task types that happen to touch the same files (coincidental overlap, not a recipe)
+- Changes that are already captured in a project's CONTRIBUTING.md, ADR, or documented convention
+- A PR with no discernible structural pattern (ad-hoc changes scattered across unrelated files) — if you can't articulate a sequence, it's not a recipe
+
 ## Anti-Signals (do NOT treat these as lessons)
 
 ### From interactive sources:
@@ -120,3 +166,12 @@ New team members consistently ask the same setup, access, or process questions:
 - Information already captured in existing documentation, runbooks, or ADRs
 - Vague complaints without a concrete solution or action
 - Personal discussions unrelated to project work
+
+### From procedural sources:
+- Generic advice without concrete steps ("you should test more thoroughly" — not a procedure)
+- Single-step actions ("run `npm install`" — a command, not a procedure; capture as knowledge or a rule)
+- Procedures already documented in the target (check existing skills, project notes, runbooks before extracting)
+- Personal workflow preferences that aren't team conventions ("I like to open VS Code first, then terminal")
+- PRs that follow a framework's standard scaffolding (Rails generators, NestJS CLI) — not team conventions
+- Procedures that are generic industry knowledge ("write tests before code") — must encode team-specific conventions
+- A PR with no discernible structural pattern (ad-hoc changes) — if you can't articulate a sequence, it's not a recipe

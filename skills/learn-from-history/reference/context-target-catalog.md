@@ -102,3 +102,71 @@ before committing changes.
 ```
 
 **Do NOT put here**: Domain knowledge (use skills), project conventions (use project notes).
+
+---
+
+## Target Type: Skill File (Capability Section)
+
+**Suitability**: Multi-step procedures extracted from historical sources that describe how to accomplish a recurring task following team conventions. These become named capabilities within the skill's `<capabilities>` section.
+
+**Lesson types that fit here**:
+- An implementation recipe extracted from multiple PRs (e.g., "how to add a new API endpoint in this codebase")
+- A procedural pattern extracted from Slack/Teams (e.g., "how to deploy a hotfix")
+- A refined capability produced by abstracting multiple similar procedures (e.g., merging "deploy service" and "deploy hotfix" into a general "deploy to environment" capability)
+
+**Format**: Must follow capability conventions:
+- **Name**: Action-verb phrase in kebab-case inside angle brackets (e.g., `<deploy-hotfix>`)
+- **Objective**: One sentence describing the goal
+- **Steps**: Numbered list, each starting with an imperative action verb
+- **Parameters** (optional): Table of what varies per instance
+- **Evolution note** (if refined via `abstract-capability`): What was merged and why
+
+**Example entry** (in capabilities section):
+```markdown
+<deploy-hotfix>
+**Objective**: Deploy a critical fix to production quickly while following the team's hotfix protocol.
+
+**Steps**:
+1. Create a hotfix branch from the latest release tag: `git checkout -b hotfix/<issue-id> <release-tag>`
+2. Apply the fix and commit with prefix `hotfix:`
+3. Open a PR against `main` — request expedited review from the on-call engineer
+4. After approval, merge to `main` and immediately tag: `git tag -a v<version>-hotfix<seq>`
+5. Trigger the deploy pipeline for the new tag and monitor the #alerts channel for 15 minutes
+
+**Parameters**:
+| Parameter | Description | Example |
+|---|---|---|
+| `<issue-id>` | Jira issue or bug ID | `ENG-421` |
+| `<release-tag>` | Latest release tag to branch from | `v2.3.1` |
+| `<version>` | New version after the hotfix | `2.3.2` |
+| `<seq>` | Hotfix sequence number for this version | `1` |
+</deploy-hotfix>
+```
+
+**Do NOT put here**: Single-step actions (capture as knowledge), generic best practices, personal preferences.
+
+---
+
+## Target Type: Project-Level Persistent Notes (How-To Guide)
+
+**Suitability**: Procedures that are project-specific but don't belong to a domain skill. When no relevant skill exists, procedures can be stored as how-to guides in project-level notes.
+
+**Lesson types that fit here**:
+- A project-specific setup or onboarding procedure (e.g., "how to set up the local dev environment")
+- A cross-cutting procedure that spans multiple domains (e.g., "how to add a new microservice to the cluster")
+- A procedure discovered from communication tool history that's too operational for a domain skill
+
+**Format**: Section heading with the task name, followed by numbered steps with any prerequisites and parameters noted.
+
+**Example entry**:
+```markdown
+## How to add a new microservice to the cluster
+
+1. Create the service repo from the `microservice-template` GitHub template
+2. Add the service to `infra/service-registry.yaml` with port and health-check endpoint
+3. Add CI config: copy `.github/workflows/deploy-template.yml` and set `SERVICE_NAME`
+4. Register the service in the API gateway at `gateway/routes.yaml`
+5. Deploy the gateway first, then the new service
+```
+
+**Do NOT put here**: Domain-specific procedures that fit in a skill (use skill files), personal workflow preferences (use personal notes).

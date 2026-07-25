@@ -1,6 +1,6 @@
 ---
 name: learn-from-history
-description: Extract reusable knowledge, rules, and capabilities from chat sessions, pull requests, git history, Slack/Teams transcripts, and other historical records, then provision them to persistent context. Use when distilling lessons from conversations, analyzing PRs against user stories, mining git history for patterns, mining communication tool chat history for team knowledge, auditing sessions for preservable insights, or updating skills, agents, or memory from any historical source.
+description: Extract reusable knowledge, rules, procedures, and implementation recipes from chat sessions, pull requests, git history, Slack/Teams transcripts, and other historical records, then provision them to persistent context. Use when distilling lessons from conversations, extracting step-by-step procedures and how-to knowledge, analyzing PRs for implementation recipes and story gaps, mining git history for patterns, mining communication tool chat history for team knowledge, auditing sessions for preservable insights, or updating skills, agents, or memory from any historical source.
 ---
 
 <when-to-use-this-skill>
@@ -12,6 +12,9 @@ description: Extract reusable knowledge, rules, and capabilities from chat sessi
 - User wants to update an existing skill, agent file, doc, or memory with insights from any historical source
 - User provides chat history from Slack, Teams, Discord, or other communication tools and wants to extract team knowledge, recurring questions, decisions, or problem-solution patterns from people's conversations
 - User wants to check whether a conversation, PR, code history, or communication tool transcript contains anything worth preserving for future work
+- User wants to extract step-by-step procedures or "how-to" knowledge from conversations, PRs, or chat history — the concrete steps the team follows to accomplish recurring tasks
+- User provides one or more PRs for similar task types and wants to distill the common implementation recipe (which repos/components to touch, what change pattern to follow)
+- User wants to refine and generalize an existing capability by merging it with newly discovered procedural knowledge from historical sources
 </when-to-use-this-skill>
 
 <knowledge>
@@ -34,16 +37,19 @@ This skill treats lessons seriously. Not every interaction or change yields a le
 | User specifies a target context for the lesson | Walkthrough of user-directed provisioning to a specific skill, agent, or memory file | [examples/user-specified-target.md](examples/user-specified-target.md) |
 | User provides a user story and PR(s) to learn from | Walkthrough of comparing story requirements to implementation changes, identifying gaps and extracting reusable knowledge | [examples/pr-story-gap-discovery.md](examples/pr-story-gap-discovery.md) |
 | User provides git commit history to learn from | Walkthrough of mining commit history for recurring patterns, convention evolution, and reusable lessons | [examples/git-history-pattern.md](examples/git-history-pattern.md) |
+| Extracting a step-by-step procedure from conversation or chat history | Walkthrough of detecting a procedural pattern signal, extracting the ordered steps, and provisioning as a capability | [examples/procedural-discovery.md](examples/procedural-discovery.md) |
+| Distilling an implementation recipe from one or more PRs | Walkthrough of detecting an implementation recipe signal across PRs, extracting the repo/component/change-pattern, and abstracting into a generalized capability | [examples/implementation-recipe.md](examples/implementation-recipe.md) |
 
 </context-loading-guide>
 
 <signal-detection-knowledge>
-Five signal types indicate potential lessons: three from interactive sources (chat sessions) and two from code-change sources (PRs, git history). Each has specific triggers and anti-signals — load the full catalog from [reference/signal-detection-catalog.md](reference/signal-detection-catalog.md) when scanning for signals.
+Signal types span multiple source categories. Each has specific triggers and anti-signals — load the full catalog from [reference/signal-detection-catalog.md](reference/signal-detection-catalog.md) when scanning for signals.
 
 Quick reference:
-- **Interactive**: explicit user feedback, AI self-discovered insight, future-useful information
-- **Code-change**: story-implementation gap, evolutionary pattern
-- **Communication tool**: recurring question, decision record, problem-solution pair, knowledge sharing, escalation pattern, onboarding gap
+- **Interactive** (chat sessions): explicit user feedback, AI self-discovered insight, future-useful information
+- **Code-change** (PRs, git history): story-implementation gap, evolutionary pattern, implementation recipe
+- **Communication tool** (Slack, Teams, Discord): recurring question, decision record, problem-solution pair, knowledge sharing, escalation pattern, onboarding gap
+- **Procedural** (any source): procedural pattern — step-by-step descriptions of how to accomplish a recurring task, including which repos and components to touch and what change pattern to follow
 - **Anti-signals**: trivial facts, one-off fixes, already-documented info, session state, boilerplate changes, casual chat, resolved-once issues
 </signal-detection-knowledge>
 
@@ -70,12 +76,13 @@ When comparing a user story against PR implementation changes, load [reference/s
    - **Communication tool history**: User provided chat transcripts from Slack, Teams, Discord, etc. — apply **analyze-communication-history** to extract candidate lessons, then return here for quality gating
    - **Mixed**: User provided multiple sources — process each with the appropriate path, then merge candidates
 
-2. For chat sessions, load [reference/signal-detection-catalog.md](reference/signal-detection-catalog.md) and **scan the conversation** for the three interactive signal types:
+2. For chat sessions, load [reference/signal-detection-catalog.md](reference/signal-detection-catalog.md) and **scan the conversation** for interactive and procedural signal types:
    - Explicit user feedback (corrections, preferences, "remember this" statements)
    - AI self-discovered insights (reasoning that produced correct knowledge not in context)
    - Future-useful information (hard-won configuration, non-obvious workarounds, undocumented constraints)
+   - Procedural pattern (step-by-step descriptions of how to accomplish a task — "first do A, then B, then C")
 
-3. For code-change sources, **delegate to analyze-code-change-history** to produce candidate lessons from the PR/git analysis.
+3. For code-change sources, **delegate to analyze-code-change-history** to produce candidate lessons from the PR/git analysis. This includes both gap-analysis candidates and implementation recipe candidates.
 
 4. **Exclude anti-signals** immediately — for each source type, filter out the anti-signals listed in the signal detection catalog.
 
@@ -162,6 +169,24 @@ When comparing a user story against PR implementation changes, load [reference/s
    - Source reference (story+PR link or commit range)
    - Which analysis lens or pattern type triggered it
    - A preliminary quality assessment
+
+**Additional step for implementation recipe detection**:
+8. For each PR (even a single one), **extract the change pattern** to detect a potential implementation recipe:
+   - **Repo map**: Which repos are touched? If a single task spans multiple repos (e.g., API repo + frontend repo + infra repo), treat each repo's changes as a separate sub-pattern first, then synthesize a cross-repo orchestration.
+   - **Per-repo component map**: Within each repo, which files or directories are modified? What's the change sequence?
+   - **Cross-repo orchestration**: When multiple repos are involved, what is the dependency order? (e.g., "1) API repo adds endpoint → 2) Frontend repo adds UI → 3) Infra repo updates config")
+   - **Generalizability check**: Ask "If someone implemented a similar task next sprint, would they touch these same repos, files, and follow this same order?" If yes, it's a candidate recipe.
+   - **Confidence**: Tag as **tentative** for a single instance, **confirmed** when 2+ instances for the same task type follow the same pattern. Even tentative recipes are worth capturing — they get refined as more data arrives.
+
+9. When multiple instances for the same task type are available, **compare across instances** to strengthen the recipe:
+   - **What was consistent** across instances vs. **what varied**? (the consistent parts are the recipe; the variants are parameters)
+   - **Multi-repo consistency**: Does the cross-repo orchestration hold across instances? Do the same repos always get touched in the same order?
+   - Upgrade confidence from tentative to confirmed when the same pattern appears in 2+ instances
+
+10. For each implementation recipe candidate, formulate it at **both levels** when repos are involved:
+   - **Repo-level capabilities** (one per repo): What specific files and steps within that repo?
+   - **Cross-repo capability** (the orchestration): What is the end-to-end sequence across repos? References the repo-level capabilities as sub-steps.
+   - Each level gets its own: **Task type**, **Confidence**, **Steps**, **Parameters**, **Evidence**
 </analyze-code-change-history>
 
 <determine-provision-target>
@@ -179,6 +204,7 @@ When comparing a user story against PR implementation changes, load [reference/s
    - **Agent behavior rule** → the relevant agent or instruction file
    - **Project documentation fact** → relevant project documentation (README, ADR, architecture doc)
    - **Code-change-derived pattern** → project-level persistent notes (if project-wide) or relevant skill (if domain-specific). PR-derived lessons are typically project-scoped; classify based on whether the pattern would apply outside this project.
+   - **Multi-step procedure or capability** → the relevant skill file (as a new or updated capability), or project-level persistent notes (as a how-to guide) if no domain skill exists. Procedural patterns and implementation recipes typically become capabilities in skills — they describe "how to do X" following team conventions.
    - **Task-specific temporary note** → session-scoped context (rare; prefer persistent targets)
 
 4. For each classification, determine:
@@ -198,6 +224,7 @@ When comparing a user story against PR implementation changes, load [reference/s
 1. For each lesson, draft the **exact content** to be added to the target context:
    - Write it in the format appropriate for the target (see [reference/context-target-catalog.md](reference/context-target-catalog.md) for format requirements)
    - Keep it concise — a few sentences for a rule, a bullet for a knowledge entry
+   - For capabilities (procedures), use the format: **name** (action-verb phrase), **objective** (one-sentence goal), **ordered steps** (numbered, each starting with an action verb), **parameters** (what varies per instance)
    - Include the source evidence (conversation excerpt, story-PR gap, or commit pattern)
 
 2. Structure the plan as a clear table:
@@ -299,6 +326,112 @@ When comparing a user story against PR implementation changes, load [reference/s
 6. **Return candidates** to **detect-learning-signals** for quality gating, with transcript evidence and the signal type that triggered each candidate.
 </analyze-communication-history>
 
+<extract-capability>
+**Objective**: Detect and extract multi-step procedures from any historical source, format them as actionable capabilities, and prepare them for provisioning. Works on single instances (tentative, lower confidence) as well as multiple instances (confirmed, higher confidence). When a task spans multiple repos, extracts at two levels — per-repo capabilities and a cross-repo orchestration capability — enabling capabilities to improve as more data arrives.
+
+**Steps**:
+1. **Identify the procedure**: Scan the source for a sequence of steps that describes how to accomplish a recurring task. Look for:
+   - Ordered language: "first", "then", "next", "finally", "after that"
+   - Imperative instructions: "you need to", "make sure to", "don't forget to"
+   - Checklist-style descriptions: numbered or bulleted steps
+   - Conditional branches: "if X, do Y; otherwise do Z"
+   - Repo/component references: "touch the auth service", "modify the payment module"
+   - For code-change sources: a clear sequence of files touched across one or more repos that suggests a reusable change pattern
+
+2. **Determine the extraction level**: Based on the source, decide whether to extract at one level or multiple:
+   - **Single repo**: The task touches one repo → extract one capability for that repo
+   - **Multiple repos**: The task spans multiple repos (e.g., API repo + frontend repo + infra repo) → extract at two levels:
+     - **Repo-level capabilities**: One per repo, describing the specific change pattern within that repo
+     - **Cross-repo capability**: The end-to-end orchestration — which repos in what order, with dependencies between them. References repo-level capabilities as sub-steps.
+   - The cross-repo capability is the higher-level abstraction — it tells a newcomer "for this task type, you need to touch these repos in this order, and within each repo you follow this pattern."
+
+3. **Scope the task**: Determine what task this procedure accomplishes:
+   - What is the goal? (e.g., "deploy a hotfix to production", "add a new payment method")
+   - What triggers this procedure? (e.g., "when a critical bug is found in prod")
+   - Who would follow this procedure? (new team member? on-call engineer? any developer?)
+
+4. **Extract the ordered steps**: Write each step as an action starting with an imperative verb:
+   - Preserve the original order
+   - Remove conversational filler — keep only the actionable part
+   - Note any dependencies between steps ("step 3 requires step 2 to complete first")
+   - Flag any steps that are conditional ("only if the build passes")
+   - For cross-repo capabilities, each step may reference a repo-level capability (e.g., "Step 2: In the frontend repo, apply `<add-bulk-ui>`")
+
+5. **Identify parameters**: Separate what is **constant** (the same every time) from what **varies**:
+   - Constants become the procedure steps themselves
+   - Variants become parameters — placeholders that differ per instance (e.g., `<branch-name>`, `<service-name>`)
+   - For cross-repo capabilities, parameters may span repos (e.g., `<entity>` is used in both API and frontend repos)
+   - Document the expected type or format of each parameter
+
+6. **Assess confidence**: Tag the extracted capability with a confidence level:
+   - **Tentative**: Derived from a single instance (one conversation, one PR, one multi-repo task). The pattern looks generalizable but hasn't been confirmed by repetition. Still worth capturing — it will be refined by **abstract-capability** when more data arrives.
+   - **Confirmed**: Derived from 2+ independent instances showing the same pattern. The recipe is validated by repetition.
+
+7. **Apply capability quality checks**:
+   - Is this procedure **reusable**? (would someone follow these same steps more than once?)
+   - Is it **non-obvious**? (would a newcomer figure this out without being told?)
+   - Is it **complete**? (can someone follow these steps end-to-end without missing context?)
+   - Is it **team-specific**? (does it encode this team's conventions vs. generic best practice?)
+   - If the procedure is generic/common knowledge, reject it — capabilities should capture team-specific conventions
+   - Tentative confidence does NOT cause rejection — it just means the capability should be tagged as tentative and revisited when more data arrives
+
+8. **Format as a capability**: Structure the extracted procedure as:
+   - **Capability name**: Action-verb phrase in kebab-case (e.g., `deploy-hotfix`, `add-payment-method`)
+   - **Level**: Repo-level (single repo) or Cross-repo (orchestration across repos)
+   - **Confidence**: Tentative (1 instance) or Confirmed (2+ instances)
+   - **Objective**: One sentence describing the goal
+   - **Trigger**: When to apply this capability
+   - **Steps**: Numbered list, each starting with an action verb. For cross-repo: reference repo-level capabilities where applicable.
+   - **Parameters**: Table of what varies per instance
+   - **Source evidence**: Where this procedure was discovered (conversation excerpt, PR links, commit range)
+
+9. **Return the formatted capability** to **determine-provision-target** for target assignment. When returning multi-level capabilities, present the cross-repo capability first (the high-level view), with repo-level capabilities as referenced sub-capabilities.
+</extract-capability>
+
+<abstract-capability>
+**Objective**: Merge newly discovered procedural knowledge with existing capabilities to produce a more general, refined version. Works at both repo-level and cross-repo level — capabilities at each level can be independently abstracted as more data arrives. This is the learning loop that makes capabilities more abstract and broadly applicable over time.
+
+**Steps**:
+1. **Load existing context**: Before proposing changes to a target, read the target file to find any existing capability that covers a related task:
+   - Same task type but different parameters? (e.g., existing "deploy service" + new "deploy hotfix")
+   - Overlapping steps? (e.g., both mention "run build", "run tests", but differ in later steps)
+   - Same repo/component pattern? (e.g., both touch the same set of files in the same order)
+   - Same cross-repo orchestration? (e.g., both touch API repo then frontend repo in that order)
+   - **Check both levels**: When repos are involved, check for overlaps at the repo level (per-repo patterns) AND at the cross-repo level (orchestration). They may abstract independently — repo-level capabilities can be refined without changing the cross-repo orchestration, and vice versa.
+
+2. **Compare existing vs. new**: For each related existing capability, compare with the new findings:
+   - What steps are **identical**? → these are the core, invariant part of the capability
+   - What steps are **similar but differ in detail**? → these can be unified with a parameter
+   - What steps are **unique to one version**? → these may be conditional branches or variants
+   - What does the new finding **add** that the existing capability is missing?
+   - What does the existing capability **cover** that the new finding doesn't?
+   - **Multi-level comparison**: If both have repo-level and cross-repo capabilities, compare at each level separately. A repo-level capability may abstract cleanly while the cross-repo orchestration stays unchanged.
+
+3. **Identify the abstraction**: Determine the most general version that covers both:
+   - Replace concrete values with parameters (e.g., "push to `staging`" → "push to `<environment-branch>`")
+   - Merge similar steps (e.g., "SSH into payments-server" + "SSH into auth-server" → "SSH into `<target-server>`")
+   - Add conditional steps (e.g., "if hotfix, also create a rollback plan")
+   - The abstraction should cover ALL known instances without being so vague it loses usefulness
+   - For cross-repo capabilities: if the same repo sequence appears across task types, parameterize what varies within repos while keeping the orchestration fixed
+
+4. **Preserve variant knowledge**: Document when each variant applies:
+   - If the procedure differs meaningfully for different contexts, keep the variants as sub-cases
+   - Use a parameter table or conditional notes: "For service type X, also do step Y"
+   - Don't force unification if the variants serve genuinely different purposes
+
+5. **Validate the abstraction**:
+   - Does the abstracted capability still guide a newcomer correctly?
+   - Can each original concrete instance be derived from the abstracted version by filling in parameters?
+   - Is anything lost in the abstraction? (if yes, preserve it as a note or variant)
+   - For multi-level: can a newcomer follow the cross-repo capability and drill into each repo-level capability correctly?
+
+6. **Produce the refined capability**: Format it as in **extract-capability** step 8, plus:
+   - **Evolution note**: A brief note showing what was generalized and why
+   - **Parameter table**: Each parameter with type, example values, and which variants introduced it
+
+7. **Return the refined capability** to **determine-provision-target** with a note that it replaces (not duplicates) the existing capability. When multiple levels were refined, present the cross-repo capability first, with updated repo-level capabilities as referenced sub-capabilities.
+</abstract-capability>
+
 </capabilities>
 
 <rules>
@@ -320,5 +453,9 @@ When comparing a user story against PR implementation changes, load [reference/s
 <rule>If the user specifies a target context explicitly (e.g., "add this to skill X"), honor that target in **determine-provision-target** step 2.</rule>
 
 <rule>When the user provides chat history from Slack, Teams, Discord, or other communication tools and wants to extract team knowledge, apply **analyze-communication-history** to parse the transcripts and extract candidate lessons, then feed results into **detect-learning-signals** for quality gating.</rule>
+
+<rule>When a candidate lesson describes a sequence of steps to accomplish a task (a procedure or how-to), apply **extract-capability** to format it as a structured capability before passing to **determine-provision-target**.</rule>
+
+<rule>When a candidate capability overlaps with an existing capability already stored in a target (same task type, similar steps, or same repo/component pattern), apply **abstract-capability** to merge them into a refined, more general version before provisioning.</rule>
 
 </rules>
