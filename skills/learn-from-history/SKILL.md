@@ -1,6 +1,6 @@
 ---
 name: learn-from-history
-description: Extract reusable knowledge, rules, and procedures from chat sessions, PRs, git history, and team transcripts, then provision to persistent context. Use when distilling lessons, analyzing change history, mining chat for tribal knowledge, extracting procedures, checking for reusable insights, or refining skills/agents/memory.
+description: Extract reusable knowledge, rules, and procedures from chat sessions, PRs, git history, and team transcripts, then provision to persistent context. Orchestrates sub-agents for parallel analysis when suitable agents are available. Use when distilling lessons, analyzing change history, mining chat for tribal knowledge, extracting procedures, checking for reusable insights, or refining skills/agents/memory.
 ---
 
 <when-to-use-this-skill>
@@ -23,6 +23,43 @@ description: Extract reusable knowledge, rules, and procedures from chat session
 This skill treats lessons seriously. Not every interaction or change yields a lesson worth preserving. A valid lesson must be **general enough to apply across multiple future sessions**, not a one-off fix or trivial observation. When nothing meets the quality bar, the skill explicitly reports "nothing worth learning" — this is a valid and important outcome.
 </core-principle>
 
+<agent-orchestration>
+When the platform supports sub-agents (specialized agents that can be invoked for subtasks), this skill orchestrates them to parallelize the learning pipeline. The parent skill always retains control of the quality gate, result merging, de-duplication, and provisioning — sub-agents handle only the analysis phase.
+
+**Agent detection**: Before starting analysis, scan the available agent registry. Look for agents whose descriptions indicate code analysis, investigation, review, communication mining, or pattern extraction capabilities. Record each agent's name, description, and any tool restrictions.
+
+**Task-to-agent mapping**:
+
+| Source type | Agent type needed | Agent description keywords | Fallback capability |
+|---|---|---|---|
+| PR(s) + user story | Code investigator / reviewer | "investigate", "review", "analyze code", "explore codebase", "discover patterns" | analyze-code-changes |
+| Git commit history | Code investigator / explorer | "investigate", "explore", "analyze history", "discover patterns", "codebase exploration" | analyze-code-changes |
+| Communication transcripts | Text analyst / researcher | "analyze text", "mine", "extract knowledge", "research", "chat analysis" | analyze-communication-history |
+| Mixed / complex sources | Multiple agents (parallel) | Above keywords, distributed across agents | Sequential internal analysis |
+
+**Parallelization strategy**: When multiple independent source types are present (e.g., PRs + git history + chat transcripts), dispatch each to a different agent simultaneously. Agents are stateless and independent — they can run in parallel without coordination. The parent collects all results after all agents complete.
+
+**Agent prompt structure**: For each dispatched agent, construct a prompt that:
+1. States the source type and what signal types to look for (reference the signal detection catalog's categories: story-implementation gaps, evolutionary patterns, recurring questions, decision records, problem-solution pairs, procedural patterns, implementation recipes)
+2. Provides the full source material (PR diff, commit range, transcript, etc.)
+3. Asks for structured output: a list of candidate lessons, each with a summary, evidence excerpt from the source, the signal type it matches, and a preliminary quality self-assessment (reusable? non-obvious? actionable? not already documented elsewhere?)
+4. Instructs the agent to be conservative — flag borderline candidates rather than missing them; the parent applies the formal quality gate later
+5. Explicitly instructs: "Return only findings as structured text. Do NOT write to any files, do NOT modify any documents, and do NOT provision any lessons."
+
+**Result collection and merging**: After all agents return:
+1. Collect all candidate lessons into a single pool
+2. De-duplicate across agent results — the same lesson discovered from different sources should be merged, not duplicated
+3. Merge complementary findings — one agent may find the pattern, another may find the rationale or a different angle on the same underlying lesson
+4. Tag each candidate with its source agent for traceability in the provision plan
+
+**Fallback**: If no suitable agents are detected, or if agent invocation fails (timeout, error, empty result), fall back to the internal capabilities (analyze-code-changes, analyze-communication-history) running sequentially. The quality gate, capability extraction, and provisioning steps are identical in both paths — only the analysis phase differs.
+
+**When NOT to use agents**: 
+- Single, small source (one short chat session) — agent dispatch overhead exceeds benefit; scan interactively
+- Sources that require tight cross-referencing (e.g., comparing a story against its PR requires seeing both together) — use a single agent that receives all inputs, or fall back to internal analysis
+- User explicitly requests sequential, step-by-step processing with visibility into each step
+</agent-orchestration>
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -41,6 +78,7 @@ This skill treats lessons seriously. Not every interaction or change yields a le
 | Distilling an implementation recipe from one or more PRs | Walkthrough: detecting recipe signal → extracting pattern → abstracting into capability | [examples/implementation-recipe.md](examples/implementation-recipe.md) |
 | Applying quality checks to an extracted capability | 4-dimension checklist with rejection rules and confidence guidance | [reference/capability-quality-checklist.md](reference/capability-quality-checklist.md) |
 | Formatting an extracted or abstracted capability for provisioning | Structured template with required fields and refined-capability extensions | [reference/capability-format-template.md](reference/capability-format-template.md) |
+| Orchestrating multiple sub-agents for parallel analysis | Prompt templates per agent type, result format spec, merging/de-duplication algorithms, error handling | [reference/agent-orchestration-pattern.md](reference/agent-orchestration-pattern.md) |
 
 </context-loading-guide>
 
@@ -68,23 +106,29 @@ When comparing a user story against PR implementation changes, load [reference/s
 <capabilities>
 
 <detect-learning-signals>
-**Objective**: Master entry point — scan any historical source for candidate lessons, delegate to specialized analysis, apply the quality gate, and route qualifying lessons to provisioning.
+**Objective**: Master entry point — detect sub-agents, scan any historical source for candidate lessons, delegate to agents or internal analysis, apply the quality gate, and route qualifying lessons to provisioning.
 **Steps**:
-1. **Identify the source type** and delegate analysis:
-   - **Chat session** → proceed to step 2 (scan interactively)
-   - **PR(s) + user story** or **Git history** → delegate to **analyze-code-changes**, return here with candidates
-   - **Communication tool transcripts** → delegate to **analyze-communication-history**, return here with candidates
-   - **Mixed sources** → process each path, then merge candidates
+0. **Detect available sub-agents**: Scan the platform's agent registry for agents suitable for analysis tasks. Look for agents whose descriptions match the keywords in the task-to-agent mapping table (see agent-orchestration knowledge). Record available agent names and their capabilities. If no suitable agents are found, proceed with internal capabilities only.
 
-2. For chat sessions, load [reference/signal-detection-catalog.md](reference/signal-detection-catalog.md) and **scan the conversation** for signal types: explicit user feedback, AI self-discovered insights, future-useful information, and procedural patterns (step-by-step task descriptions).
+1. **Identify the source type and choose execution mode**:
+   - **Single, small chat session** → proceed to step 3 (scan interactively — agent overhead not justified for small sessions)
+   - **PR(s) + user story** → if a suitable code investigator/reviewer agent was detected in step 0, dispatch to it (see step 2); otherwise delegate to **analyze-code-changes**
+   - **Git commit history** → if a suitable code investigator/explorer agent was detected, dispatch to it; otherwise delegate to **analyze-code-changes**
+   - **Communication tool transcripts** → if a suitable text analyst/researcher agent was detected, dispatch to it; otherwise delegate to **analyze-communication-history**
+   - **Mixed sources (multiple independent source types)** → dispatch each source type to a different agent in parallel if available; otherwise process each path sequentially with internal capabilities
+   - **Sources requiring cross-referencing** (e.g., story + its PR) → dispatch to a single agent with ALL inputs, or fall back to internal analysis
 
-3. **Exclude anti-signals** immediately — filter out trivial facts, one-off fixes, already-documented info, session state, boilerplate changes.
+2. **Dispatch to agents** (when agents are available): For each agent to invoke, load [reference/agent-orchestration-pattern.md](reference/agent-orchestration-pattern.md) and construct a prompt following the prompt template for that agent type. Include: the source material, signal types to look for, structured output requirements, and the instruction to NOT write files. Dispatch all independent agents in parallel. Wait for all agents to complete, then collect results. Merge by de-duplicating across agent outputs and combining complementary findings. Tag each candidate with its source agent. Proceed to step 4.
 
-4. For each remaining candidate, **apply the quality gate**. Load [reference/quality-rubric.md](reference/quality-rubric.md) and score all five dimensions: Reusability, Non-obviousness, Actionability, Non-duplication, Specificity.
+3. For chat sessions without agent dispatch, load [reference/signal-detection-catalog.md](reference/signal-detection-catalog.md) and **scan the conversation** for signal types: explicit user feedback, AI self-discovered insights, future-useful information, and procedural patterns (step-by-step task descriptions).
 
-5. **If no candidates pass**: Report "No lessons worth learning from this [source]" and stop. This is a valid outcome — do not fabricate lessons.
+4. **Exclude anti-signals** immediately — filter out trivial facts, one-off fixes, already-documented info, session state, boilerplate changes. For agent-produced candidates, apply a lighter pre-filter since agents were already instructed to be conservative.
 
-6. **If candidates pass**: Collect them with evidence and proceed. For procedural candidates, route through **extract-and-refine-capability** first. Then pass all to **provision-lessons**.
+5. For each remaining candidate, **apply the quality gate**. Load [reference/quality-rubric.md](reference/quality-rubric.md) and score all five dimensions: Reusability, Non-obviousness, Actionability, Non-duplication, Specificity.
+
+6. **If no candidates pass**: Report "No lessons worth learning from this [source]" and stop. This is a valid outcome — do not fabricate lessons.
+
+7. **If candidates pass**: Collect them with evidence and source attribution (agent name or internal analysis). For procedural candidates, route through **extract-and-refine-capability** first. Then pass all to **provision-lessons**.
 </detect-learning-signals>
 
 <analyze-code-changes>
@@ -193,7 +237,9 @@ When comparing a user story against PR implementation changes, load [reference/s
 
 <rules>
 
-<rule>When the user asks to learn from any source (chat session, PRs+story, git history, communication transcripts) → apply **detect-learning-signals** as the master entry point. It will delegate to **analyze-code-changes** or **analyze-communication-history** as needed.</rule>
+<rule>When the user asks to learn from any source (chat session, PRs+story, git history, communication transcripts) → apply **detect-learning-signals** as the master entry point. It will detect available sub-agents, dispatch analysis tasks in parallel when suitable agents exist, or fall back to internal **analyze-code-changes** / **analyze-communication-history** capabilities. The parent always controls the quality gate and provisioning.</rule>
+
+<rule>When suitable sub-agents are detected and the source is large or multi-type → prefer agent dispatch over internal analysis. Agents enable parallel execution and specialized analysis. Fall back to internal capabilities only when no suitable agents exist or dispatch fails.</rule>
 
 <rule>When **detect-learning-signals** produces qualifying lessons → if any candidate is procedural, route through **extract-and-refine-capability** first. Then pass all lessons to **provision-lessons**. Never apply changes without explicit user confirmation.</rule>
 
