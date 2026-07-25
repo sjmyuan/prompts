@@ -1,6 +1,6 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations to explore technical problems and produce ADRs with a solution document. Coordinates sub-agents to parallelize investigation and ADR drafting for heavy spikes. Use when conducting, scoping, or planning a spike, evaluating solutions, breaking down problems, or producing formal ADRs from findings.
+description: Conduct spike investigations to explore technical problems and produce ADRs with a solution document. Use when conducting, investigating, evaluating, breaking down, or producing formal ADRs for a spike.
 ---
 
 <when-to-use-this-skill>
@@ -15,21 +15,21 @@ description: Conduct spike investigations to explore technical problems and prod
 
 <knowledge>
 
-<about-spike>
+<spike-definition>
 A spike is an investigation activity aimed at reducing uncertainty around a technical problem. Unlike a full implementation, a spike focuses on research, prototyping, and decision-making. The output is knowledge and documented decisions — not production code.
 
 A well-conducted spike produces:
 - **N ADRs** — one Architecture Decision Record per independently decidable investigation area, each evaluating options and recommending a solution
 - **1 Solution Document** — a consolidated document that weaves together the assumed/recommended solutions from all ADRs into a coherent system-level view, with C4 diagrams, API contracts, RAID analysis, and RACI matrix
-</about-spike>
+</spike-definition>
 
-<when-not-to-use-this-skill>
+<inappropriate-scenarios>
 This skill is NOT appropriate when:
 - The user wants a quick answer or informal recommendation without formal documentation — use a direct conversation instead
 - The problem has already been decided and only needs implementation — skip the spike and proceed to planning
 - The scope is trivial (single well-understood option, no architectural impact) — a spike would be overkill
 - The user wants to write code or build a prototype immediately — spikes produce decisions, not production code
-</when-not-to-use-this-skill>
+</inappropriate-scenarios>
 
 <greenfield-scenarios>
 When there is no existing implementation to investigate (greenfield), adapt the investigate phase:
@@ -52,26 +52,7 @@ The spike workflow proceeds through five sequential phases. Phases 2 and 4 can b
 </spike-workflow-phases>
 
 <multi-agent-orchestration>
-Spikes with multiple investigation areas benefit from parallel execution. The orchestrating agent (running this skill) can dispatch independent work units to specialized sub-agents that operate concurrently:
-
-| Phase | Parallelizable? | Mechanism |
-|---|---|---|
-| 2. Investigate | Yes — each area is independent | Dispatch each investigation area to a code-exploration sub-agent with a focused investigation brief |
-| 4. Draft ADRs | Yes — each ADR is independent | Dispatch each area's evaluation results to a sub-agent with instructions to load `draft-adr` and produce a complete ADR |
-
-**Dispatching pattern**:
-1. Identify independent work units (one per investigation area).
-2. For each unit, prepare a focused brief with the area's context, scope, and expected output format.
-3. Dispatch all briefs to sub-agents concurrently. Sub-agents operate independently and do not communicate with each other.
-4. Collect results from all sub-agents when they complete.
-5. Synthesize the collected results into the consolidated format required by the next phase. Review for completeness and consistency across areas.
-
-**When NOT to parallelize**:
-- Single-area spikes: direct execution is simpler and has less coordination overhead.
-- Phases 1 (define scope), 3 (evaluate solutions), and 5 (compile solution doc): these involve user interaction or cross-area synthesis that cannot be parallelized.
-- When suitable sub-agents are not available on the current platform: fall back to sequential execution within the orchestrating agent.
-
-**Platform detection**: Before dispatching, detect what code-exploration and skill-execution agents are available on the current platform. Use the most appropriate agent type for each work unit. If no suitable sub-agents are detected, execute sequentially.
+For spikes with multiple investigation areas, dispatch independent work to sub-agents in parallel for Phases 2 (investigate) and 4 (draft ADRs). See the full dispatch pattern, parallelization rules, and platform-detection guidance in **reference/multi-agent-orchestration.md**.
 </multi-agent-orchestration>
 
 <problem-decomposition-guide>
@@ -81,14 +62,7 @@ When breaking down a spike problem into investigation areas, apply the heuristic
 </problem-decomposition-guide>
 
 <solution-brainstorming-prompts>
-When helping the user brainstorm solution options for an investigation area, prompt them to consider:
-
-- **Status quo / do nothing**: What if we change nothing? What are the consequences?
-- **Incremental improvement**: Can we evolve the existing solution rather than replace it?
-- **Industry-standard approach**: What do similar teams or systems use?
-- **Build vs. buy vs. adopt**: Should we build, purchase, or adopt an open-source solution?
-- **Greenfield rewrite**: Would starting fresh produce a better outcome than modifying?
-- **Hybrid / phased**: Can we combine approaches or phase the transition?
+When helping the user brainstorm solution options for an investigation area, prompt them to consider status quo, incremental improvement, industry-standard approaches, build-vs-buy-vs-adopt, greenfield rewrite, and hybrid/phased strategies. See the full prompt set in **reference/solution-brainstorming-prompts.md**.
 </solution-brainstorming-prompts>
 
 <skill-integration-points>
@@ -110,10 +84,12 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
 | Load when | Provides | File |
 |---|---|---|
 | Conducting a full end-to-end spike from scope to solution doc | Complete walkthrough with all 5 phases for a real-world migration problem | [examples/end-to-end-spike.md](examples/end-to-end-spike.md) |
-| User provides narrow scope (single area) and wants a lightweight spike | Condensed workflow for a single-area spike producing one ADR + solution doc | [examples/single-area-spike.md](examples/single-area-spike.md) |
-| User has existing investigation findings and only needs ADRs + solution doc | Workflow starting from pre-existing investigation results | [examples/from-existing-findings.md](examples/from-existing-findings.md) |
+| Conducting a single-area spike with narrow scope | Condensed workflow for a single-area spike producing one ADR + solution doc | [examples/single-area-spike.md](examples/single-area-spike.md) |
+| Working from pre-existing investigation findings without re-investigating | Workflow starting from pre-existing investigation results | [examples/from-existing-findings.md](examples/from-existing-findings.md) |
 | Decomposing a complex problem into investigation areas | Decomposition rubric with examples and edge cases | [reference/decomposition-rubric.md](reference/decomposition-rubric.md) |
 | Conducting a heavy multi-area spike that benefits from parallel sub-agent execution | Walkthrough of dispatching investigation and ADR drafting to sub-agents in parallel | [examples/multi-agent-investigation.md](examples/multi-agent-investigation.md) |
+| Dispatching investigation or ADR drafting to sub-agents in parallel | Full dispatch pattern, parallelization rules, and platform-detection guidance | [reference/multi-agent-orchestration.md](reference/multi-agent-orchestration.md) |
+| Brainstorming solution options during the evaluate phase | Full set of solution-brainstorming prompts | [reference/solution-brainstorming-prompts.md](reference/solution-brainstorming-prompts.md) |
 
 </context-loading-guide>
 
@@ -181,7 +157,8 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
    - If the user is unsure, help them compare the top contenders against decision drivers.
    - Record the **assumed solution** — this is provisional and may change after formal ADR review.
 3. Repeat for each investigation area.
-4. Present a summary table of all areas with their assumed solutions.
+4. Validate each area's evaluation: confirm at least 2 options were considered, pros/cons relate to decision drivers, and the assumed solution follows logically from the comparison.
+5. Present a summary table of all areas with their assumed solutions.
 </evaluate-solutions-per-area>
 
 <draft-area-adrs>
@@ -258,7 +235,7 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
 
 <rule>If the user wants to add a new investigation area mid-spike, apply **define-spike-scope** (step 4 only) to confirm the addition, then apply the remaining capabilities for the new area.</rule>
 
-<rule>If the user asks for a quick recommendation without formal documentation, decline to use this skill — direct them to a regular conversation instead. See **when-not-to-use-this-skill**.</rule>
+<rule>If the user asks for a quick recommendation without formal documentation, decline to use this skill — direct them to a regular conversation instead. See **inappropriate-scenarios**.</rule>
 
 <rule>After each phase, pause and ask the user to confirm before proceeding. Do not skip phases unless the user explicitly requests it.</rule>
 

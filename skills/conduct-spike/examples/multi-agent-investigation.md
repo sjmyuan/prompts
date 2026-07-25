@@ -10,12 +10,7 @@
 
 ## Phase 1: Define Spike Scope
 
-### User Input
-> "We need to spike migrating our payment processing service from the monolith to microservices. It's a big system — ~200K LOC, three payment types. I want this to go as fast as possible."
-
-### Assistant Output
-
-**Spike Goal**: Determine the target architecture for decomposing the payment monolith into independently deployable services, selecting technologies, and defining a migration strategy.
+*(Scope definition proceeds as in `examples/end-to-end-spike.md` — the same payment service migration problem with 4 investigation areas. See that example for the full scope-definition dialog.)*
 
 **Investigation Areas** (4 areas — qualifies for parallel dispatch):
 
@@ -147,9 +142,7 @@ Expected output: Current deployment architecture, constraints, migration feasibi
 
 ## Phase 3: Evaluate Solutions Per Area
 
-*Evaluation is interactive and runs sequentially (not parallelizable). The orchestrator guides the user through each area using the investigation findings collected from sub-agents.*
-
-*[Evaluation proceeds as in the standard end-to-end example — see `examples/end-to-end-spike.md` for the full evaluation dialog.]*
+*(Evaluation proceeds as in `examples/end-to-end-spike.md` — same options and decision drivers. See that example for the full evaluation dialog.)*
 
 **Assumed Solutions Summary**:
 

@@ -47,6 +47,8 @@
 
 ### Area 2: Inter-service Communication
 
+*(Areas 2–4 follow the same investigation pattern as Area 1 — abbreviated here for conciseness.)*
+
 *[investigate-code skill applied]*
 
 **Current State**:
