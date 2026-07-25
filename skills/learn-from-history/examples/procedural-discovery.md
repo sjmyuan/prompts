@@ -1,8 +1,8 @@
 # Example: Procedural Pattern Extraction and Abstraction
 
-**Applies**: `detect-learning-signals` → `extract-capability` → `determine-provision-target` → `generate-provision-plan` → `review-and-apply`
+**Applies**: `detect-learning-signals` → `extract-and-refine-capability` → `provision-lessons`
 
-And later: `detect-learning-signals` → `extract-capability` → `abstract-capability` → `determine-provision-target` → `generate-provision-plan` → `review-and-apply`
+And later: `detect-learning-signals` → `extract-and-refine-capability` (refine phase) → `provision-lessons`
 
 **Scenario**: A user provides Slack transcripts from the #deployments channel. The AI finds a step-by-step procedure for deploying hotfixes that was described by a senior engineer but never documented. Later, another Slack thread reveals a similar procedure for deploying regular releases — the AI abstracts both into a general deployment capability.
 
@@ -41,7 +41,7 @@ User says: "Learn from this Slack transcript and save what's worth keeping."
 
 **Source type**: Communication tool history → delegate to **analyze-communication-history**
 
-### analyze-communication-history
+### detect-learning-signals → analyze-communication-history
 
 **Signal detected**: Procedural pattern — Alice describes a numbered sequence of steps for deploying a hotfix, with explicit language ("always", "the protocol we agreed on") indicating this is a team convention.
 

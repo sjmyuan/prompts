@@ -1,6 +1,6 @@
 # Example: User Feedback Becomes a Rule
 
-**Applies**: `detect-learning-signals` → `determine-provision-target` → `generate-provision-plan` → `review-and-apply`
+**Applies**: `detect-learning-signals` → `provision-lessons`
 
 **Scenario**: During a coding session, the user corrects the AI about a project convention. The user wants this preserved so the AI doesn't repeat the mistake.
 
@@ -46,7 +46,7 @@ Later, user says: "Learn from this session and save what's worth keeping."
 
 ---
 
-## Step 2: determine-provision-target
+## Step 2: provision-lessons (classify phase)
 
 **Platform detection**: This platform supports project-level persistent notes (workspace conventions).
 

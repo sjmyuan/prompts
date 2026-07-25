@@ -1,6 +1,6 @@
 # Example: AI-Discovered Insight Becomes Knowledge
 
-**Applies**: `detect-learning-signals` → `determine-provision-target` → `generate-provision-plan` → `review-and-apply`
+**Applies**: `detect-learning-signals` → `provision-lessons`
 
 **Scenario**: During a miniprogram development session, the AI discovers through trial and error that a certain WX API behaves differently than documented. This insight wasn't in any loaded context.
 

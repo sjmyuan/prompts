@@ -68,221 +68,135 @@ When comparing a user story against PR implementation changes, load [reference/s
 <capabilities>
 
 <detect-learning-signals>
-**Objective**: Scan the current session or provided historical source for candidate lessons, applying the quality gate to filter out noise.
+**Objective**: Master entry point — scan any historical source for candidate lessons, delegate to specialized analysis, apply the quality gate, and route qualifying lessons to provisioning.
 **Steps**:
-1. **Identify the source type**: Chat session → scan for interactive signals. PR + user story or Git history → delegate to **analyze-code-change-history** first. Communication tool history → delegate to **analyze-communication-history** first. Mixed sources → process each path, then merge candidates.
+1. **Identify the source type** and delegate analysis:
+   - **Chat session** → proceed to step 2 (scan interactively)
+   - **PR(s) + user story** or **Git history** → delegate to **analyze-code-changes**, return here with candidates
+   - **Communication tool transcripts** → delegate to **analyze-communication-history**, return here with candidates
+   - **Mixed sources** → process each path, then merge candidates
 
-2. For chat sessions, load [reference/signal-detection-catalog.md](reference/signal-detection-catalog.md) and **scan the conversation** for interactive and procedural signal types:
-   - Explicit user feedback (corrections, preferences, "remember this" statements)
-   - AI self-discovered insights (reasoning that produced correct knowledge not in context)
-   - Future-useful information (hard-won configuration, non-obvious workarounds, undocumented constraints)
-   - Procedural pattern (step-by-step descriptions of how to accomplish a task — "first do A, then B, then C")
+2. For chat sessions, load [reference/signal-detection-catalog.md](reference/signal-detection-catalog.md) and **scan the conversation** for signal types: explicit user feedback, AI self-discovered insights, future-useful information, and procedural patterns (step-by-step task descriptions).
 
-3. For code-change sources, **delegate to analyze-code-change-history** to produce candidate lessons from the PR/git analysis. This includes both gap-analysis candidates and implementation recipe candidates.
+3. **Exclude anti-signals** immediately — filter out trivial facts, one-off fixes, already-documented info, session state, boilerplate changes.
 
-4. **Exclude anti-signals** immediately — for each source type, filter out the anti-signals listed in the signal detection catalog.
+4. For each remaining candidate, **apply the quality gate**. Load [reference/quality-rubric.md](reference/quality-rubric.md) and score all five dimensions: Reusability, Non-obviousness, Actionability, Non-duplication, Specificity.
 
-5. For each remaining candidate, **apply the quality gate**. Load [reference/quality-rubric.md](reference/quality-rubric.md) and score all five dimensions: Reusability, Non-obviousness, Actionability, Non-duplication, Specificity.
+5. **If no candidates pass**: Report "No lessons worth learning from this [source]" and stop. This is a valid outcome — do not fabricate lessons.
 
-6. **If no candidates pass**: Report "No lessons worth learning from this [source]" and stop. This is a valid outcome — do not fabricate lessons.
-
-7. **If candidates pass**: Collect them into a provisional list with the evidence (conversation excerpt, story-PR gap, or commit pattern that triggered the signal) and proceed to **determine-provision-target**.
+6. **If candidates pass**: Collect them with evidence and proceed. For procedural candidates, route through **extract-and-refine-capability** first. Then pass all to **provision-lessons**.
 </detect-learning-signals>
 
-<analyze-code-change-history>
-**Objective**: Route code-change analysis to the appropriate sub-capability based on source type, apply quality pre-filter, then return candidates to **detect-learning-signals**.
+<analyze-code-changes>
+**Objective**: Analyze PRs (with user stories) and git commit history for reusable patterns, constraints, architectural decisions, and implementation recipes.
 **Steps**:
-1. **Identify the source type** and delegate:
-   - PR(s) + user story → delegate to **analyze-pr-against-story**
-   - Git commit history → delegate to **analyze-git-history**
+1. **Identify the source type**: PR(s) + user story → steps 2–5. Git commit history → steps 6–9. For any PRs analyzed, also run step 10 (implementation recipe).
 
-2. After gap/pattern analysis completes, for any PRs analyzed, delegate to **detect-implementation-recipe** to extract reusable change patterns.
+2. **Gather PR inputs**: Confirm you have the user story text, story comments, PR diff(s), PR review comments, and any additional context.
 
-3. **Apply quality pre-filter**: Check if already documented, actionable, and non-trivial (not something a junior dev would already know).
+3. **Parse the user story**: Extract explicit requirements, implicit assumptions, acceptance criteria, and scope boundaries.
 
-4. **Return candidates** to **detect-learning-signals** with:
-   - The candidate lesson summary
-   - Source reference (story+PR link or commit range)
-   - Which analysis lens or pattern type triggered it
-   - A preliminary quality assessment
-</analyze-code-change-history>
+4. **Analyze the PR changes**: Examine files changed and their roles, nature of changes (new abstraction? workaround? data model change?), commit messages for rationale, lines added/removed, test files, and PR review comments — reviewer questions and author replies often surface constraints and unwritten conventions.
 
-<analyze-pr-against-story>
-**Objective**: Compare a user story's requirements against PR implementation changes to extract candidate reusable knowledge, patterns, and rules.
-**Steps**:
-1. **Gather inputs**: Confirm you have the user story text, story comments/discussion threads, PR diff(s), PR review comments, and any additional context (design docs, discussion threads).
+5. **Compare story vs implementation**: Load [reference/story-analysis-framework.md](reference/story-analysis-framework.md) and for each analysis lens, ask "Did the implementation reveal something the story didn't capture?" Focus on the top four lenses (missing capability, architectural decision, discovered constraint, PR discussion insight). Draft candidate lessons for each gap: what was expected vs. what happened, why the gap existed, and what to do differently next time.
 
-2. **Parse the user story**: Extract explicit requirements, implicit assumptions, acceptance criteria, and scope boundaries.
+6. **Gather git inputs**: Confirm commit range/references and access to commit messages and diffs.
 
-3. **Analyze the PR changes**: For each PR, examine files changed and their roles, nature of changes (new abstraction? workaround? data model change?), commit messages for rationale, lines added/removed, test files, and PR review comments — reviewer questions and author replies often surface constraints and unwritten conventions not visible in the diff.
+7. **Scan commit messages for themes**: Look for recurring verbs/patterns ("fix:", "refactor:", "migrate:"), repeated file paths (hotspots), and sequences of related commits.
 
-4. Load [reference/story-analysis-framework.md](reference/story-analysis-framework.md) and **compare story vs implementation**: for each analysis lens, ask "Did the implementation reveal something the story didn't capture?" Focus on the top four lenses (missing capability, architectural decision, discovered constraint, PR discussion insight). Draft candidate lessons for each gap found.
+8. **Analyze representative diffs**: For interesting clusters, identify the applied pattern, whether it's a one-off or trend, and whether commit messages explain the WHY.
 
-5. **Extract candidate lessons**: For each meaningful gap or pattern, formulate it as a candidate:
-   - **What was expected** (from the story) vs **what happened** (in the implementation)
-   - **Why** the gap existed (missing capability? undiscovered constraint? ambiguous story?)
-   - **What to do differently** next time (the actionable lesson)
+9. **Identify evolutionary patterns**: Conventions that crystallized over time, recurring bug categories and their fixes, and refactoring arcs spanning multiple commits. Formulate each as: the pattern, the lesson, and the evidence (commits).
 
-6. **Return candidates** to **analyze-code-change-history** with the candidate lesson summary, source reference, analysis lens, and preliminary quality assessment.
-</analyze-pr-against-story>
+10. **Extract implementation recipes**: For each PR, map which repos/files are touched and the dependency order. Check generalizability: "Would a similar task follow this same pattern?" Tag confidence as **tentative** (single instance) or **confirmed** (2+ instances). When multiple instances exist, compare across them to identify the invariant recipe vs. parameters. Formulate at both **repo-level** and **cross-repo** levels.
 
-<analyze-git-history>
-**Objective**: Mine git commit history for recurring patterns, convention evolution, and reusable lessons.
-**Steps**:
-1. **Gather inputs**: Confirm commit range/references and access to commit messages and diffs.
-
-2. **Scan commit messages for themes**: Look for recurring verbs/patterns ("fix:", "refactor:", "migrate:"), repeated file paths (hotspots), and sequences of related commits.
-
-3. **Analyze representative diffs**: For interesting clusters, identify the applied pattern, whether it's a one-off or trend, and whether commit messages explain the WHY.
-
-4. **Identify evolutionary patterns**: Conventions that crystallized over time, recurring bug categories and their fixes, and refactoring arcs spanning multiple commits.
-
-5. **Extract candidate lessons**: For each pattern, formulate it:
-   - **The pattern** (what recurred)
-   - **The lesson** (what future work should follow)
-   - **Evidence** (the commits that demonstrate the pattern)
-
-6. **Return candidates** to **analyze-code-change-history** with the candidate lesson summary, pattern type, and evidence.
-</analyze-git-history>
-
-<detect-implementation-recipe>
-**Objective**: Extract reusable implementation recipes from PRs by identifying which repos, components, and change sequences are involved, then generalize into a repeatable pattern.
-**Steps**:
-1. For each PR, **extract the change pattern**: Map which repos are touched, which files/directories within each repo, and the dependency order across repos. Check generalizability: "Would a similar task next sprint touch these same repos/files in this order?" Tag confidence as **tentative** (single instance) or **confirmed** (2+ instances).
-
-2. When multiple instances exist, **compare across instances**: Identify what was consistent (the recipe) vs. what varied (the parameters). Verify cross-repo orchestration holds across instances. Upgrade confidence when 2+ instances match.
-
-3. For each candidate, formulate at **both levels** when repos are involved: **repo-level** (per-repo files and steps) and **cross-repo** (end-to-end sequence, referencing repo-level capabilities as sub-steps). Each level gets: Task type, Confidence, Steps, Parameters, Evidence.
-
-4. **Return recipe candidates** to **analyze-code-change-history** for quality pre-filtering and forwarding to **detect-learning-signals**.
-</detect-implementation-recipe>
-
-<determine-provision-target>
-**Objective**: For each qualifying lesson, identify the most appropriate persistent context to receive it.
-**Steps**:
-1. **Detect platform capabilities**: Identify what persistent context mechanisms are available (personal notes, project notes, skill files, agent files, documentation). Load [reference/context-target-catalog.md](reference/context-target-catalog.md) for guidance on target types and their suitability.
-
-2. If the user **explicitly specified a target** (e.g., "add this to my coding assistant skill"), honor that target. Validate that it exists or can be created, and note this in the plan.
-
-3. If the user did NOT specify a target, **classify each lesson** by its nature and map to the appropriate context target: personal preference → personal notes; project convention → project notes; skill domain knowledge → skill file; agent behavior → agent/instruction file; doc fact → README/ADR/architecture doc; code-change pattern → project notes (project-wide) or skill (domain-specific); procedure/capability → skill file (as capability) or project notes (as how-to); temporary note → session context (rare).
-
-4. For each classification, determine:
-   - The **exact file path** to update
-   - The **section** within that file where the lesson belongs
-   - The **format** the lesson should take (rule, knowledge entry, capability step, etc.)
-
-5. If a lesson could fit multiple targets, choose the **most specific and discoverable** one (e.g., a skill is more discoverable than personal notes; project-level notes are more scoped than personal notes).
-
-6. Collect all target assignments and proceed to **generate-provision-plan**.
-</determine-provision-target>
-
-<generate-provision-plan>
-**Objective**: Produce a concrete, reviewable plan showing exactly what will be added and where.
-**Steps**:
-1. For each lesson, draft the **exact content** in the format appropriate for the target (see [reference/context-target-catalog.md](reference/context-target-catalog.md)): concise rule or knowledge bullet; for capabilities use name + objective + ordered steps + parameters. Include source evidence.
-
-2. Structure the plan as a table with columns: #, Lesson Summary, Signal Type, Target File, Section, Content to Add.
-
-3. For each entry, include a **rationale** sentence for the target choice.
-
-4. If any target file does not yet exist, note that it will be created.
-
-5. Present the complete plan to the user and proceed to **review-and-apply**.
-</generate-provision-plan>
-
-<review-and-apply>
-**Objective**: Present the plan for user review, pause for confirmation, then apply approved changes.
-**Steps**:
-1. Present the plan from **generate-provision-plan** in full.
-
-2. For each lesson, ask the user to **Approve** (proceed), **Modify** (adjust content/target/format), or **Reject** (skip). Present all lessons together for batch review.
-
-3. **Do NOT apply any changes until the user explicitly confirms.**
-
-4. For approved lessons: read the target file, insert content into the correct section, create the file if needed, and follow skill conventions (facts → knowledge, routing → rules, steps → capabilities) when the target is a skill file.
-
-5. For modified lessons: apply the user's adjustments and re-confirm before writing.
-
-6. After all changes are applied, summarize what was added and where.
-
-7. **Important**: If the user rejects all lessons or no lessons passed the quality gate, acknowledge this explicitly — do not force a lesson.
-</review-and-apply>
+11. **Apply quality pre-filter**: Check if already documented, actionable, and non-trivial. Return all candidates to **detect-learning-signals** with summaries, source references, analysis lens/pattern type, and preliminary quality assessment.
+</analyze-code-changes>
 
 <analyze-communication-history>
-**Objective**: Parse chat transcripts from Slack, Teams, Discord, or similar tools to extract reusable team knowledge, decisions, and patterns from people's conversations.
+**Objective**: Parse chat transcripts from Slack, Teams, Discord, or similar tools to extract reusable team knowledge, decisions, and patterns.
 **Steps**:
-1. **Gather inputs**: Confirm you have the chat transcript(s), context about channels/threads, and any focus area the user wants to narrow to.
+1. **Gather inputs**: Confirm you have the chat transcript(s), context about channels/threads, and any focus area.
 
 2. Load [reference/signal-detection-catalog.md](reference/signal-detection-catalog.md) and **scan the transcripts** for communication tool signals: recurring questions (undocumented knowledge), decision records (unformalized ADRs), problem-solution pairs (tribal knowledge), knowledge sharing (undocumented tips/tricks), escalation patterns (ownership gaps), onboarding gaps (missing setup docs).
 
 3. **Exclude anti-signals**: Filter out casual conversation, one-off resolved issues, already-documented information, status updates, and operational chatter.
 
-4. **Cluster related signals**: If the same topic surfaces across multiple threads or channels, group them — a pattern seen 5 times is a much stronger candidate than a single mention.
+4. **Cluster related signals**: Group the same topic across multiple threads — a pattern seen 5 times is stronger than a single mention.
 
-5. **Formulate candidate lessons**: For each signal that survives filtering, draft it as:
-   - **The pattern** (what recurred or was decided)
-   - **Evidence** (excerpts from the transcripts, with thread/channel context)
-   - **The lesson** (what should be documented, where, and for whom)
+5. **Formulate candidate lessons**: For each surviving signal, draft the pattern (what recurred/was decided), evidence (transcript excerpts with context), and the lesson (what to document, where, and for whom).
 
-6. **Return candidates** to **detect-learning-signals** for quality gating, with transcript evidence and the signal type that triggered each candidate.
+6. **Return candidates** to **detect-learning-signals** for quality gating, with transcript evidence and signal type.
 </analyze-communication-history>
 
-<extract-capability>
-**Objective**: Detect and extract multi-step procedures from any historical source, format them as actionable capabilities, and prepare them for provisioning. Works on single instances (tentative) as well as multiple instances (confirmed). When a task spans multiple repos, extracts at two levels — per-repo and cross-repo orchestration.
+<extract-and-refine-capability>
+**Objective**: Extract multi-step procedures from any source and optionally refine them by merging with existing capabilities. Handles both net-new extraction and abstraction of overlapping capabilities.
 **Steps**:
-1. **Identify the procedure**: Scan the source for ordered language ("first", "then", "finally"), imperative instructions, checklist-style steps, conditional branches, or repo/component references. For code-change sources, look for a clear sequence of files touched that suggests a reusable change pattern.
+
+**Extract phase** (always run):
+1. **Identify the procedure**: Scan for ordered language, imperative instructions, checklist-style steps, conditional branches, or repo/component references. For code-change sources, look for a clear sequence of files touched.
 
 2. **Determine the extraction level**: Single repo → one capability. Multiple repos → extract at two levels: **repo-level** (per-repo change pattern) and **cross-repo** (end-to-end orchestration, referencing repo-level capabilities as sub-steps).
 
-3. **Scope the task**: Identify the goal, trigger condition, and intended audience (newcomer, on-call engineer, any developer).
+3. **Scope the task**: Identify the goal, trigger condition, and intended audience.
 
-4. **Extract the ordered steps**: Write each step as an imperative verb, preserving order, removing filler, noting dependencies and conditional branches. Cross-repo steps reference repo-level capabilities where applicable.
+4. **Extract the ordered steps**: Write each step as an imperative verb, preserving order, removing filler, noting dependencies and conditional branches.
 
-5. **Identify parameters**: Separate constants (become steps) from variants (become parameters like `<branch-name>`, `<service-name>`). Cross-repo parameters may span repos. Document expected type/format.
+5. **Identify parameters**: Separate constants (become steps) from variants (become parameters). Document expected type/format.
 
-6. **Assess confidence**: **Tentative** (single instance — worth capturing, refined later by **abstract-capability**) or **Confirmed** (2+ independent instances showing the same pattern).
+6. **Assess confidence**: **Tentative** (single instance) or **Confirmed** (2+ independent instances).
 
-7. **Apply capability quality checks**: Load [reference/capability-quality-checklist.md](reference/capability-quality-checklist.md) and verify each criterion (Reusable, Non-obvious, Complete, Team-specific). Tentative confidence does NOT cause rejection.
+7. **Apply quality checks**: Load [reference/capability-quality-checklist.md](reference/capability-quality-checklist.md) and verify Reusable, Non-obvious, Complete, Team-specific. Tentative confidence does NOT cause rejection.
 
-8. **Format as a capability**: Load [reference/capability-format-template.md](reference/capability-format-template.md) and structure the extracted procedure using the template fields (name, level, confidence, objective, trigger, steps, parameters, source evidence).
+8. **Format as a capability**: Load [reference/capability-format-template.md](reference/capability-format-template.md) and structure using the template fields.
 
-9. **Return the formatted capability** to **determine-provision-target** for target assignment. When returning multi-level capabilities, present the cross-repo capability first (the high-level view), with repo-level capabilities as referenced sub-capabilities.
-</extract-capability>
+**Refine phase** (run only when an overlapping capability exists in the target):
+9. **Load existing context**: Read the target file to find existing capabilities covering related tasks. Check for overlaps at both repo-level and cross-repo level.
 
-<abstract-capability>
-**Objective**: Merge newly discovered procedural knowledge with existing capabilities to produce a more general, refined version. Works at both repo-level and cross-repo level — each can be independently abstracted as more data arrives.
+10. **Compare existing vs. new**: Identify identical steps (core invariant), similar-but-different steps (unifiable with parameters), unique steps (conditional branches). Compare at each level separately.
+
+11. **Identify the abstraction**: Replace concrete values with parameters, merge similar steps, add conditional branches. Cover all known instances without becoming too vague.
+
+12. **Preserve variant knowledge**: Keep meaningful variants as sub-cases. Don't force unification if variants serve genuinely different purposes.
+
+13. **Validate the abstraction**: Verify each original instance is derivable by filling parameters, and nothing is lost.
+
+14. **Produce the refined capability**: Format using the template, plus an evolution note and parameter table. Mark as replacing (not duplicating) the existing capability.
+
+**Return** the formatted capability (or multi-level capabilities) to **detect-learning-signals** for routing to **provision-lessons**.
+</extract-and-refine-capability>
+
+<provision-lessons>
+**Objective**: Classify qualifying lessons by target, generate a reviewable plan, get user approval, and apply changes.
 **Steps**:
-1. **Load existing context**: Read the target file to find existing capabilities covering related tasks (same task type, overlapping steps, same repo/component pattern, same cross-repo orchestration). When repos are involved, check for overlaps at both repo-level and cross-repo level — they may abstract independently.
 
-2. **Compare existing vs. new**: Identify identical steps (core invariant), similar-but-different steps (unifiable with a parameter), unique steps (conditional branches), what the new finding adds, and what the existing covers that the new doesn't. Compare at each level separately when repos are involved.
+**Classify phase**:
+1. **Detect platform capabilities**: Identify available persistent context mechanisms. Load [reference/context-target-catalog.md](reference/context-target-catalog.md) for target types and suitability.
 
-3. **Identify the abstraction**: Replace concrete values with parameters, merge similar steps, add conditional steps where variants differ. Cover all known instances without becoming too vague. For cross-repo: parameterize what varies within repos while keeping the orchestration fixed.
+2. If the user **explicitly specified a target**, honor it. Otherwise, **classify each lesson** by nature: personal preference → personal notes; project convention → project notes; skill domain knowledge → skill file; agent behavior → agent/instruction file; doc fact → README/ADR/architecture doc; code-change pattern → project notes (project-wide) or skill (domain-specific); procedure/capability → skill file (as capability) or project notes (as how-to); temporary note → session context (rare). Choose the **most specific and discoverable** target when multiple fit.
 
-4. **Preserve variant knowledge**: Keep meaningful variants as sub-cases with conditional notes ("For service type X, also do step Y"). Don't force unification if variants serve genuinely different purposes.
+**Plan phase**:
+3. For each lesson, draft the **exact content** in the format appropriate for the target (see context-target-catalog). Include source evidence. Structure as a table: #, Lesson Summary, Signal Type, Target File, Section, Content to Add. Include a rationale for each target choice. Note any files that need creation.
 
-5. **Validate the abstraction**: Verify the abstracted capability still guides a newcomer correctly, each original instance is derivable by filling parameters, and nothing is lost (preserve as note/variant if so). For multi-level: verify cross-repo → repo-level drill-down works correctly.
+**Review phase**:
+4. Present the complete plan. For each lesson, ask the user to **Approve** (proceed), **Modify** (adjust), or **Reject** (skip). Present all lessons together for batch review. **Do NOT apply any changes until the user explicitly confirms.**
 
-6. **Produce the refined capability**: Format it using [reference/capability-format-template.md](reference/capability-format-template.md), plus:
-   - **Evolution note**: A brief note showing what was generalized and why
-   - **Parameter table**: Each parameter with type, example values, and which variants introduced it
+**Apply phase**:
+5. For approved lessons: read the target file, insert content into the correct section, create the file if needed, and follow skill conventions (facts → knowledge, routing → rules, steps → capabilities) when the target is a skill file.
 
-7. **Return the refined capability** to **determine-provision-target** with a note that it replaces (not duplicates) the existing capability. When multiple levels were refined, present the cross-repo capability first, with updated repo-level capabilities as referenced sub-capabilities.
-</abstract-capability>
+6. For modified lessons: apply the user's adjustments and re-confirm before writing.
+
+7. After all changes are applied, summarize what was added and where. If the user rejects all lessons or none passed the quality gate, acknowledge this explicitly — do not force a lesson.
+</provision-lessons>
 
 </capabilities>
 
 <rules>
 
-<rule>When the user asks to learn from a chat session, PR(s) with a user story, git commit history, or communication tool transcripts → apply the source-appropriate analysis capability (**detect-learning-signals** for chat, **analyze-code-change-history** for PRs/git, **analyze-communication-history** for transcripts), then feed results into **detect-learning-signals** for quality gating.</rule>
+<rule>When the user asks to learn from any source (chat session, PRs+story, git history, communication transcripts) → apply **detect-learning-signals** as the master entry point. It will delegate to **analyze-code-changes** or **analyze-communication-history** as needed.</rule>
 
-<rule>If **detect-learning-signals** produces qualifying lessons → apply **determine-provision-target**, then **generate-provision-plan**, then **review-and-apply**. Never apply changes without explicit user confirmation.</rule>
+<rule>When **detect-learning-signals** produces qualifying lessons → if any candidate is procedural, route through **extract-and-refine-capability** first. Then pass all lessons to **provision-lessons**. Never apply changes without explicit user confirmation.</rule>
 
-<rule>If no lessons pass the quality gate → report "No lessons worth learning from this [source]" and stop. Do not fabricate lessons or proceed to downstream capabilities.</rule>
-
-<rule>If the user specifies a target context explicitly → honor that target in **determine-provision-target** step 2.</rule>
-
-<rule>When a candidate lesson describes a sequence of steps (a procedure/how-to) → apply **extract-capability** before passing to **determine-provision-target**.</rule>
-
-<rule>When a candidate capability overlaps with an existing one → apply **abstract-capability** to merge them before provisioning.</rule>
+<rule>If no lessons pass the quality gate → report "No lessons worth learning from this [source]" and stop. Do not fabricate lessons.</rule>
 
 </rules>

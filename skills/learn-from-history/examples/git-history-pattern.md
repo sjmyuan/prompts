@@ -1,6 +1,6 @@
 # Example: Git History Pattern Discovery
 
-**Applies**: `analyze-code-change-history` → `detect-learning-signals` → `determine-provision-target` → `generate-provision-plan` → `review-and-apply`
+**Applies**: `detect-learning-signals` → `analyze-code-changes` → `provision-lessons`
 
 **Scenario**: User asks to mine the last 3 months of git history on the `main` branch to find recurring patterns worth preserving as conventions or knowledge.
 
@@ -16,7 +16,7 @@ User: Look at the git history on main for the last 3 months and see if there are
 
 ---
 
-## Step 1: analyze-code-change-history (git history path)
+## Step 1: detect-learning-signals → analyze-code-changes (git history path)
 
 ### Gather inputs
 - Commit range: `main` branch, last 3 months (~400 commits)

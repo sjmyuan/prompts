@@ -1,10 +1,10 @@
 # Example: Implementation Recipe — Single Task to Abstraction
 
-**Applies**: `analyze-code-change-history` → `detect-learning-signals` → `extract-capability` → `determine-provision-target` → `review-and-apply`
+**Applies**: `detect-learning-signals` → `analyze-code-changes` → `extract-and-refine-capability` → `provision-lessons`
 
-Then later: `analyze-code-change-history` → `extract-capability` → (confidence upgrade) → `review-and-apply`
+Then later: `detect-learning-signals` → `analyze-code-changes` → `extract-and-refine-capability` (confidence upgrade) → `provision-lessons`
 
-Then later: `analyze-code-change-history` → `extract-capability` → `abstract-capability` → `determine-provision-target` → `review-and-apply`
+Then later: `detect-learning-signals` → `analyze-code-changes` → `extract-and-refine-capability` (refine phase) → `provision-lessons`
 
 **Scenario**: This example shows the full learning loop — a single PR yields a **tentative** recipe, more PRs **confirm** it, and later PRs for a related task type trigger **abstraction** into a general capability.
 

@@ -1,6 +1,6 @@
 # Example: User-Specified Target
 
-**Applies**: `detect-learning-signals` → `determine-provision-target` (user-directed) → `generate-provision-plan` → `review-and-apply`
+**Applies**: `detect-learning-signals` → `provision-lessons` (user-directed target)
 
 **Scenario**: User provides a rule and explicitly says where it should go — in this case, into a specific agent's instructions file.
 
@@ -44,7 +44,7 @@ User: Now learn from this session.
 
 ---
 
-## Step 2: determine-provision-target
+## Step 2: provision-lessons (classify phase — user-directed)
 
 **User specified target**: "coding-assistant agent instructions"
 

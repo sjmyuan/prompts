@@ -1,6 +1,6 @@
 # Example: PR Story-Gap Discovery
 
-**Applies**: `analyze-code-change-history` → `detect-learning-signals` → `determine-provision-target` → `generate-provision-plan` → `review-and-apply`
+**Applies**: `detect-learning-signals` → `analyze-code-changes` → `provision-lessons`
 
 **Scenario**: User provides a user story about adding a "bulk delete" feature and the PR that implemented it. The implementation diverged from the story in several important ways that reveal reusable knowledge about the codebase.
 
@@ -23,7 +23,7 @@ User provides the PR link or diff directly.
 
 ---
 
-## Step 1: analyze-code-change-history
+## Step 1: detect-learning-signals → analyze-code-changes
 
 ### Gather inputs
 - Story text: confirmed
