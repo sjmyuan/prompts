@@ -127,6 +127,20 @@ skills/<skill-name>/
 ```
 </skill-directory-structure>
 
+<pipeline-integration-design>
+When creating a skill that is part of a multi-skill pipeline (one skill produces output consumed by another), ensure these 4 integration points are addressed:
+
+1. **Handoff mechanism**: The producing skill must include an export/persist capability that writes output to a file. The consuming skill must define a plan-input-schema or equivalent input format and support loading from files. Do not rely on conversation text as the sole transport layer.
+
+2. **Shared schema**: Both skills must agree on the format of transferred data. The consuming skill defines the schema; the producing skill writes compliant output. Document the schema in the consuming skill's knowledge section.
+
+3. **Bidirectional awareness**: Each skill's description, when-to-use, or skill-boundary must reference the other skill by name. The producing skill states what consumes its output; the consuming skill states where its input comes from.
+
+4. **Guard clauses**: The downstream skill's when-to-use must include a constraint preventing premature loading (e.g., "Do NOT load when no plan has been generated yet — let [upstream-skill] handle it first").
+
+Apply these when the user describes a workflow involving multiple skills (e.g., "first plan, then execute").
+</pipeline-integration-design>
+
 </knowledge>
 
 <skills>
@@ -174,7 +188,8 @@ The skills section describes the capabilities you can use to create a skill.
    - Rules must **not** re-state implementation details already in capabilities.
    - If the skill has only one capability, `<rules>` may be omitted entirely.
 7. Validate the generated file against **common-structural-violations**: check for knowledge in capabilities, capabilities that violate the **action-verb naming convention** (noun-named), missing or duplicate sections, and correct section order.
-8. Write the complete content to `skills/<skill-name>/SKILL.md`.
+8. **Check pipeline integration**: If the skill is part of a multi-skill pipeline (referenced by or referencing another skill), load `<pipeline-integration-design>` in `<knowledge>` and verify all 4 integration points are addressed. Add missing handoff mechanisms, schema definitions, cross-references, or guard clauses as needed.
+9. Write the complete content to `skills/<skill-name>/SKILL.md`.
 </creating-skill-file>
 
 <creating-examples>

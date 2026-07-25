@@ -96,6 +96,20 @@ Flag violations as:
 - 🔴 Major — Multiple platform-specific references that would prevent the skill from working on another platform
 </platform-agnostic-writing>
 
+<pipeline-integration-review>
+When a skill references or is referenced by another skill (forming a producer→consumer pipeline), review must verify 4 integration points beyond the individual file structure:
+
+1. **Handoff mechanism** — Is there a file-based export/import between the skills, or is the user the transport layer? A skill that produces plans should offer an export capability; a skill that consumes plans should define a plan-input-schema and support loading from files. If the handoff relies entirely on conversation text → 🟡 Minor (fragile — context resets lose the plan).
+
+2. **Shared schema** — Does the downstream skill define the format it expects? The downstream skill should document its input schema (minimum fields, accepted formats). If the upstream skill produces output in a format the downstream skill doesn't explicitly accept → 🟡 Minor.
+
+3. **Bidirectional awareness** — Do both skills reference each other? The upstream skill should mention the downstream skill in its description, skill-boundary, or rules. The downstream skill should mention the upstream skill in its description or when-to-use. Missing cross-references → 🟡 Minor.
+
+4. **Guard clauses** — Does the downstream skill prevent premature loading? Its when-to-use or description should include a loading constraint (e.g., "Do NOT load when no plan has been generated yet"). Absence → 🟡 Minor (both skills could load simultaneously).
+
+Apply these checks when the skill's description, when-to-use, or skill-boundary references another skill by name.
+</pipeline-integration-review>
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -114,6 +128,7 @@ Flag violations as:
 | Checking file size and line count (step 1c) | Size limit thresholds (150/300 lines) and severity guidance | See `<skill-size-limit>` in `<knowledge>` |
 | Checking for output evaluation process (step 4) | Evaluation process patterns, common checklist patterns, and severity guidance | See `<evaluation-process>` in `<knowledge>` |
 | Checking conciseness across all files (step 5) | Unnecessary-content patterns per file type and severity guidance | [reference/conciseness-check.md](reference/conciseness-check.md) |
+| Checking cross-skill pipeline integration (step 16) | 4-point pipeline integration checklist with severity guidance | See `<pipeline-integration-review>` in `<knowledge>` |
 
 </context-loading-guide>
 
@@ -162,7 +177,8 @@ Flag violations as:
 13. Include a **Positive Highlights** section that acknowledges at least one well-structured aspect of the skill.
 14. Include a **Risks & Assumptions** section that states any assumptions made about the intended skill format (e.g., four-section semantics) and notes that no runtime evaluation was performed.
 15. Format findings with severity levels (🚫 Blocker, 🔴 Major, 🟡 Minor, 🟢 Nit, ⚠️ Inconsistency) and load **examples/skill-file-review.md** for output structure guidance.
-16. Verify output completeness: every finding has a severity label, **Positive Highlights** and **Risks & Assumptions** sections are present, and all recommendations are actionable (not vague).
+16. **Check cross-skill pipeline integration**: If the skill's description, when-to-use, or skill-boundary references another skill by name (indicating a producer→consumer pipeline), load `<pipeline-integration-review>` in `<knowledge>` and verify all 4 integration points. Flag gaps per the severity guidance in each point. If the skill does not reference any other skill, skip this step.
+17. Verify output completeness: every finding has a severity label, **Positive Highlights** and **Risks & Assumptions** sections are present, and all recommendations are actionable (not vague).
 </review-skill-file>
 
 </capabilities>
