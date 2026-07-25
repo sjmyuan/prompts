@@ -19,7 +19,7 @@ Extract anything reusable — patterns, constraints, decisions, procedures.
 
 ---
 
-## Step 0: Agent Detection
+## Step 1: Agent Detection
 
 **Platform scan**: Two suitable agents detected:
 - `Explore` — description: "Fast read-only codebase exploration and Q&A subagent"
@@ -34,42 +34,15 @@ Extract anything reusable — patterns, constraints, decisions, procedures.
 
 ---
 
-## Step 1-2: Dispatch
+## Step 2-3: Dispatch
 
 ### Agent 1: code-investigator (PR analysis)
 
-**Prompt constructed** following the code analysis agent prompt template:
-
-```
-You are analyzing a PR + user story to extract reusable lessons.
-
-SOURCE MATERIAL:
-- User Story: "As a merchant, I want to offer recurring billing plans so customers can subscribe weekly/monthly..."
-- PR #342 diff: [full diff showing changes to src/payment/, src/billing/, src/notifications/]
-- PR review comments: [discussion about idempotency keys, webhook handling, retry strategy]
-
-YOUR TASK: Scan for story-implementation gaps, PR discussion insights, and implementation recipes.
-[Full prompt as per template]
-
-CRITICAL: Return only findings. Do NOT write files.
-```
+**Prompt constructed** following the code analysis agent prompt template from `reference/agent-orchestration-pattern.md`, populated with the PR #342 source material (story text, diff, review comments) and instructed to scan for story-implementation gaps, PR discussion insights, and implementation recipes.
 
 ### Agent 2: Explore (git history analysis)
 
-**Prompt constructed** following the code analysis agent prompt template:
-
-```
-You are analyzing git commit history to extract reusable lessons.
-
-SOURCE MATERIAL:
-- Git log for src/payment/ over 30 days: [list of 47 commits with messages and file paths]
-- Representative diffs for the top 5 most-changed files
-
-YOUR TASK: Scan for evolutionary patterns, bug-fix clusters, and convention evolution.
-[Full prompt as per template]
-
-CRITICAL: Return only findings. Do NOT write files.
-```
+**Prompt constructed** following the code analysis agent prompt template from `reference/agent-orchestration-pattern.md`, populated with the git log (47 commits, file paths, representative diffs) and instructed to scan for evolutionary patterns, bug-fix clusters, and convention evolution.
 
 ### Internal: analyze-communication-history (Slack transcripts)
 
@@ -79,7 +52,7 @@ Runs internally since no communication-mining agent is available.
 
 ---
 
-## Step 2 (continued): Collect and Merge Results
+## Step 3 (continued): Collect and Merge Results
 
 ### Agent 1 (code-investigator) returns:
 
@@ -159,13 +132,13 @@ Checking for overlaps:
 
 ---
 
-## Step 4-5: Quality Gate
+## Step 5-6: Quality Gate
 
 All 7 candidates (5 original + 2 merged from complementary pairs) pass the quality gate.
 
 ---
 
-## Step 6-7: Provisioning
+## Step 7-8: Provisioning
 
 | # | Lesson | Target | Rationale |
 |---|---|---|---|

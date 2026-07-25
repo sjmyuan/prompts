@@ -22,6 +22,45 @@ Before any analysis, scan the platform's agent registry. The detection mechanism
 
 ---
 
+## Task-to-Agent Mapping
+
+Map source types to the best-fit agent and specify the fallback internal capability:
+
+| Source type | Agent type needed | Agent description keywords | Fallback capability |
+|---|---|---|---|
+| PR(s) + user story | Code investigator / reviewer | "investigate", "review", "analyze code", "explore codebase", "discover patterns" | analyze-code-changes |
+| Git commit history | Code investigator / explorer | "investigate", "explore", "analyze history", "discover patterns", "codebase exploration" | analyze-code-changes |
+| Communication transcripts | Text analyst / researcher | "analyze text", "mine", "extract knowledge", "research", "chat analysis" | analyze-communication-history |
+| Mixed / complex sources | Multiple agents (parallel) | Above keywords, distributed across agents | Sequential internal analysis |
+
+---
+
+## Parallelization Strategy
+
+When multiple independent source types are present (e.g., PRs + git history + chat transcripts), dispatch each to a different agent simultaneously. Agents are stateless and independent — they can run in parallel without coordination. The parent collects all results after all agents complete.
+
+---
+
+## Agent Prompt Construction Rules
+
+For each dispatched agent, construct a prompt that follows these rules:
+
+1. **State the source type** and what signal types to look for (reference the signal detection catalog's categories: story-implementation gaps, evolutionary patterns, recurring questions, decision records, problem-solution pairs, procedural patterns, implementation recipes)
+2. **Provide the full source material** (PR diff, commit range, transcript, etc.)
+3. **Require structured output**: a list of candidate lessons, each with a summary, evidence excerpt from the source, the signal type it matches, and a preliminary quality self-assessment (reusable? non-obvious? actionable? not already documented elsewhere?)
+4. **Instruct conservatism**: flag borderline candidates rather than missing them; the parent applies the formal quality gate later
+5. **Explicitly forbid file writes**: "Return only findings as structured text. Do NOT write to any files, do NOT modify any documents, and do NOT provision any lessons."
+
+---
+
+## When NOT to Use Agents
+
+- **Single, small source** (one short chat session) — agent dispatch overhead exceeds benefit; scan interactively
+- **Sources requiring tight cross-referencing** (e.g., comparing a story against its PR requires seeing both together) — use a single agent that receives all inputs, or fall back to internal analysis
+- **User explicitly requests** sequential, step-by-step processing with visibility into each step
+
+---
+
 ## Prompt Templates by Agent Type
 
 ### Code Analysis Agent Prompt
