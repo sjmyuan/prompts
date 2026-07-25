@@ -1,6 +1,6 @@
 ---
 name: write-solution-doc
-description: Produce comprehensive solution documentation with C4 diagrams, sequence/flowchart diagrams, API contracts, RAID analysis, and RACI matrices. Use when documenting, writing, creating, or authoring a finalized solution decision, solution architecture, or technical solution document.
+description: Produce comprehensive solution documentation with C4 diagrams, sequence/flowchart diagrams, API contracts, RAID analysis, and RACI matrices. Use when documenting, writing, creating, or authoring a finalized solution decision, solution architecture, or technical solution document; producing C4/sequence/flowchart diagrams for a solution; defining API/event schemas; performing RAID analysis; creating RACI matrices; or compiling a complete multi-section solution document.
 ---
 
 <when-to-use-this-skill>
@@ -45,8 +45,17 @@ Use the following decision matrix to choose the right diagram type for each inte
 | Business process with decision branches and conditional paths (e.g., order approval workflow, refund eligibility logic, state transitions) | **Flowchart** | Shows decision diamonds, branching paths, and process steps — best for logic and control flow |
 | Data pipeline with transformation stages and branching (e.g., ETL steps, data routing rules, enrichment logic) | **Flowchart** | Pipeline stages are process steps; routing rules are decision nodes — naturally fits flowchart syntax |
 | Multi-participant orchestration with both runtime calls AND decision logic (e.g., saga orchestration with compensating actions, complex checkout flow) | **Both** — sequence diagram for the happy-path call chain + flowchart for the decision/compensation logic | Use sequence to show who-calls-whom, flowchart to show what-decisions-are-made |
-| State machine transitions (e.g., order status lifecycle, user onboarding states) | **Flowchart** (state diagram style) | States as nodes, transitions as arrows with conditions — flowchart is the simplest PlantUML option for this |
+| State machine transitions (e.g., order status lifecycle, user onboarding states) | **Flowchart** (state diagram style) — use PlantUML `state` diagram syntax if the focus is on states and transitions; use flowchart activity syntax if decision logic is the emphasis | States as nodes, transitions as arrows with conditions — choose syntax based on whether states or decisions dominate |
+| Pure state/status lifecycle with no decision branching (e.g., entity status flow, deployment states) | **State Diagram** (PlantUML `state` syntax or Mermaid `stateDiagram-v2`) | Cleaner than flowchart for state-centric views — use when the primary question is "what states exist and what triggers transitions?" |
 | Algorithm or processing logic within a single component (e.g., rate limiting algorithm, caching strategy) | **Flowchart** | No cross-component participants — purely internal logic flow |
+
+<diagram-interop>
+When receiving existing diagrams (from prior investigation, other tools, or user-provided sources) that use different conventions:
+- **C4 diagrams**: Accept C4-PlantUML diagrams regardless of `!include` path style; normalize to the `https://raw.githubusercontent.com/...` convention when embedding in the final document.
+- **Sequence diagrams**: Accept both numbered and unnumbered message styles. Preserve existing numbering when present (useful for traceability); add a brief note explaining the numbering scheme.
+- **Flowcharts**: Accept both PlantUML activity syntax and Mermaid `flowchart` syntax. Render whichever the user provides; offer conversion only if the user wants unified diagramming across the document.
+- **State diagrams**: Accept both PlantUML `state` syntax and Mermaid `stateDiagram-v2` syntax.
+</diagram-interop>
 
 **Decision rule**: If the primary question is "who talks to whom and in what order?" → use a sequence diagram. If the primary question is "what decisions are made and what paths exist?" → use a flowchart. When both questions matter, produce both diagrams.
 </diagram-selection-guide>
@@ -79,7 +88,7 @@ The assistant supports both English and Chinese (中文) output:
 
 | Load when | Provides | File |
 |---|---|---|
-| User wants to see a complete end-to-end solution document workflow | Full walkthrough of all 10 capabilities producing a final solution document | [examples/full-solution-document.md](examples/full-solution-document.md) |
+| User wants to see a complete end-to-end solution document workflow | Full walkthrough of all capabilities producing a final solution document | [examples/full-solution-document.md](examples/full-solution-document.md) |
 | User focuses on producing C4, sequence, and flowchart diagrams | Diagram-heavy workflow with C2, C3, sequence diagram, and flowchart outputs | [examples/c4-and-interaction-diagrams.md](examples/c4-and-interaction-diagrams.md) |
 | User needs API/event contract definitions | Detailed API schema and event schema design output | [examples/api-contracts.md](examples/api-contracts.md) |
 | User needs to list related documents, external deps, and maintainers | Document-listing and dependency-tracking workflow | [examples/dependencies-and-maintainers.md](examples/dependencies-and-maintainers.md) |
@@ -256,6 +265,8 @@ The assistant supports both English and Chinese (中文) output:
 <rule>Always ask questions one at a time and wait for the user's response before proceeding to the next question or capability. Never batch multiple questions together unless the user explicitly requests it.</rule>
 
 <rule>After each capability's output, pause and ask the user to confirm before proceeding to the next capability. On receiving feedback, refine the current output until the user confirms satisfaction.</rule>
+
+<rule>When the user provides existing diagrams or documented architecture → incorporate them directly into the relevant capability instead of redrawing. Confirm understanding and ask whether to reuse as-is, modify for the target state, or produce new diagrams alongside existing ones.</rule>
 
 <rule>When the user says "looks good", "confirmed", "approved", "proceed", "next", or similar confirmations, move on to the next capability in the sequence. Do not skip capabilities unless the user explicitly asks to.</rule>
 
