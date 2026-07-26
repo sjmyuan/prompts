@@ -1,5 +1,5 @@
 ---
-name: code-assistant
+name: coding-assistant
 description: 'Plan-driven coding assistant that classifies change requests, generates TDD-based plans, and executes them step-by-step. Handles bugs, features, and refactors.'
 tools: Glob, Grep, Read, Write, Edit, Bash, TodoWrite, KillShell, BashOutput
 model: inherit
