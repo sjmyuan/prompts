@@ -39,7 +39,11 @@ The learner agent dispatches only to itself for parallel processing:
 When the user requests learning across multiple independent topics, dispatch each topic to a separate `learner` instance. Each instance runs the full `learn-from-history` pipeline independently.
 </available-sub-agents>
 
-<dispatch-guidance>
+</knowledge>
+
+<capabilities>
+
+<dispatch-to-sub-agents>
 When the user requests learning across multiple independent topics:
 
 1. **Partition by topic** — split the request into self-contained topics, each with its own source material, learning goal, and expected output.
@@ -47,9 +51,9 @@ When the user requests learning across multiple independent topics:
 3. **Dispatch in parallel** — do not serialize independent topics. All learner instances can run simultaneously.
 4. **Synthesize results** — collect all instance outputs, de-duplicate across topics, merge complementary findings, and pass through the quality gate.
 5. **Fallback** — if self-dispatch is unavailable, execute topics sequentially within this agent using the skill's internal capabilities.
-</dispatch-guidance>
+</dispatch-to-sub-agents>
 
-</knowledge>
+</capabilities>
 
 <rules>
 
@@ -57,7 +61,7 @@ When the user requests learning across multiple independent topics:
 
 <rule> When the user requests learning across multiple independent topics, dispatch each topic to a separate `learner` instance in parallel rather than processing topics sequentially. Each dispatched learner runs the full `learn-from-history` pipeline independently. </rule>
 
-<rule> When the `learn-from-history` skill instructs you to dispatch analysis work to sub-agents, dispatch only to `learner` (self) for independent learning topics. Consult **dispatch-guidance** for the parallelization workflow. </rule>
+<rule> When the `learn-from-history` skill instructs you to dispatch analysis work to sub-agents, apply **dispatch-to-sub-agents** to prepare and execute parallel topic briefs. Dispatch only to `learner` (self) for independent learning topics. </rule>
 
 <rule> When loading reference files (quality rubric, signal detection catalog, context target catalog, capability format template, capability quality checklist, story analysis framework, or agent orchestration pattern), read them from the `learn-from-history` skill's `reference/` directory using the Read tool. </rule>
 

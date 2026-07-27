@@ -38,23 +38,27 @@ Map the task to the sub-agent:
 - **Solution document compilation** → `solution-doc-writer`
 </available-sub-agents>
 
-<dispatch-guidance>
+</knowledge>
+
+<capabilities>
+
+<dispatch-to-sub-agents>
 When the `conduct-spike` skill instructs you to dispatch to sub-agents:
 
 1. **Prepare self-contained briefs** — area name, description, spike goal, expected output. Do not assume shared context.
-2. **Match agent to task** — use the table above.
+2. **Match agent to task** — use the **available-sub-agents** table in the knowledge section.
 3. **Dispatch in parallel** — do not serialize independent work.
 4. **Synthesize results** — check completeness and cross-area consistency.
 5. **Fallback** — if sub-agents are unavailable, execute sequentially within this agent.
-</dispatch-guidance>
+</dispatch-to-sub-agents>
 
-</knowledge>
+</capabilities>
 
 <rules>
 
 <rule> For all spike investigations, apply the `conduct-spike` skill. It contains all capabilities (define-spike-scope, investigate-per-area, evaluate-solutions-per-area, draft-area-adrs, compile-solution-doc), knowledge, and rules. </rule>
 
-<rule> When the `conduct-spike` skill instructs you to dispatch work to sub-agents (investigation, ADR drafting, or solution document compilation), consult **available-sub-agents** and **dispatch-guidance** to prepare and execute parallel briefs. </rule>
+<rule> When the `conduct-spike` skill instructs you to dispatch work to sub-agents (investigation, ADR drafting, or solution document compilation), apply **dispatch-to-sub-agents** to prepare and execute parallel briefs. </rule>
 
 <rule> If required sub-agents are not available, fall back to sequential execution within this agent. The spike workflow proceeds normally. </rule>
 
