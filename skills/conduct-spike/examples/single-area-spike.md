@@ -2,7 +2,7 @@
 
 **Scenario**: The user wants to spike the choice of database for a new analytics service. Since this is a greenfield service with a single clear decision, it's a single-area spike.
 
-**Applies**: All capabilities — `define-spike-scope` → `investigate-per-area` → `evaluate-solutions-per-area` → `draft-area-adrs` → `compile-solution-doc`
+**Applies**: All capabilities — `define-spike-scope` → `investigate-per-area` → `compile-findings-doc` → `evaluate-solutions-per-area` → `draft-area-adrs` → `compile-solution-doc`
 
 **What makes this distinct**: Single investigation area with greenfield context (no existing implementation to investigate). Demonstrates the workflow still applies in full but with a lighter touch.
 
@@ -46,7 +46,38 @@
 **Relevant patterns from org**: All existing services use PostgreSQL via JPA/Hibernate. DevOps team manages infrastructure via Terraform.
 
 ---
+## Phase 2b: Compile Findings Document
 
+*[compile-findings-doc applied — greenfield adaptation; no existing code to document]*
+
+### Findings Document: `findings-analytics-database.md`
+
+*[write-solution-doc skill applied to current state, adapted for greenfield]*
+
+**Current State**: No existing analytics service. The findings document captures the organizational and operational baseline that constrains the solution space.
+
+**Organizational Baseline**:
+- PostgreSQL used for all relational workloads; team has deep expertise
+- Elasticsearch used by search team for log indexing
+- No existing ClickHouse, Druid, or other OLAP database experience
+- Infrastructure runs on AWS (EKS); team prefers managed services
+- DevOps team manages infrastructure via Terraform
+
+**Operational Constraints**:
+- Expected write throughput: 50K events/second peak
+- Query patterns: time-series aggregations, funnel analysis, real-time counters
+- Retention: raw events 30 days, aggregated data 2 years
+- Team: 4 backend engineers, no dedicated DBA
+- All existing services use PostgreSQL via JPA/Hibernate
+
+**Relevant Industry Patterns** (greenfield adaptation):
+- ClickHouse widely adopted for clickstream analytics (CloudFlare, GitLab)
+- Amazon Timestream used by AWS-native teams for time-series
+- Common pattern: managed OLAP + PostgreSQL for service metadata
+
+> *This findings document serves as the constraints baseline. Since this is greenfield, it captures organizational and operational constraints rather than existing code architecture. Evaluation will compare options against these constraints.*
+
+---
 ## Phase 3: Evaluate Solutions Per Area
 
 ### Area 1: Database Selection

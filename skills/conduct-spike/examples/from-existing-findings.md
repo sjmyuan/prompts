@@ -2,7 +2,7 @@
 
 **Scenario**: The user has already done informal investigation on a caching strategy problem and has notes. They want to formalize the findings into ADRs and a solution document without re-doing the investigation.
 
-**Applies**: `define-spike-scope` → `evaluate-solutions-per-area` → `draft-area-adrs` → `compile-solution-doc` (skipping `investigate-per-area`)
+**Applies**: `define-spike-scope` → `compile-findings-doc` → `evaluate-solutions-per-area` → `draft-area-adrs` → `compile-solution-doc` (skipping `investigate-per-area`; compile-findings-doc formalizes the provided findings)
 
 **What makes this distinct**: The investigation phase is skipped because the user already has findings. The spike starts from evaluation, demonstrating the "provide pre-existing findings" rule.
 
@@ -31,6 +31,40 @@
 ## Phase 2: Investigate Per Area — SKIPPED
 
 *User provided pre-existing investigation findings. Skipping investigation phase per the "pre-existing findings" rule.*
+
+---
+
+## Phase 2b: Compile Findings Document
+
+*[compile-findings-doc applied to formalize the user's pre-existing investigation notes]*
+
+### Findings Document: `findings-caching-strategy.md`
+
+*[write-solution-doc skill applied to current state, seeded with user's provided findings]*
+
+**C2 Container Diagram (Current State)**: Product Catalog Service → PostgreSQL (no caching layer). 10K reads/sec, 50 writes/sec. DB CPU regularly exceeds 80%.
+
+**Current Architecture Summary** (formalized from user's notes):
+- Product Catalog Service queries PostgreSQL directly for all read operations
+- No caching layer exists at any tier (application, distributed, or CDN)
+- Database CPU exceeds 80% during peak traffic; P99 latency is 450ms
+- Read-to-write ratio: 200:1 (10K reads/sec vs. 50 writes/sec)
+- The service is the single source of truth for product data
+- No existing Redis/ElastiCache infrastructure in the organization
+
+**Constraints & Pain Points**:
+- Database is the scaling bottleneck — cannot handle projected 2x traffic growth
+- P99 latency of 450ms is above the 100ms target for cache hits
+- Any caching solution must not increase write latency (already acceptable at ~50ms)
+- No existing cache infrastructure — any solution requires new operational investment
+
+**Raw Data & Metrics**:
+- 10K reads/sec, 50 writes/sec (200:1 ratio)
+- DB CPU: 80%+ during peak
+- P99 latency: 450ms (target: <100ms for cache hits)
+- Write latency: ~50ms (acceptable)
+
+> *Findings formalized from your pre-existing notes. This document is the current-state baseline. Evaluation will compare solution options against these constraints. No re-investigation was needed.*
 
 ---
 

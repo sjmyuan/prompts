@@ -2,7 +2,7 @@
 
 **Scenario**: The user wants to conduct a heavy spike with 4 investigation areas on migrating a legacy payment service. The orchestrating agent dispatches investigation and ADR drafting to sub-agents in parallel to reduce wall-clock time.
 
-**Applies**: `define-spike-scope` → `investigate-per-area` (parallel dispatch) → `evaluate-solutions-per-area` → `draft-area-adrs` (parallel dispatch) → `compile-solution-doc`
+**Applies**: `define-spike-scope` → `investigate-per-area` (parallel dispatch) → `compile-findings-doc` → `evaluate-solutions-per-area` → `draft-area-adrs` (parallel dispatch) → `compile-solution-doc`
 
 **What makes this distinct**: This example demonstrates the multi-agent orchestration pattern where the orchestrating agent delegates independent work units to sub-agents that run concurrently, then synthesizes their results. Contrast with `end-to-end-spike.md` where investigation runs sequentially.
 
@@ -137,6 +137,38 @@ Expected output: Current deployment architecture, constraints, migration feasibi
 > - No contradictions found across sub-agent outputs
 >
 > *The orchestrator compiles the synthesized investigation summary and presents it to the user.*
+
+---
+
+## Phase 2b: Compile Findings Documents
+
+*[Orchestrator applies compile-findings-doc — producing one consolidated findings document from the synthesized investigation results of all 4 sub-agents]*
+
+### Findings Document: `findings-payment-migration.md`
+
+*[write-solution-doc skill applied to current state]*
+
+**C2 Container Diagram (Current State)**: Monolithic Spring Boot app on Kubernetes → single PostgreSQL, behind Kong API Gateway.
+
+**Current Architecture (synthesized from 4 sub-agent investigations)**:
+
+| Area | Current State | Key Constraint |
+|---|---|---|
+| Service decomposition | Single app, package-by-layer, 3 intermingled domains | `PaymentOrchestrator` (1200 lines) couples all types |
+| Inter-service communication | All in-process calls; external: REST/gRPC/SOAP | No async messaging experience on team |
+| Database decomposition | Single PostgreSQL, ~80 tables, shared `transactions`/`accounts` | 12 stored procedures (2000+ lines) are a migration blocker |
+| Migration strategy | K8s + Kong API Gateway + GitHub Actions CI/CD | No traffic splitting or feature flags in place |
+
+**Cross-Area Observations**:
+- Area 1 (service boundaries) and Area 3 (database): the shared `transactions` table couples payment-type services and database decomposition — both must be addressed together.
+- Area 2 (communication) and Area 4 (migration): lack of async messaging and traffic splitting means migration must start with synchronous patterns.
+
+**Raw Data & Metrics**:
+- ~200K LOC, ~80 tables, 3 K8s replicas
+- 3 external protocols (REST, gRPC, SOAP)
+- Team: 3 sub-teams, no Kafka experience
+
+> *Findings consolidated from 4 parallel sub-agent investigations. Cross-area consistency verified — no contradictions found. This document is the current-state baseline for evaluation.*
 
 ---
 

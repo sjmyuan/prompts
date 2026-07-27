@@ -1,6 +1,6 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations to explore technical problems and produce ADRs, findings documents, and solution documents. Use when conducting, investigating, evaluating, continuing, deep-diving, or producing formal ADRs for a spike.
+description: Conduct spike investigations to explore technical problems and produce ADRs, findings documents, and solution documents. Use when conducting, decomposing, investigating, evaluating, formalizing findings, continuing, or deep-diving a spike.
 ---
 
 <when-to-use-this-skill>
