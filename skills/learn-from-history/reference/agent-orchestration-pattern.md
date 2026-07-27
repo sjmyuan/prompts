@@ -45,7 +45,7 @@ When multiple independent source types are present (e.g., PRs + git history + ch
 
 For each dispatched agent, construct a prompt that follows these rules:
 
-1. **State the source type** and what signal types to look for (reference the signal detection catalog's categories: story-implementation gaps, evolutionary patterns, recurring questions, decision records, problem-solution pairs, procedural patterns, implementation recipes)
+1. **State the source type** and what signal types to look for (reference the signal detection catalog's categories: story-implementation gaps, evolutionary patterns, recurring questions, decision records, problem-solution pairs, described procedures, implementation recipes)
 2. **Provide the full source material** (PR diff, commit range, transcript, etc.)
 3. **Require structured output**: a list of candidate lessons, each with a summary, evidence excerpt from the source, the signal type it matches, and a preliminary quality self-assessment (reusable? non-obvious? actionable? not already documented elsewhere?)
 4. **Instruct conservatism**: flag borderline candidates rather than missing them; the parent applies the formal quality gate later
@@ -113,7 +113,7 @@ YOUR TASK: Scan these transcripts for the following signal types:
 - **Knowledge sharing**: Team members proactively sharing tips, tricks, or "TIL" moments.
 - **Escalation patterns**: Certain topics consistently routing to the same person — reveals single points of knowledge.
 - **Onboarding gaps**: New team members repeatedly asking the same setup, access, or process questions.
-- **Procedural patterns**: Step-by-step descriptions of how to accomplish recurring tasks.
+- **Described procedures**: Step-by-step descriptions of how to accomplish recurring tasks.
 
 **Anti-signals to IGNORE**: Casual conversation, jokes, status updates, one-off resolved issues, operational chatter ("deploy done", "PR merged"), already-documented information, vague complaints without solutions.
 
@@ -148,7 +148,7 @@ YOUR TASK: Scan this material for patterns, decisions, workarounds, constraints,
 For each finding, produce a structured candidate lesson with:
 1. **Summary**: One sentence describing the reusable lesson
 2. **Evidence**: Quote or reference the specific source material
-3. **Signal type**: Best-fit category (story-implementation gap, evolutionary pattern, decision record, problem-solution pair, procedural pattern, implementation recipe, etc.)
+3. **Signal type**: Best-fit category (story-implementation gap, evolutionary pattern, decision record, problem-solution pair, described procedure, implementation recipe, etc.)
 4. **Preliminary quality self-check**: Is it reusable? Non-obvious? Actionable? Undocumented?
 
 Be conservative — flag borderline findings rather than missing them.

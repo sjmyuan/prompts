@@ -23,6 +23,22 @@ description: Extract reusable knowledge, rules, and procedures from chat session
 This skill treats lessons seriously. Not every interaction or change yields a lesson worth preserving. A valid lesson must be **general enough to apply across multiple future sessions**, not a one-off fix or trivial observation. When nothing meets the quality bar, the skill explicitly reports "nothing worth learning" — this is a valid and important outcome.
 </core-principle>
 
+<lesson-type-concepts>
+A **lesson** is any reusable insight extracted from a historical source. Lessons come in two forms, distinguished by their **structure**, not how they were discovered:
+
+| Lesson form | Structure | Examples | Provisioned as | Routed through |
+|---|---|---|---|---|
+| **Rule / Knowledge fact** | A single, standalone directive or piece of information — can be stated in one sentence | "Always null-check API responses with `?.` and `??`", "The rate limiter has a 10KB body limit", "Extract utilities to `src/shared/` when used in 3+ places" | Knowledge section of the target (skill, project notes, agent file, etc.) | Directly to **provision-lessons** |
+| **Procedure (capability)** | An ordered, multi-step sequence of actions for accomplishing a recurring task | "How to deploy a hotfix" (6 steps), "How to add a bulk operation" (8 steps with parameters), "How to onboard a new service" (5 steps) | Named capability in the target (skill or project notes), formatted per the capability format template | Through **extract-and-refine-capability** before **provision-lessons** |
+
+A **pattern** is a recurring observation across historical sources — it describes the **discovery mechanism**, not the lesson form. Patterns can yield either rules or procedures:
+- An **evolutionary pattern** in git history (signal #5) may yield rules ("always use `date-fns-tz`") or procedures
+- A **described procedure** in chat (signal #12) yields a procedure
+- An **implementation recipe** in PRs (signal #13) yields a procedure
+
+**Key decision rule**: If a candidate can be fully expressed as a single sentence directive or fact → it's a rule/knowledge fact (provision directly). If it requires ordered steps, parameters, conditional branches, or a sequence of actions → it's a procedure (route through extract-and-refine-capability).
+</lesson-type-concepts>
+
 <agent-orchestration>
 When the platform supports sub-agents, this skill orchestrates them to parallelize the learning pipeline. The parent skill retains control of the quality gate, result merging, de-duplication, and provisioning. Load [reference/agent-orchestration-pattern.md](reference/agent-orchestration-pattern.md) for the full task-to-agent mapping table, agent detection protocol, prompt templates, parallelization strategy, result merging algorithm, fallback guidance, and anti-patterns for agent use.
 </agent-orchestration>
@@ -41,8 +57,8 @@ When the platform supports sub-agents, this skill orchestrates them to paralleli
 | User specifies a target context for the lesson | Walkthrough of user-directed provisioning to a specific target | [examples/user-specified-target.md](examples/user-specified-target.md) |
 | User provides a user story and PR(s) to learn from | Walkthrough: comparing story vs implementation → identifying gaps → extracting knowledge | [examples/pr-story-gap-discovery.md](examples/pr-story-gap-discovery.md) |
 | User provides git commit history to learn from | Walkthrough: mining commit history for patterns, convention evolution, and lessons | [examples/git-history-pattern.md](examples/git-history-pattern.md) |
-| Extracting a step-by-step procedure from conversation or chat history | Walkthrough: detecting procedural signal → extracting steps → provisioning as capability | [examples/procedural-discovery.md](examples/procedural-discovery.md) |
-| Distilling an implementation recipe from one or more PRs | Walkthrough: detecting recipe signal → extracting pattern → abstracting into capability | [examples/implementation-recipe.md](examples/implementation-recipe.md) |
+| Extracting a step-by-step procedure from conversation or chat history | Walkthrough: detecting a described procedure (signal #12) → extracting steps → provisioning as capability | [examples/procedural-discovery.md](examples/procedural-discovery.md) |
+| Distilling an implementation recipe from one or more PRs | Walkthrough: detecting a recipe signal (signal #13) → extracting change sequence → abstracting into capability | [examples/implementation-recipe.md](examples/implementation-recipe.md) |
 | Applying quality checks to an extracted capability | 4-dimension checklist with rejection rules and confidence guidance | [reference/capability-quality-checklist.md](reference/capability-quality-checklist.md) |
 | Formatting an extracted or abstracted capability for provisioning | Structured template with required fields and refined-capability extensions | [reference/capability-format-template.md](reference/capability-format-template.md) |
 | Orchestrating multiple sub-agents for parallel analysis | Prompt templates per agent type, result format spec, merging/de-duplication algorithms, error handling | [reference/agent-orchestration-pattern.md](reference/agent-orchestration-pattern.md) |
@@ -56,7 +72,7 @@ Quick reference:
 - **Interactive** (chat): explicit user feedback, AI self-discovered insight, future-useful information
 - **Code-change** (PRs, git): story-implementation gap, evolutionary pattern, implementation recipe
 - **Communication tool** (Slack, Teams, Discord): recurring question, decision record, problem-solution pair, knowledge sharing, escalation pattern, onboarding gap
-- **Procedural** (any source): step-by-step descriptions of recurring tasks, including repos/components to touch and change patterns
+- **Procedural** (any source): described procedures (step-by-step task instructions in text) and implementation recipes (change sequences inferred from PRs) — both yield multi-step capabilities, not single rules
 - **Anti-signals**: trivial facts, one-off fixes, already-documented info, session state, boilerplate changes, casual chat, resolved-once issues
 </signal-types>
 
@@ -73,7 +89,7 @@ When comparing a user story against PR implementation changes, load [reference/s
 <capabilities>
 
 <detect-learning-signals>
-**Objective**: Master entry point — detect sub-agents, scan any historical source for candidate lessons, delegate to agents or internal analysis, apply the quality gate, and route qualifying lessons to provisioning.
+**Objective**: Master entry point — detect sub-agents, scan any historical source for candidate lessons, delegate to agents or internal analysis, apply the quality gate, classify each lesson by form (rule vs. procedure), route accordingly, and pass all to provisioning.
 **Steps**:
 1. **Detect available sub-agents**: Scan the platform's agent registry for agents suitable for analysis tasks. Look for agents whose descriptions match the keywords in the task-to-agent mapping table (see agent-orchestration knowledge). Record available agent names and their capabilities. If no suitable agents are found, proceed with internal capabilities only.
 
@@ -87,7 +103,7 @@ When comparing a user story against PR implementation changes, load [reference/s
 
 3. **Dispatch to agents** (when agents are available): For each agent to invoke, load [reference/agent-orchestration-pattern.md](reference/agent-orchestration-pattern.md) and construct a prompt following the prompt template for that agent type. Include: the source material, signal types to look for, structured output requirements, and the instruction to NOT write files. Dispatch all independent agents in parallel. Wait for all agents to complete, then collect results. Merge by de-duplicating across agent outputs and combining complementary findings. Tag each candidate with its source agent. Proceed to step 5.
 
-4. For chat sessions without agent dispatch, load [reference/signal-detection-catalog.md](reference/signal-detection-catalog.md) and **scan the conversation** for signal types: explicit user feedback, AI self-discovered insights, future-useful information, and procedural patterns (step-by-step task descriptions).
+4. For chat sessions without agent dispatch, load [reference/signal-detection-catalog.md](reference/signal-detection-catalog.md) and **scan the conversation** for signal types: explicit user feedback, AI self-discovered insights, future-useful information, and described procedures (step-by-step task descriptions — signal #12).
 
 5. **Exclude anti-signals** immediately — filter out trivial facts, one-off fixes, already-documented info, session state, boilerplate changes. For agent-produced candidates, apply a lighter pre-filter since agents were already instructed to be conservative.
 
@@ -95,7 +111,16 @@ When comparing a user story against PR implementation changes, load [reference/s
 
 7. **If no candidates pass**: Report "No lessons worth learning from this [source]" and stop. This is a valid outcome — do not fabricate lessons.
 
-8. **If candidates pass**: Collect them with evidence and source attribution (agent name or internal analysis). For procedural candidates, route through **extract-and-refine-capability** first. Then pass all to **provision-lessons**.
+8. **Classify each qualifying candidate by lesson form** (see lesson-type-concepts in knowledge). Ask: "Can this lesson be fully expressed as a single sentence directive or fact, or does it require ordered steps, parameters, conditional branches, or a sequence of actions?"
+   - **Rule / Knowledge fact** (single statement) → tag as `form: rule` and hold for direct provisioning
+   - **Procedure / Capability** (multi-step) → tag as `form: procedure` and route through **extract-and-refine-capability** before provisioning
+   - **When in doubt**, default to `form: procedure` — it's safer to structure something as steps and later simplify than to lose procedural structure
+
+9. **Route by form**:
+   - For `form: rule` candidates: collect with evidence and source attribution, pass directly to **provision-lessons**
+   - For `form: procedure` candidates: first pass through **extract-and-refine-capability** to produce formatted capabilities, then pass the resulting capabilities (now in structured form) along with any `form: rule` candidates to **provision-lessons**
+
+10. Collect **all** processed candidates (rules + formatted capabilities) with evidence, source attribution, and form tags. Pass the complete set to **provision-lessons**.
 </detect-learning-signals>
 
 <analyze-code-changes>
@@ -119,9 +144,9 @@ When comparing a user story against PR implementation changes, load [reference/s
 
 9. **Identify evolutionary patterns**: Conventions that crystallized over time, recurring bug categories and their fixes, and refactoring arcs spanning multiple commits. Formulate each as: the pattern, the lesson, and the evidence (commits).
 
-10. **Extract implementation recipes**: For each PR, map which repos/files are touched and the dependency order. Check generalizability: "Would a similar task follow this same pattern?" Tag confidence as **tentative** (single instance) or **confirmed** (2+ instances). When multiple instances exist, compare across them to identify the invariant recipe vs. parameters. Formulate at both **repo-level** and **cross-repo** levels.
+10. **Flag implementation recipe signals**: For each PR, ask "Would a similar task follow the same sequence of files and changes?" If yes, flag this as an implementation recipe candidate (signal #13). Gather the raw evidence — the list of repos touched, files changed per repo, change order, and dependency order between repos. Do NOT extract or format the recipe here — that is the job of **extract-and-refine-capability**. Tag each flagged recipe with `form: procedure` and attach the raw evidence (repo map, file list, change sequence).
 
-11. **Apply quality pre-filter**: Check if already documented, actionable, and non-trivial. Return all candidates to **detect-learning-signals** with summaries, source references, analysis lens/pattern type, and preliminary quality assessment.
+11. **Apply quality pre-filter**: Check if already documented, actionable, and non-trivial. Return all candidates to **detect-learning-signals** with summaries, source references, analysis lens/pattern type, form tags, raw evidence (for recipes), and preliminary quality assessment.
 </analyze-code-changes>
 
 <analyze-communication-history>
@@ -141,40 +166,65 @@ When comparing a user story against PR implementation changes, load [reference/s
 </analyze-communication-history>
 
 <extract-and-refine-capability>
-**Objective**: Extract multi-step procedures from any source and optionally refine them by merging with existing capabilities. Handles both net-new extraction and abstraction of overlapping capabilities.
+**Objective**: Transform raw procedural candidates into structured capabilities, handling two distinct source types: described procedures (text-described steps from chat/transcripts) and implementation recipes (change sequences inferred from PRs). Also refine existing capabilities by merging overlapping ones into parameterized abstractions.
 **Steps**:
 
-**Extract phase** (always run):
-1. **Identify the procedure**: Scan for ordered language, imperative instructions, checklist-style steps, conditional branches, or repo/component references. For code-change sources, look for a clear sequence of files touched.
+**Determine source type** (always run first):
+1. **Identify what kind of procedural candidate this is**:
+   - **Described procedure** (signal #12): Someone described steps in words — chat message, Slack thread, document. The steps are explicit in the text. → follow steps 2–8 (extract phase, text path)
+   - **Implementation recipe** (signal #13): The procedure is inferred from code changes across PRs. The steps are implicit in the file/change sequence and repo map. → follow steps 9–16 (extract phase, code path)
+   - When multiple PRs exist for the same task type, process them together — the code path handles multi-instance comparison natively.
 
-2. **Determine the extraction level**: Single repo → one capability. Multiple repos → extract at two levels: **repo-level** (per-repo change pattern) and **cross-repo** (end-to-end orchestration, referencing repo-level capabilities as sub-steps).
+**Extract phase — Text path** (described procedures from chat, transcripts, documents):
+2. **Identify the procedure in the text**: Scan for ordered language (first/then/next/finally), imperative instructions (you need to/make sure to/always), checklist-style formatting (numbered/bulleted lists), conditional branches (if this is a hotfix, also…), and tool/script invocations.
 
-3. **Scope the task**: Identify the goal, trigger condition, and intended audience.
+3. **Scope the task**: Identify the goal (what does this accomplish?), the trigger condition (when would someone do this?), and the intended audience.
 
-4. **Extract the ordered steps**: Write each step as an imperative verb, preserving order, removing filler, noting dependencies and conditional branches.
+4. **Extract the ordered steps**: Write each step as an imperative verb phrase, preserve order, remove filler, note dependencies between steps and conditional branches.
 
-5. **Identify parameters**: Separate constants (become steps) from variants (become parameters). Document expected type/format.
+5. **Identify parameters**: Separate constants (team conventions that become steps) from variants (values that change per instance — become parameters). Document expected type/format for each parameter.
 
-6. **Assess confidence**: **Tentative** (single instance) or **Confirmed** (2+ independent instances).
+6. **Assess confidence**: **Tentative** (single description from one source) or **Confirmed** (described independently 2+ times, or explicitly stated as "the standard way").
 
 7. **Apply quality checks**: Load [reference/capability-quality-checklist.md](reference/capability-quality-checklist.md) and verify Reusable, Non-obvious, Complete, Team-specific. Tentative confidence does NOT cause rejection.
 
-8. **Format as a capability**: Load [reference/capability-format-template.md](reference/capability-format-template.md) and structure using the template fields.
+8. **Format as a capability**: Load [reference/capability-format-template.md](reference/capability-format-template.md) and structure using the template fields. Skip to step 17 (refine phase check).
+
+**Extract phase — Code path** (implementation recipes from PRs):
+9. **Gather the raw evidence**: The candidate should already have attached: repo map (which repos were touched), per-repo file list and change order, and dependency order between repos. If this evidence is missing, go back to the source PR(s) and collect it.
+
+10. **Map the change sequence per repo**: For each repo touched, list the files modified/created in order. Identify the logical phases within each repo (e.g., "API endpoint → DB helper → tests").
+
+11. **Map the cross-repo orchestration** (if multiple repos): Identify which repo must be worked on first and the dependency order. Note any deploy ordering constraints.
+
+12. **Check generalizability**: "Would a similar task follow this same sequence of repos, files, and change types?" If the task is domain-specific (e.g., bulk operations) but the structural pattern generalizes (e.g., "API endpoint → middleware → UI → tests"), capture both.
+
+13. **Determine the extraction level**:
+    - Single repo → one repo-level capability
+    - Multiple repos → extract at two levels: **repo-level** (per-repo change pattern) and **cross-repo** (end-to-end orchestration, referencing repo-level capabilities as sub-steps)
+
+14. **Assess confidence and compare instances** (when multiple PRs exist):
+    - **Tentative** (1 PR) — the recipe is a hypothesis; tag accordingly
+    - **Confirmed** (2+ PRs for same task type) — compare across instances, compute hit rate per step, identify which steps are always present vs. conditional
+
+15. **Apply quality checks**: Load [reference/capability-quality-checklist.md](reference/capability-quality-checklist.md) and verify Reusable, Non-obvious, Complete, Team-specific. For cross-repo capabilities, also verify that dependencies between repos are clear. Tentative confidence does NOT cause rejection.
+
+16. **Format as a capability** (or set of capabilities for multi-repo): Load [reference/capability-format-template.md](reference/capability-format-template.md) and structure using the template fields. For multi-repo: produce one capability per repo plus one cross-repo orchestration capability.
 
 **Refine phase** (run only when an overlapping capability exists in the target):
-9. **Load existing context**: Read the target file to find existing capabilities covering related tasks. Check for overlaps at both repo-level and cross-repo level.
+17. **Load existing context**: Read the target file to find existing capabilities covering related tasks. Check for overlaps at both repo-level and cross-repo level.
 
-10. **Compare existing vs. new**: Identify identical steps (core invariant), similar-but-different steps (unifiable with parameters), unique steps (conditional branches). Compare at each level separately.
+18. **Compare existing vs. new**: Identify identical steps (core invariant), similar-but-different steps (unifiable with parameters), unique steps (conditional branches). Compare at each level separately.
 
-11. **Identify the abstraction**: Replace concrete values with parameters, merge similar steps, add conditional branches. Cover all known instances without becoming too vague.
+19. **Identify the abstraction**: Replace concrete values with parameters, merge similar steps, add conditional branches. Cover all known instances without becoming too vague.
 
-12. **Preserve variant knowledge**: Keep meaningful variants as sub-cases. Don't force unification if variants serve genuinely different purposes.
+20. **Preserve variant knowledge**: Keep meaningful variants as sub-cases with their concrete parameter values. Don't force unification if variants serve genuinely different purposes.
 
-13. **Validate the abstraction**: Verify each original instance is derivable by filling parameters, and nothing is lost.
+21. **Validate the abstraction**: Verify each original instance is derivable by filling parameters, and nothing is lost.
 
-14. **Produce the refined capability**: Format using the template, plus an evolution note and parameter table. Mark as replacing (not duplicating) the existing capability.
+22. **Produce the refined capability**: Format using the template, plus an evolution note and parameter table showing each parameter with values for all known variants. Mark as replacing (not duplicating) the existing capability.
 
-**Return** the formatted capability (or multi-level capabilities) to **detect-learning-signals** for routing to **provision-lessons**.
+**Return** the formatted capability (or multi-level capabilities for multi-repo recipes, or refined capability for abstractions) to **detect-learning-signals** for routing to **provision-lessons**.
 </extract-and-refine-capability>
 
 <provision-lessons>
@@ -184,7 +234,10 @@ When comparing a user story against PR implementation changes, load [reference/s
 **Classify phase**:
 1. **Detect platform capabilities**: Identify available persistent context mechanisms. Load [reference/context-target-catalog.md](reference/context-target-catalog.md) for target types and suitability.
 
-2. If the user **explicitly specified a target**, honor it. Otherwise, **classify each lesson** by nature: personal preference → personal notes; project convention → project notes; skill domain knowledge → skill file; agent behavior → agent/instruction file; doc fact → README/ADR/architecture doc; code-change pattern → project notes (project-wide) or skill (domain-specific); procedure/capability → skill file (as capability) or project notes (as how-to); temporary note → session context (rare). Choose the **most specific and discoverable** target when multiple fit.
+2. If the user **explicitly specified a target**, honor it. Otherwise, **classify each lesson** by nature and form:
+   - **`form: rule` candidates** (single facts/directives): personal preference → personal notes; project convention → project notes; skill domain knowledge → skill file; agent behavior → agent/instruction file; doc fact → README/ADR/architecture doc; temporary note → session context (rare)
+   - **`form: procedure` candidates** (formatted capabilities): project-specific how-to → project notes (as a named capability); domain-specific procedure → skill file (as a named capability); cross-cutting operational procedure → project notes (as a named capability)
+   Choose the **most specific and discoverable** target when multiple fit.
 
 **Plan phase**:
 3. For each lesson, draft the **exact content** in the format appropriate for the target (see context-target-catalog). Include source evidence. Structure as a table: #, Lesson Summary, Signal Type, Target File, Section, Content to Add. Include a rationale for each target choice. Note any files that need creation.
@@ -208,7 +261,7 @@ When comparing a user story against PR implementation changes, load [reference/s
 
 <rule>When suitable sub-agents are detected and the source is large or multi-type → prefer agent dispatch over internal analysis. Agents enable parallel execution and specialized analysis. Fall back to internal capabilities only when no suitable agents exist or dispatch fails.</rule>
 
-<rule>When **detect-learning-signals** produces qualifying lessons → if any candidate is procedural, route through **extract-and-refine-capability** first. Then pass all lessons to **provision-lessons**. Never apply changes without explicit user confirmation.</rule>
+<rule>When **detect-learning-signals** produces qualifying lessons → route `form: procedure` candidates through **extract-and-refine-capability** first to produce formatted capabilities. Then pass all lessons (rules + formatted capabilities) to **provision-lessons**. Never apply changes without explicit user confirmation.</rule>
 
 <rule>If no lessons pass the quality gate → report "No lessons worth learning from this [source]" and stop. Do not fabricate lessons.</rule>
 

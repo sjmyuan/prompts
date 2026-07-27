@@ -111,7 +111,7 @@ before committing changes.
 
 **Lesson types that fit here**:
 - An implementation recipe extracted from multiple PRs (e.g., "how to add a new API endpoint in this codebase")
-- A procedural pattern extracted from Slack/Teams (e.g., "how to deploy a hotfix")
+- A described procedure extracted from Slack/Teams (e.g., "how to deploy a hotfix")
 - A refined capability produced by abstracting multiple similar procedures (e.g., merging "deploy service" and "deploy hotfix" into a general "deploy to environment" capability)
 
 **Format**: Must follow capability conventions:

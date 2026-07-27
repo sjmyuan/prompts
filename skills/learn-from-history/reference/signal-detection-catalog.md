@@ -98,10 +98,14 @@ New team members consistently ask the same setup, access, or process questions:
 
 ## Procedural Sources (Any Source Type)
 
-Procedural signals capture step-by-step knowledge about how to accomplish recurring tasks. Unlike rules (which are single directives) or knowledge (which are facts), procedures are ordered sequences of actions. They can appear in any source: a Slack thread where someone explains how to deploy, a PR whose change pattern reveals how to add a feature, or a chat session where the team discusses their workflow.
+Procedural signals capture step-by-step knowledge about how to accomplish recurring tasks. Unlike rules (single directives) or knowledge (facts), procedures are ordered sequences of actions. They come in two forms:
+- **Described procedures** (signal #12): Steps explicitly described in text — a Slack message, a document, a chat session. The procedure is read, not inferred.
+- **Implementation recipes** (signal #13): Steps inferred from code changes — which files were touched in a PR and in what order. The procedure is deduced, not read.
 
-### 12. Procedural pattern
-A sequence of steps describing how to accomplish a recurring task is shared or discovered:
+Both yield structured capabilities (multi-step, parameterized procedures) after going through **extract-and-refine-capability**.
+
+### 12. Described procedure
+A sequence of steps describing how to accomplish a recurring task is explicitly shared in text form (chat, transcripts, documents). The steps exist in the text — no inference from code is needed:
 - A team member explains "here's how you deploy a hotfix" in Slack with numbered steps
 - Someone shares a checklist-style guide in a Teams channel: "To onboard a new service: 1) create repo, 2) add CI config, 3) register in service catalog…"
 - During a chat session, the user walks through their workflow step by step and says "this is how we always do it"
@@ -109,7 +113,9 @@ A sequence of steps describing how to accomplish a recurring task is shared or d
 - An ADR or design doc describes a multi-step process that was decided on but never distilled into a capability
 - **Signal strength**: High — uncodified procedures create inconsistency and slow down newcomers
 
-**What to look for**:
+**Distinction from signal #13 (implementation recipe)**: This signal captures procedures **described in words** — someone said or wrote the steps. Signal #13 captures procedures **inferred from code changes** — the steps are deduced from which files were changed and in what order. Both yield multi-step capabilities, but the extraction path differs.
+
+**What to look for** (in text):
 - Ordered language: "first", "then", "next", "finally", "after that", "step 1/2/3"
 - Imperative instructions: "you need to", "make sure to", "don't forget to", "always"
 - Checklist-style formatting: numbered or bulleted lists of actions
@@ -117,18 +123,20 @@ A sequence of steps describing how to accomplish a recurring task is shared or d
 - Repo/component references: "touch the auth service", "modify the payment module"
 - Tool or script invocations: "run `deploy.sh`", "call the `/register` endpoint"
 
-**Anti-signals for procedural patterns**:
+**Anti-signals for described procedures**:
 - Generic advice without concrete steps ("you should test more thoroughly" — not a procedure)
 - Single-step actions ("run `npm install`" — this is a command, not a procedure; it's a knowledge entry or rule)
 - Procedures that are already documented in the target (check existing skills, project notes, runbooks)
 - Personal workflow preferences that aren't team conventions ("I like to open VS Code first, then terminal")
 
 ### 13. Implementation recipe
-A task's PR(s) reveal a pattern of which repos, components, and change sequences are involved — indicating an unwritten recipe. A single task can suggest a tentative recipe; confidence increases as more instances confirm it. When a task spans multiple repos, the recipe works at two levels: per-repo change patterns and cross-repo orchestration:
+A task's PR(s) reveal a sequence of which repos, components, and changes are involved — indicating an unwritten procedure that must be **inferred from code changes** rather than read from text. A single task can suggest a tentative recipe; confidence increases as more instances confirm it. When a task spans multiple repos, the recipe works at two levels: per-repo change patterns and cross-repo orchestration:
 - A single task with PRs in 3 repos (API, frontend, infra) reveals both per-repo steps and the cross-repo order — both are worth capturing (confidence: tentative)
 - Multiple tasks of the same type follow the same multi-repo pattern — the full recipe is confirmed at both levels (confidence: high)
 - A code review comment says "follow the same pattern as the X feature" — the pattern exists but isn't captured anywhere
 - **Signal strength**: Medium for single instance (tentative recipe), High for 2+ instances (confirmed recipe)
+
+**Distinction from signal #12 (described procedure)**: This signal captures procedures **inferred from code changes** — you deduce the steps by examining which files were touched and in what order. Signal #12 captures procedures **explicitly described in text** — someone wrote or said the steps. Both yield multi-step capabilities, but the extraction path differs: recipes need the code path (analyze-code-changes flags them, extract-and-refine-capability's code path structures them), while described procedures use the text path.
 
 **What to look for**:
 - **Repo map**: Which repos are touched? Single repo or multiple? If multiple, what's the dependency order between them?

@@ -1,4 +1,4 @@
-# Example: Procedural Pattern Extraction and Abstraction
+# Example: Described Procedure Extraction and Abstraction
 
 **Applies**: `detect-learning-signals` → `extract-and-refine-capability` → `provision-lessons`
 
@@ -43,9 +43,9 @@ User says: "Learn from this Slack transcript and save what's worth keeping."
 
 ### detect-learning-signals → analyze-communication-history
 
-**Signal detected**: Procedural pattern — Alice describes a numbered sequence of steps for deploying a hotfix, with explicit language ("always", "the protocol we agreed on") indicating this is a team convention.
+**Signal detected**: Described procedure — Alice describes a numbered sequence of steps for deploying a hotfix, with explicit language ("always", "the protocol we agreed on") indicating this is a team convention.
 
-**Signal type**: Procedural pattern (signal #12)
+**Signal type**: Described procedure (signal #12)
 
 **Signal strength**: High — 5 concrete steps, multiple team members confirming it's the agreed protocol, explicit statement that it was never written down.
 
@@ -140,7 +140,7 @@ Constants: always branch from release tag (not main), always ping on-call, alway
 
 | # | Lesson Summary | Signal Type | Target File | Section | Content |
 |---|---|---|---|---|---|
-| 1 | Hotfix deployment protocol (5 steps + parameters) | Procedural pattern | Project conventions | Deployment Procedures → `deploy-hotfix` capability | [Formatted capability from Step 2] |
+| 1 | Hotfix deployment protocol (5 steps + parameters) | Described procedure | Project conventions | Deployment Procedures → `deploy-hotfix` capability | [Formatted capability from Step 2] |
 
 **Plan approved by user. Capability provisioned to project notes.**
 
@@ -172,9 +172,9 @@ User says: "Learn from this too and update the deployment docs."
 
 ## Step 5: detect-learning-signals (second session)
 
-**Signal detected**: Procedural pattern — Charlie asks for a procedure, Alice describes it by referencing and differing from the hotfix procedure ("almost the same as hotfix, but…").
+**Signal detected**: Described procedure — Charlie asks for a procedure, Alice describes it by referencing and differing from the hotfix procedure ("almost the same as hotfix, but…").
 
-**Signal type**: Procedural pattern (signal #12)
+**Signal type**: Described procedure (signal #12)
 
 **Quality gate**: PASSES all dimensions.
 
@@ -290,6 +290,6 @@ What varies: branch source, merge type, tag format, review urgency, monitoring r
 
 | # | Lesson Summary | Signal Type | Target File | Section | Content |
 |---|---|---|---|---|---|
-| 1 | Abstract `deploy-hotfix` + `deploy-release` into unified `deploy-to-production` | Procedural pattern (abstracted) | Project conventions | Deployment Procedures (replace existing) | [Refined capability from Step 7] |
+| 1 | Abstract `deploy-hotfix` + `deploy-release` into unified `deploy-to-production` | Described procedure (abstracted) | Project conventions | Deployment Procedures (replace existing) | [Refined capability from Step 7] |
 
 **Plan approved. Old capability replaced with abstracted version.**
