@@ -1,6 +1,6 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations to explore technical problems and produce ADRs, findings documents, and solution documents. Use when conducting, decomposing, investigating, evaluating, formalizing findings, continuing, or deep-diving a spike.
+description: Conduct spike investigations to explore technical problems and produce ADRs, findings documents, and solution documents. Use when conducting, decomposing, investigating, evaluating, formalizing findings, continuing, parallelizing, or deep-diving a spike.
 ---
 
 <when-to-use-this-skill>
@@ -34,45 +34,11 @@ This skill is NOT appropriate when:
 </inappropriate-scenarios>
 
 <deep-dive-mode>
-When a user has previously conducted a spike (formally or informally) and now wants to drill deeper into specific investigation areas, the skill operates in **deep-dive mode**. This is distinct from:
-
-- **Full spike**: Starts from scratch with scope definition; all areas go through the full 5-phase workflow.
-- **From existing findings**: The user already has complete findings and just wants to formalize them — investigation is skipped entirely, all areas proceed through evaluate → ADR → solution doc.
-- **Revising an ADR**: The evaluation is already done and an ADR exists; only the ADR text needs updating.
-
-**Deep-dive mode** is for when:
-- The user completed a spike but one or more areas had open questions, insufficient depth, or no conclusion reached.
-- The user has existing context (scope, partial ADRs, investigation notes) but needs focused re-investigation and evaluation on a subset of areas.
-- The goal is to reach a decision on those specific areas, which may produce new ADRs or update existing ones.
-
-The deep-dive workflow:
-1. Gather existing context from the previous spike (scope, findings docs, ADRs, solution doc if any).
-2. Confirm which specific area(s) to deep-dive into.
-3. For each selected area: investigate deeper (targeted, not broad), update the findings document(s), evaluate options, produce or update the ADR.
-4. Optionally update the solution document if the new/updated ADRs change the overall system view.
-
-Areas not selected for deep-dive are left as-is — their existing findings docs, ADRs, and decisions are preserved.
+When a user has previously conducted a spike and now wants to drill deeper into specific unresolved areas, the skill operates in **deep-dive mode** — distinct from a full spike (starts from scratch), from-existing-findings (skips investigation), or ADR revision (text-only update). Areas not selected for deep-dive are left as-is. See **reference/deep-dive-mode-guide.md** for the full comparison of modes and when each applies.
 </deep-dive-mode>
 
 <findings-document>
-A findings document documents the **current-state architecture** — what exists in the code today. It uses the same format as a solution document (C4 diagrams, sequence diagrams, API/event contracts, dependency maps) but describes the as-is rather than the to-be. This makes findings documents directly transformable into the solution document during Phase 5.
-
-**Why the solution-doc format?** Most of the time, the current implementation *is* a solution — just the existing one. Documenting it in solution-doc format means:
-- The solution document (Phase 5) can start from the findings doc and evolve diagrams from as-is → to-be, rather than drawing from scratch.
-- ADRs have a precise, structured baseline to compare options against: "The current architecture (see Findings Doc §3, C2 diagram) couples payment types via shared tables..."
-- Reviewers can diff the findings doc against the solution doc to see exactly what changes are proposed.
-
-**One per area or one consolidated?** Either approach is valid:
-- **Per-area findings docs** (recommended for multi-area spikes): Each investigation area gets its own findings document. This keeps each doc focused and independently updatable. Best when areas are loosely coupled.
-- **One consolidated findings doc**: All areas in a single document with per-area sections and cross-area observations. Best when areas are tightly coupled and cross-cutting concerns are significant.
-- The decision is made during **compile-findings-doc** based on area count and coupling. The user confirms the approach.
-
-**Document format**: Findings documents are produced by the `write-solution-doc` skill, applied to the **current state** instead of the target state. Load that skill to access its full document structure, diagramming, and formatting capabilities. The key difference: label all diagrams as "current state" and replace RAID/RACI sections with constraints & pain points + raw data & metrics.
-
-**Relationship to other artifacts**:
-- **ADRs** reference findings docs for evidence: "The current C2 topology (Findings Doc §2) shows all payment types sharing a single database..."
-- **The solution document** is produced by loading the findings doc(s), then evolving each section from current-state → target-state using `write-solution-doc`. Diagrams are updated in-place; new API contracts are added; RAID replaces constraints & pain points.
-- When findings change (e.g., after a deep-dive), update the affected findings doc and any ADRs that reference it.
+A findings document captures the **current-state architecture** in solution-document format (C4 diagrams, sequence diagrams, API/event contracts) but describes the as-is rather than the to-be. This makes findings docs directly transformable into the solution document in Phase 5, and gives ADRs a precise baseline to compare options against. Findings can be per-area (recommended for loosely-coupled areas) or consolidated (for tightly-coupled areas). For the full guide on format, strategy, and artifact relationships, see **reference/findings-document-guide.md**.
 </findings-document>
 
 <greenfield-scenarios>
@@ -137,6 +103,9 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
 | Continuing a previous spike by digging deeper into specific unresolved areas | Walkthrough of deep-dive mode: loading existing context, focusing investigation, updating ADRs | [examples/deep-dive-continuation.md](examples/deep-dive-continuation.md) |
 | Dispatching investigation or ADR drafting to sub-agents in parallel | Full dispatch pattern, parallelization rules, and platform-detection guidance | [reference/multi-agent-orchestration.md](reference/multi-agent-orchestration.md) |
 | Brainstorming solution options during the evaluate phase | Full set of solution-brainstorming prompts | [reference/solution-brainstorming-prompts.md](reference/solution-brainstorming-prompts.md) |
+| Producing or understanding findings documents (format, per-area vs consolidated strategy, artifact relationships) | Full findings document guide: format rationale, strategy selection, relationship to ADRs and solution doc | [reference/findings-document-guide.md](reference/findings-document-guide.md) |
+| Determining whether the user's request is a deep-dive vs full spike vs from-existing-findings vs ADR revision | Full comparison of spike modes and when each applies | [reference/deep-dive-mode-guide.md](reference/deep-dive-mode-guide.md) |
+| Executing a deep-dive on specific areas (continuing a previous spike) | Full detailed deep-dive procedure with prompts and validation checks per step | [reference/deep-dive-procedure.md](reference/deep-dive-procedure.md) |
 
 </context-loading-guide>
 
@@ -283,55 +252,16 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
 </compile-findings-doc>
 
 <deep-dive-specific-areas>
-1. **Gather existing context**: Ask the user to share the context from the previous spike. This may include:
-   - The original spike goal and investigation area list.
-   - Existing ADRs (draft or final) for any areas.
-   - Investigation notes, diagrams, or findings from the previous session.
-   - A solution document if one was already produced.
-   - If the user doesn't have these readily available, ask them to describe what was covered and what was decided.
+1. **Gather existing context** from the previous spike (goal, area list, existing ADRs, investigation notes, solution doc).
+2. **Confirm the deep-dive scope** — which areas to revisit, what questions remain unanswered, and which areas are left as-is.
+3. **Investigate deeper** per selected area with targeted, narrow focus — fill gaps only, don't re-investigate what was already confirmed.
+4. **Update the findings document(s)** with new investigation results, clearly marking what's new vs. previously known.
+5. **Evaluate solutions** per selected area — bring forward previously considered options, re-evaluate against new findings, confirm assumed solutions.
+6. **Update or produce ADRs** — revise existing ADRs or draft new ones, ensuring each references the relevant findings doc.
+7. **Optionally update the solution document** if the new/updated ADRs change the system-level view.
+8. **Present the deep-dive results** — updated findings, new/updated ADRs, refreshed solution doc (if applicable).
 
-2. **Confirm the deep-dive scope**:
-   - Ask: "Which specific area(s) from the previous spike do you want to dig deeper into?"
-   - For each selected area, clarify: "What question remains unanswered? What uncertainty do you need to resolve?"
-   - Confirm which areas are **not** being revisited — those areas' decisions stand as-is.
-   - Validate: ensure the selected areas are still independently decidable and that the deep-dive scope is narrow enough to produce a conclusion.
-
-3. **Investigate deeper (per selected area)**:
-   - For each selected area, announce: "Deep-diving into area: [area name] — [specific unresolved question]."
-   - Load and apply the `investigate-code` skill (or adapt for greenfield per **greenfield-scenarios**), but with a **targeted, narrow focus**:
-     - Scope investigation strictly to what's needed to answer the unresolved question.
-     - Don't re-investigate what was already confirmed — reference existing findings and only fill gaps.
-     - If the previous investigation was shallow, deepen it: trace deeper call paths, profile performance, prototype a critical path, research alternative technologies more thoroughly.
-   - Compile the new findings, noting what's new vs. what was already known from the previous spike.
-
-4. **Update the findings document(s) (per selected area)**:
-   - Load the existing findings document(s) from the previous spike.
-   - For each deep-dived area, update its findings document with the new investigation results. If the area has its own findings doc, update that file. If using a consolidated doc, update the relevant section.
-   - Clearly mark what's new vs. what was previously known.
-   - Present the updated findings document(s) and ask the user to confirm before proceeding.
-
-5. **Evaluate solutions (per selected area)**:
-   - Present the deepened investigation findings (now reflected in the updated findings document).
-   - Apply **evaluate-solutions-per-area** for each deep-dived area, leveraging the brainstorm prompts in **solution-brainstorming-prompts**.
-   - If options were already considered in the previous spike, bring them forward — ask if any should be re-evaluated in light of new findings or if new options have emerged.
-   - Confirm the assumed solution for each area.
-
-6. **Update or produce ADRs (per selected area)**:
-   - If an ADR already exists for the area: load it, update the investigation findings, re-evaluate the options if needed, and revise the chosen option and consequences accordingly. Preserve the ADR's existing structure and metadata.
-   - If no ADR exists yet for the area: apply **draft-area-adrs** to produce a new ADR.
-   - Ensure each ADR references the relevant findings document(s) for evidence.
-
-7. **Optionally update the solution document**:
-   - Ask: "Do the new or updated ADRs change the overall system-level view?"
-   - If yes, apply **compile-solution-doc** to refresh the solution document, incorporating the updated ADR decisions.
-   - If no, note that the existing solution document remains valid. The new/updated ADRs supplement it.
-
-8. **Present the deep-dive results**:
-   - Summary of what was investigated deeper and what changed.
-   - The updated findings document(s) (or updated sections).
-   - The new or updated ADRs.
-   - The updated solution document (if applicable).
-   - Remind the user: "Other areas from the previous spike were not revisited. If those areas also need deeper investigation, we can deep-dive into them next."
+For the full detailed procedure with prompts and validation checks, see **reference/deep-dive-procedure.md**.
 </deep-dive-specific-areas>
 
 </capabilities>
@@ -366,10 +296,6 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
 
 <rule>After each phase, pause and ask the user to confirm before proceeding. Do not skip phases unless the user explicitly requests it.</rule>
 
-<rule>When dispatching work to sub-agents, prepare focused briefs that are self-contained — each sub-agent must have all the context it needs without depending on other sub-agents' results.</rule>
-
 <rule>If sub-agents are not available on the current platform, fall back to sequential execution within the orchestrating agent. The spike workflow proceeds normally, just without parallelism.</rule>
-
-<rule>After collecting results from parallel sub-agents, always synthesize and review for cross-area consistency before presenting to the user. Sub-agents work independently and may produce overlapping or contradictory findings.</rule>
 
 </rules>
