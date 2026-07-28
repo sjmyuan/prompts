@@ -38,7 +38,7 @@ When a user has previously conducted a spike and now wants to drill deeper into 
 </deep-dive-mode>
 
 <findings-document>
-A findings document captures the **current-state architecture** in solution-document format (C4 diagrams, sequence diagrams, API/event contracts) but describes the as-is rather than the to-be. This makes findings docs directly transformable into the solution document in Phase 5, and gives ADRs a precise baseline to compare options against. Findings can be per-area (recommended for loosely-coupled areas) or consolidated (for tightly-coupled areas). For the full guide on format, strategy, and artifact relationships, see **reference/findings-document-guide.md**.
+A findings document captures the **current-state architecture** using the `write-solution-doc` skill's format (C4 diagrams, sequence diagrams, API/event contracts) but describes the as-is rather than the to-be. This makes findings docs directly transformable into the solution document in Phase 5, and gives ADRs a precise baseline to compare options against. For the full guide on format, strategy, and artifact relationships, see **reference/findings-document-guide.md**.
 </findings-document>
 
 <greenfield-scenarios>
@@ -77,18 +77,16 @@ When helping the user brainstorm solution options for an investigation area, pro
 </solution-brainstorming-prompts>
 
 <skill-integration-points>
-This skill orchestrates skills and sub-agents. Key integration points:
+This skill orchestrates three sub-skills and optional sub-agents. It provides the when-to-invoke and what-context-to-seed; the sub-skills handle detailed execution.
 
-| Skill / Agent | When invoked | What it contributes |
+| Phase | Invokes | Purpose |
 |---|---|---|
-| `investigate-code` | During Phase 2 (investigate) — loaded by orchestrator or sub-agents | Codebase understanding, C4/sequence diagrams, pattern discovery |
-| `write-solution-doc` | During Phase 2b (compile findings docs) — loaded by orchestrator | Document structure, C4/sequence diagrams, API contracts — applied to current state |
-| Code-exploration sub-agents | During Phase 2 (parallel investigation) | Concurrent codebase exploration per investigation area |
-| `draft-adr` | During Phase 4 (draft ADRs) — loaded by orchestrator or sub-agents | Structured ADR per area: problem → drivers → options → evaluation → decision |
-| Sub-agents with `draft-adr` | During Phase 4 (parallel ADR drafting) | Concurrent ADR drafting per investigation area |
-| `write-solution-doc` | During Phase 5 (compile) | Consolidated solution document with topology, contracts, RAID, RACI |
+| 2. Investigate | `investigate-code` (direct or via sub-agents) | Codebase understanding for each area |
+| 2b. Findings docs | `write-solution-doc` (adapted to current-state) | Structured as-is documentation |
+| 4. Draft ADRs | `draft-adr` (direct or via sub-agents) | One ADR per area, seeded with evaluation results |
+| 5. Solution doc | `write-solution-doc` (target-state) | Consolidated to-be architecture |
 
-When invoking a sub-skill, load its SKILL.md to access its full capabilities. The spike skill provides the high-level orchestration; the sub-skills and sub-agents handle the detailed execution.
+When invoking a sub-skill, load its SKILL.md to access its full capabilities.
 </skill-integration-points>
 
 <context-loading-guide>
@@ -133,16 +131,8 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
 
 2. **For single-area investigation (direct execution)**:
    - Announce: "Investigating area: [area name]"
-   - Load the `investigate-code` skill's SKILL.md to access its full capabilities.
-   - Apply `investigate-code` to understand the current implementation relevant to this area:
-     - Discover relevant code, configuration, and dependencies.
-     - Trace control and data flows through the relevant paths.
-     - Draw C4 or sequence diagrams if they help clarify the current state.
-     - Discover implementation patterns and note any inconsistencies.
-   - Compile findings into a structured summary:
-     - **Current state**: What exists today, key components, data flows.
-     - **Constraints & pain points**: What's limiting, broken, or hard to change.
-     - **Relevant diagrams**: C4/sequence diagrams showing current architecture.
+   - Load the `investigate-code` skill's SKILL.md and apply its capabilities to understand the current implementation relevant to this area.
+   - Compile findings into a structured summary: **current state** (what exists today), **constraints & pain points** (what's limiting or broken), and **relevant diagrams** (C4/sequence showing current architecture).
 
 3. **For multi-area investigation (parallel dispatch)**:
    - Announce: "Dispatching investigation of [N] areas to sub-agents in parallel for faster completion."
@@ -184,15 +174,8 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
    - **Multiple ADRs (2+ areas)**: Dispatch all areas' evaluation results to sub-agents in parallel (step 3). See **multi-agent-orchestration** for the dispatch pattern.
 
 2. **For single ADR drafting (direct execution)**:
-   - Load the `draft-adr` skill's SKILL.md to access its full capabilities.
-   - Apply `draft-adr` to produce a complete ADR for the area:
-     - **Problem statement**: The investigation area's scope, refined from the spike definition.
-     - **Decision drivers**: Hard constraints and soft preferences identified during evaluation.
-     - **Considered options**: All options brainstormed and evaluated, with pros/cons.
-     - **Chosen option**: The assumed solution with synthesized justification.
-     - **Consequences**: Positive impacts, risks, and mitigation strategies.
-   - Each ADR should be self-contained and independently readable.
-   - Use the standard ADR template and metadata format.
+   - Load the `draft-adr` skill's SKILL.md and apply its capabilities (define-problem → define-decision-drivers → define-considered-options → evaluate-options → compile-adr) to produce a complete, self-contained ADR for the area.
+   - Seed each capability with the evaluation results from Phase 3: problem statement from the investigation area scope, decision drivers from the evaluation, considered options from the brainstorming, and the assumed solution as the chosen option.
 
 3. **For multi-ADR drafting (parallel dispatch)**:
    - Announce: "Dispatching ADR drafting for [N] areas to sub-agents in parallel."
@@ -209,21 +192,17 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
 </draft-area-adrs>
 
 <compile-solution-doc>
-1. Load the `write-solution-doc` skill's SKILL.md to access its full capabilities.
-2. Seed the solution document with context from the spike:
+1. Load the `write-solution-doc` skill's SKILL.md and apply its capabilities to produce the full solution document. Seed it with spike context:
    - **Business context**: The spike goal and problem statement.
-   - **Current-state baseline**: Load the findings documents — their C4 diagrams, sequence diagrams, API contracts, and data models form the starting point. The solution document evolves each from as-is → to-be.
-   - **Assumed solutions**: The chosen option from each ADR forms the basis of the solution architecture.
-3. Apply `write-solution-doc` to produce the full solution document:
-   - Walk through its capabilities in the order defined by that skill (typically: clarify business context, draw C4 topology and sequence diagrams, design API/event schemas, list dependencies/maintainers/RAID/RACI, then structure the final document).
-   - For each step, use the pre-seeded spike context as the starting point rather than re-gathering from scratch.
-   - The C4 diagrams should show the **target architecture** (post-solution), not just the current state.
-4. Compile the final output bundle:
+   - **Current-state baseline**: The findings documents — evolve their diagrams and contracts from as-is → to-be.
+   - **Assumed solutions**: The chosen option from each ADR.
+2. The C4 diagrams should show the **target architecture**, not just the current state.
+3. Compile the final output bundle:
    - **Findings Documents** (the output from compile-findings-doc — current-state architecture, one per area or consolidated)
    - **N ADRs** (the output from draft-area-adrs, one per investigation area)
    - **1 Solution Document** (the consolidated output from write-solution-doc — target-state architecture)
-5. Validate the bundle: verify every ADR's chosen solution is reflected in the solution document, cross-references between all three artifact types are consistent (ADRs cite findings doc sections, solution doc evolves findings doc diagrams from as-is → to-be), and all diagrams in the solution doc match the assumed solutions.
-6. Present the complete bundle to the user. Remind them:
+4. Validate the bundle: verify every ADR's chosen solution is reflected in the solution document, cross-references between all three artifact types are consistent (ADRs cite findings doc sections, solution doc evolves findings doc diagrams from as-is → to-be), and all diagrams in the solution doc match the assumed solutions.
+5. Present the complete bundle to the user. Remind them:
    - The findings documents are the current-state record — keep them even if decisions change; they're useful for onboarding and future reference.
    - ADRs are formal decision records — they should be reviewed and approved by the team.
    - The solution document is the target-state architecture. If an ADR decision changes, update the solution document accordingly.
@@ -236,10 +215,7 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities. Th
    - **One consolidated findings doc** (for tightly-coupled areas or single-area spikes): All areas in one document with cross-area observations.
    - Ask the user: "Should we produce one findings document per area (easier to update independently) or one consolidated document (better for cross-cutting concerns)?"
 
-2. For each findings document to produce, load the `write-solution-doc` skill's SKILL.md and apply it to produce a **current-state document**:
-   - Follow `write-solution-doc`'s full capabilities (C4 diagrams, sequence diagrams, API/event contracts, data models, dependencies) — its SKILL.md defines the complete document structure.
-   - The key adaptation: label all diagrams as "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings.
-   - Seed the document with the investigation results from Phase 2 rather than gathering context from scratch.
+2. For each findings document to produce, load the `write-solution-doc` skill's SKILL.md and apply its capabilities to produce a **current-state document**. The key adaptation: label all diagrams as "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings. Seed with Phase 2 results rather than gathering context from scratch.
 
 3. Cross-reference between findings docs (if per-area): Note where one area's current state creates constraints for another. For example: "Area 1 (service boundaries): the monolithic `PaymentOrchestrator` → constrains Area 2 (communication): all calls are in-process, no service mesh exists."
 
