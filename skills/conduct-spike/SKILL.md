@@ -1,6 +1,6 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations to explore technical problems and produce ADRs, findings documents, and solution documents. Use when conducting, decomposing, investigating, evaluating, formalizing findings, continuing, parallelizing, or deep-diving a spike.
+description: Conduct spike investigations to explore technical problems and produce ADRs, findings documents, and solution documents. Use when conducting, scoping, investigating, evaluating, formalizing findings, continuing, parallelizing, or deep-diving a spike.
 ---
 
 <when-to-use-this-skill>
@@ -19,17 +19,17 @@ description: Conduct spike investigations to explore technical problems and prod
 <spike-definition>
 A spike is an investigation activity aimed at reducing uncertainty around a technical problem. Unlike a full implementation, a spike focuses on research, prototyping, and decision-making. The output is knowledge and documented decisions — not production code.
 
-A well-conducted spike produces:
-- **Findings Documents** — one per investigation area (or one consolidated), each documenting the current-state architecture in the same format as a solution document: C4 diagrams, sequence diagrams, API/event contracts, dependencies. These capture what exists in code today — the factual foundation that ADRs evaluate against and the solution document transforms into the target state.
-- **N ADRs** — one Architecture Decision Record per independently decidable investigation area, each evaluating options and recommending a solution, with references back to the findings documents for supporting evidence
-- **1 Solution Document** — a consolidated document that transforms the findings documents' current-state architecture into the target-state architecture, with C4 diagrams, API contracts, RAID analysis, and RACI matrix
+A well-conducted spike produces three artifact types:
+- **Findings Documents** — current-state architecture (C4, sequence, API/event contracts) per area or consolidated; the factual baseline that ADRs evaluate against
+- **N ADRs** — one Architecture Decision Record per area, each evaluating options and recommending a solution, referencing findings docs for evidence
+- **1 Solution Document** — target-state architecture evolved from findings docs, with C4 diagrams, API contracts, RAID analysis, and RACI matrix
 </spike-definition>
 
 <inappropriate-scenarios>
 This skill is NOT appropriate when:
-- The user wants a quick answer or informal recommendation without formal documentation — use a direct conversation instead
-- The problem has already been decided and only needs implementation — skip the spike and proceed to planning
-- The scope is trivial (single well-understood option, no architectural impact) — a spike would be overkill
+- The user wants a quick answer or informal recommendation without formal documentation
+- The problem has already been decided and only needs implementation
+- The scope is trivial (single well-understood option, no architectural impact)
 - The user wants to write code or build a prototype immediately — spikes produce decisions, not production code
 </inappropriate-scenarios>
 
@@ -228,16 +228,12 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities.
 </compile-findings-doc>
 
 <deep-dive-specific-areas>
-1. **Gather existing context** from the previous spike (goal, area list, existing ADRs, investigation notes, solution doc).
-2. **Confirm the deep-dive scope** — which areas to revisit, what questions remain unanswered, and which areas are left as-is.
-3. **Investigate deeper** per selected area with targeted, narrow focus — fill gaps only, don't re-investigate what was already confirmed.
-4. **Update the findings document(s)** with new investigation results, clearly marking what's new vs. previously known.
-5. **Evaluate solutions** per selected area — bring forward previously considered options, re-evaluate against new findings, confirm assumed solutions.
-6. **Update or produce ADRs** — revise existing ADRs or draft new ones, ensuring each references the relevant findings doc.
-7. **Optionally update the solution document** if the new/updated ADRs change the system-level view.
-8. **Present the deep-dive results** — updated findings, new/updated ADRs, refreshed solution doc (if applicable).
+1. **Gather existing context** and **confirm the deep-dive scope** — which areas to revisit, what questions remain, which areas stay as-is.
+2. **Deep-dive per selected area**: investigate deeper with targeted focus → update findings doc → evaluate solutions with new findings → update or produce ADRs.
+3. **Optionally update the solution document** if ADR changes affect the system-level view.
+4. **Present the deep-dive results** — updated findings, new/updated ADRs, refreshed solution doc (if applicable).
 
-For the full detailed procedure with prompts and validation checks, see **reference/deep-dive-procedure.md**.
+For the full step-by-step procedure with prompts and validation checks per step, load **reference/deep-dive-procedure.md**.
 </deep-dive-specific-areas>
 
 </capabilities>
