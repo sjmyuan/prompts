@@ -1,6 +1,6 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations to explore technical problems and produce ADRs, findings documents, and solution documents. Use when conducting, scoping, investigating, evaluating, formalizing findings, continuing, parallelizing, or deep-diving a spike.
+description: Conduct spike investigations to explore technical problems and produce ADRs, findings documents, solution documents, and change summaries. Use when conducting, scoping, investigating, evaluating, formalizing findings, continuing, parallelizing, deep-diving, summarizing required changes, or modularizing solution documents for a spike.
 ---
 
 <when-to-use-this-skill>
@@ -12,6 +12,8 @@ description: Conduct spike investigations to explore technical problems and prod
 - User has pre-existing investigation findings and wants to formalize them into ADRs and a solution document
 - User has a heavy spike with multiple investigation areas and wants to parallelize work across sub-agents for faster completion
 - User wants to continue a previous spike by digging deeper into one or more specific investigation areas that were not fully resolved
+- User wants to summarize the concrete code changes required to implement the chosen solution (change summary)
+- User wants to keep the solution document modular and efficiently loadable by AI (split large solution docs into independent sub-documents)
 </when-to-use-this-skill>
 
 <knowledge>
@@ -19,10 +21,11 @@ description: Conduct spike investigations to explore technical problems and prod
 <spike-definition>
 A spike is an investigation activity aimed at reducing uncertainty around a technical problem. Unlike a full implementation, a spike focuses on research, prototyping, and decision-making. The output is knowledge and documented decisions — not production code.
 
-A well-conducted spike produces three artifact types:
+A well-conducted spike produces four artifact types:
 - **Findings Documents** — current-state architecture (C4, sequence, API/event contracts) per area or consolidated; the factual baseline that ADRs evaluate against
 - **N ADRs** — one Architecture Decision Record per area, each evaluating options and recommending a solution, referencing findings docs for evidence
-- **1 Solution Document** — target-state architecture evolved from findings docs, with C4 diagrams, API contracts, RAID analysis, and RACI matrix
+- **1 Solution Document** — target-state architecture evolved from findings docs, with C4 diagrams, API contracts, RAID analysis, and RACI matrix; split into modular sub-documents when large to keep individual documents AI-friendly
+- **1 Change Summary** (optional) — concrete code-level changes required to implement the solution, grouped by area/service and traceable to ADRs; produced when the user wants to understand implementation scope
 </spike-definition>
 
 <inappropriate-scenarios>
@@ -40,6 +43,14 @@ When a user has previously conducted a spike and now wants to drill deeper into 
 <findings-document>
 A findings document captures the **current-state architecture** using the `write-solution-doc` skill's format (C4 diagrams, sequence diagrams, API/event contracts) but describes the as-is rather than the to-be. This makes findings docs directly transformable into the solution document in Phase 5, and gives ADRs a precise baseline to compare options against. For the full guide on format, strategy, and artifact relationships, see **reference/findings-document-guide.md**.
 </findings-document>
+
+<change-summary>
+A change summary translates the delta between findings documents (current state) and the solution document (target state) into concrete, actionable change items. It bridges architectural decisions and implementation planning. Changes are grouped by category — New, Modified, Retired, Configuration, Data, Dependency, Test — and traceable to ADRs. The quality of scope estimates depends on code access: with code access, estimates are concrete and code-path-verified; without it, estimates are architectural approximations. Always be transparent about which mode is in effect. For the full format, categories, and code-access guidance, see **reference/change-summary-guide.md**.
+</change-summary>
+
+<solution-doc-modularity>
+Large solution documents become unwieldy for AI context windows. When a solution document exceeds manageable size (~3000 words or 5+ major sections), identify sections that are independently understandable and extract them into separate reference documents. The main solution document becomes a hub with concise summaries (2–4 sentences) and cross-reference links to the extracted docs. Each extracted doc must include enough context to stand alone and a back-reference to the hub. Split by service, by architectural layer, or by decision area — whichever produces the most independently-loadable pieces. For the full splitting heuristics, patterns, cross-reference format, and validation checklist, see **reference/solution-doc-modularity-guide.md**.
+</solution-doc-modularity>
 
 <greenfield-scenarios>
 When there is no existing implementation to investigate (greenfield), adapt the investigate phase:
@@ -104,6 +115,9 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities.
 | Producing or understanding findings documents (format, per-area vs consolidated strategy, artifact relationships) | Full findings document guide: format rationale, strategy selection, relationship to ADRs and solution doc | [reference/findings-document-guide.md](reference/findings-document-guide.md) |
 | Determining whether the user's request is a deep-dive vs full spike vs from-existing-findings vs ADR revision | Full comparison of spike modes and when each applies | [reference/deep-dive-mode-guide.md](reference/deep-dive-mode-guide.md) |
 | Executing a deep-dive on specific areas (continuing a previous spike) | Full detailed deep-dive procedure with prompts and validation checks per step | [reference/deep-dive-procedure.md](reference/deep-dive-procedure.md) |
+| Generating a change summary (code-level changes required to implement the solution) | Full change summary guide: format, categories, code-access guidance, relationship to other artifacts | [reference/change-summary-guide.md](reference/change-summary-guide.md) |
+| Assessing and splitting a large solution document into modular, AI-friendly pieces | Full modularity guide: splitting heuristics, patterns, cross-reference format, validation checklist | [reference/solution-doc-modularity-guide.md](reference/solution-doc-modularity-guide.md) |
+| Producing a concrete change summary with code access, demonstrating all change categories | End-to-end change summary for a multi-service migration, with code-verified scope estimates | [examples/change-summary-example.md](examples/change-summary-example.md) |
 
 </context-loading-guide>
 
@@ -197,15 +211,27 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities.
    - **Current-state baseline**: The findings documents — evolve their diagrams and contracts from as-is → to-be.
    - **Assumed solutions**: The chosen option from each ADR.
 2. The C4 diagrams should show the **target architecture**, not just the current state.
-3. Compile the final output bundle:
+3. **Assess solution doc size and modularity**: After producing the initial solution document, apply the heuristics in **solution-doc-modularity** to determine whether it should be split:
+   - Does the document exceed ~3000 words or have 5+ major sections?
+   - Are there sections that are independently understandable and would be useful as standalone references (e.g., detailed API contracts for a specific service, infrastructure topology, data schemas)?
+   - Would different reviewers or implementers need different sections?
+   - If the answer to any of these is yes, identify candidate sections for extraction.
+4. **Extract independent sections**: For each identified section:
+   - Create a standalone document with the extracted content, ensuring it includes enough context to be understood independently (service context, role in system, back-reference to the hub).
+   - Replace the extracted section in the main solution document with a concise summary (2–4 sentences) and a cross-reference link.
+   - Apply the cross-reference format from **solution-doc-modularity**: hub summarizes + links out; extracted doc has back-reference + standalone context.
+   - If the solution is small and simple (single service, few sections), skip extraction and keep a single document.
+5. Compile the final output bundle:
    - **Findings Documents** (the output from compile-findings-doc — current-state architecture, one per area or consolidated)
    - **N ADRs** (the output from draft-area-adrs, one per investigation area)
-   - **1 Solution Document** (the consolidated output from write-solution-doc — target-state architecture)
-4. Validate the bundle: verify every ADR's chosen solution is reflected in the solution document, cross-references between all three artifact types are consistent (ADRs cite findings doc sections, solution doc evolves findings doc diagrams from as-is → to-be), and all diagrams in the solution doc match the assumed solutions.
-5. Present the complete bundle to the user. Remind them:
+   - **1 Solution Document** (the hub — target-state architecture with cross-references to modular sub-documents if split)
+   - **Modular sub-documents** (if extracted — API contracts, infrastructure details, data schemas, etc.)
+6. Validate the bundle: verify every ADR's chosen solution is reflected in the solution document, cross-references between all artifact types are consistent (ADRs cite findings doc sections, solution doc evolves findings doc diagrams from as-is → to-be), all diagrams in the solution doc match the assumed solutions, and extracted sub-documents have correct back-references to the hub.
+7. Present the complete bundle to the user. Remind them:
    - The findings documents are the current-state record — keep them even if decisions change; they're useful for onboarding and future reference.
    - ADRs are formal decision records — they should be reviewed and approved by the team.
    - The solution document is the target-state architecture. If an ADR decision changes, update the solution document accordingly.
+   - If the solution document was split into modular pieces, the hub + the relevant sub-document can be loaded independently — AI and reviewers don't need to load everything at once.
    - Consider version-controlling all artifacts in the project repository.
 </compile-solution-doc>
 
@@ -226,6 +252,25 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities.
    - ADRs will cite specific sections of findings docs as evidence.
    - The solution document will evolve each findings doc's diagrams and contracts from as-is → to-be.
 </compile-findings-doc>
+
+<summarize-required-changes>
+1. Confirm prerequisites: the findings documents and solution document must be finalized. Ask: "Would you like me to generate a summary of the concrete code changes required to implement this solution?" Do not produce this artifact unless the user wants it — it is optional.
+2. Determine code access: Ask: "Can I access the current codebase to verify the scope of changes?" 
+   - **With code access**: Explore the relevant code paths identified in the findings documents. Trace which files, classes, and packages correspond to each area. Estimate scope concretely (file counts, LOC ranges, specific classes to modify). Mark estimates as code-verified.
+   - **Without code access**: Generate the summary at an architectural level based on the findings and solution documents alone. Mark all scope estimates as unverified architectural approximations. Note where code access would improve accuracy.
+3. For each investigation area/ADR, map the delta from current state (findings doc) to target state (solution doc) using the change categories defined in **change-summary-guide**:
+   - **New**: services, modules, packages, files to create from scratch.
+   - **Modified**: existing code to change, with scope estimates.
+   - **Retired**: code to deprecate or delete, with timing (which migration phase).
+   - **Configuration**: environment variables, feature flags, CI/CD, infrastructure-as-code changes.
+   - **Data**: schema migrations, data transforms, ETL jobs.
+   - **Dependency**: new libraries, frameworks, or external services to adopt.
+   - **Test**: new or updated test suites needed.
+4. Group changes by area/service, labeling each cluster with its ADR reference for traceability. Identify cross-cutting concerns that span multiple areas (e.g., shared library changes, auth integration, logging standards).
+5. Compile the change summary document following the format in **change-summary-guide**. Include a notes section for caveats, assumptions, and open questions.
+6. Present the summary and ask: "Does this change scope look accurate? Anything missing, overestimated, or underestimated?"
+7. Note to the user: the change summary is a planning aid, not a detailed task breakdown or implementation plan. Each change item traces back to an ADR decision and a solution doc section. For effort estimation or sprint planning, use this summary as input — not as the final word.
+</summarize-required-changes>
 
 <deep-dive-specific-areas>
 1. **Gather existing context** and **confirm the deep-dive scope** — which areas to revisit, what questions remain, which areas stay as-is.
@@ -254,7 +299,7 @@ For the full step-by-step procedure with prompts and validation checks per step,
 
 <rule>If the user provides pre-existing investigation findings (e.g., from a previous exploration), skip **investigate-per-area** and proceed directly to **compile-findings-doc** (to formalize the provided findings), then continue to **evaluate-solutions-per-area**.</rule>
 
-<rule>If the spike has only one investigation area, the workflow still applies in full: investigate → compile findings doc → evaluate → draft one ADR → compile solution doc. All three artifacts are produced even for single-area spikes.</rule>
+<rule>If the spike has only one investigation area, the workflow still applies in full: investigate → compile findings doc → evaluate → draft one ADR → compile solution doc. All four artifact types (findings doc, ADR, solution doc, and optional change summary) are available even for single-area spikes.</rule>
 
 <rule>If the problem is greenfield (no existing implementation), adapt **investigate-per-area** per the **greenfield-scenarios** guidance — research industry approaches, study constraints, and prototype instead of tracing code.</rule>
 
@@ -269,5 +314,9 @@ For the full step-by-step procedure with prompts and validation checks per step,
 <rule>After each phase, pause and ask the user to confirm before proceeding. Do not skip phases unless the user explicitly requests it.</rule>
 
 <rule>If sub-agents are not available on the current platform, fall back to sequential execution within the orchestrating agent. The spike workflow proceeds normally, just without parallelism.</rule>
+
+<rule>After the solution document is compiled and presented, if the user wants to understand the implementation scope, apply **summarize-required-changes** to produce a concrete change summary. Skip this if the user declines or if the spike is purely exploratory with no implementation planned.</rule>
+
+<rule>When the solution document is large (multiple services, complex API surfaces, extensive infrastructure), apply the modularity steps in **compile-solution-doc** to split independent sections into separate reference documents before presenting the final bundle. This keeps individual documents small enough for efficient AI context loading.</rule>
 
 </rules>
