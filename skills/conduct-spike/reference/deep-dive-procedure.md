@@ -27,11 +27,13 @@ Ask the user to share the context from the previous spike. This may include:
   - Don't re-investigate what was already confirmed — reference existing findings and only fill gaps.
   - If the previous investigation was shallow, deepen it: trace deeper call paths, profile performance, prototype a critical path, research alternative technologies more thoroughly.
 - Compile the new findings, noting what's new vs. what was already known from the previous spike.
+- **Record discoveries**: If the deep-dive reveals facts that contradict or refine previous findings, record them in the findings document's Discovery Log following the format in **reference/discovery-log-guide.md**. Each entry must capture: what was found, the evidence, and the impact on the document.
 
 ## Step 4: Update the findings document(s) (per selected area)
 
 - Load the existing findings document(s) from the previous spike.
 - For each deep-dived area, update its findings document with the new investigation results. If the area has its own findings doc, update that file. If using a consolidated doc, update the relevant section.
+- **Record corrections in the Discovery Log**: For each change to the findings document, add a dated entry in the Discovery Log section (create the section if it doesn't exist yet). Each entry must capture what was corrected, the evidence from the deep-dive, and which sections were updated. See **reference/discovery-log-guide.md** for the full format.
 - Clearly mark what's new vs. what was previously known.
 - Present the updated findings document(s) and ask the user to confirm before proceeding.
 

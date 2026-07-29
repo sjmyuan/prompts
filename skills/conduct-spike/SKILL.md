@@ -52,6 +52,30 @@ A change summary translates the delta between findings documents (current state)
 Large solution documents become unwieldy for AI context windows. When a solution document exceeds manageable size (~3000 words or 5+ major sections), identify sections that are independently understandable and extract them into separate reference documents. The main solution document becomes a hub with concise summaries (2–4 sentences) and cross-reference links to the extracted docs. Each extracted doc must include enough context to stand alone and a back-reference to the hub. Split by service, by architectural layer, or by decision area — whichever produces the most independently-loadable pieces. For the full splitting heuristics, patterns, cross-reference format, and validation checklist, see **reference/solution-doc-modularity-guide.md**.
 </solution-doc-modularity>
 
+<discovery-tracking>
+Spike investigations are iterative — new facts surface, assumptions get invalidated, and earlier conclusions may need revision. When this happens, record **what changed, why, and the evidence** directly in the affected document so the spike's reasoning trail is never lost. This practice serves three purposes:
+
+1. **Audit trail**: Anyone reading the final artifacts can trace how the team arrived at the correct solution — which assumptions were tested, which were disproven, and what evidence drove each correction.
+2. **Lesson capture**: The discovery log becomes a compact record of what the team learned during the spike, making post-spike retrospectives and knowledge transfer more efficient.
+3. **Review confidence**: Reviewers can see that conclusions weren't simply asserted — they were tested against evidence, and when evidence contradicted earlier beliefs, the documents were corrected.
+
+**When to record a discovery entry:**
+- Investigation reveals a fact that contradicts or refines a previous assumption in the findings document.
+- Evaluation of solution options uncovers a constraint or risk not captured in the findings.
+- A deep-dive produces new information that changes the understanding of an area.
+- An ADR's chosen option needs revision because new evidence surfaced during a later phase.
+
+**Where to record:** Each findings document includes a **Discovery Log** section (see **reference/discovery-log-guide.md** for format). When a correction affects an ADR or the solution document, update those documents too and note the change in their respective revision sections.
+
+**What a discovery entry captures:**
+- **What was found or corrected** — the specific fact, constraint, or insight.
+- **Evidence** — code traces, benchmarks, documentation, experiments, or reasoning that supports it.
+- **Impact** — which sections of which documents were updated as a result.
+- **Date** — when the discovery was made (so the timeline is traceable).
+
+For the full log format, entry structure, and examples, see **reference/discovery-log-guide.md**.
+</discovery-tracking>
+
 <greenfield-scenarios>
 When there is no existing implementation to investigate (greenfield), adapt the investigate phase:
 - Research industry approaches, open-source solutions, and similar systems in the organization
@@ -118,6 +142,7 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities.
 | Generating a change summary (code-level changes required to implement the solution) | Full change summary guide: format, categories, code-access guidance, relationship to other artifacts | [reference/change-summary-guide.md](reference/change-summary-guide.md) |
 | Assessing and splitting a large solution document into modular, AI-friendly pieces | Full modularity guide: splitting heuristics, patterns, cross-reference format, validation checklist | [reference/solution-doc-modularity-guide.md](reference/solution-doc-modularity-guide.md) |
 | Producing a concrete change summary with code access, demonstrating all change categories | End-to-end change summary for a multi-service migration, with code-verified scope estimates | [examples/change-summary-example.md](examples/change-summary-example.md) |
+| Recording new discoveries, corrections, or invalidated assumptions discovered during investigation or evaluation | Discovery log format, entry structure, when and how to record corrections in findings documents | [reference/discovery-log-guide.md](reference/discovery-log-guide.md) |
 
 </context-loading-guide>
 
@@ -159,8 +184,9 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities.
    - When all sub-agents complete, collect their findings.
    - Synthesize findings: review each sub-agent's output for completeness, resolve any cross-area inconsistencies, and compile each area's findings into the structured summary format (current state, constraints & pain points, relevant diagrams).
 
-4. After all areas are investigated (via either method), present a consolidated investigation summary and ask the user to confirm before proceeding.
-5. After the user confirms the findings, apply **compile-findings-doc** to formalize the investigation results into a structured findings document before moving to evaluation.
+4. After all areas are investigated (via either method), present a consolidated investigation summary. For each area where the investigation revealed something that contradicts or refines a prior assumption, flag it explicitly: "New discovery in [area]: [what was found and the evidence]." Record each such discovery in the findings document's Discovery Log when the findings doc is compiled.
+5. Ask the user to confirm the investigation findings before proceeding.
+6. After the user confirms, apply **compile-findings-doc** to formalize the investigation results into a structured findings document before moving to evaluation. Any discoveries flagged in step 4 must appear in the findings document's Discovery Log.
 </investigate-per-area>
 
 <evaluate-solutions-per-area>
@@ -177,9 +203,13 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities.
 2. After all options are evaluated, ask: "Which option do you recommend as the assumed solution for [area name]?"
    - If the user is unsure, help them compare the top contenders against decision drivers.
    - Record the **assumed solution** — this is provisional and may change after formal ADR review.
-3. Repeat for each investigation area.
-4. Validate each area's evaluation: confirm at least 2 options were considered, pros/cons relate to decision drivers, and the assumed solution follows logically from the comparison.
-5. Present a summary table of all areas with their assumed solutions.
+3. **Check for findings gaps**: During evaluation, did any option reveal a constraint, risk, or fact that was not captured in the findings document? If so:
+   - Record the new discovery in the findings document's Discovery Log (what was found, evidence, impact).
+   - Update the affected sections of the findings document.
+   - Note the correction when presenting the evaluation summary.
+4. Repeat for each investigation area.
+5. Validate each area's evaluation: confirm at least 2 options were considered, pros/cons relate to decision drivers, and the assumed solution follows logically from the comparison. Also confirm any findings corrections from step 3 were recorded in the Discovery Log.
+6. Present a summary table of all areas with their assumed solutions and any findings corrections made.
 </evaluate-solutions-per-area>
 
 <draft-area-adrs>
@@ -241,13 +271,15 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities.
    - **One consolidated findings doc** (for tightly-coupled areas or single-area spikes): All areas in one document with cross-area observations.
    - Ask the user: "Should we produce one findings document per area (easier to update independently) or one consolidated document (better for cross-cutting concerns)?"
 
-2. For each findings document to produce, load the `write-solution-doc` skill's SKILL.md and apply its capabilities to produce a **current-state document**. The key adaptation: label all diagrams as "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings. Seed with Phase 2 results rather than gathering context from scratch.
+2. For each findings document to produce, load the `write-solution-doc` skill's SKILL.md and apply its capabilities to produce a **current-state document**. The key adaptation: label all diagrams as "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings. Include a **Discovery Log** section at the end of each findings document, following the format in **reference/discovery-log-guide.md**. Populate it with any discoveries flagged during investigation (from **investigate-per-area** step 4). Seed with Phase 2 results rather than gathering context from scratch.
 
 3. Cross-reference between findings docs (if per-area): Note where one area's current state creates constraints for another. For example: "Area 1 (service boundaries): the monolithic `PaymentOrchestrator` → constrains Area 2 (communication): all calls are in-process, no service mesh exists."
 
 4. Present each findings document to the user and ask: "Does this accurately capture the current state? Anything to add, correct, or remove?"
 
-5. After confirmation, note that the findings documents are now the **current-state baseline**:
+5. After confirmation, ensure the Discovery Log is up to date — any corrections from user feedback in step 4 should be recorded as discovery entries.
+
+6. Note that the findings documents are now the **current-state baseline**:
    - Evaluation will compare solution options against this baseline.
    - ADRs will cite specific sections of findings docs as evidence.
    - The solution document will evolve each findings doc's diagrams and contracts from as-is → to-be.
@@ -274,9 +306,9 @@ When invoking a sub-skill, load its SKILL.md to access its full capabilities.
 
 <deep-dive-specific-areas>
 1. **Gather existing context** and **confirm the deep-dive scope** — which areas to revisit, what questions remain, which areas stay as-is.
-2. **Deep-dive per selected area**: investigate deeper with targeted focus → update findings doc → evaluate solutions with new findings → update or produce ADRs.
+2. **Deep-dive per selected area**: investigate deeper with targeted focus → update findings doc (including Discovery Log entries for any new facts or corrections) → evaluate solutions with new findings → update or produce ADRs.
 3. **Optionally update the solution document** if ADR changes affect the system-level view.
-4. **Present the deep-dive results** — updated findings, new/updated ADRs, refreshed solution doc (if applicable).
+4. **Present the deep-dive results** — updated findings with Discovery Log entries, new/updated ADRs, refreshed solution doc (if applicable).
 
 For the full step-by-step procedure with prompts and validation checks per step, load **reference/deep-dive-procedure.md**.
 </deep-dive-specific-areas>

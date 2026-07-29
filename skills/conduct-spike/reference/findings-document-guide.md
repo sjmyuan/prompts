@@ -19,7 +19,9 @@ Either approach is valid:
 
 ## Document format
 
-Findings documents are produced by the `write-solution-doc` skill, applied to the **current state** instead of the target state. Load that skill to access its full document structure, diagramming, and formatting capabilities. The key difference: label all diagrams as "current state" and replace RAID/RACI sections with constraints & pain points + raw data & metrics.
+Findings documents are produced by the `write-solution-doc` skill, applied to the **current state** instead of the target state. Load that skill to access its full document structure, diagramming, and formatting capabilities. The key difference: label all diagrams as "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings, and append a **Discovery Log** section at the end — see **reference/discovery-log-guide.md** for the full format and usage.
+
+The Discovery Log records facts, corrections, and insights discovered during investigation or evaluation, along with their evidence. It creates an audit trail from initial assumptions to final conclusions. Every correction to the findings document (whether from investigation, evaluation, deep-dive, or user review) must be recorded in the Discovery Log.
 
 ## Relationship to other artifacts
 
