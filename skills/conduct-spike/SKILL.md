@@ -56,18 +56,7 @@ After each spike round completes, the user often doesn't know what to ask next. 
 When there is no existing implementation to investigate (greenfield): research industry approaches and similar systems in the organization, study operational constraints (cloud, team, compliance), build proof-of-concept prototypes instead of tracing code. Remaining phases (evaluate, draft ADRs, compile solution doc) proceed unchanged.
 </greenfield-scenarios>
 
-<spike-workflow-phases>
-The spike workflow proceeds through five sequential phases. Phases 2 and 4 can be parallelized across sub-agents when there are multiple investigation areas. This skill orchestrates three sub-skills (`investigate-code`, `write-solution-doc`, `draft-adr`); when invoking a sub-skill, load its SKILL.md to access its full capabilities.
 
-| Phase | What happens | Invokes |
-|---|---|---|
-| 1. Define scope | Clarify the spike goal and decompose into investigation areas | — |
-| 2. Investigate | Understand current implementation per area; dispatch to sub-agents in parallel for multi-area spikes | `investigate-code` |
-| 2b. Compile findings doc(s) | Produce findings docs in solution-doc format, adapted for current-state architecture | `write-solution-doc` (as-is) |
-| 3. Evaluate | Brainstorm and evaluate solution options per area, grounded in findings docs | — |
-| 4. Draft ADRs | Produce one formal ADR per area; dispatch to sub-agents in parallel for multi-area spikes | `draft-adr` |
-| 5. Compile solution doc | Consolidate all ADRs into a system-level solution document | `write-solution-doc` (to-be) |
-</spike-workflow-phases>
 
 <multi-agent-orchestration>
 For spikes with multiple investigation areas, dispatch independent work to sub-agents in parallel for Phases 2 (investigate) and 4 (draft ADRs). See the full dispatch pattern and parallelization rules in **reference/multi-agent-orchestration.md**.
@@ -108,6 +97,18 @@ When helping the user brainstorm solution options, prompt them to consider: stat
 
 <capabilities>
 
+<run-spike-workflow>
+1. Apply **define-spike-scope** to establish the spike goal and decompose the problem into investigation areas. Do not proceed until the scope is confirmed by the user.
+2. Apply **investigate-per-area** to understand the current implementation per area. For multi-area spikes, dispatch investigation to sub-agents in parallel per **multi-agent-orchestration**. After the investigation summary, direction suggestions are presented (3 go-deeper, 3 go-broader).
+   - **If the user selects a direction candidate**: treat it as a new spike scope — loop back to step 1 with the selected question as the goal.
+   - **If the user confirms the investigation is complete**: proceed to step 3.
+3. Apply **compile-findings-doc** to formalize the investigation results into a structured findings document. Ensure any discoveries flagged during investigation appear in the Discovery Log.
+4. After findings are confirmed, apply **evaluate-solutions-per-area** to brainstorm, compare, and select an assumed solution for each area.
+5. After evaluation, apply **draft-area-adrs** to produce one formal ADR per area documenting the decision.
+6. After all ADRs are finalized, apply **compile-solution-doc** to consolidate all ADRs into a system-level solution document.
+7. Pause for user confirmation after each phase. Do not skip phases unless the user explicitly requests it or a specific override rule applies (e.g., pre-existing findings, deep-dive continuation).
+</run-spike-workflow>
+
 <define-spike-scope>
 1. Ask the user: "What technical problem or feature do you want to spike? Describe it in 2–4 sentences."
 2. Clarify the spike's **goal**: What question(s) should this spike answer? What uncertainty should it reduce?
@@ -138,9 +139,12 @@ When helping the user brainstorm solution options, prompt them to consider: stat
    - When all sub-agents complete, collect their findings.
    - Synthesize findings: review each sub-agent's output for completeness, resolve any cross-area inconsistencies, and compile each area's findings into the structured summary format (current state, constraints & pain points, relevant diagrams).
 
-4. Present a consolidated investigation summary. For each area where the investigation revealed a discovery that contradicts or refines a prior assumption, flag it: "New discovery in [area]: [what was found, evidence]." Record each discovery in the findings doc's Discovery Log.
-5. Ask the user to confirm the investigation findings before proceeding.
-6. After the user confirms, apply **compile-findings-doc** to formalize the investigation results into a structured findings document before moving to evaluation. Any discoveries flagged in step 4 must appear in the findings document's Discovery Log.
+4. Present a consolidated investigation summary. For each area where the investigation revealed a discovery that contradicts or refines a prior assumption, flag it: "New discovery in [area]: [what was found, evidence]." Record each discovery for handoff to the findings document's Discovery Log.
+5. After presenting the investigation summary, apply **suggest-spike-directions** to present 3 go-deeper and 3 go-broader candidate questions grounded in the investigation evidence.
+6. Ask the user: "Would you like to pursue any of these directions, or is the investigation complete?"
+   - If the user selects a direction: the workflow loops back to scope definition with the selected question as the new spike goal.
+   - If the user confirms the investigation is complete: proceed to step 7.
+7. Hand off to the workflow orchestrator for **compile-findings-doc**. Ensure any discoveries flagged in step 4 are passed along for inclusion in the findings document's Discovery Log.
 </investigate-per-area>
 
 <evaluate-solutions-per-area>
@@ -221,12 +225,13 @@ When helping the user brainstorm solution options, prompt them to consider: stat
 2. **Deep-dive per selected area**: investigate deeper with targeted focus → update findings doc (including Discovery Log entries for any new facts or corrections) → evaluate solutions with new findings → update or produce ADRs.
 3. **Optionally update the solution document** if ADR changes affect the system-level view.
 4. **Present the deep-dive results** — updated findings with Discovery Log entries, new/updated ADRs, refreshed solution doc (if applicable).
+5. After presenting the results, apply **suggest-spike-directions** to present direction candidates for the next spike round.
 
 For the full step-by-step procedure with prompts and validation checks per step, load **reference/deep-dive-procedure.md**.
 </deep-dive-specific-areas>
 
 <suggest-spike-directions>
-1. **Review what was learned this round**: From the findings document (or solution doc if after a full spike), extract the key discoveries — systems identified, constraints measured, surprises found, open questions that remain.
+1. **Review what was learned this round**: From the investigation summary (or findings document if already compiled, or solution doc if after a full spike), extract the key discoveries — systems identified, constraints measured, surprises found, open questions that remain.
 2. **Generate 3 go-deeper candidates**: For each, write a concrete, answerable question that narrows the spike into a specific unresolved detail. Each candidate must:
    - Reference a specific finding from this round ("We found X, but didn't explore Y")
    - Be investigable — the codebase or a prototype can answer it
@@ -261,9 +266,9 @@ For the full step-by-step procedure with prompts and validation checks per step,
 
 <rules>
 
-<rule>When the user initiates a spike investigation, apply **define-spike-scope** to establish the goal and investigation areas. Do not skip to investigation until the scope is confirmed.</rule>
+<rule>When the user initiates a spike investigation, apply **run-spike-workflow** to orchestrate all phases from scope definition through solution compilation.</rule>
 
-<rule>The spike workflow runs sequentially through all phases per **spike-workflow-phases**: **define-spike-scope** → **investigate-per-area** → **compile-findings-doc** → **evaluate-solutions-per-area** → **draft-area-adrs** → **compile-solution-doc**. After each phase, pause for user confirmation before proceeding. Do not skip phases unless the user explicitly requests it. For multi-area spikes, Phases 2 and 4 dispatch work to sub-agents in parallel per **multi-agent-orchestration**.</rule>
+<rule>Do not skip phases in **run-spike-workflow** unless the user explicitly requests it or a specific override rule applies (e.g., pre-existing findings, deep-dive, mid-spike modification).</rule>
 
 <rule>If the user provides pre-existing investigation findings (e.g., from a previous exploration), skip **investigate-per-area** and proceed directly to **compile-findings-doc** (to formalize the provided findings), then continue to **evaluate-solutions-per-area**.</rule>
 
@@ -274,7 +279,5 @@ For the full step-by-step procedure with prompts and validation checks per step,
 <rule>If the user asks for a quick recommendation without formal documentation, decline — direct them to a regular conversation instead (see **inappropriate-scenarios**). If sub-agents are not available, fall back to sequential execution.</rule>
 
 <rule>After the solution doc is compiled: if the user wants implementation scope, apply **summarize-required-changes**; if the doc is large, apply modularity steps in **compile-solution-doc** to split independent sections.</rule>
-
-<rule>After **compile-findings-doc** completes (post-investigation), apply **suggest-spike-directions** to present 3 go-deeper and 3 go-broader candidate questions grounded in the investigation evidence. Also apply it after **compile-solution-doc** (post-full-spike) for a comprehensive set of next-step candidates. Skip only if the user explicitly declines or says they're satisfied with the current results.</rule>
 
 </rules>

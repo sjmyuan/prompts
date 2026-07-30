@@ -46,6 +46,49 @@
 **Relevant patterns from org**: All existing services use PostgreSQL via JPA/Hibernate. DevOps team manages infrastructure via Terraform.
 
 ---
+
+## Phase 2a: Direction Suggestions After Investigation
+
+*[suggest-spike-directions applied — presenting 3 go-deeper and 3 go-broader candidates grounded in investigation evidence]*
+
+### Assistant Output
+
+> "Here's what we learned from the investigation. Before we formalize findings, let me suggest some directions — 3 to go deeper on unresolved details, 3 to broaden to adjacent concerns.
+
+---
+
+## Where to take this spike next?
+
+### Go Deeper (narrow the focus on unresolved details)
+
+| # | Candidate question | Based on (evidence from this round) | Why it matters |
+|---|---|---|---|
+| **D1** | We estimated 50K events/sec peak write throughput — should we benchmark ClickHouse Cloud at this volume with realistic query patterns before committing? | We have the throughput estimate but no empirical validation | If ClickHouse Cloud can't actually meet the 50K/sec target with our query patterns, we need to reconsider options before writing the ADR |
+| **D2** | The dashboard team needs SQL-like queries — what specific query patterns do they use? Are they simple aggregations or complex JOINs across event types? | We assumed SQL compatibility is sufficient but didn't profile the actual dashboard queries | ClickHouse's SQL dialect differs from PostgreSQL — complex JOINs may need query rewrites that affect the dashboard team's migration effort |
+| **D3** | Raw events retained 30 days, aggregated data 2 years — what's the expected data volume and growth rate? This determines cluster sizing and cost projections | We captured retention policy but not data volume estimates | Cluster sizing directly affects cost — if we're off by 10x, the managed service bill could blow the budget |
+
+### Go Broader (expand to adjacent concerns we haven't covered)
+
+| # | Candidate question | Based on (evidence from this round) | Why it matters |
+|---|---|---|---|
+| **B1** | How will the analytics ingestion service authenticate and authorize incoming events? The org uses PostgreSQL for service metadata — should auth data live there or in ClickHouse? | We focused on the analytics database but didn't address the ingestion service's auth layer | Auth architecture is a cross-cutting decision that affects both the ingestion service and the database choice — deciding it now prevents rework |
+| **B2** | What's the backup and disaster recovery strategy for ClickHouse Cloud? The org's existing PostgreSQL backups use pg_dump + S3 — does ClickHouse Cloud have equivalent guarantees? | We assumed managed = solved, but DR requirements weren't explored | If ClickHouse Cloud's DR doesn't meet the org's RPO/RTO, we may need a hybrid approach or a different vendor |
+| **B3** | The 4-person team has no dedicated DBA — who will own ClickHouse schema design, query optimization, and cost management? Is this a new role or shared responsibility? | We noted team size as a constraint but didn't address operational ownership | Without clear ownership, the database becomes an orphaned dependency — performance degrades and costs escalate with no one accountable |
+
+---
+
+Would you like to pursue any of these directions? Pick one (or more) and I'll start a new spike round. Or if you're satisfied with the investigation depth, we can proceed to formalize findings and evaluate solutions."
+
+### User Response
+
+> "D1 (benchmarking) is a good call — but let's proceed with the assumption that 50K/sec is achievable and note it as a risk in the ADR. We can benchmark before final approval. B3 (operational ownership) is something I need to discuss with the team. Let's continue to formalize findings for now."
+
+### Assistant
+
+> "Understood. I'll note the 50K/sec assumption as a key risk in the ADR. Proceeding to compile findings document."
+
+---
+
 ## Phase 2b: Compile Findings Document
 
 *[compile-findings-doc applied — greenfield adaptation; no existing code to document]*

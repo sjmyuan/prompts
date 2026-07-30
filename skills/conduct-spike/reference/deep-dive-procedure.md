@@ -63,3 +63,12 @@ Ask the user to share the context from the previous spike. This may include:
 - The new or updated ADRs.
 - The updated solution document (if applicable).
 - Remind the user: "Other areas from the previous spike were not revisited. If those areas also need deeper investigation, we can deep-dive into them next."
+
+## Step 9: Suggest spike directions for the next round
+
+After presenting the deep-dive results, apply **suggest-spike-directions** to present direction candidates for the next spike round. Generate 3 go-deeper and 3 go-broader candidates grounded in what the deep-dive uncovered:
+
+- **Go-deeper candidates**: Anchor to specific unresolved details surfaced by the deep-dive (e.g., "we decided on settlement extraction but didn't design the Kafka topic schema — should we spike that now?").
+- **Go-broader candidates**: Anchor to adjacent concerns the deep-dive touched but didn't investigate (e.g., "settlement is now a critical dependency — should we spike its resilience requirements?").
+
+Following the direction menu format in **suggest-spike-directions**, present the candidates and ask the user whether to pursue any direction or conclude the deep-dive. If the user selects a direction, treat it as a new spike scope and apply **define-spike-scope**.
