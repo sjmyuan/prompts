@@ -50,23 +50,7 @@ Spike investigations are iterative — new facts may contradict earlier assumpti
 </discovery-tracking>
 
 <spike-direction-guidance>
-After each spike round completes, the user often doesn't know what to ask next. The skill should use what it learned during investigation to suggest concrete candidate questions — 3 to narrow the spike (go deeper on unresolved specifics) and 3 to broaden it (expand to adjacent concerns the user may not have considered). These suggestions are grounded in evidence from the investigation, not guesswork.
-
-**Go deeper candidates** — questions that narrow focus on specific unresolved details discovered during investigation:
-- A subsystem or code path that was touched but not fully explored ("we saw X does Y, but didn't trace how Z works")
-- A performance, security, or reliability concern surfaced but not measured ("we know it's slow, but haven't profiled which function")
-- An edge case or failure mode the current architecture doesn't handle ("what happens when the queue is full?")
-- A technology choice that has a specific sub-decision pending ("we chose Postgres, but which indexing strategy?")
-- An integration point where the contract is poorly understood ("what exactly does the payment gateway return on timeout?")
-
-**Go broader candidates** — questions that expand scope to adjacent concerns the user may have missed:
-- A neighboring system or service that the current spike touches but didn't investigate ("we looked at orders, but what about inventory?")
-- A cross-cutting concern that affects multiple areas ("how does this change affect monitoring/alerting?")
-- An organizational or process impact beyond pure architecture ("which team owns this after the change?")
-- An alternative approach that wasn't considered because the spike scope excluded it ("what if we bought instead of built?")
-- A longer-term implication the current decisions create ("if we choose X now, what does migration to Y look like in 2 years?")
-
-For the full procedure, candidate-generation heuristics, and output format, see **reference/spike-direction-suggestions-guide.md**.
+After each spike round completes, the user often doesn't know what to ask next. The skill should use what it learned during investigation to suggest concrete candidate questions — 3 to narrow the spike (go deeper on unresolved specifics) and 3 to broaden it (expand to adjacent concerns the user may not have considered). These suggestions are grounded in evidence from the investigation, not guesswork. For the full candidate-generation heuristics, go-deeper vs. go-broader patterns, and output format, see **reference/spike-direction-suggestions-guide.md**.
 </spike-direction-guidance>
 
 <greenfield-scenarios>
@@ -196,11 +180,11 @@ When helping the user brainstorm solution options, prompt them to consider: stat
 
 <compile-solution-doc>
 1. Load the `write-solution-doc` skill's SKILL.md and apply its capabilities. Seed with: business context (spike goal, problem statement), current-state baseline (findings docs — evolve diagrams from as-is → to-be), and assumed solutions (chosen option from each ADR). C4 diagrams must show the **target architecture**, not just current state.
-3. **Assess solution doc size and modularity**: Apply the heuristics in **solution-doc-modularity**. If the doc exceeds ~3000 words, has 5+ major sections, or has independently useful sections for different audiences, identify candidate sections for extraction.
-4. **Extract independent sections**: For each candidate, create a standalone doc with standalone context and back-reference, replace it in the hub with a 2–4 sentence summary and cross-reference link per **solution-doc-modularity**. Skip extraction for small, single-service solutions.
-5. Compile the final output bundle: Findings Documents, N ADRs, 1 Solution Document (hub), and modular sub-documents (if extracted).
-6. Validate the bundle: every ADR's chosen solution is reflected in the solution doc, cross-references between all artifacts are consistent, diagrams match assumed solutions, and extracted sub-docs have correct back-references.
-7. Present the complete bundle. Remind the user:
+2. **Assess solution doc size and modularity**: Apply the heuristics in **solution-doc-modularity**. If the doc exceeds ~3000 words, has 5+ major sections, or has independently useful sections for different audiences, identify candidate sections for extraction.
+3. **Extract independent sections**: For each candidate, create a standalone doc with standalone context and back-reference, replace it in the hub with a 2–4 sentence summary and cross-reference link per **solution-doc-modularity**. Skip extraction for small, single-service solutions.
+4. Compile the final output bundle: Findings Documents, N ADRs, 1 Solution Document (hub), and modular sub-documents (if extracted).
+5. Validate the bundle: every ADR's chosen solution is reflected in the solution doc, cross-references between all artifacts are consistent, diagrams match assumed solutions, and extracted sub-docs have correct back-references.
+6. Present the complete bundle. Remind the user:
    - Findings docs are the current-state record — keep them even if decisions change.
    - ADRs are formal decision records — review and approve with the team.
    - The solution doc is the target-state architecture; update it if an ADR decision changes.
