@@ -1,6 +1,6 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations to produce ADRs, findings, solution docs, and change summaries. Use when conducting, scoping, investigating, evaluating, formalizing, continuing, parallelizing, deep-diving, summarizing changes, modularizing documents, or suggesting direction candidates to narrow or broaden a spike.
+description: Conduct spike investigations to produce ADRs, findings, solution docs, and change summaries. Use when scoping, investigating, evaluating, formalizing, continuing, deep-diving, summarizing changes, or suggesting direction for a spike.
 ---
 
 <when-to-use-this-skill>
@@ -28,10 +28,6 @@ A well-conducted spike produces: **Findings Documents** (current-state architect
 Do NOT use this skill for: quick answers without formal documentation, already-decided problems needing only implementation, trivial scope with no architectural impact, or immediate prototyping — spikes produce decisions, not production code.
 </inappropriate-scenarios>
 
-<deep-dive-mode>
-When a user wants to drill deeper into specific unresolved areas from a previous spike, the skill operates in **deep-dive mode**. Areas not selected are left as-is. See **reference/deep-dive-mode-guide.md** for full mode comparison.
-</deep-dive-mode>
-
 <findings-document>
 A findings document captures the **current-state architecture** using the `write-solution-doc` skill's format (C4, sequence, API/event contracts) but describes the as-is rather than to-be. This makes them directly transformable into the solution doc and gives ADRs a precise baseline. For full format and strategy guidance, see **reference/findings-document-guide.md**.
 </findings-document>
@@ -44,19 +40,17 @@ A change summary translates the delta between findings (current state) and solut
 When a solution document exceeds ~3000 words or 5+ major sections, split independently understandable sections into standalone reference documents. The main doc becomes a hub with 2–4 sentence summaries and cross-references; each extracted doc must stand alone and back-reference the hub. Split by service, architectural layer, or decision area. For full heuristics and validation checklist, see **reference/solution-doc-modularity-guide.md**.
 </solution-doc-modularity>
 
-<discovery-tracking>
+<discovery-log>
 Spike investigations are iterative — new facts may contradict earlier assumptions. When this happens, record **what changed, why, and the evidence** in the affected findings document's **Discovery Log** section. Update ADRs and the solution document if they are also affected. A discovery entry captures: the fact/correction, evidence, impact on documents, and date. For the full log format, entry structure, and when-to-record triggers, see **reference/discovery-log-guide.md**.
-</discovery-tracking>
+</discovery-log>
 
-<spike-direction-guidance>
-After each spike round completes, the user often doesn't know what to ask next. The skill should use what it learned during investigation to suggest concrete candidate questions — 3 to narrow the spike (go deeper on unresolved specifics) and 3 to broaden it (expand to adjacent concerns the user may not have considered). These suggestions are grounded in evidence from the investigation, not guesswork. For the full candidate-generation heuristics, go-deeper vs. go-broader patterns, and output format, see **reference/spike-direction-suggestions-guide.md**.
-</spike-direction-guidance>
+<deep-dive-mode>
+When a user wants to drill deeper into specific unresolved areas from a previous spike, the skill operates in **deep-dive mode**. Areas not selected are left as-is. See **reference/deep-dive-mode-guide.md** for full mode comparison.
+</deep-dive-mode>
 
 <greenfield-scenarios>
 When there is no existing implementation to investigate (greenfield): research industry approaches and similar systems in the organization, study operational constraints (cloud, team, compliance), build proof-of-concept prototypes instead of tracing code. Remaining phases (evaluate, draft ADRs, compile solution doc) proceed unchanged.
 </greenfield-scenarios>
-
-
 
 <multi-agent-orchestration>
 For spikes with multiple investigation areas, dispatch independent work to sub-agents in parallel for Phases 2 (investigate) and 4 (draft ADRs). See the full dispatch pattern and parallelization rules in **reference/multi-agent-orchestration.md**.
@@ -69,6 +63,10 @@ When breaking down a spike problem into investigation areas, target 2–5 areas.
 <solution-brainstorming-prompts>
 When helping the user brainstorm solution options, prompt them to consider: status quo, incremental improvement, industry-standard approaches, build-vs-buy-vs-adopt, greenfield rewrite, and hybrid/phased strategies. See the full prompt set in **reference/solution-brainstorming-prompts.md**.
 </solution-brainstorming-prompts>
+
+<spike-direction-suggestions>
+After each spike round completes, the user often doesn't know what to ask next. The skill should use what it learned during investigation to suggest concrete candidate questions — 3 to narrow the spike (go deeper on unresolved specifics) and 3 to broaden it (expand to adjacent concerns the user may not have considered). These suggestions are grounded in evidence from the investigation, not guesswork. For the full candidate-generation heuristics, go-deeper vs. go-broader patterns, and output format, see **reference/spike-direction-suggestions-guide.md**.
+</spike-direction-suggestions>
 
 <context-loading-guide>
 
