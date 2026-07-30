@@ -1,6 +1,6 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations to produce ADRs, findings, solution docs, and change summaries. Use when conducting, scoping, investigating, evaluating, formalizing, continuing, parallelizing, deep-diving, summarizing changes, or modularizing documents for a spike.
+description: Conduct spike investigations to produce ADRs, findings, solution docs, and change summaries. Use when conducting, scoping, investigating, evaluating, formalizing, continuing, parallelizing, deep-diving, summarizing changes, modularizing documents, or suggesting direction candidates to narrow or broaden a spike.
 ---
 
 <when-to-use-this-skill>
@@ -14,6 +14,7 @@ description: Conduct spike investigations to produce ADRs, findings, solution do
 - User wants to continue a previous spike by digging deeper into one or more specific investigation areas that were not fully resolved
 - User wants to summarize the concrete code changes required to implement the chosen solution (change summary)
 - User wants to keep the solution document modular and efficiently loadable by AI (split large solution docs into independent sub-documents)
+- After completing a spike round, the user is unsure what to investigate next — the skill should suggest concrete candidate questions to either narrow the spike (go deeper on unresolved details) or broaden it (expand to adjacent concerns they may have missed)
 </when-to-use-this-skill>
 
 <knowledge>
@@ -47,6 +48,26 @@ When a solution document exceeds ~3000 words or 5+ major sections, split indepen
 <discovery-tracking>
 Spike investigations are iterative — new facts may contradict earlier assumptions. When this happens, record **what changed, why, and the evidence** in the affected findings document's **Discovery Log** section. Update ADRs and the solution document if they are also affected. A discovery entry captures: the fact/correction, evidence, impact on documents, and date. For the full log format, entry structure, and when-to-record triggers, see **reference/discovery-log-guide.md**.
 </discovery-tracking>
+
+<spike-direction-guidance>
+After each spike round completes, the user often doesn't know what to ask next. The skill should use what it learned during investigation to suggest concrete candidate questions — 3 to narrow the spike (go deeper on unresolved specifics) and 3 to broaden it (expand to adjacent concerns the user may not have considered). These suggestions are grounded in evidence from the investigation, not guesswork.
+
+**Go deeper candidates** — questions that narrow focus on specific unresolved details discovered during investigation:
+- A subsystem or code path that was touched but not fully explored ("we saw X does Y, but didn't trace how Z works")
+- A performance, security, or reliability concern surfaced but not measured ("we know it's slow, but haven't profiled which function")
+- An edge case or failure mode the current architecture doesn't handle ("what happens when the queue is full?")
+- A technology choice that has a specific sub-decision pending ("we chose Postgres, but which indexing strategy?")
+- An integration point where the contract is poorly understood ("what exactly does the payment gateway return on timeout?")
+
+**Go broader candidates** — questions that expand scope to adjacent concerns the user may have missed:
+- A neighboring system or service that the current spike touches but didn't investigate ("we looked at orders, but what about inventory?")
+- A cross-cutting concern that affects multiple areas ("how does this change affect monitoring/alerting?")
+- An organizational or process impact beyond pure architecture ("which team owns this after the change?")
+- An alternative approach that wasn't considered because the spike scope excluded it ("what if we bought instead of built?")
+- A longer-term implication the current decisions create ("if we choose X now, what does migration to Y look like in 2 years?")
+
+For the full procedure, candidate-generation heuristics, and output format, see **reference/spike-direction-suggestions-guide.md**.
+</spike-direction-guidance>
 
 <greenfield-scenarios>
 When there is no existing implementation to investigate (greenfield): research industry approaches and similar systems in the organization, study operational constraints (cloud, team, compliance), build proof-of-concept prototypes instead of tracing code. Remaining phases (evaluate, draft ADRs, compile solution doc) proceed unchanged.
@@ -95,6 +116,8 @@ When helping the user brainstorm solution options, prompt them to consider: stat
 | Assessing and splitting a large solution document into modular, AI-friendly pieces | Splitting heuristics, patterns, and validation checklist | [reference/solution-doc-modularity-guide.md](reference/solution-doc-modularity-guide.md) |
 | Producing a concrete change summary with code access, demonstrating all change categories | End-to-end change summary with code-verified scope estimates | [examples/change-summary-example.md](examples/change-summary-example.md) |
 | Recording new discoveries, corrections, or invalidated assumptions during investigation or evaluation | Discovery log format and when-to-record guidance | [reference/discovery-log-guide.md](reference/discovery-log-guide.md) |
+| Suggesting candidate questions to narrow or broaden a spike after a round completes | Candidate-generation heuristics, go-deeper vs go-broader patterns, and output format | [reference/spike-direction-suggestions-guide.md](reference/spike-direction-suggestions-guide.md) |
+| Seeing a worked example of direction suggestions — 3 go-deeper and 3 go-broader candidates grounded in investigation evidence | Walkthrough of generating direction candidates after a spike round, with rationale for each | [examples/spike-direction-suggestions.md](examples/spike-direction-suggestions.md) |
 
 </context-loading-guide>
 
@@ -219,6 +242,38 @@ When helping the user brainstorm solution options, prompt them to consider: stat
 For the full step-by-step procedure with prompts and validation checks per step, load **reference/deep-dive-procedure.md**.
 </deep-dive-specific-areas>
 
+<suggest-spike-directions>
+1. **Review what was learned this round**: From the findings document (or solution doc if after a full spike), extract the key discoveries — systems identified, constraints measured, surprises found, open questions that remain.
+2. **Generate 3 go-deeper candidates**: For each, write a concrete, answerable question that narrows the spike into a specific unresolved detail. Each candidate must:
+   - Reference a specific finding from this round ("We found X, but didn't explore Y")
+   - Be investigable — the codebase or a prototype can answer it
+   - Include a 1-sentence rationale: why going deeper here matters
+3. **Generate 3 go-broader candidates**: For each, write a concrete question that expands the spike to an adjacent concern the user may have missed. Each candidate must:
+   - Reference something the current spike scope excluded or touched but didn't investigate
+   - Be a genuine decision the user will need to make, not a tangent
+   - Include a 1-sentence rationale: why broadening here matters
+4. **Present as a direction menu**:
+   ```
+   ## Where to take this spike next?
+
+   ### Go Deeper (narrow the focus)
+   | # | Candidate question | Based on (evidence from this round) | Why it matters |
+   |---|---|---|---|
+   | D1 | [concrete question] | [specific finding] | [1-sentence rationale] |
+   | D2 | [concrete question] | [specific finding] | [1-sentence rationale] |
+   | D3 | [concrete question] | [specific finding] | [1-sentence rationale] |
+
+   ### Go Broader (expand the scope)
+   | # | Candidate question | Based on (evidence from this round) | Why it matters |
+   |---|---|---|---|
+   | B1 | [concrete question] | [specific finding or gap] | [1-sentence rationale] |
+   | B2 | [concrete question] | [specific finding or gap] | [1-sentence rationale] |
+   | B3 | [concrete question] | [specific finding or gap] | [1-sentence rationale] |
+   ```
+5. Ask the user: "Would you like to pursue any of these directions? Pick one (or more) and I'll start a new spike round. Or if you're satisfied with the current results, we can stop here."
+6. If the user selects a direction, treat it as a new spike scope — apply **define-spike-scope** with the selected question as the goal, then proceed through the workflow phases.
+</suggest-spike-directions>
+
 </capabilities>
 
 <rules>
@@ -236,5 +291,7 @@ For the full step-by-step procedure with prompts and validation checks per step,
 <rule>If the user asks for a quick recommendation without formal documentation, decline — direct them to a regular conversation instead (see **inappropriate-scenarios**). If sub-agents are not available, fall back to sequential execution.</rule>
 
 <rule>After the solution doc is compiled: if the user wants implementation scope, apply **summarize-required-changes**; if the doc is large, apply modularity steps in **compile-solution-doc** to split independent sections.</rule>
+
+<rule>After **compile-findings-doc** completes (post-investigation), apply **suggest-spike-directions** to present 3 go-deeper and 3 go-broader candidate questions grounded in the investigation evidence. Also apply it after **compile-solution-doc** (post-full-spike) for a comprehensive set of next-step candidates. Skip only if the user explicitly declines or says they're satisfied with the current results.</rule>
 
 </rules>
