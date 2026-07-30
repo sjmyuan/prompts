@@ -10,11 +10,10 @@ description: Conduct spike investigations to produce ADRs, findings, solution do
 - User needs to understand current implementation before proposing changes or solutions
 - User wants to break down a large technical problem into independently decidable investigation areas
 - User has pre-existing investigation findings and wants to formalize them into ADRs and a solution document
-- User has a heavy spike with multiple investigation areas and wants to parallelize work across sub-agents for faster completion
 - User wants to continue a previous spike by digging deeper into one or more specific investigation areas that were not fully resolved
 - User wants to summarize the concrete code changes required to implement the chosen solution (change summary)
 - User wants to keep the solution document modular and efficiently loadable by AI (split large solution docs into independent sub-documents)
-- After completing a spike round, the user is unsure what to investigate next — the skill should suggest concrete candidate questions to either narrow the spike (go deeper on unresolved details) or broaden it (expand to adjacent concerns they may have missed)
+- User wants to get suggestions for the next steps in the spike (direction candidates)
 </when-to-use-this-skill>
 
 <knowledge>
