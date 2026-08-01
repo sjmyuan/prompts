@@ -1,6 +1,6 @@
 ---
 name: draft-adr
-description: Guide users through drafting well-structured ADRs. Use when creating, writing, drafting, or authoring an ADR, documenting decisions, evaluating options, or compiling a record from raw notes.
+description: Guide users through drafting well-structured ADRs, proactively visualizing context and solutions with diagrams. Use when creating, writing, drafting, or authoring an ADR, documenting decisions, evaluating options, or compiling a record from raw notes.
 ---
 
 <when-to-use-this-skill>
@@ -40,11 +40,28 @@ When the user has only one option, prompt them to consider alternatives from the
 - **Incremental vs. big-bang**: Can we phase the change, or does it need to be all at once?
 </option-brainstorming-prompts>
 
+<diagram-selection>
+Use diagrams proactively whenever explaining context or a solution — never wait to be asked. Choose the diagram type by the context you want to explain, not by which ADR step you are in. Prefer PlantUML wherever the platform supports it, and fall back to Mermaid, SVG, or ASCII when it does not.
+
+| Diagram | Draw when explaining | Shows |
+|---|---|---|
+| C4 context diagram | The overall system landscape — who or what interacts with the system(s) in scope | Systems in scope, actors, external dependencies |
+| C4 container diagram | Zooming into a system — the high-level applications and data stores that compose it | Containers, technology choices, container relationships |
+| C4 component diagram | Zooming into a single container — the components inside it and how they interact | Components, their responsibilities, component relationships |
+| Flowchart | A step-by-step process or flow | Flow steps, decision branches |
+| Sequence diagram | The order and timing of interactions between components | Lifelines, message sequence, sync/async calls |
+| Decision driver map | The trade-off space that drives the decision | Hard constraints vs soft preferences |
+| Option comparison matrix + elimination tree | How options compare against the drivers, or why options were dropped | Driver satisfaction per option, elimination reasoning |
+
+Zoom in level by level: C4 context → container → component for structure, then a flowchart or sequence diagram for a specific flow or interaction. The solution architecture is simply a C4/flowchart view of the target state — no separate diagram type is required. Draw C4 diagrams with the C4-PlantUML macros (`Person`, `System`, `System_Ext`, `Container`, `ContainerDb`, `Component`, `Rel`, `System_Boundary`, `Container_Boundary`). Keep each diagram to a single message. Load **reference/diagram-guide.md** for the include paths, notation, and snippets.
+</diagram-selection>
+
 <context-loading-guide>
 
 | Load when | Provides | File |
 |---|---|---|
 | Compiling the final ADR document (compile-adr capability step 3) | Complete ADR markdown template with all sections and placeholder annotations | [reference/adr-template.md](reference/adr-template.md) |
+| Drawing any diagram (any capability) | PlantUML-first notation for C4 (context / container / component), flowchart, sequence, driver map, and comparison diagrams, with fallback snippets | [reference/diagram-guide.md](reference/diagram-guide.md) |
 | User provides a complete, well-formed problem statement and wants to see a full end-to-end walkthrough | Full walkthrough of all 5 capabilities for a database selection decision | [examples/database-selection.md](examples/database-selection.md) |
 | User has partial notes or rough ideas and needs help structuring them into an ADR | Full walkthrough of all 5 capabilities starting from unstructured input | [examples/from-rough-notes.md](examples/from-rough-notes.md) |
 
@@ -60,6 +77,7 @@ When the user has only one option, prompt them to consider alternatives from the
 3. Identify and resolve any ambiguous terms or implicit assumptions.
 4. Restate the problem back to the user as a concise, structured summary and ask: "Does this accurately capture the problem?"
 5. Iterate until the user confirms.
+6. Once the problem is confirmed, draw the diagram that best explains the context involved (per **diagram-selection**, usually a C4 context diagram; zoom into flows or interactions with a flowchart or sequence diagram when the problem depends on them), and use it to verify the scope is shared before proceeding.
 </define-problem>
 
 <define-decision-drivers>
@@ -67,6 +85,7 @@ When the user has only one option, prompt them to consider alternatives from the
 2. If the user struggles, suggest categories from **decision-driver-categories** to prompt thinking.
 3. Help the user distinguish between hard constraints (must-haves / knock-out criteria) and soft preferences (nice-to-haves).
 4. Summarize the drivers in a bullet list and ask the user to confirm or reorder by priority.
+5. Once the drivers are confirmed, draw the diagram that best explains the trade-off space (per **diagram-selection**, the decision driver map) so constraints and preferences are visible.
 </define-decision-drivers>
 
 <define-considered-options>
@@ -82,23 +101,26 @@ When the user has only one option, prompt them to consider alternatives from the
    - "What are the main disadvantages, risks, or trade-offs?"
 2. Relate each pro/con back to the decision drivers defined earlier — highlight which drivers are satisfied and which are compromised.
 3. Summarize the evaluation of the current option with a Pros/Cons list and ask for confirmation.
-4. After all options are evaluated, guide the user toward a recommendation by asking: "Given the evaluations, which option best satisfies the decision drivers?"
+4. After all options are evaluated, draw the diagram that best explains the comparison (per **diagram-selection**, the option comparison matrix with an elimination tree), highlighting any knock-out criteria and why each option was dropped.
+5. Guide the user toward a recommendation by asking: "Given the evaluations, which option best satisfies the decision drivers?"
 </evaluate-options>
 
 <compile-adr>
 1. Gather all confirmed outputs from the preceding capabilities: problem statement, decision drivers, considered options, and evaluations.
 2. Prompt the user for metadata: preferred title, owners, and status (draft | adopt | declined | superseded).
 3. Load **reference/adr-template.md** and populate the template with all collected information, using the user's recommended option as "Chosen option" with a synthesized justification.
-4. Fill in the Consequences section based on the evaluated pros/cons and risks discussed.
-5. Verify the completed ADR against this quality checklist:
+4. Draw a C4/flowchart view of the target state with the chosen option integrated (per **diagram-selection**), and embed it alongside the session's other diagrams in the Context and Decision Outcome sections.
+5. Fill in the Consequences section based on the evaluated pros/cons and risks discussed.
+6. Verify the completed ADR against this quality checklist:
    - [ ] Problem statement is clear, scoped, and unambiguous
    - [ ] Decision drivers include both hard constraints and soft preferences
    - [ ] At least 2 distinct options were evaluated
    - [ ] Each option has pros/cons explicitly tied to decision drivers
    - [ ] Chosen option justification references specific drivers
    - [ ] Consequences section addresses risks and positive impacts
+   - [ ] Context and solution are visualized with diagrams (context diagram + target-state C4/flowchart view)
    - [ ] Metadata (title, owners, status) is populated
-6. Present the completed ADR to the user for final review and ask: "Would you like to adjust any section before saving?"
+7. Present the completed ADR to the user for final review and ask: "Would you like to adjust any section before saving?"
 </compile-adr>
 
 </capabilities>
@@ -114,5 +136,6 @@ When the user has only one option, prompt them to consider alternatives from the
 <rule>If the user submits a new option mid-evaluation, apply **evaluate-options** to assess it and integrate it into the comparison.</rule>
 <rule>If the user revises the problem or decision drivers at any point, re-apply the affected downstream capabilities to keep the ADR consistent.</rule>
 <rule>After each user confirmation, update any in-progress ADR draft so nothing is lost.</rule>
+<rule>Whenever explaining context or a solution during any capability, proactively draw the matching diagram from **diagram-selection** — do not wait for the user to ask.</rule>
 
 </rules>

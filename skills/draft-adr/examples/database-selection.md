@@ -22,6 +22,41 @@
 
 **User confirms**: Yes.
 
+**Agent output**:
+> Here's a C4 context diagram of the system in scope so we're aligned before moving on:
+>
+> ```plantuml
+> @startuml
+> !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+>
+> Person(customer, "Customer", "Places orders and queries order history")
+> System(oms, "Order Management Service", "Handles ~10K orders/day, ACID payments; storage backend TBD")
+> System_Ext(ps, "Payment Processor", "Charges payments")
+> System_Ext(iam, "GCP IAM", "AuthN / authZ")
+>
+> Rel(customer, oms, "places orders / queries")
+> Rel(oms, ps, "payment processing")
+> Rel(oms, iam, "authN / authZ")
+> @enduml
+> ```
+>
+> Let me also zoom into the order lifecycle with a flowchart, since the ACID/payment requirement lives there:
+>
+> ```plantuml
+> @startuml
+> start
+> :Customer places order;
+> :Validate & charge payment;
+> if (Payment succeeds?) then (yes)
+>   :Write order with ACID transaction;
+>   :Query order history;
+> else (no)
+>   :Reject order;
+> endif
+> stop
+> @enduml
+> ```
+
 ---
 
 ## Capability: define-decision-drivers
@@ -45,6 +80,32 @@
 > Would you like to reorder or adjust any of these?
 
 **User confirms**: Looks good.
+
+**Agent output**:
+> Here's a map of the confirmed decision drivers so the trade-off space is visible:
+>
+> ```plantuml
+> @startuml
+> rectangle "Decision drivers" as Root
+> rectangle "Hard constraints" as Hard
+> rectangle "Soft preferences" as Soft
+> rectangle "ACID transactions" as H1
+> rectangle "Query latency < 100ms" as H2
+> rectangle "GCP integration" as H3
+> rectangle "Team expertise: PostgreSQL" as S1
+> rectangle "Low infrastructure cost" as S2
+> rectangle "Managed service" as S3
+>
+> Root --> Hard
+> Root --> Soft
+> Hard --> H1
+> Hard --> H2
+> Hard --> H3
+> Soft --> S1
+> Soft --> S2
+> Soft --> S3
+> @enduml
+> ```
 
 ---
 
@@ -179,6 +240,27 @@
 >
 > Firestore is eliminated by the ACID hard constraint. Cloud Spanner fails on cost and team expertise. Cloud SQL for PostgreSQL satisfies all hard constraints and 3/3 soft preferences.
 >
+> Here's the elimination tree that visualizes why we dropped each option:
+>
+> ```plantuml
+> @startuml
+> rectangle "All options" as All
+> rectangle "Cloud SQL for PostgreSQL" as A
+> rectangle "Cloud Spanner" as B
+> rectangle "Firestore" as C
+> rectangle "Eliminated" as X1
+> rectangle "Eliminated" as X2
+> rectangle "Chosen: Cloud SQL for PostgreSQL" as W
+>
+> All --> A
+> All --> B
+> All --> C
+> C --> X1 : fails ACID knock-out
+> B --> X2 : fails low cost + team expertise
+> A --> W : passes all hard constraints + 3/3 soft
+> @enduml
+> ```
+>
 > **Given the evaluations, which option best satisfies the decision drivers?**
 
 **User confirms**: Cloud SQL for PostgreSQL.
@@ -209,9 +291,13 @@
 
 We need to select a database for a new order-management microservice running on GCP. The service will handle approximately 10,000 orders per day and must support complex queries on order history (filtering by date range, status, customer) and ACID transactions for payment processing.
 
+![C4 context diagram: customer, order management service, database, payment processor, GCP IAM](diagrams/context.png)
+
 ## Decision Outcome
 
 Chosen option: "Cloud SQL for PostgreSQL", because it is the only option that satisfies all three hard constraints (ACID transactions, query latency under 100ms, GCP integration) while also meeting all soft preferences — the team already has PostgreSQL expertise, costs are reasonable at the projected scale, and it is a fully managed GCP service.
+
+![C4/flowchart: target state — order management service with Cloud SQL for PostgreSQL, PgBouncer, read replica, and payment processor](diagrams/solution.png)
 
 ## Consequences
 

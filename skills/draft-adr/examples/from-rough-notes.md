@@ -32,6 +32,69 @@
 
 **User confirms**: Yes, that's it.
 
+**Agent output**:
+> Here's a C4 context diagram of the auth flow so we're aligned:
+>
+> ```plantuml
+> @startuml
+> !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+>
+> Person(user, "User", "Logs in and calls the API")
+>
+> System_Boundary(auth_system, "Auth System") {
+>     System(spa, "React SPA", "Single-page web app")
+>     System(be, "Node.js Backend", "AuthN: JWT or Session (decision pending)")
+> }
+>
+> System_Ext(audit, "Audit Log", "SOC 2 audit trail")
+>
+> Rel(user, spa, "login / API calls")
+> Rel(spa, be, "Bearer token / session cookie")
+> Rel(be, audit, "audit events")
+> @enduml
+> ```
+>
+> Let me zoom into the Node.js Backend with a C4 component diagram to see the pieces involved in auth:
+>
+> ```plantuml
+> @startuml
+> !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+>
+> Container_Boundary(be, "Node.js Backend") {
+>     Component(am, "Auth Middleware", "Express middleware", "Authenticates requests")
+>     Component(ts, "Token Service", "Module", "Validates / issues tokens")
+>     Component(al, "Audit Logger", "Module", "Logs auth events")
+> }
+>
+> ContainerDb(audit, "Audit Log", "Log store", "SOC 2 audit trail")
+> System_Ext(spa, "React SPA", "Single-page web app")
+>
+> Rel(spa, am, "requests with credentials")
+> Rel(am, ts, "calls", "validate / issue token")
+> Rel(ts, am, "token result")
+> Rel(am, al, "calls", "log auth events")
+> Rel(al, audit, "write")
+> @enduml
+> ```
+>
+> Since revocation is the key concern, let me zoom into the compromised-account flow with a sequence diagram:
+>
+> ```plantuml
+> @startuml
+> actor User
+> actor "Security Team" as Sec
+> participant "Node.js Backend" as BE
+> participant "AuthN" as AUTH
+>
+> User -> BE : API call with token
+> BE -> AUTH : validate token
+> AUTH --> BE : valid / invalid
+> Sec -> BE : report compromised account
+> BE -> AUTH : revoke access now
+> AUTH --> BE : revoked
+> @enduml
+> ```
+
 ---
 
 ## Capability: define-decision-drivers
@@ -100,6 +163,27 @@
 | SSO readiness | ✅ | ⚠️ | ✅ |
 
 > JWT (status quo) is eliminated by the revocation hard constraint. Sessions satisfy all hard constraints but compromise statelessness. JWT + Redis denylist satisfies all hard constraints and strikes the best balance on soft preferences — it preserves most statelessness (Redis is lightweight) and keeps SSO readiness.
+>
+> Here's the elimination tree that visualizes the reasoning:
+>
+> ```plantuml
+> @startuml
+> rectangle "All options" as All
+> rectangle "JWT - status quo" as A
+> rectangle "Sessions" as B
+> rectangle "JWT + Redis denylist" as C
+> rectangle "Eliminated" as X1
+> rectangle "Weaker fit" as X2
+> rectangle "Chosen: JWT + Redis denylist" as W
+>
+> All --> A
+> All --> B
+> All --> C
+> A --> X1 : fails immediate revocation knock-out
+> B --> X2 : compromises statelessness
+> C --> W : passes all hard constraints
+> @enduml
+> ```
 
 **User confirms**: JWT + Redis denylist.
 
@@ -107,4 +191,4 @@
 
 ## Capability: compile-adr
 
-*(Same pattern as database-selection example — loads reference/adr-template.md, gathers metadata, produces the final ADR document.)*
+*(Same pattern as database-selection example — loads reference/adr-template.md, gathers metadata, produces the final ADR document including the context diagram (and any zoom-in sequence/flowchart) in the Context section and a C4/flowchart view of the target state in the Decision Outcome section.)*

@@ -12,11 +12,16 @@ When producing the final ADR document, use the exact structure below. Wrap place
 ## Context and Problem Statement
 
 [ Describe the context and problem statement, e.g. in free form using two to three sentences. You may want to articulate the problem in form of a question. ]
-[ For architecture diagrams use C4 Models see https://c4model.com ]
+
+![Context diagram: system(s) in scope, actors, and external dependencies]({{DIAGRAM:context}})
+[ Embed the C4 context diagram drawn during define-problem, plus any flowchart or sequence diagram used to zoom into the context. For architecture diagrams use C4 Models see https://c4model.com ]
 
 ## Decision Outcome
 
 Chosen option: "[ option 1 ]", because [ justification e.g. only option which meets k.o. criterion of decision driver 1 | which resolves issue | comes out best (see below) | ... ].
+
+![C4/flowchart: target state with the chosen option integrated into the context]({{DIAGRAM:solution}})
+[ Embed the target-state C4/flowchart view drawn during compile-adr. ]
 
 ## Consequences
 
@@ -48,6 +53,9 @@ Chosen option: "[ option 1 ]", because [ justification e.g. only option which me
 * [ option 1 ]
 * [ option 2 ]
 * ...
+
+![Option comparison matrix: drivers × options with knock-out highlights]({{DIAGRAM:comparison-matrix}})
+[ Embed the option comparison matrix / elimination tree drawn during evaluate-options. ]
 
 ## Evaluation of the Options <!-- required -->
 
