@@ -1,12 +1,13 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations to produce ADRs, findings, solution docs, and change summaries. Use when scoping, investigating, evaluating, formalizing, continuing, deep-diving, summarizing changes, or suggesting direction for a spike.
+description: Conduct spike investigations to produce ADRs, findings, solution docs, and change summaries. Use when scoping, investigating, evaluating, discussing ADR decisions that need investigation, formalizing, continuing, deep-diving, summarizing changes, or suggesting direction for a spike.
 ---
 
 <when-to-use-this-skill>
 - User wants to conduct a spike investigation on a technical problem or feature
 - User needs to research, evaluate, and compare solution approaches for a complex problem before committing to one
 - User wants to produce ADRs for each decision area alongside a consolidated solution document
+- User is discussing an ADR (drafting, reviewing, or adjusting a decision) and the outcome depends on unverified assumptions, unknown feasibility, or missing evidence that needs investigation
 - User needs to understand current implementation before proposing changes or solutions
 - User wants to break down a large technical problem into independently decidable investigation areas
 - User has pre-existing investigation findings and wants to formalize them into ADRs and a solution document
@@ -68,6 +69,18 @@ When helping the user brainstorm solution options, prompt them to consider: stat
 After each spike round completes, the user often doesn't know what to ask next. The skill should use what it learned during investigation to suggest concrete candidate questions — 3 to narrow the spike (go deeper on unresolved specifics) and 3 to broaden it (expand to adjacent concerns the user may not have considered). These suggestions are grounded in evidence from the investigation, not guesswork. For the full candidate-generation heuristics, go-deeper vs. go-broader patterns, and output format, see **reference/spike-direction-suggestions-guide.md**.
 </spike-direction-suggestions>
 
+<adr-uncertainty-signals>
+During ADR discussion (drafting, reviewing, or adjusting a decision — inside the spike workflow or in a standalone ADR session), suggest a spike when the decision hinges on something reasoning alone cannot settle:
+- **Unverified assumption**: the chosen option assumes a fact no one has checked (e.g., "the message bus can handle peak volume")
+- **Unknown feasibility**: whether the option can actually work in this codebase or organization is unknown
+- **Missing measurement**: the decision depends on cost, latency, capacity, or effort data that hasn't been collected
+- **Undecidable comparison**: two options remain close and the tiebreaker requires evidence, not opinion
+- **Uninvestigated dependency**: the chosen option's success depends on a system whose behavior is unknown
+- **Reviewer disagreement**: reviewers can't converge and need data rather than debate
+
+This is the "Untested assumption in ADR" go-deeper heuristic from **reference/spike-direction-suggestions-guide.md**, applied while the ADR is still being discussed rather than only after an investigation round.
+</adr-uncertainty-signals>
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -88,6 +101,7 @@ After each spike round completes, the user often doesn't know what to ask next. 
 | Recording new discoveries, corrections, or invalidated assumptions during investigation or evaluation | Discovery log format and when-to-record guidance | [reference/discovery-log-guide.md](reference/discovery-log-guide.md) |
 | Suggesting candidate questions to narrow or broaden a spike after a round completes | Candidate-generation heuristics, go-deeper vs go-broader patterns, and output format | [reference/spike-direction-suggestions-guide.md](reference/spike-direction-suggestions-guide.md) |
 | Seeing a worked example of direction suggestions — 3 go-deeper and 3 go-broader candidates grounded in investigation evidence | Walkthrough of generating direction candidates after a spike round, with rationale for each | [examples/spike-direction-suggestions.md](examples/spike-direction-suggestions.md) |
+| Suggesting a spike when ADR discussion reveals a decision hinges on unverified assumptions or unknown facts | Worked example of detecting ADR uncertainty and offering a focused spike before finalizing the ADR | [examples/adr-uncertainty-spike-suggestion.md](examples/adr-uncertainty-spike-suggestion.md) |
 
 </context-loading-guide>
 
@@ -174,7 +188,7 @@ After each spike round completes, the user often doesn't know what to ask next. 
    - Detect what agents are available on the current platform, then dispatch all briefs to sub-agents concurrently. Each sub-agent loads `draft-adr` independently.
    - When all sub-agents complete, collect and review each ADR for completeness and consistency.
 
-4. After all ADRs are drafted (via either method), present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?"
+4. After all ADRs are drafted (via either method), present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?" If the user raises uncertainty about any ADR's decision — an unverified assumption, unknown feasibility, or unresolved comparison — apply **suggest-spike-on-adr-uncertainty** before finalizing.
 5. Validate each ADR: confirm the chosen option follows logically from the decision drivers, all evaluated options are fairly represented, consequences include both positive and negative impacts, and the ADR can be understood without reading other ADRs.
 6. Note: The chosen option in each ADR is the **assumed solution**. The solution document will adopt these. If an ADR decision changes later, the solution document should be updated accordingly.
 </draft-area-adrs>
@@ -260,6 +274,14 @@ For the full step-by-step procedure with prompts and validation checks per step,
 6. If the user selects a direction, treat it as a new spike scope — apply **define-spike-scope** with the selected question as the goal, then proceed through the workflow phases.
 </suggest-spike-directions>
 
+<suggest-spike-on-adr-uncertainty>
+1. Detect uncertainty signals in the ADR discussion using **adr-uncertainty-signals** in the knowledge section — an unverified assumption, unknown feasibility, missing measurement, undecidable comparison, uninvestigated dependency, or reviewer disagreement.
+2. Name the uncertainty precisely: "This decision seems to hinge on [the unverified assumption / the unknown fact / the unresolved comparison]." Explain why it matters for the chosen option.
+3. Offer a spike: "Would you like to spike this before finalizing the ADR?" Do not start one without explicit confirmation.
+4. If the user agrees, define a focused spike scope: a single goal (the uncertainty to resolve) and 1–3 investigation areas, then apply **define-spike-scope** to confirm before proceeding. Treat the ADR as provisional until the spike resolves the uncertainty.
+5. If the user declines, continue the current ADR flow and record the uncertainty as an open question in the ADR's consequences so it isn't lost.
+</suggest-spike-on-adr-uncertainty>
+
 </capabilities>
 
 <rules>
@@ -277,5 +299,7 @@ For the full step-by-step procedure with prompts and validation checks per step,
 <rule>If the user asks for a quick recommendation without formal documentation, decline — direct them to a regular conversation instead (see **inappropriate-scenarios**). If sub-agents are not available, fall back to sequential execution.</rule>
 
 <rule>After the solution doc is compiled: if the user wants implementation scope, apply **summarize-required-changes**; if the doc is large, apply modularity steps in **compile-solution-doc** to split independent sections.</rule>
+
+<rule>When the user discusses an ADR (drafting, reviewing, or adjusting it — inside the spike workflow or in a standalone ADR session) and the decision depends on an unverified assumption, unknown feasibility, missing evidence, or an unresolved option comparison, apply **suggest-spike-on-adr-uncertainty** to propose investigating it with a spike before the ADR is finalized.</rule>
 
 </rules>
