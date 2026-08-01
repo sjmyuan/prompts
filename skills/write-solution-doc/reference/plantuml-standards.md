@@ -72,3 +72,13 @@ else (no)
 endif
 @enduml
 ```
+
+## Updating Existing Diagrams
+
+Diagrams are living artifacts of the solution document: sync them whenever the user confirms a new finding or correction, so the visual record never goes stale.
+
+- **Update in place when the change affects an existing diagram**: keep the same diagram identity (title, aliases, structure) and change only what is affected. State the delta in one line before the updated code block (e.g., "Updated: added the Media Service container and rerouted file uploads to it").
+- **Add a new diagram when the context is genuinely new**: a new flow, zoom level, or edge case no existing diagram covers. Give it a distinct title; do not overload an existing diagram with extra branches.
+- **Preserve identity**: when updating, keep the same aliases and labels so readers can diff old vs. new.
+- **Keep the set consistent**: after every change, each confirmed architectural fact appears in at least one diagram, and no diagram contradicts the latest confirmed state. Cross-check the whole set before proceeding.
+- **Never leave stale visuals**: if a diagram depicts an obsolete state, update or replace it — do not leave both old and new versions in the document.

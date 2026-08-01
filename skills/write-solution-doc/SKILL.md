@@ -60,6 +60,22 @@ When receiving existing diagrams (from prior investigation, other tools, or user
 **Decision rule**: If the primary question is "who talks to whom and in what order?" → use a sequence diagram. If the primary question is "what decisions are made and what paths exist?" → use a flowchart. When both questions matter, produce both diagrams.
 </diagram-selection-guide>
 
+<diagram-sync>
+Diagrams are living artifacts of the solution document: every new finding or correction may invalidate an existing diagram or reveal context that needs a new one. After any confirmed change, sync the affected diagrams before continuing so the visual record always matches the latest confirmed state.
+
+Update an existing diagram when:
+- The element it depicts changed — a container, component, system, actor, or relationship was added, removed, or renamed
+- The interaction or process it shows was corrected — a message, call order, branch, or step is different
+- A confirmed section changed and the diagram is the visual for that section
+
+Add a new diagram when:
+- New context is discussed that no existing diagram covers — a new flow, boundary, zoom level, error path, or edge case
+- The discussion zooms into a level not yet drawn (C2 → C3 → sequence/flowchart)
+- A correction introduces a distinct scenario worth its own view
+
+Never leave a stale diagram: after each change, every diagram either reflects the latest confirmed state or is replaced by a new one that does.
+</diagram-sync>
+
 <plantuml-standards>
 PlantUML diagram conventions and formatting rules for all diagram types (C4, sequence, flowchart, etc.). Load **reference/plantuml-standards.md** for the full standards.
 </plantuml-standards>
@@ -96,6 +112,7 @@ The assistant supports both English and Chinese (中文) output:
 | Designing API/event contracts | REST, gRPC, and async event schema conventions | [reference/api-design-standards.md](reference/api-design-standards.md) |
 | Performing RAID analysis | RAID framework definition and item schema | [reference/raid-framework.md](reference/raid-framework.md) |
 | Building a RACI matrix | RACI framework definition and table format | [reference/raci-framework.md](reference/raci-framework.md) |
+| User corrects content or new findings emerge mid-session and diagrams need to stay current | Walkthrough of **sync-diagrams** updating affected diagrams and adding new ones | [examples/diagram-sync.md](examples/diagram-sync.md) |
 
 </context-loading-guide>
 
@@ -132,7 +149,7 @@ The assistant supports both English and Chinese (中文) output:
 
 <draw-interaction-diagrams>
 1. Based on confirmed C4 topology, identify the key interaction flows that need documenting.
-2. For each flow, consult the **diagram-selection-guide** in `<knowledge>` to decide whether a sequence diagram, flowchart, or both are appropriate. If unsure, explain the trade-off and ask the user.
+2. For each flow, consult the **diagram-selection-guide** to decide whether a sequence diagram, flowchart, or both are appropriate. If unsure, explain the trade-off and ask the user.
 3. Ask 3–8 clarifying questions, one at a time, about:
    - Which scenarios/flows are most critical to document.
    - For sequence diagrams: the exact sequence of calls/messages between components, synchronous vs. asynchronous interactions, error and edge-case flows.
@@ -255,18 +272,31 @@ The assistant supports both English and Chinese (中文) output:
 6. Present the final document and offer to refine any section.
 </structure-solution-doc>
 
+<sync-diagrams>
+1. After the user confirms a new finding or correction (changed topology, added or removed container/component, corrected interaction flow, revised schema, new dependency or edge case), identify every diagram produced earlier in the session.
+2. For each diagram, decide whether the change affects any element, relationship, message, branch, or section it depicts. Leave unaffected diagrams untouched.
+3. For each affected diagram, produce the updated version reflecting the latest confirmed state, and state in one line what changed and why.
+4. For any new context introduced by the change that no existing diagram covers, draw a new diagram per **diagram-selection-guide** (e.g., a new flow, a zoom into a container, a new error path) and add it to the document section it belongs to.
+5. Cross-check the full diagram set against the confirmed sections: every confirmed architectural fact is represented in at least one diagram, and no diagram contradicts the latest confirmed state.
+6. Present the updated and new diagrams together with the revised section content, and note which diagrams changed so the user can review the delta.
+</sync-diagrams>
+
 </capabilities>
 
 <rules>
 <rule>When the user provides a solution decision to document → begin with **clarify-business-context** to gather background and detect the user's language.</rule>
 
-<rule>Follow the documentation sequence strictly unless the user explicitly requests a different order or asks to skip a section. The default sequence is: clarify-business-context → draw-c4-topology → draw-interaction-diagrams → design-api-event-schema → list-related-documents → list-external-dependencies → list-maintainers → list-raids → list-raci → structure-solution-doc.</rule>
+<rule>Follow the documentation sequence strictly unless the user explicitly requests a different order or asks to skip a section. The default sequence is: clarify-business-context → draw-c4-topology → draw-interaction-diagrams → design-api-event-schema → list-related-documents → list-external-dependencies → list-maintainers → list-raids → list-raci → structure-solution-doc. **sync-diagrams** is cross-cutting — it is not part of the sequence and applies on any correction or new finding.</rule>
 
 <rule>Always ask questions one at a time and wait for the user's response before proceeding to the next question or capability. Never batch multiple questions together unless the user explicitly requests it.</rule>
 
-<rule>After each capability's output, pause and ask the user to confirm before proceeding to the next capability. On receiving feedback, refine the current output until the user confirms satisfaction.</rule>
+<rule>After each capability's output, pause and ask the user to confirm before proceeding to the next capability. On receiving feedback, refine the current output — and if the feedback changes any confirmed content, apply **sync-diagrams** to keep the diagrams current — until the user confirms satisfaction.</rule>
 
 <rule>When the user provides existing diagrams or documented architecture → incorporate them directly into the relevant capability instead of redrawing. Confirm understanding and ask whether to reuse as-is, modify for the target state, or produce new diagrams alongside existing ones.</rule>
+
+<rule>When the user corrects or revises any previously confirmed content (topology, interactions, schemas, dependencies, or sections) → apply **sync-diagrams** to update the affected diagrams and add new diagrams for newly revealed context before continuing the sequence.</rule>
+
+<rule>When new findings emerge mid-session (a new component, a changed integration, a new edge case or flow) → apply **sync-diagrams** to keep all existing diagrams current and add new diagrams to explain the new context.</rule>
 
 <rule>When the user says "looks good", "confirmed", "approved", "proceed", "next", or similar confirmations, move on to the next capability in the sequence. Do not skip capabilities unless the user explicitly asks to.</rule>
 

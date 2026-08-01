@@ -56,6 +56,22 @@ Use diagrams proactively whenever explaining context or a solution — never wai
 Zoom in level by level: C4 context → container → component for structure, then a flowchart or sequence diagram for a specific flow or interaction. The solution architecture is simply a C4/flowchart view of the target state — no separate diagram type is required. Draw C4 diagrams with the C4-PlantUML macros (`Person`, `System`, `System_Ext`, `Container`, `ContainerDb`, `Component`, `Rel`, `System_Boundary`, `Container_Boundary`). Keep each diagram to a single message. Load **reference/diagram-guide.md** for the include paths, notation, and snippets.
 </diagram-selection>
 
+<diagram-sync>
+Diagrams are living artifacts of the ADR session: every new finding or correction may invalidate an existing diagram or reveal context that needs a new one. After any confirmed change, sync the diagrams before proceeding so the visual record always matches the latest confirmed state.
+
+Update an existing diagram when:
+- The element it depicts changed — a system, container, component, actor, option, driver, or relationship was added, removed, or renamed
+- The flow or interaction it shows was corrected — a step, branch, or message order is different
+- The decision it visualizes changed — the chosen option, or the drivers it satisfies, is different
+
+Add a new diagram when:
+- New context is discussed that no existing diagram covers — a new flow, boundary, edge case, or failure path
+- The discussion zooms into a level not yet drawn (context → container → component → flow)
+- A correction introduces a distinct scenario worth its own view
+
+Never leave a stale diagram: after each change, every diagram either reflects the latest confirmed state or is replaced by a new one that does.
+</diagram-sync>
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -64,6 +80,7 @@ Zoom in level by level: C4 context → container → component for structure, th
 | Drawing any diagram (any capability) | PlantUML-first notation for C4 (context / container / component), flowchart, sequence, driver map, and comparison diagrams, with fallback snippets | [reference/diagram-guide.md](reference/diagram-guide.md) |
 | User provides a complete, well-formed problem statement and wants to see a full end-to-end walkthrough | Full walkthrough of all 5 capabilities for a database selection decision | [examples/database-selection.md](examples/database-selection.md) |
 | User has partial notes or rough ideas and needs help structuring them into an ADR | Full walkthrough of all 5 capabilities starting from unstructured input | [examples/from-rough-notes.md](examples/from-rough-notes.md) |
+| User corrects content or new findings emerge mid-session and diagrams need to stay current | Walkthrough of **sync-diagrams** updating affected diagrams and adding new ones | [examples/diagram-sync.md](examples/diagram-sync.md) |
 
 </context-loading-guide>
 
@@ -123,6 +140,15 @@ Zoom in level by level: C4 context → container → component for structure, th
 7. Present the completed ADR to the user for final review and ask: "Would you like to adjust any section before saving?"
 </compile-adr>
 
+<sync-diagrams>
+1. After the user confirms a new finding or correction (revised problem, changed decision drivers, new or removed option, updated evaluation, different chosen option, corrected fact), identify every diagram drawn earlier in the session.
+2. For each diagram, decide whether the change affects any element, relationship, flow, or decision it depicts. Leave unaffected diagrams untouched.
+3. For each affected diagram, produce the updated version that reflects the latest confirmed state, and state in one line what changed and why.
+4. For any new context introduced by the change that no existing diagram covers, draw a new diagram per **diagram-selection** (e.g., a new flow, a zoomed level, an edge-case path) and add it to the session alongside the existing diagrams.
+5. Cross-check the full diagram set against the confirmed ADR content: every confirmed fact is represented in at least one diagram, and no diagram contradicts the latest confirmed state.
+6. Present the updated and new diagrams together with the revised ADR content, and note which diagrams changed so the user can review the delta.
+</sync-diagrams>
+
 </capabilities>
 
 <rules>
@@ -133,9 +159,10 @@ Zoom in level by level: C4 context → container → component for structure, th
 <rule>After options are confirmed, apply **evaluate-options** to assess each option's pros and cons against the decision drivers.</rule>
 <rule>After all options are evaluated and a recommendation is chosen, apply **compile-adr** to produce the final ADR document using the template.</rule>
 
-<rule>If the user submits a new option mid-evaluation, apply **evaluate-options** to assess it and integrate it into the comparison.</rule>
-<rule>If the user revises the problem or decision drivers at any point, re-apply the affected downstream capabilities to keep the ADR consistent.</rule>
+<rule>If the user submits a new option mid-evaluation, apply **evaluate-options** to assess it and integrate it into the comparison, then apply **sync-diagrams** to update the comparison matrix and elimination tree.</rule>
+<rule>If the user revises the problem or decision drivers at any point, re-apply the affected downstream capabilities to keep the ADR consistent, then apply **sync-diagrams** to update every affected diagram.</rule>
 <rule>After each user confirmation, update any in-progress ADR draft so nothing is lost.</rule>
+<rule>When the user corrects previously confirmed content or reveals new context at any point (e.g., a new option, a revised driver, a changed chosen option, a newly discovered flow), apply **sync-diagrams** to update the affected diagrams and add new diagrams to explain the new context.</rule>
 <rule>Whenever explaining context or a solution during any capability, proactively draw the matching diagram from **diagram-selection** — do not wait for the user to ask.</rule>
 
 </rules>

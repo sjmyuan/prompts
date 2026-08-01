@@ -249,7 +249,18 @@ sequenceDiagram
 [Order Management Service] --payment--> [Payment Processor]
 ```
 
+## Updating and Extending Diagrams
+
+Diagrams are living artifacts of the ADR session: sync them whenever the user confirms a new finding or correction, so the visual record never goes stale.
+
+- **Update in place when the change affects an existing diagram**: keep the same diagram identity (title, aliases, structure) and change only what is affected. State the delta in one line before the updated code block (e.g., "Updated: added the analytics system and its relationship to the OMS").
+- **Add a new diagram when the context is genuinely new**: a flow, zoom level, or edge case no existing diagram covers. Give it a distinct title; do not overload an existing diagram with extra branches.
+- **Preserve identity**: when updating, keep the same aliases and labels so readers can diff old vs. new easily.
+- **Keep the set consistent**: after every change, each confirmed fact appears in at least one diagram, and no diagram contradicts the latest confirmed state. Cross-check the whole set before proceeding.
+- **Never leave stale visuals**: if a diagram depicts an obsolete state, update or replace it — do not leave both the old and new versions in the session.
+
 ## Cross-References
 
 - Selection logic (which diagram to draw for which context): **diagram-selection** in `SKILL.md`
+- When to update vs. add diagrams after corrections: **diagram-sync** in `SKILL.md`
 - Where diagrams appear in the final document: `reference/adr-template.md`
