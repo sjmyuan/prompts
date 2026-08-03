@@ -158,6 +158,8 @@
 - (-) Eventual consistency between payment capture and settlement processing — requires monitoring and alerting.
 - (-) Shared DB remains in the short term — full per-service databases deferred to Phase 2.
 
+> *Note: The deep-dive corrections (stored procedure dependency graph, settlement batch profiling) were applied directly to the findings document. The ADR itself carries only the updated decision and its rationale — no logs or investigation history appear in the ADR or the solution document (see **clean-artifact-principle**).*
+
 ---
 
 ## Step 6: Optionally Update Solution Document

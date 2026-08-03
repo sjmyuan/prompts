@@ -41,9 +41,9 @@ A change summary translates the delta between findings (current state) and solut
 When a solution document exceeds ~3000 words or 5+ major sections, split independently understandable sections into standalone reference documents. The main doc becomes a hub with 2–4 sentence summaries and cross-references; each extracted doc must stand alone and back-reference the hub. Split by service, architectural layer, or decision area. For full heuristics and validation checklist, see **reference/solution-doc-modularity-guide.md**.
 </solution-doc-modularity>
 
-<discovery-log>
-Spike investigations are iterative — new facts may contradict earlier assumptions. When this happens, record **what changed, why, and the evidence** in the affected findings document's **Discovery Log** section. Update ADRs and the solution document if they are also affected. A discovery entry captures: the fact/correction, evidence, impact on documents, and date. For the full log format, entry structure, and when-to-record triggers, see **reference/discovery-log-guide.md**.
-</discovery-log>
+<clean-artifact-principle>
+Keep ADRs and the solution document as clean as possible. These are decision documents, not investigation reports: an ADR contains only the decision (problem, decision drivers, considered options, chosen option, consequences); the solution document contains only the target-state architecture (business context, C4/sequence diagrams, API contracts, RAID, RACI). Never embed investigation logs, raw data dumps, evidence trails, process history, or change notes in either. All such supporting detail belongs in the separate findings document — cite it with a cross-reference instead of copying it in. If content does not help a reader understand or act on the decision, it does not belong in the ADR or solution document.
+</clean-artifact-principle>
 
 <deep-dive-mode>
 When a user wants to drill deeper into specific unresolved areas from a previous spike, the skill operates in **deep-dive mode**. Areas not selected are left as-is. See **reference/deep-dive-mode-guide.md** for full mode comparison.
@@ -98,7 +98,6 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
 | Generating a change summary (code-level changes required to implement the solution) | Format, categories, and code-access guidance | [reference/change-summary-guide.md](reference/change-summary-guide.md) |
 | Assessing and splitting a large solution document into modular, AI-friendly pieces | Splitting heuristics, patterns, and validation checklist | [reference/solution-doc-modularity-guide.md](reference/solution-doc-modularity-guide.md) |
 | Producing a concrete change summary with code access, demonstrating all change categories | End-to-end change summary with code-verified scope estimates | [examples/change-summary-example.md](examples/change-summary-example.md) |
-| Recording new discoveries, corrections, or invalidated assumptions during investigation or evaluation | Discovery log format and when-to-record guidance | [reference/discovery-log-guide.md](reference/discovery-log-guide.md) |
 | Suggesting candidate questions to narrow or broaden a spike after a round completes | Candidate-generation heuristics, go-deeper vs go-broader patterns, and output format | [reference/spike-direction-suggestions-guide.md](reference/spike-direction-suggestions-guide.md) |
 | Seeing a worked example of direction suggestions — 3 go-deeper and 3 go-broader candidates grounded in investigation evidence | Walkthrough of generating direction candidates after a spike round, with rationale for each | [examples/spike-direction-suggestions.md](examples/spike-direction-suggestions.md) |
 | Suggesting a spike when ADR discussion reveals a decision hinges on unverified assumptions or unknown facts | Worked example of detecting ADR uncertainty and offering a focused spike before finalizing the ADR | [examples/adr-uncertainty-spike-suggestion.md](examples/adr-uncertainty-spike-suggestion.md) |
@@ -114,7 +113,7 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
 2. Apply **investigate-per-area** to understand the current implementation per area. For multi-area spikes, dispatch investigation to sub-agents in parallel per **multi-agent-orchestration**. After the investigation summary, direction suggestions are presented (3 go-deeper, 3 go-broader).
    - **If the user selects a direction candidate**: treat it as a new spike scope — loop back to step 1 with the selected question as the goal.
    - **If the user confirms the investigation is complete**: proceed to step 3.
-3. Apply **compile-findings-doc** to formalize the investigation results into a structured findings document. Ensure any discoveries flagged during investigation appear in the Discovery Log.
+3. Apply **compile-findings-doc** to formalize the investigation results into a structured findings document.
 4. After findings are confirmed, apply **evaluate-solutions-per-area** to brainstorm, compare, and select an assumed solution for each area.
 5. After evaluation, apply **draft-area-adrs** to produce one formal ADR per area documenting the decision.
 6. After all ADRs are finalized, apply **compile-solution-doc** to consolidate all ADRs into a system-level solution document.
@@ -151,12 +150,12 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
    - When all sub-agents complete, collect their findings.
    - Synthesize findings: review each sub-agent's output for completeness, resolve any cross-area inconsistencies, and compile each area's findings into the structured summary format (current state, constraints & pain points, relevant diagrams).
 
-4. Present a consolidated investigation summary. For each area where the investigation revealed a discovery that contradicts or refines a prior assumption, flag it: "New discovery in [area]: [what was found, evidence]." Record each discovery for handoff to the findings document's Discovery Log.
+4. Present a consolidated investigation summary, noting any facts that contradict or refine prior assumptions so they can be corrected in the findings document.
 5. After presenting the investigation summary, apply **suggest-spike-directions** to present 3 go-deeper and 3 go-broader candidate questions grounded in the investigation evidence.
 6. Ask the user: "Would you like to pursue any of these directions, or is the investigation complete?"
    - If the user selects a direction: the workflow loops back to scope definition with the selected question as the new spike goal.
    - If the user confirms the investigation is complete: proceed to step 7.
-7. Hand off to the workflow orchestrator for **compile-findings-doc**. Ensure any discoveries flagged in step 4 are passed along for inclusion in the findings document's Discovery Log.
+7. Hand off to the workflow orchestrator for **compile-findings-doc**.
 </investigate-per-area>
 
 <evaluate-solutions-per-area>
@@ -164,12 +163,9 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
 2. After all options are evaluated, ask: "Which option do you recommend as the assumed solution for [area name]?"
    - If the user is unsure, help them compare the top contenders against decision drivers.
    - Record the **assumed solution** — this is provisional and may change after formal ADR review.
-3. **Check for findings gaps**: During evaluation, did any option reveal a constraint, risk, or fact that was not captured in the findings document? If so:
-   - Record the new discovery in the findings document's Discovery Log (what was found, evidence, impact).
-   - Update the affected sections of the findings document.
-   - Note the correction when presenting the evaluation summary.
+3. **Check for findings gaps**: During evaluation, did any option reveal a constraint, risk, or fact that was not captured in the findings document? If so, update the affected sections of the findings document and note the correction when presenting the evaluation summary.
 4. Repeat for each investigation area.
-5. Validate each area's evaluation: confirm at least 2 options were considered, pros/cons relate to decision drivers, and the assumed solution follows logically from the comparison. Also confirm any findings corrections from step 3 were recorded in the Discovery Log.
+5. Validate each area's evaluation: confirm at least 2 options were considered, pros/cons relate to decision drivers, and the assumed solution follows logically from the comparison.
 6. Present a summary table of all areas with their assumed solutions and any findings corrections made.
 </evaluate-solutions-per-area>
 
@@ -189,8 +185,9 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
    - When all sub-agents complete, collect and review each ADR for completeness and consistency.
 
 4. After all ADRs are drafted (via either method), present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?" If the user raises uncertainty about any ADR's decision — an unverified assumption, unknown feasibility, or unresolved comparison — apply **suggest-spike-on-adr-uncertainty** before finalizing.
-5. Validate each ADR: confirm the chosen option follows logically from the decision drivers, all evaluated options are fairly represented, consequences include both positive and negative impacts, and the ADR can be understood without reading other ADRs.
-6. Note: The chosen option in each ADR is the **assumed solution**. The solution document will adopt these. If an ADR decision changes later, the solution document should be updated accordingly.
+5. Keep each ADR clean per **clean-artifact-principle**: it contains only the decision — problem, decision drivers, considered options, chosen option, and consequences. No logs, raw data, evidence dumps, or process history. Cite the findings document for evidence rather than embedding it.
+6. Validate each ADR: confirm the chosen option follows logically from the decision drivers, all evaluated options are fairly represented, consequences include both positive and negative impacts, and the ADR can be understood without reading other ADRs.
+7. Note: The chosen option in each ADR is the **assumed solution**. The solution document will adopt these. If an ADR decision changes later, the solution document should be updated accordingly.
 </draft-area-adrs>
 
 <compile-solution-doc>
@@ -198,8 +195,9 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
 2. **Assess solution doc size and modularity**: Apply the heuristics in **solution-doc-modularity**. If the doc exceeds ~3000 words, has 5+ major sections, or has independently useful sections for different audiences, identify candidate sections for extraction.
 3. **Extract independent sections**: For each candidate, create a standalone doc with standalone context and back-reference, replace it in the hub with a 2–4 sentence summary and cross-reference link per **solution-doc-modularity**. Skip extraction for small, single-service solutions.
 4. Compile the final output bundle: Findings Documents, N ADRs, 1 Solution Document (hub), and modular sub-documents (if extracted).
-5. Validate the bundle: every ADR's chosen solution is reflected in the solution doc, cross-references between all artifacts are consistent, diagrams match assumed solutions, and extracted sub-docs have correct back-references.
-6. Present the complete bundle. Remind the user:
+5. Keep the solution document clean per **clean-artifact-principle**: it contains only the target-state architecture — business context, C4/sequence diagrams, API contracts, RAID, RACI. No logs, raw investigation data, process history, or change notes. Where supporting detail exists, it lives in the findings document — cross-reference it rather than copying it in.
+6. Validate the bundle: every ADR's chosen solution is reflected in the solution doc, cross-references between all artifacts are consistent, diagrams match assumed solutions, and extracted sub-docs have correct back-references.
+7. Present the complete bundle. Remind the user:
    - Findings docs are the current-state record — keep them even if decisions change.
    - ADRs are formal decision records — review and approve with the team.
    - The solution doc is the target-state architecture; update it if an ADR decision changes.
@@ -209,15 +207,13 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
 <compile-findings-doc>
 1. Determine document strategy: **per-area** (recommended for 2+ loosely-coupled areas) or **one consolidated doc** (tightly-coupled or single-area). Ask the user which they prefer.
 
-2. For each findings document to produce, load the `write-solution-doc` skill's SKILL.md and apply its capabilities to produce a **current-state document**. The key adaptation: label all diagrams as "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings. Include a **Discovery Log** section at the end of each findings document, following the format in **reference/discovery-log-guide.md**. Populate it with any discoveries flagged during investigation (from **investigate-per-area** step 4). Seed with Phase 2 results rather than gathering context from scratch.
+2. For each findings document to produce, load the `write-solution-doc` skill's SKILL.md and apply its capabilities to produce a **current-state document**. The key adaptation: label all diagrams as "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings. Seed with Phase 2 results rather than gathering context from scratch.
 
 3. Cross-reference between findings docs (if per-area): Note where one area's current state creates constraints for another. For example: "Area 1 (service boundaries): the monolithic `PaymentOrchestrator` → constrains Area 2 (communication): all calls are in-process, no service mesh exists."
 
 4. Present each findings document to the user and ask: "Does this accurately capture the current state? Anything to add, correct, or remove?"
 
-5. After confirmation, ensure the Discovery Log is up to date — any corrections from user feedback in step 4 should be recorded as discovery entries.
-
-6. The findings docs are now the **current-state baseline**: evaluation compares options against them, ADRs cite them as evidence, and the solution doc evolves their diagrams from as-is → to-be.
+5. The findings docs are now the **current-state baseline**: evaluation compares options against them, ADRs cite them as evidence, and the solution doc evolves their diagrams from as-is → to-be.
 </compile-findings-doc>
 
 <summarize-required-changes>
@@ -234,9 +230,9 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
 
 <deep-dive-specific-areas>
 1. **Gather existing context** and **confirm the deep-dive scope** — which areas to revisit, what questions remain, which areas stay as-is.
-2. **Deep-dive per selected area**: investigate deeper with targeted focus → update findings doc (including Discovery Log entries for any new facts or corrections) → evaluate solutions with new findings → update or produce ADRs.
+2. **Deep-dive per selected area**: investigate deeper with targeted focus → update findings doc with any new facts or corrections → evaluate solutions with new findings → update or produce ADRs.
 3. **Optionally update the solution document** if ADR changes affect the system-level view.
-4. **Present the deep-dive results** — updated findings with Discovery Log entries, new/updated ADRs, refreshed solution doc (if applicable).
+4. **Present the deep-dive results** — updated findings, new/updated ADRs, refreshed solution doc (if applicable). ADRs and the solution doc are updated cleanly with the corrected decisions and facts, without logs or change notes (see **clean-artifact-principle**).
 5. After presenting the results, apply **suggest-spike-directions** to present direction candidates for the next spike round.
 
 For the full step-by-step procedure with prompts and validation checks per step, load **reference/deep-dive-procedure.md**.

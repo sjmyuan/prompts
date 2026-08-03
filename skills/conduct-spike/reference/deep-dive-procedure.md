@@ -26,14 +26,12 @@ Ask the user to share the context from the previous spike. This may include:
   - Scope investigation strictly to what's needed to answer the unresolved question.
   - Don't re-investigate what was already confirmed — reference existing findings and only fill gaps.
   - If the previous investigation was shallow, deepen it: trace deeper call paths, profile performance, prototype a critical path, research alternative technologies more thoroughly.
-- Compile the new findings, noting what's new vs. what was already known from the previous spike.
-- **Record discoveries**: If the deep-dive reveals facts that contradict or refine previous findings, record them in the findings document's Discovery Log following the format in **reference/discovery-log-guide.md**. Each entry must capture: what was found, the evidence, and the impact on the document.
+- Compile the new findings, noting what's new vs. what was already known from the previous spike. If the deep-dive reveals facts that contradict or refine previous findings, incorporate the corrections directly into the findings document.
 
 ## Step 4: Update the findings document(s) (per selected area)
 
 - Load the existing findings document(s) from the previous spike.
-- For each deep-dived area, update its findings document with the new investigation results. If the area has its own findings doc, update that file. If using a consolidated doc, update the relevant section.
-- **Record corrections in the Discovery Log**: For each change to the findings document, add a dated entry in the Discovery Log section (create the section if it doesn't exist yet). Each entry must capture what was corrected, the evidence from the deep-dive, and which sections were updated. See **reference/discovery-log-guide.md** for the full format.
+- For each deep-dived area, update its findings document with the new investigation results, applying any corrections directly to the affected sections. If the area has its own findings doc, update that file. If using a consolidated doc, update the relevant section.
 - Clearly mark what's new vs. what was previously known.
 - Present the updated findings document(s) and ask the user to confirm before proceeding.
 
@@ -49,12 +47,14 @@ Ask the user to share the context from the previous spike. This may include:
 - If an ADR already exists for the area: load it, update the investigation findings, re-evaluate the options if needed, and revise the chosen option and consequences accordingly. Preserve the ADR's existing structure and metadata.
 - If no ADR exists yet for the area: apply the draft-area-adrs capability to produce a new ADR.
 - Ensure each ADR references the relevant findings document(s) for evidence.
+- Keep the ADR clean: it contains only the revised decision (problem, drivers, options, chosen option, consequences). No logs or raw investigation data — any corrected facts live in the findings document.
 
 ## Step 7: Optionally update the solution document
 
 - Ask: "Do the new or updated ADRs change the overall system-level view?"
 - If yes, apply the compile-solution-doc capability to refresh the solution document, incorporating the updated ADR decisions.
 - If no, note that the existing solution document remains valid. The new/updated ADRs supplement it.
+- Keep the refreshed solution document clean: update only the affected target-state sections (diagrams, contracts, RAID, RACI). No logs, no change notes, no investigation history — those stay in the findings document.
 
 ## Step 8: Present the deep-dive results
 

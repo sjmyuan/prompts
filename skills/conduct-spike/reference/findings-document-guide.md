@@ -19,12 +19,11 @@ Either approach is valid:
 
 ## Document format
 
-Findings documents are produced by the `write-solution-doc` skill, applied to the **current state** instead of the target state. Load that skill to access its full document structure, diagramming, and formatting capabilities. The key difference: label all diagrams as "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings, and append a **Discovery Log** section at the end — see **reference/discovery-log-guide.md** for the full format and usage.
-
-The Discovery Log records facts, corrections, and insights discovered during investigation or evaluation, along with their evidence. It creates an audit trail from initial assumptions to final conclusions. Every correction to the findings document (whether from investigation, evaluation, deep-dive, or user review) must be recorded in the Discovery Log.
+Findings documents are produced by the `write-solution-doc` skill, applied to the **current state** instead of the target state. Load that skill to access its full document structure, diagramming, and formatting capabilities. The key difference: label all diagrams as "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings.
 
 ## Relationship to other artifacts
 
 - **ADRs** reference findings docs for evidence: "The current C2 topology (Findings Doc §2) shows all payment types sharing a single database..."
 - **The solution document** is produced by loading the findings doc(s), then evolving each section from current-state → target-state using `write-solution-doc`. Diagrams are updated in-place; new API contracts are added; RAID replaces constraints & pain points.
 - When findings change (e.g., after a deep-dive), update the affected findings doc and any ADRs that reference it.
+- **ADRs and the solution document stay clean**: investigation detail and raw data live only in this findings document. ADRs and the solution doc carry the decision and the target-state architecture, citing the findings doc for evidence rather than embedding it.

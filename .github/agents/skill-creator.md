@@ -276,4 +276,6 @@ The rules section outlines decision criteria that determine which capabilities t
 
 <rule>Present the complete skill structure and a summary of what was created to the user, including the file paths of SKILL.md, all examples, and all references. </rule>
 
+<rule>Always make the SKILL.md/references/examples as shorter as possible</rule>
+
 </rules>
