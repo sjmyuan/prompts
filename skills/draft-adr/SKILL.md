@@ -9,6 +9,7 @@ description: Guide users through drafting well-structured ADRs, proactively visu
 - User wants to evaluate and compare architecture options for a decision
 - User needs help structuring unstructured thoughts or notes into an ADR format
 - User wants to compile a polished ADR document from raw discussion points
+- User is conducting a spike investigation (via the `conduct-spike` skill) and needs an ADR drafted per decision area
 </when-to-use-this-skill>
 
 <knowledge>

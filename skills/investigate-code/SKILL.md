@@ -10,6 +10,7 @@ description: Investigate codebases to answer questions about functionality, arch
 - User wants to investigate code across multiple repositories and their interactions
 - User wants to visualize architecture with C4 diagrams, sequence diagrams, or call stack traces
 - User wants to discover implementation patterns or detect inconsistencies across the codebase
+- User is conducting a spike investigation (via the `conduct-spike` skill) and needs current-state investigation of an area
 </when-to-use-this-skill>
 
 <knowledge>

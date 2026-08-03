@@ -81,39 +81,15 @@
 
 ## Phase 2a: Direction Suggestions After Investigation
 
-*[suggest-spike-directions applied — presenting 3 go-deeper and 3 go-broader candidates grounded in investigation evidence]*
+*[suggest-spike-directions applied — presenting 3 go-deeper and 3 go-broader candidates grounded in investigation evidence; see `examples/spike-direction-suggestions.md` for the full candidate format]*
 
-### Assistant Output
+### Assistant Output (condensed)
 
-> "Here's what we learned from the investigation. Before we formalize findings and move to evaluation, let me suggest some directions — 3 to go deeper on unresolved details, 3 to broaden to concerns we haven't covered yet.
-
----
-
-## Where to take this spike next?
-
-### Go Deeper (narrow the focus on unresolved details)
-
-| # | Candidate question | Based on (evidence from this round) | Why it matters |
-|---|---|---|---|
-| **D1** | The `PaymentOrchestrator` (1200 lines) coordinates all payment types — should we trace its full call graph to identify which methods are type-specific vs. cross-cutting before finalizing service boundaries? | We identified the orchestrator as a coupling point but didn't map its internal dependency graph | If 80% of orchestrator logic is type-specific, extraction is straightforward. If 50% is cross-cutting, we need a shared orchestration layer — very different architectures |
-| **D2** | The team has no Kafka/RabbitMQ experience — what's the actual learning curve and operational readiness? Should we spike a small async prototype to assess feasibility before committing to ADR-002? | We noted no async messaging experience as a constraint but didn't assess the team's ability to adopt it | If Kafka adoption requires 3+ months of team ramp-up, the hybrid communication strategy may not be viable in the near term |
-| **D3** | The 12 stored procedures (2000+ lines) are flagged as a migration blocker — which specific procedures span multiple payment types, and can they be isolated or must they be rewritten? | We identified stored procedures as a DB decomposition blocker but didn't trace their cross-type dependencies | If only 2 of 12 procedures are cross-type, the DB split is manageable. If 8 of 12 are, we may need a completely different decomposition strategy |
-
-### Go Broader (expand to adjacent concerns we haven't covered)
-
-| # | Candidate question | Based on (evidence from this round) | Why it matters |
-|---|---|---|---|
-| **B1** | The monolith integrates with 3 external protocols (REST, gRPC, SOAP) — how will these integrations be distributed across the new services? Will the SOAP legacy acquirer need its own adapter service? | We mapped external integrations but didn't plan how they map to new service boundaries | The SOAP integration could force a dedicated adapter service that wasn't in the original decomposition plan |
-| **B2** | How will monitoring and observability change when we go from 1 monolith to 4+ services? Current logging, tracing, and alerting assume a single application | We investigated architecture but not operations — monitoring was out of scope | If the team can't debug distributed traces, the migration will stall at the first production incident regardless of how good the architecture is |
-| **B3** | The 3 teams currently working on the monolith have overlapping ownership — who will own each new service? Is there a Conway's Law alignment to validate? | We noted team contention as a pain point but didn't map team-to-service ownership | If team boundaries don't align with service boundaries, we'll recreate the same contention in the new architecture |
-
----
-
-Would you like to pursue any of these directions? Pick one (or more) and I'll start a new spike round. Or if you're satisfied with the investigation depth, we can proceed to formalize findings and evaluate solutions."
+> "Here's what we learned. Before we formalize findings, here are 6 direction candidates — e.g., **D1**: trace the `PaymentOrchestrator` call graph to decide whether extraction is straightforward; **B2**: plan monitoring/observability for the multi-service target. See `examples/spike-direction-suggestions.md` for the full go-deeper/go-broader table."
 
 ### User Response
 
-> "These are good suggestions. D1 (orchestrator call graph) and B2 (monitoring) are worth investigating, but let's proceed with what we have for now — we can deep-dive those after the first round of ADRs. Let's continue to formalize the findings."
+> "D1 (orchestrator call graph) and B2 (monitoring) are worth investigating, but let's proceed with what we have for now — we can deep-dive those after the first round of ADRs."
 
 ### Assistant
 

@@ -1,24 +1,12 @@
 # Spike Direction Suggestions Guide
 
-After each spike round completes, the skill should suggest concrete candidate questions for the next step — 3 to narrow the spike (go deeper) and 3 to broaden it (go broader). These suggestions are grounded in evidence from the investigation, helping the user correct their direction without the skill needing to guess before it knows anything.
-
-## Why Direction Suggestions?
-
-Users often finish a spike round unsure what to ask next. They may:
-
-- Not realize there are unresolved details worth investigating ("we answered the big question, what else is there?")
-- Not see adjacent concerns their spike scope excluded ("we looked at the database, but what about the cache layer?")
-- Default to stopping when a deeper or broader investigation would produce better decisions
-
-Direction suggestions give the user a concrete menu of next steps — each backed by evidence from what the skill just learned.
-
----
+After each spike round completes, suggest 3 go-deeper and 3 go-broader candidate questions grounded in investigation evidence.
 
 ## Candidate Generation Procedure
 
 ### Step 1: Review What Was Learned
 
-From the findings document (or solution doc), extract:
+From the investigation summary, findings document, or solution doc (whichever exists at the current point in the workflow), extract:
 
 | Category | What to extract | Example |
 |---|---|---|

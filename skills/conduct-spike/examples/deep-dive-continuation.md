@@ -206,42 +206,18 @@
 
 ## Step 8: Direction Suggestions After Deep-Dive
 
-*[suggest-spike-directions applied — presenting direction candidates for the next spike round, grounded in the deep-dive findings]*
+*[suggest-spike-directions applied — presenting direction candidates for the next spike round, grounded in the deep-dive findings; see `examples/spike-direction-suggestions.md` for the full candidate format]*
 
-### Assistant Output
+### Assistant Output (condensed)
 
-> "ADR-003 is now resolved. Before we wrap up, let me suggest some directions for where to take this spike next — 3 to go deeper on details the deep-dive surfaced, 3 to broaden to adjacent concerns.
-
----
-
-## Where to take this spike next?
-
-### Go Deeper (narrow the focus on unresolved details from this deep-dive)
-
-| # | Candidate question | Based on (evidence from this round) | Why it matters |
-|---|---|---|---|
-| **D1** | We decided to extract settlement into its own service — should we design the exact Kafka topic schema and partitioning strategy for settlement events now, since the correctness of cross-type settlement depends on event ordering? | The deep-dive revealed settlement depends on ordered processing across payment types, but topic design wasn't specified | If Kafka partitioning doesn't align with settlement's ordering requirements, we could introduce subtle data consistency bugs that are hard to detect |
-| **D2** | The 4 cross-type stored procedures (`settle_cross_type()`, `reconcile_daily()`, `calculate_fees()`, `audit_trail()`) need to be rewritten — should we spike the rewrite effort for the most complex one to get a realistic estimate? | We identified which procedures are cross-type but didn't estimate rewrite effort | If rewriting `settle_cross_type()` alone takes 3 sprints, the phased migration timeline needs to account for that — it could be the long pole |
-| **D3** | We identified that 8 of 12 stored procedures are payment-type-specific and can be isolated — should we spike extracting one of them into a payment-type service as a proof-of-concept for the extraction pattern? | The isolation analysis is theoretical — no extraction has been attempted | A single successful extraction validates the entire decomposition strategy and surfaces practical issues (connection pooling, transaction boundaries) that the analysis missed |
-
-### Go Broader (expand to adjacent concerns surfaced by this deep-dive)
-
-| # | Candidate question | Based on (evidence from this round) | Why it matters |
-|---|---|---|---|
-| **B1** | The settlement service becomes a critical runtime dependency — if it's down, cross-type reconciliation pauses. Should we spike the settlement service's resilience requirements (redundancy, failover, SLAs) before implementation? | The deep-dive identified settlement as a new critical path but didn't define its availability requirements | Without defined resilience requirements, the team may build a single-point-of-failure that's worse than the monolith's current reliability |
-| **B2** | We introduced eventual consistency between payment writes and settlement processing via Kafka — should we spike the monitoring and alerting strategy for detecting consistency lag? | The ADR notes eventual consistency as a consequence but monitoring wasn't addressed | If the team can't detect when settlement falls behind, they'll be blind to a critical business issue — revenue reconciliation could silently break |
-| **B3** | The current monolith handles all 3 payment types — after extracting settlement, should we revisit whether the payment-type services (ADR-001) need to coordinate with the settlement service differently than they did with the monolith? | This deep-dive only touched DB decomposition (ADR-003), but the settlement extraction creates new cross-service dependencies that ADR-001 didn't account for | ADR-001 (service boundaries) was drafted before we knew settlement would be a separate service — the service interaction model may need updating |
-
----
-
-Would you like to pursue any of these directions? Pick one (or more) and I'll start a new spike round. Or if you're satisfied with the current results, we can stop here."
+> "ADR-003 is now resolved. Before we wrap up, here are 6 direction candidates — e.g., **D1**: design the Kafka topic schema and partitioning for settlement events (ordering correctness); **B1**: define settlement service resilience requirements. See `examples/spike-direction-suggestions.md` for the full go-deeper/go-broader table."
 
 ### User Response
 
-> "D1 (Kafka topic design) is actually critical — we need to get the event ordering right before any implementation starts. And B1 (settlement resilience) is something I hadn't considered. Let's note both as follow-up spikes. For now, I'm satisfied with ADR-003 as-is."
+> "D1 (Kafka topic design) is critical — we need event ordering right before any implementation starts. And B1 (settlement resilience) is something I hadn't considered. Let's note both as follow-up spikes. For now, I'm satisfied with ADR-003 as-is."
 
 ### Assistant
 
-> "Noted. D1 (Kafka topic design for settlement) and B1 (settlement service resilience) are queued as follow-up spikes. ADR-003 is finalized.
+> "Noted. D1 and B1 are queued as follow-up spikes. ADR-003 is finalized.
 >
 > As always: ADRs are formal decision records — review and approve with the team. The solution document should be version-controlled alongside the ADRs."

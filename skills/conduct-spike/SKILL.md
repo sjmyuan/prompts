@@ -1,20 +1,17 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations to produce ADRs, findings, solution docs, and change summaries. Use when scoping, investigating, evaluating, discussing ADR decisions that need investigation, formalizing, continuing, deep-diving, summarizing changes, or suggesting direction for a spike.
+description: Conduct spike investigations to produce ADRs, findings, solution docs, and change summaries. Use when scoping, investigating, evaluating, discussing ADR decisions needing investigation, formalizing, continuing, deep-diving, modularizing, summarizing changes, or suggesting direction.
 ---
 
 <when-to-use-this-skill>
-- User wants to conduct a spike investigation on a technical problem or feature
-- User needs to research, evaluate, and compare solution approaches for a complex problem before committing to one
+- User wants to conduct a spike investigation on a technical problem or feature — researching, evaluating, and comparing solution approaches before committing to one
 - User wants to produce ADRs for each decision area alongside a consolidated solution document
 - User is discussing an ADR (drafting, reviewing, or adjusting a decision) and the outcome depends on unverified assumptions, unknown feasibility, or missing evidence that needs investigation
 - User needs to understand current implementation before proposing changes or solutions
-- User wants to break down a large technical problem into independently decidable investigation areas
+- User wants to break down a large technical problem into independently decidable investigation areas, or split a large solution document into modular sub-documents
 - User has pre-existing investigation findings and wants to formalize them into ADRs and a solution document
 - User wants to continue a previous spike by digging deeper into one or more specific investigation areas that were not fully resolved
-- User wants to summarize the concrete code changes required to implement the chosen solution (change summary)
-- User wants to keep the solution document modular and efficiently loadable by AI (split large solution docs into independent sub-documents)
-- User wants to get suggestions for the next steps in the spike (direction candidates)
+- User wants to summarize the concrete code changes required to implement the chosen solution (change summary) or get suggestions for the next steps in the spike (direction candidates)
 </when-to-use-this-skill>
 
 <knowledge>
@@ -38,11 +35,11 @@ A change summary translates the delta between findings (current state) and solut
 </change-summary>
 
 <solution-doc-modularity>
-When a solution document exceeds ~3000 words or 5+ major sections, split independently understandable sections into standalone reference documents. The main doc becomes a hub with 2–4 sentence summaries and cross-references; each extracted doc must stand alone and back-reference the hub. Split by service, architectural layer, or decision area. For full heuristics and validation checklist, see **reference/solution-doc-modularity-guide.md**.
+When a solution document exceeds ~3000 words or 5+ major sections, split independently understandable sections into standalone reference documents. The main doc becomes a hub with 2–4 sentence summaries and cross-references; each extracted doc must stand alone and back-reference the hub. See **reference/solution-doc-modularity-guide.md** for full heuristics and validation checklist.
 </solution-doc-modularity>
 
 <deep-dive-mode>
-When a user wants to drill deeper into specific unresolved areas from a previous spike, the skill operates in **deep-dive mode**. Areas not selected are left as-is. See **reference/deep-dive-mode-guide.md** for full mode comparison.
+When drilling deeper into specific unresolved areas from a previous spike, the skill operates in **deep-dive mode**; areas not selected are left as-is. See **reference/deep-dive-mode-guide.md** for full mode comparison.
 </deep-dive-mode>
 
 <greenfield-scenarios>
@@ -62,7 +59,7 @@ When helping the user brainstorm solution options, prompt them to consider: stat
 </solution-brainstorming-prompts>
 
 <spike-direction-suggestions>
-After each spike round completes, the user often doesn't know what to ask next. The skill should use what it learned during investigation to suggest concrete candidate questions — 3 to narrow the spike (go deeper on unresolved specifics) and 3 to broaden it (expand to adjacent concerns the user may not have considered). These suggestions are grounded in evidence from the investigation, not guesswork. For the full candidate-generation heuristics, go-deeper vs. go-broader patterns, and output format, see **reference/spike-direction-suggestions-guide.md**.
+After each spike round, suggest 3 go-deeper and 3 go-broader candidate questions grounded in investigation evidence — never guesswork. For candidate-generation heuristics, go-deeper vs. go-broader patterns, and output format, see **reference/spike-direction-suggestions-guide.md**.
 </spike-direction-suggestions>
 
 <adr-uncertainty-signals>
@@ -142,10 +139,7 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
 
 3. **For multi-area investigation (parallel dispatch)**:
    - Announce: "Dispatching investigation of [N] areas to sub-agents in parallel for faster completion."
-   - For each investigation area, prepare a brief with: area name and description, spike goal, brownfield/greenfield designation (see **greenfield-scenarios**), and expected output format (current state, constraints & pain points, relevant diagrams).
-   - Detect what code-exploration agents are available on the current platform, then dispatch all briefs to them concurrently. Sub-agents operate independently.
-   - When all sub-agents complete, collect their findings.
-   - Synthesize findings: review each sub-agent's output for completeness, resolve any cross-area inconsistencies, and compile each area's findings into the structured summary format (current state, constraints & pain points, relevant diagrams).
+   - Prepare per-area briefs (area name/description, spike goal, brownfield/greenfield designation, expected output format), detect available code-exploration agents, dispatch all briefs concurrently, then collect and synthesize results — resolving any cross-area inconsistencies. See **multi-agent-orchestration** for the dispatch pattern.
 
 4. Present a consolidated investigation summary, noting any facts that contradict or refine prior assumptions so they can be corrected in the findings document.
 5. After presenting the investigation summary, apply **suggest-spike-directions** to present 3 go-deeper and 3 go-broader candidate questions grounded in the investigation evidence.
@@ -177,9 +171,7 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
 
 3. **For multi-ADR drafting (parallel dispatch)**:
    - Announce: "Dispatching ADR drafting for [N] areas to sub-agents in parallel."
-   - For each area, prepare a brief with: area name/description, complete evaluation results (decision drivers, options with pros/cons, assumed solution), and instructions to load `draft-adr` to produce a self-contained ADR.
-   - Detect what agents are available on the current platform, then dispatch all briefs to sub-agents concurrently. Each sub-agent loads `draft-adr` independently.
-   - When all sub-agents complete, collect and review each ADR for completeness and consistency.
+   - Prepare per-area briefs (area name/description, complete evaluation results — decision drivers, options with pros/cons, assumed solution — and instructions to load `draft-adr` to produce a self-contained ADR), detect available agents, dispatch all briefs concurrently, then collect and review each ADR for completeness and consistency. See **multi-agent-orchestration** for the dispatch pattern.
 
 4. After all ADRs are drafted (via either method), present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?" If the user raises uncertainty about any ADR's decision — an unverified assumption, unknown feasibility, or unresolved comparison — apply **suggest-spike-on-adr-uncertainty** before finalizing.
 5. Keep each ADR clean per **clean-artifact-principle** (see **reference/clean-artifact-principle.md**): it contains only the decision — problem, decision drivers, considered options, chosen option, and consequences. No logs, raw data, evidence dumps, or process history. Cite the findings document for evidence rather than embedding it.
@@ -280,8 +272,6 @@ For the full step-by-step procedure with prompts and validation checks per step,
 <rules>
 
 <rule>When the user initiates a spike investigation, apply **run-spike-workflow** to orchestrate all phases from scope definition through solution compilation.</rule>
-
-<rule>Do not skip phases in **run-spike-workflow** unless the user explicitly requests it or a specific override rule applies (e.g., pre-existing findings, deep-dive, mid-spike modification).</rule>
 
 <rule>If the user provides pre-existing investigation findings (e.g., from a previous exploration), skip **investigate-per-area** and proceed directly to **compile-findings-doc** (to formalize the provided findings), then continue to **evaluate-solutions-per-area**.</rule>
 

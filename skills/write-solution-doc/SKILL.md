@@ -11,6 +11,7 @@ description: Produce comprehensive solution documentation with C4 diagrams, sequ
 - User wants to perform RAID analysis (Risks, Assumptions, Issues, Dependencies)
 - User wants to create a RACI matrix for solution ownership
 - User wants to compile a complete, multi-section solution document
+- User is conducting a spike investigation (via the `conduct-spike` skill) and needs a solution document or current-state findings documents compiled
 </when-to-use-this-skill>
 
 <knowledge>

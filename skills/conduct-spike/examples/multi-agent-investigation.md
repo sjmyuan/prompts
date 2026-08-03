@@ -142,39 +142,15 @@ Expected output: Current deployment architecture, constraints, migration feasibi
 
 ## Phase 2a: Direction Suggestions After Investigation
 
-*[suggest-spike-directions applied — presenting 3 go-deeper and 3 go-broader candidates grounded in the multi-agent investigation evidence]*
+*[suggest-spike-directions applied — presenting 3 go-deeper and 3 go-broader candidates grounded in the multi-agent investigation evidence; see `examples/spike-direction-suggestions.md` for the full candidate format]*
 
-### Orchestrator Output
+### Orchestrator Output (condensed)
 
-> "All 4 sub-agents have returned their findings. Before we formalize, let me suggest directions based on what we've learned — 3 to go deeper on unresolved details, 3 to broaden to adjacent concerns.
-
----
-
-## Where to take this spike next?
-
-### Go Deeper (narrow the focus on unresolved details)
-
-| # | Candidate question | Based on (evidence from this round) | Why it matters |
-|---|---|---|---|
-| **D1** | Sub-agent A found `PaymentOrchestrator` (1200 lines) couples all types; sub-agent C found 12 stored procedures are a blocker — should we trace which orchestrator methods call which stored procedures to map the full coupling chain? | Cross-agent finding: both decomposition and DB areas flagged the same coupling point from different angles | Understanding the orchestrator → stored procedure call chain tells us whether we can extract services incrementally or must tackle both layers simultaneously |
-| **D2** | Sub-agent B found no async messaging experience; sub-agent D found no traffic splitting — should we spike a small prototype combining Kafka + API Gateway routing to validate the hybrid communication + strangler fig strategy end-to-end? | Two infrastructure gaps identified by different sub-agents that must work together in the target architecture | If Kafka and traffic splitting don't integrate well, the entire hybrid + strangler strategy may be infeasible — better to find out now |
-| **D3** | Sub-agent C found `transactions` and `accounts` tables shared across all payment types — should we analyze the exact query patterns (read vs. write, JOIN frequency) to determine if a read replica or CDC approach is more appropriate than a full DB split? | The shared tables were identified but query patterns weren't profiled | The decomposition strategy (DB per service vs. read replicas vs. CDC) hinges on whether reads or writes dominate the shared table access |
-
-### Go Broader (expand to adjacent concerns we haven't covered)
-
-| # | Candidate question | Based on (evidence from this round) | Why it matters |
-|---|---|---|---|
-| **B1** | Sub-agent B found 3 external protocols (REST, gRPC, SOAP) — will the SOAP legacy acquirer integration need a dedicated adapter service that outlives the migration? | SOAP integration was noted as a constraint but its long-term architectural impact wasn't assessed | If SOAP requires a permanent adapter, that's an additional service in the target architecture not accounted for in the current decomposition plan |
-| **B2** | Sub-agent D found canary deployments exist but aren't tested for routing-based migration — what's the effort to productionize canary + traffic splitting for the strangler fig pattern? | Migration infrastructure gap identified but effort wasn't estimated | If productionizing traffic splitting takes 2 sprints, it becomes the critical path for the entire migration — not the service extraction itself |
-| **B3** | Sub-agent A found 3 teams sharing the monolith — should we spike the organizational aspect: which team takes which service, and how do we handle the shared utility code during transition? | Team contention was flagged but the organizational migration wasn't scoped | Conway's Law: if team boundaries don't match service boundaries, the technical architecture won't stick regardless of how well it's designed |
-
----
-
-Would you like to pursue any of these directions? Pick one (or more) and I'll start a new spike round. Or if you're satisfied with the investigation depth, we can proceed to formalize findings and evaluate solutions."
+> "All 4 sub-agents have returned. Before we formalize, here are 6 direction candidates grounded in the cross-agent findings — e.g., **D2**: prototype Kafka + API Gateway routing to validate the hybrid + strangler strategy end-to-end; **B3**: map team ownership to service boundaries (Conway's Law). See `examples/spike-direction-suggestions.md` for the full go-deeper/go-broader table."
 
 ### User Response
 
-> "D2 (async + routing prototype) is actually a great idea — it addresses the two biggest infrastructure unknowns. But let's proceed with the findings first and circle back to D2 as a follow-up spike. B3 (team ownership) is a conversation I need to have with the engineering manager, not a technical spike."
+> "D2 (async + routing prototype) is a great idea — it addresses the two biggest infrastructure unknowns. But let's proceed with the findings first and circle back to D2 as a follow-up spike. B3 (team ownership) is a conversation I need to have with the engineering manager, not a technical spike."
 
 ### Orchestrator
 
