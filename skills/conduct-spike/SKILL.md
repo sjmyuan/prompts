@@ -41,10 +41,6 @@ A change summary translates the delta between findings (current state) and solut
 When a solution document exceeds ~3000 words or 5+ major sections, split independently understandable sections into standalone reference documents. The main doc becomes a hub with 2–4 sentence summaries and cross-references; each extracted doc must stand alone and back-reference the hub. Split by service, architectural layer, or decision area. For full heuristics and validation checklist, see **reference/solution-doc-modularity-guide.md**.
 </solution-doc-modularity>
 
-<clean-artifact-principle>
-Keep ADRs and the solution document as clean as possible. These are decision documents, not investigation reports: an ADR contains only the decision (problem, decision drivers, considered options, chosen option, consequences); the solution document contains only the target-state architecture (business context, C4/sequence diagrams, API contracts, RAID, RACI). Never embed investigation logs, raw data dumps, evidence trails, process history, or change notes in either. All such supporting detail belongs in the separate findings document — cite it with a cross-reference instead of copying it in. If content does not help a reader understand or act on the decision, it does not belong in the ADR or solution document.
-</clean-artifact-principle>
-
 <deep-dive-mode>
 When a user wants to drill deeper into specific unresolved areas from a previous spike, the skill operates in **deep-dive mode**. Areas not selected are left as-is. See **reference/deep-dive-mode-guide.md** for full mode comparison.
 </deep-dive-mode>
@@ -94,6 +90,7 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
 | Dispatching investigation or ADR drafting to sub-agents in parallel | Dispatch pattern and parallelization rules | [reference/multi-agent-orchestration.md](reference/multi-agent-orchestration.md) |
 | Brainstorming solution options during the evaluate phase | Solution-brainstorming prompt set | [reference/solution-brainstorming-prompts.md](reference/solution-brainstorming-prompts.md) |
 | Producing or understanding findings documents (format, per-area vs consolidated strategy, artifact relationships) | Findings doc format and strategy selection | [reference/findings-document-guide.md](reference/findings-document-guide.md) |
+| Drafting ADRs or compiling the solution document — keeping decision docs free of logs and investigation detail | Clean-document rules for ADRs and the solution doc | [reference/clean-artifact-principle.md](reference/clean-artifact-principle.md) |
 | Entering or executing deep-dive mode (continuing a previous spike on unresolved areas) | Mode comparison guide and deep-dive procedure | [reference/deep-dive-mode-guide.md](reference/deep-dive-mode-guide.md), [reference/deep-dive-procedure.md](reference/deep-dive-procedure.md) |
 | Generating a change summary (code-level changes required to implement the solution) | Format, categories, and code-access guidance | [reference/change-summary-guide.md](reference/change-summary-guide.md) |
 | Assessing and splitting a large solution document into modular, AI-friendly pieces | Splitting heuristics, patterns, and validation checklist | [reference/solution-doc-modularity-guide.md](reference/solution-doc-modularity-guide.md) |
@@ -185,7 +182,7 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
    - When all sub-agents complete, collect and review each ADR for completeness and consistency.
 
 4. After all ADRs are drafted (via either method), present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?" If the user raises uncertainty about any ADR's decision — an unverified assumption, unknown feasibility, or unresolved comparison — apply **suggest-spike-on-adr-uncertainty** before finalizing.
-5. Keep each ADR clean per **clean-artifact-principle**: it contains only the decision — problem, decision drivers, considered options, chosen option, and consequences. No logs, raw data, evidence dumps, or process history. Cite the findings document for evidence rather than embedding it.
+5. Keep each ADR clean per **clean-artifact-principle** (see **reference/clean-artifact-principle.md**): it contains only the decision — problem, decision drivers, considered options, chosen option, and consequences. No logs, raw data, evidence dumps, or process history. Cite the findings document for evidence rather than embedding it.
 6. Validate each ADR: confirm the chosen option follows logically from the decision drivers, all evaluated options are fairly represented, consequences include both positive and negative impacts, and the ADR can be understood without reading other ADRs.
 7. Note: The chosen option in each ADR is the **assumed solution**. The solution document will adopt these. If an ADR decision changes later, the solution document should be updated accordingly.
 </draft-area-adrs>
@@ -195,7 +192,7 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
 2. **Assess solution doc size and modularity**: Apply the heuristics in **solution-doc-modularity**. If the doc exceeds ~3000 words, has 5+ major sections, or has independently useful sections for different audiences, identify candidate sections for extraction.
 3. **Extract independent sections**: For each candidate, create a standalone doc with standalone context and back-reference, replace it in the hub with a 2–4 sentence summary and cross-reference link per **solution-doc-modularity**. Skip extraction for small, single-service solutions.
 4. Compile the final output bundle: Findings Documents, N ADRs, 1 Solution Document (hub), and modular sub-documents (if extracted).
-5. Keep the solution document clean per **clean-artifact-principle**: it contains only the target-state architecture — business context, C4/sequence diagrams, API contracts, RAID, RACI. No logs, raw investigation data, process history, or change notes. Where supporting detail exists, it lives in the findings document — cross-reference it rather than copying it in.
+5. Keep the solution document clean per **clean-artifact-principle** (see **reference/clean-artifact-principle.md**): it contains only the target-state architecture — business context, C4/sequence diagrams, API contracts, RAID, RACI. No logs, raw investigation data, process history, or change notes. Where supporting detail exists, it lives in the findings document — cross-reference it rather than copying it in.
 6. Validate the bundle: every ADR's chosen solution is reflected in the solution doc, cross-references between all artifacts are consistent, diagrams match assumed solutions, and extracted sub-docs have correct back-references.
 7. Present the complete bundle. Remind the user:
    - Findings docs are the current-state record — keep them even if decisions change.
@@ -232,7 +229,7 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
 1. **Gather existing context** and **confirm the deep-dive scope** — which areas to revisit, what questions remain, which areas stay as-is.
 2. **Deep-dive per selected area**: investigate deeper with targeted focus → update findings doc with any new facts or corrections → evaluate solutions with new findings → update or produce ADRs.
 3. **Optionally update the solution document** if ADR changes affect the system-level view.
-4. **Present the deep-dive results** — updated findings, new/updated ADRs, refreshed solution doc (if applicable). ADRs and the solution doc are updated cleanly with the corrected decisions and facts, without logs or change notes (see **clean-artifact-principle**).
+4. **Present the deep-dive results** — updated findings, new/updated ADRs, refreshed solution doc (if applicable). ADRs and the solution doc are updated cleanly with the corrected decisions and facts, without logs or change notes (see **reference/clean-artifact-principle.md**).
 5. After presenting the results, apply **suggest-spike-directions** to present direction candidates for the next spike round.
 
 For the full step-by-step procedure with prompts and validation checks per step, load **reference/deep-dive-procedure.md**.
