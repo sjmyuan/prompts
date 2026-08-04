@@ -91,27 +91,24 @@ Controller → Orchestrator → EventPublisher interface → KafkaTemplate → K
 
 **Canonical Example** (using `order-service`):
 
-```plantuml
-@startuml
-title Event Publishing Pattern — Canonical Example
+```mermaid
+sequenceDiagram
+    %% Event Publishing Pattern — Canonical Example
+    participant Orch as CheckoutOrchestrator
+    participant Pub as EventPublisher
+    participant Kafka as KafkaTemplate
+    database Broker as Kafka
 
-participant "CheckoutOrchestrator" as Orch
-participant "EventPublisher" as Pub
-participant "KafkaTemplate" as Kafka
-database "Kafka" as Broker
-
-Orch -> Pub: 1: publish(event)
-activate Pub
-Pub -> Kafka: 2: send(topic, key, event)
-activate Kafka
-group retry 3 times
-    Kafka --> Pub: success/exception
-end
-Pub --> Orch: return
-deactivate Pub
-deactivate Kafka
-
-@enduml
+    Orch->>Pub: 1: publish(event)
+    activate Pub
+    Pub->>Kafka: 2: send(topic, key, event)
+    activate Kafka
+    loop retry 3 times
+        Kafka-->>Pub: success/exception
+    end
+    Pub-->>Orch: return
+    deactivate Pub
+    deactivate Kafka
 ```
 
 **Pattern 2 (Variant — 1 service)** — Direct usage, no abstraction:

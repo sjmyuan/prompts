@@ -35,64 +35,62 @@
 **Agent output**:
 > Here's a C4 context diagram of the auth flow so we're aligned:
 >
-> ```plantuml
-> @startuml
-> !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+> ```mermaid
+> C4Context
+>     title Auth System — System Context
 >
-> Person(user, "User", "Logs in and calls the API")
+>     Person(user, "User", "Logs in and calls the API")
 >
-> System_Boundary(auth_system, "Auth System") {
->     System(spa, "React SPA", "Single-page web app")
->     System(be, "Node.js Backend", "AuthN: JWT or Session (decision pending)")
-> }
+>     System_Boundary(auth_system, "Auth System") {
+>         System(spa, "React SPA", "Single-page web app")
+>         System(be, "Node.js Backend", "AuthN: JWT or Session (decision pending)")
+>     }
 >
-> System_Ext(audit, "Audit Log", "SOC 2 audit trail")
+>     System_Ext(audit, "Audit Log", "SOC 2 audit trail")
 >
-> Rel(user, spa, "login / API calls")
-> Rel(spa, be, "Bearer token / session cookie")
-> Rel(be, audit, "audit events")
-> @enduml
+>     Rel(user, spa, "login / API calls")
+>     Rel(spa, be, "Bearer token / session cookie")
+>     Rel(be, audit, "audit events")
 > ```
 >
 > Let me zoom into the Node.js Backend with a C4 component diagram to see the pieces involved in auth:
 >
-> ```plantuml
-> @startuml
-> !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+> ```mermaid
+> C4Component
+>     title Node.js Backend — Component Diagram
 >
-> Container_Boundary(be, "Node.js Backend") {
->     Component(am, "Auth Middleware", "Express middleware", "Authenticates requests")
->     Component(ts, "Token Service", "Module", "Validates / issues tokens")
->     Component(al, "Audit Logger", "Module", "Logs auth events")
-> }
+>     Container_Boundary(be, "Node.js Backend") {
+>         Component(am, "Auth Middleware", "Express middleware", "Authenticates requests")
+>         Component(ts, "Token Service", "Module", "Validates / issues tokens")
+>         Component(al, "Audit Logger", "Module", "Logs auth events")
 >
-> ContainerDb(audit, "Audit Log", "Log store", "SOC 2 audit trail")
-> System_Ext(spa, "React SPA", "Single-page web app")
+>         Rel(am, ts, "validate / issue token")
+>         Rel(ts, am, "token result")
+>         Rel(am, al, "log auth events")
+>     }
 >
-> Rel(spa, am, "requests with credentials")
-> Rel(am, ts, "calls", "validate / issue token")
-> Rel(ts, am, "token result")
-> Rel(am, al, "calls", "log auth events")
-> Rel(al, audit, "write")
-> @enduml
+>     ContainerDb(audit, "Audit Log", "Log store", "SOC 2 audit trail")
+>     System_Ext(spa, "React SPA", "Single-page web app")
+>
+>     Rel(spa, am, "requests with credentials")
+>     Rel(al, audit, "write")
 > ```
 >
 > Since revocation is the key concern, let me zoom into the compromised-account flow with a sequence diagram:
 >
-> ```plantuml
-> @startuml
-> actor User
-> actor "Security Team" as Sec
-> participant "Node.js Backend" as BE
-> participant "AuthN" as AUTH
+> ```mermaid
+> sequenceDiagram
+>     actor User
+>     actor Sec as "Security Team"
+>     participant BE as "Node.js Backend"
+>     participant AUTH as AuthN
 >
-> User -> BE : API call with token
-> BE -> AUTH : validate token
-> AUTH --> BE : valid / invalid
-> Sec -> BE : report compromised account
-> BE -> AUTH : revoke access now
-> AUTH --> BE : revoked
-> @enduml
+>     User->>BE: API call with token
+>     BE->>AUTH: validate token
+>     AUTH-->>BE: valid / invalid
+>     Sec->>BE: report compromised account
+>     BE->>AUTH: revoke access now
+>     AUTH-->>BE: revoked
 > ```
 
 ---
@@ -166,23 +164,14 @@
 >
 > Here's the elimination tree that visualizes the reasoning:
 >
-> ```plantuml
-> @startuml
-> rectangle "All options" as All
-> rectangle "JWT - status quo" as A
-> rectangle "Sessions" as B
-> rectangle "JWT + Redis denylist" as C
-> rectangle "Eliminated" as X1
-> rectangle "Weaker fit" as X2
-> rectangle "Chosen: JWT + Redis denylist" as W
->
-> All --> A
-> All --> B
-> All --> C
-> A --> X1 : fails immediate revocation knock-out
-> B --> X2 : compromises statelessness
-> C --> W : passes all hard constraints
-> @enduml
+> ```mermaid
+> flowchart TD
+>     All["All options"] --> A["JWT - status quo"]
+>     All --> B["Sessions"]
+>     All --> C["JWT + Redis denylist"]
+>     A -->|"fails immediate revocation knock-out"| X1["Eliminated"]
+>     B -->|"compromises statelessness"| X2["Weaker fit"]
+>     C -->|"passes all hard constraints"| W["Chosen: JWT + Redis denylist"]
 > ```
 
 **User confirms**: JWT + Redis denylist.

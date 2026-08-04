@@ -35,25 +35,21 @@ Applies `<compile-markdown-report>`.
 
 ### C2 Container Diagram
 
-```plantuml
-@startuml
-!include <C4/C4_Container>
+```mermaid
+C4Container
+    title User Registration Flow — System Landscape (C2)
 
-title User Registration Flow — System Landscape (C2)
+    Person(new_user, "New User", "Browser")
 
-Person(new_user, "New User", "Browser")
+    System_Boundary(registration_system, "Registration System") {
+        Container(user_service, "user-service", "Spring Boot / Java 17", "User management, registration orchestration, Port 8080")
+        Container(notification_service, "notification-service", "Spring Boot / Java 17", "Email verification, welcome notifications, Port 8081")
+        ContainerDb(user_db, "PostgreSQL", "Relational Database", "User data")
+    }
 
-System_Boundary(registration_system, "Registration System") {
-    Container(user_service, "user-service", "Spring Boot / Java 17", "User management, registration orchestration, Port 8080")
-    Container(notification_service, "notification-service", "Spring Boot / Java 17", "Email verification, welcome notifications, Port 8081")
-    ContainerDb(user_db, "PostgreSQL", "Relational Database", "User data")
-}
-
-Rel(new_user, user_service, "POST /register", "HTTPS")
-Rel(user_service, notification_service, "POST /emails", "HTTPS")
-Rel(user_service, user_db, "Reads/Writes", "JDBC")
-
-@enduml
+    Rel(new_user, user_service, "POST /register", "HTTPS")
+    Rel(user_service, notification_service, "POST /emails", "HTTPS")
+    Rel(user_service, user_db, "Reads/Writes", "JDBC")
 ```
 
 ---
@@ -62,95 +58,85 @@ Rel(user_service, user_db, "Reads/Writes", "JDBC")
 
 ### `user-service` Components
 
-```plantuml
-@startuml
-!include <C4/C4_Component>
+```mermaid
+C4Component
+    title user-service — Component Diagram (C3)
 
-title user-service — Component Diagram (C3)
+    Container_Boundary(user_service, "user-service") {
+        Component(reg_ctrl, "RegistrationController", "REST Controller", "POST /register")
+        Component(verify_ctrl, "EmailVerificationController", "REST Controller", "GET /verify?token=xxx")
+        Component(reg_orch, "RegistrationOrchestrator", "Application Service", "register() → validate → create → notify")
+        Component(user_svc, "UserService", "Domain Service", "User creation and validation")
+        Component(token_svc, "VerificationTokenService", "Domain Service", "Token generation and validation")
+        Component(email_adapter, "EmailAdapter", "HTTP Client", "Calls notification-service")
+        ComponentDb(user_repo, "UserRepository", "JDBC", "User persistence")
+        ComponentDb(token_repo, "VerificationTokenRepository", "JDBC", "Token persistence")
 
-Container_Boundary(user_service, "user-service") {
-    Component(reg_ctrl, "RegistrationController", "REST Controller", "POST /register")
-    Component(verify_ctrl, "EmailVerificationController", "REST Controller", "GET /verify?token=xxx")
-    Component(reg_orch, "RegistrationOrchestrator", "Application Service", "register() → validate → create → notify")
-    Component(user_svc, "UserService", "Domain Service", "User creation and validation")
-    Component(token_svc, "VerificationTokenService", "Domain Service", "Token generation and validation")
-    Component(email_adapter, "EmailAdapter", "HTTP Client", "Calls notification-service")
-    ComponentDb(user_repo, "UserRepository", "JDBC", "User persistence")
-    ComponentDb(token_repo, "VerificationTokenRepository", "JDBC", "Token persistence")
-}
+        Rel(reg_ctrl, reg_orch, "register()")
+        Rel(verify_ctrl, token_svc, "verify(token)")
+        Rel(reg_orch, user_svc, "validateRegistration(), createUser()")
+        Rel(reg_orch, token_svc, "generateToken()")
+        Rel(reg_orch, email_adapter, "sendVerificationEmail()")
+        Rel(user_svc, user_repo, "Reads/Writes", "JDBC")
+        Rel(token_svc, token_repo, "Reads/Writes", "JDBC")
+    }
 
-Container(notification_service, "notification-service", "Spring Boot", "External email service", $external=true)
+    Container_Ext(notification_service, "notification-service", "Spring Boot", "External email service")
 
-Rel(reg_ctrl, reg_orch, "register()")
-Rel(verify_ctrl, token_svc, "verify(token)")
-Rel(reg_orch, user_svc, "validateRegistration(), createUser()")
-Rel(reg_orch, token_svc, "generateToken()")
-Rel(reg_orch, email_adapter, "sendVerificationEmail()")
-Rel(user_svc, user_repo, "Reads/Writes", "JDBC")
-Rel(token_svc, token_repo, "Reads/Writes", "JDBC")
-Rel(email_adapter, notification_service, "POST /emails", "HTTPS")
-
-@enduml
+    Rel(email_adapter, notification_service, "POST /emails", "HTTPS")
 ```
 
 ### `notification-service` Components
 
-```plantuml
-@startuml
-!include <C4/C4_Component>
+```mermaid
+C4Component
+    title notification-service — Component Diagram (C3)
 
-title notification-service — Component Diagram (C3)
+    Container_Boundary(notification_service, "notification-service") {
+        Component(email_ctrl, "EmailController", "REST Controller", "POST /emails")
+        Component(email_orch, "EmailOrchestrator", "Application Service", "sendEmail() → render → send → track")
+        Component(template_svc, "TemplateService", "Domain Service", "Email template rendering")
+        Component(email_sender, "EmailSender", "Infrastructure", "SMTP/Mail integration")
+        ComponentDb(email_repo, "EmailRepository", "JDBC", "Email status tracking")
 
-Container_Boundary(notification_service, "notification-service") {
-    Component(email_ctrl, "EmailController", "REST Controller", "POST /emails")
-    Component(email_orch, "EmailOrchestrator", "Application Service", "sendEmail() → render → send → track")
-    Component(template_svc, "TemplateService", "Domain Service", "Email template rendering")
-    Component(email_sender, "EmailSender", "Infrastructure", "SMTP/Mail integration")
-    ComponentDb(email_repo, "EmailRepository", "JDBC", "Email status tracking")
-}
-
-Rel(email_ctrl, email_orch, "sendEmail()")
-Rel(email_orch, template_svc, "render()")
-Rel(email_orch, email_sender, "send()")
-Rel(email_orch, email_repo, "track", "JDBC")
-
-@enduml
+        Rel(email_ctrl, email_orch, "sendEmail()")
+        Rel(email_orch, template_svc, "render()")
+        Rel(email_orch, email_sender, "send()")
+        Rel(email_orch, email_repo, "track", "JDBC")
+    }
 ```
 
 ---
 
 ## 3. Sequence Diagram: User Registration
 
-```plantuml
-@startuml
-title User Registration Flow — Sequence Diagram
+```mermaid
+sequenceDiagram
+    %% User Registration Flow — Sequence Diagram
+    actor Browser
+    participant RegCtrl as RegistrationController
+    participant RegOrch as RegistrationOrchestrator
+    participant UserSvc as UserService
+    participant TokenSvc as VerificationTokenService
+    participant EmailAdptr as EmailAdapter
+    participant NotifSvc as "notification-service"
 
-actor "Browser" as Browser
-participant "RegistrationController" as RegCtrl
-participant "RegistrationOrchestrator" as RegOrch
-participant "UserService" as UserSvc
-participant "VerificationTokenService" as TokenSvc
-participant "EmailAdapter" as EmailAdptr
-participant "notification-service" as NotifSvc
-
-Browser -> RegCtrl: 1: POST /register\n{email, password, name}
-RegCtrl -> RegOrch: 2: register(request)
-RegOrch -> UserSvc: 3: validateRegistration(email)
-UserSvc --> RegOrch: 4: <return valid
-RegOrch -> UserSvc: 5: createUser(request)
-UserSvc -> UserSvc: 6: INSERT INTO users
-UserSvc --> RegOrch: 7: <return User(id=42)
-RegOrch -> TokenSvc: 8: generateToken(userId)
-TokenSvc -> TokenSvc: 9: INSERT INTO verification_tokens
-TokenSvc --> RegOrch: 10: <return token("abc123def456")
-RegOrch -> EmailAdptr: 11: sendVerificationEmail(email, token)
-EmailAdptr -> NotifSvc: 12: POST /emails (HTTPS)\n[cross-repo]
-NotifSvc --> EmailAdptr: 13: <return emailSent
-EmailAdptr --> RegOrch: 14: <return emailSent
-RegOrch --> RegCtrl: 15: <return RegistrationResult
-RegCtrl --> Browser: 16: <return 201 Created
-
-@enduml
+    Browser->>RegCtrl: 1: POST /register<br/>{email, password, name}
+    RegCtrl->>RegOrch: 2: register(request)
+    RegOrch->>UserSvc: 3: validateRegistration(email)
+    UserSvc-->>RegOrch: 4: return valid
+    RegOrch->>UserSvc: 5: createUser(request)
+    UserSvc->>UserSvc: 6: INSERT INTO users
+    UserSvc-->>RegOrch: 7: return User(id=42)
+    RegOrch->>TokenSvc: 8: generateToken(userId)
+    TokenSvc->>TokenSvc: 9: INSERT INTO verification_tokens
+    TokenSvc-->>RegOrch: 10: return token("abc123def456")
+    RegOrch->>EmailAdptr: 11: sendVerificationEmail(email, token)
+    EmailAdptr->>NotifSvc: 12: POST /emails (HTTPS)<br/>[cross-repo]
+    NotifSvc-->>EmailAdptr: 13: return emailSent
+    EmailAdptr-->>RegOrch: 14: return emailSent
+    RegOrch-->>RegCtrl: 15: return RegistrationResult
+    RegCtrl-->>Browser: 16: return 201 Created
 ```
 
 **Message sequence**:

@@ -7,7 +7,7 @@ This guide supports the **diagram-selection** knowledge entry. Load it when actu
 - Draw a diagram the moment you explain context or a solution — never wait for the user to ask.
 - Choose the diagram type by the context you want to explain, not by which ADR step you are in.
 - One diagram = one message. If two messages are needed, draw two diagrams.
-- Prefer PlantUML wherever the platform supports it; fall back to Mermaid, SVG, or ASCII when it does not. If a dedicated diagram skill exists, delegate the rendering to it.
+- Draw all diagrams with Mermaid inside a fenced code block with `mermaid` language tag.
 - Keep diagrams small: 4–9 nodes for context diagrams; use sub-packages instead of merging messages.
 
 ## Zooming In
@@ -20,19 +20,19 @@ Start with a C4 context diagram for the big picture, then zoom into the part of 
 
 The solution architecture of an ADR is itself a C4/flowchart view of the target state: draw it the same way, adding the chosen option as a named system/container and marking what changes because of the decision.
 
-## C4 Context Diagram (Level 1)
+## Mermaid C4 Reference
 
-Use the C4-PlantUML standard library macros. Include `C4_Context.puml` for context diagrams, `C4_Container.puml` for container diagrams, and `C4_Component.puml` for component diagrams:
+Mermaid has native C4 support — use `C4Context` (level 1), `C4Container` (level 2), `C4Component` (level 3). Syntax is compatible with C4-PlantUML; no `@startuml`/`@enduml` is needed, just start with the diagram type and an optional `title`:
 
-| Element | C4-PlantUML macro | Example |
+| Element | Mermaid syntax | Example |
 |---|---|---|
-| Person (actor) | `Person(alias, "Label", "Description")` | `Person(customer, "Customer", "Places orders")` |
-| System in scope | `System(alias, "Label", "Description")` | `System(oms, "Order Management Service", "Handles orders")` |
-| External system | `System_Ext(alias, "Label", "Description")` | `System_Ext(ps, "Payment Processor", "Charges payments")` |
-| Container | `Container(alias, "Label", "Tech", "Description")` | `Container(api, "API Gateway", "Go", "Ingests orders")` |
-| Database / store | `ContainerDb(alias, "Label", "Tech", "Description")` | `ContainerDb(db, "Order DB", "PostgreSQL", "Stores orders")` |
-| Component | `Component(alias, "Label", "Tech", "Description")` | `Component(oc, "Order Controller", "REST", "Ingests orders")` |
-| Relationship | `Rel(from, to, "Label", "Description")` | `Rel(customer, oms, "places orders")` |
+| Person (actor) | `Person(alias, "Label", "Descr")` | `Person(customer, "Customer", "Places orders")` |
+| System in scope | `System(alias, "Label", "Descr")` | `System(oms, "Order Management Service", "Handles orders")` |
+| External system | `System_Ext(alias, "Label", "Descr")` | `System_Ext(ps, "Payment Processor", "Charges payments")` |
+| Container | `Container(alias, "Label", "Tech", "Descr")` | `Container(api, "API Gateway", "Go", "Ingests orders")` |
+| Database / store | `ContainerDb(alias, "Label", "Tech", "Descr")` | `ContainerDb(db, "Order DB", "PostgreSQL", "Stores orders")` |
+| Component | `Component(alias, "Label", "Tech", "Descr")` | `Component(oc, "Order Controller", "REST", "Ingests orders")` |
+| Relationship | `Rel(from, to, "Label", "Tech")` | `Rel(customer, oms, "places orders")` |
 | Grouping | `System_Boundary(alias, "Label") { ... }` / `Container_Boundary(alias, "Label") { ... }` | `System_Boundary(oms, "Order Management Service") { ... }` |
 
 Rules:
@@ -40,34 +40,41 @@ Rules:
 - Show the system(s) IN scope as the center of the diagram; keep internal containers/databases out of a level-1 context diagram.
 - Show only direct relationships; no message-level detail at this level.
 - Label every relationship with what flows across it (data, request, event).
+- Mark external elements with the `_Ext` suffix (`System_Ext`, `Container_Ext`, `Component_Ext`).
+
+## C4 Context Diagram (Level 1)
+
+- Center the system(s) in scope; place actors to the left and external systems to the right.
+- Connect with `Rel(from, to, "Label", "Tech")` only — no message-level detail at this level.
 
 ## C4 Container Diagram (Level 2)
 
-- Include `C4_Container.puml`; zoom into a system and place its top-level containers (applications, data stores, microservices) inside a `System_Boundary`.
-- Name each container with `Container(alias, "Label", "Tech", "Description")` and note its main technology.
-- Connect containers with `Rel` and label what flows between them.
+- Zoom into a system: place its top-level containers (applications, data stores, microservices) inside a `System_Boundary`.
+- Name each container with `Container(alias, "Label", "Tech", "Descr")` and note its main technology.
+- Connect containers with `Rel(from, to, "Label", "Tech")` describing what flows between them.
 
 ## C4 Component Diagram (Level 3)
 
-- Include `C4_Component.puml`; zoom into a single container with a `Container_Boundary` to show the components inside it (modules, services, libraries).
-- Name each component with `Component(alias, "Label", "Tech", "Description")` and give it a one-line responsibility.
-- Connect components with `Rel`; keep dependencies pointing in a clean direction.
+- Zoom into a single container: wrap its internal components in a `Container_Boundary`.
+- Give each component a one-line responsibility in its description.
+- Connect components with `Rel`; mark external dependencies with the `_Ext` suffix and keep dependencies pointing in a clean direction.
 
 ## Flowchart
 
 - Show the sequence of steps and the decision branches that matter to the explanation.
+- Use `([...])` stadium nodes for start/end, `[...]` rectangles for steps, `{...}` diamonds for decisions, and `-->|yes| / -->|no|` labeled edges for branches.
 - Keep each branch readable — extract a second diagram instead of packing in more branches.
 
 ## Sequence Diagram
 
-- Name each participant (actor, system, component) as a lifeline.
+- Name each participant (actor, system, component) as a lifeline with `actor` / `participant`.
 - Show messages top-to-bottom in time order.
-- Use solid arrows for synchronous calls and dashed arrows for asynchronous ones.
+- Use `->>` for synchronous calls and `-->>` for asynchronous calls/returns.
 - Highlight the interaction that matters for the decision (e.g., a revocation path, a payment flow).
 
 ## Decision Driver Map
 
-A tree that separates hard constraints from soft preferences:
+A tree that separates hard constraints from soft preferences — use `subgraph`s for the two branches:
 
 - Root: "Decision drivers"
 - Branch 1: "Hard constraints (knock-out)" → each must-have driver
@@ -81,172 +88,119 @@ A drivers × options grid using three visual states:
 - ⚠️ partially satisfies / conditional
 - ❌ fails the driver (mark knock-out failures prominently)
 
-Pair the matrix with an elimination tree when explaining WHY options were dropped:
+Pair the matrix with an elimination tree (`flowchart`) when explaining WHY options were dropped:
 
 - Start node: all considered options
 - For each eliminated option: edge labeled with the failing driver → "Eliminated"
 - For the chosen option: edge labeled "passes all hard constraints" → "Chosen"
 
-## PlantUML Snippets
+## Mermaid Snippets
 
 ### C4 context diagram
 
-```plantuml
-@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+```mermaid
+C4Context
+    title Order Management — System Context
 
-Person(customer, "Customer", "Places orders and queries history")
-System(oms, "Order Management Service", "Handles orders and payments")
-System_Ext(ps, "Payment Processor", "Charges payments")
-System_Ext(iam, "GCP IAM", "AuthN / authZ")
+    Person(customer, "Customer", "Places orders and queries history")
+    System(oms, "Order Management Service", "Handles orders and payments")
+    System_Ext(ps, "Payment Processor", "Charges payments")
+    System_Ext(iam, "GCP IAM", "AuthN / authZ")
 
-Rel(customer, oms, "places orders / queries")
-Rel(oms, ps, "payment processing")
-Rel(oms, iam, "authN / authZ")
-@enduml
+    Rel(customer, oms, "places orders / queries")
+    Rel(oms, ps, "payment processing")
+    Rel(oms, iam, "authN / authZ")
 ```
 
 ### C4 container diagram
 
-```plantuml
-@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+```mermaid
+C4Container
+    title Order Management — Container Diagram
 
-Person(customer, "Customer", "Places orders and queries history")
+    Person(customer, "Customer", "Places orders and queries history")
 
-System_Boundary(oms, "Order Management Service") {
-    Container(api, "API Gateway", "Go", "Ingests orders")
-    Container(svc, "Order Service", "Go", "Business logic")
-    ContainerDb(db, "Order DB", "PostgreSQL", "Stores orders")
-}
+    System_Boundary(oms, "Order Management Service") {
+        Container(api, "API Gateway", "Go", "Ingests orders")
+        Container(svc, "Order Service", "Go", "Business logic")
+        ContainerDb(db, "Order DB", "PostgreSQL", "Stores orders")
+    }
 
-System_Ext(ps, "Payment Processor", "Charges payments")
+    System_Ext(ps, "Payment Processor", "Charges payments")
 
-Rel(customer, api, "HTTPS", "places orders")
-Rel(api, svc, "gRPC", "forwards")
-Rel(svc, db, "SQL", "reads / writes")
-Rel(svc, ps, "HTTPS", "charges")
-@enduml
+    Rel(customer, api, "places orders", "HTTPS")
+    Rel(api, svc, "forwards", "gRPC")
+    Rel(svc, db, "reads / writes", "SQL")
+    Rel(svc, ps, "charges", "HTTPS")
 ```
 
 ### C4 component diagram
 
-```plantuml
-@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+```mermaid
+C4Component
+    title Order Service — Component Diagram
 
-Container_Boundary(svc, "Order Service") {
-    Component(oc, "Order Controller", "REST API", "Ingests orders")
-    Component(or, "Order Repository", "DAO", "Queries orders")
-    Component(pc, "Payment Client", "HTTP client", "Charges payments")
-}
+    Container_Boundary(svc, "Order Service") {
+        Component(oc, "Order Controller", "REST API", "Ingests orders")
+        Component(or, "Order Repository", "DAO", "Queries orders")
+        Component(pc, "Payment Client", "HTTP client", "Charges payments")
 
-ContainerDb(db, "Order DB", "PostgreSQL", "Stores orders")
-System_Ext(ps, "Payment Processor", "Charges payments")
+        Rel(oc, or, "queries orders")
+        Rel(oc, pc, "charges payment")
+    }
 
-Rel(oc, or, "calls", "queries orders")
-Rel(or, db, "SQL", "reads / writes")
-Rel(oc, pc, "calls", "charges payment")
-Rel(pc, ps, "HTTPS", "payment request")
-@enduml
+    ContainerDb(db, "Order DB", "PostgreSQL", "Stores orders")
+    System_Ext(ps, "Payment Processor", "Charges payments")
+
+    Rel(or, db, "reads / writes", "SQL")
+    Rel(pc, ps, "payment request", "HTTPS")
 ```
 
 ### Flowchart (zoom into a flow)
 
-```plantuml
-@startuml
-start
-:Receive order;
-if (Validate payment) then (yes)
-  :Write to database;
-  :Notify customer;
-else (no)
-  :Reject order;
-endif
-stop
-@enduml
+```mermaid
+flowchart TD
+    A([Start]) --> B[Receive order]
+    B --> C{Validate payment}
+    C -->|yes| D[Write to database]
+    D --> E[Notify customer]
+    E --> F([End])
+    C -->|no| G[Reject order]
+    G --> F
 ```
 
 ### Sequence diagram (zoom into interactions)
 
-```plantuml
-@startuml
-actor Customer
-participant "Order Management Service" as OMS
-participant "Payment Processor" as PS
+```mermaid
+sequenceDiagram
+    actor Customer
+    participant OMS as "Order Management Service"
+    participant PS as "Payment Processor"
 
-Customer -> OMS : place order
-OMS -> PS : charge payment
-PS --> OMS : payment result
-OMS -> OMS : persist order
-@enduml
+    Customer->>OMS: place order
+    OMS->>PS: charge payment
+    PS-->>OMS: payment result
+    OMS->>OMS: persist order
 ```
 
 ### Decision driver map
 
-```plantuml
-@startuml
-rectangle "Decision drivers" as Root
-rectangle "Hard constraints" as Hard
-rectangle "Soft preferences" as Soft
-rectangle "ACID transactions" as H1
-rectangle "Low cost" as S1
-
-Root --> Hard
-Root --> Soft
-Hard --> H1
-Soft --> S1
-@enduml
+```mermaid
+flowchart TD
+    Root["Decision drivers"] --> Hard["Hard constraints"]
+    Root --> Soft["Soft preferences"]
+    Hard --> H1["ACID transactions"]
+    Soft --> S1["Low cost"]
 ```
 
 ### Elimination tree
 
-```plantuml
-@startuml
-rectangle "All options" as All
-rectangle "Option A" as A
-rectangle "Option B" as B
-rectangle "Eliminated" as X
-rectangle "Chosen: Option C" as W
-
-All --> A
-All --> B
-A --> X : fails driver X
-B --> W : passes all hard constraints
-@enduml
-```
-
-## Fallback Snippets
-
-When PlantUML is unavailable, render the same content in Mermaid or as ASCII for single-message diagrams.
-
-### Mermaid — C4 context diagram
-
 ```mermaid
-flowchart LR
-    Actor([Actor]) -->|request| Sys[System in scope]
-    Sys -->|reads / writes| DB[(Database)]
-    Sys -->|calls| Ext[External System]
-```
-
-### Mermaid — sequence diagram
-
-```mermaid
-sequenceDiagram
-    actor Customer
-    participant OMS as Order Management Service
-    participant PS as Payment Processor
-    Customer->>OMS: place order
-    OMS->>PS: charge payment
-    PS-->>OMS: payment result
-```
-
-### ASCII fallback
-
-```
-[Customer] --places orders--> [Order Management Service]
-[Order Management Service] --reads / writes--> [(Database)]
-[Order Management Service] --payment--> [Payment Processor]
+flowchart TD
+    All["All options"] --> A["Option A"]
+    All --> B["Option B"]
+    A -->|"fails driver X"| X["Eliminated"]
+    B -->|"passes all hard constraints"| W["Chosen: Option C"]
 ```
 
 ## Updating and Extending Diagrams

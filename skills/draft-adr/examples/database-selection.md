@@ -25,36 +25,32 @@
 **Agent output**:
 > Here's a C4 context diagram of the system in scope so we're aligned before moving on:
 >
-> ```plantuml
-> @startuml
-> !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+> ```mermaid
+> C4Context
+>     title Order Management — System Context
 >
-> Person(customer, "Customer", "Places orders and queries order history")
-> System(oms, "Order Management Service", "Handles ~10K orders/day, ACID payments; storage backend TBD")
-> System_Ext(ps, "Payment Processor", "Charges payments")
-> System_Ext(iam, "GCP IAM", "AuthN / authZ")
+>     Person(customer, "Customer", "Places orders and queries order history")
+>     System(oms, "Order Management Service", "Handles ~10K orders/day, ACID payments; storage backend TBD")
+>     System_Ext(ps, "Payment Processor", "Charges payments")
+>     System_Ext(iam, "GCP IAM", "AuthN / authZ")
 >
-> Rel(customer, oms, "places orders / queries")
-> Rel(oms, ps, "payment processing")
-> Rel(oms, iam, "authN / authZ")
-> @enduml
+>     Rel(customer, oms, "places orders / queries")
+>     Rel(oms, ps, "payment processing")
+>     Rel(oms, iam, "authN / authZ")
 > ```
 >
 > Let me also zoom into the order lifecycle with a flowchart, since the ACID/payment requirement lives there:
 >
-> ```plantuml
-> @startuml
-> start
-> :Customer places order;
-> :Validate & charge payment;
-> if (Payment succeeds?) then (yes)
->   :Write order with ACID transaction;
->   :Query order history;
-> else (no)
->   :Reject order;
-> endif
-> stop
-> @enduml
+> ```mermaid
+> flowchart TD
+>     A([Start]) --> B[Customer places order]
+>     B --> C[Validate & charge payment]
+>     C --> D{Payment succeeds?}
+>     D -->|yes| E[Write order with ACID transaction]
+>     E --> F[Query order history]
+>     F --> G([End])
+>     D -->|no| H[Reject order]
+>     H --> G
 > ```
 
 ---
@@ -84,27 +80,16 @@
 **Agent output**:
 > Here's a map of the confirmed decision drivers so the trade-off space is visible:
 >
-> ```plantuml
-> @startuml
-> rectangle "Decision drivers" as Root
-> rectangle "Hard constraints" as Hard
-> rectangle "Soft preferences" as Soft
-> rectangle "ACID transactions" as H1
-> rectangle "Query latency < 100ms" as H2
-> rectangle "GCP integration" as H3
-> rectangle "Team expertise: PostgreSQL" as S1
-> rectangle "Low infrastructure cost" as S2
-> rectangle "Managed service" as S3
->
-> Root --> Hard
-> Root --> Soft
-> Hard --> H1
-> Hard --> H2
-> Hard --> H3
-> Soft --> S1
-> Soft --> S2
-> Soft --> S3
-> @enduml
+> ```mermaid
+> flowchart TD
+>     Root["Decision drivers"] --> Hard["Hard constraints"]
+>     Root --> Soft["Soft preferences"]
+>     Hard --> H1["ACID transactions"]
+>     Hard --> H2["Query latency < 100ms"]
+>     Hard --> H3["GCP integration"]
+>     Soft --> S1["Team expertise: PostgreSQL"]
+>     Soft --> S2["Low infrastructure cost"]
+>     Soft --> S3["Managed service"]
 > ```
 
 ---
@@ -242,23 +227,14 @@
 >
 > Here's the elimination tree that visualizes why we dropped each option:
 >
-> ```plantuml
-> @startuml
-> rectangle "All options" as All
-> rectangle "Cloud SQL for PostgreSQL" as A
-> rectangle "Cloud Spanner" as B
-> rectangle "Firestore" as C
-> rectangle "Eliminated" as X1
-> rectangle "Eliminated" as X2
-> rectangle "Chosen: Cloud SQL for PostgreSQL" as W
->
-> All --> A
-> All --> B
-> All --> C
-> C --> X1 : fails ACID knock-out
-> B --> X2 : fails low cost + team expertise
-> A --> W : passes all hard constraints + 3/3 soft
-> @enduml
+> ```mermaid
+> flowchart TD
+>     All["All options"] --> A["Cloud SQL for PostgreSQL"]
+>     All --> B["Cloud Spanner"]
+>     All --> C["Firestore"]
+>     C -->|"fails ACID knock-out"| X1["Eliminated"]
+>     B -->|"fails low cost + team expertise"| X2["Eliminated"]
+>     A -->|"passes all hard constraints + 3/3 soft"| W["Chosen: Cloud SQL for PostgreSQL"]
 > ```
 >
 > **Given the evaluations, which option best satisfies the decision drivers?**

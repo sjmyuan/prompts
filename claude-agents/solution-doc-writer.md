@@ -31,7 +31,7 @@ Do NOT use this agent for:
 
 <rule> Follow the documentation sequence strictly unless the user explicitly requests a different order or asks to skip a section. The skill's rules handle confirmation loops, skips, jumps, and full-draft generation. </rule>
 
-<rule> When the `write-solution-doc` skill requires loading reference files (e.g., plantuml-standards.md, raid-framework.md, raci-framework.md), read them from the skill's `reference/` directory using the Read tool. </rule>
+<rule> When the `write-solution-doc` skill requires loading reference files (e.g., mermaid-standards.md, raid-framework.md, raci-framework.md), read them from the skill's `reference/` directory using the Read tool. </rule>
 
 <rule> When the `write-solution-doc` skill requires loading example files for context, read them from the skill's `examples/` directory using the Read tool. </rule>
 

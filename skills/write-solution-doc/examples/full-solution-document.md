@@ -54,43 +54,41 @@
 
 **C2 Container Diagram output**:
 
-```plantuml
-@startuml ShopMesh C2 Container
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+```mermaid
+C4Container
+    title ShopMesh C2 — Container Diagram
 
-Person(customer, "Customer", "Online shopper")
-Person(admin, "Admin", "Store administrator")
+    Person(customer, "Customer", "Online shopper")
+    Person(admin, "Admin", "Store administrator")
 
-System_Boundary(shopmesh, "ShopMesh") {
-    Container(order_svc, "Order Service", "Go", "Manages order lifecycle")
-    Container(catalog_svc, "Catalog Service", "Go", "Product catalog and inventory")
-    Container(payment_svc, "Payment Service", "Java", "Payment processing (PCI-DSS)")
-    ContainerDb(order_db, "Order DB", "PostgreSQL", "Order data")
-    ContainerDb(catalog_db, "Catalog DB", "PostgreSQL", "Product and inventory data")
-    ContainerDb(payment_db, "Payment DB", "PostgreSQL", "Payment records (encrypted)")
-    Container(api_gw, "API Gateway", "Kong", "Routes, auth, rate limiting")
-}
+    System_Boundary(shopmesh, "ShopMesh") {
+        Container(order_svc, "Order Service", "Go", "Manages order lifecycle")
+        Container(catalog_svc, "Catalog Service", "Go", "Product catalog and inventory")
+        Container(payment_svc, "Payment Service", "Java", "Payment processing (PCI-DSS)")
+        ContainerDb(order_db, "Order DB", "PostgreSQL", "Order data")
+        ContainerDb(catalog_db, "Catalog DB", "PostgreSQL", "Product and inventory data")
+        ContainerDb(payment_db, "Payment DB", "PostgreSQL", "Payment records (encrypted)")
+        Container(api_gw, "API Gateway", "Kong", "Routes, auth, rate limiting")
+    }
 
-System_Ext(monomart, "MonolithMart", "Legacy monolith (accounts, reviews, recs)")
-System_Ext(pay_gw, "Payment Gateway", "Stripe")
-System_Ext(notify, "Notification Service", "SendGrid")
+    System_Ext(monomart, "MonolithMart", "Legacy monolith (accounts, reviews, recs)")
+    System_Ext(pay_gw, "Payment Gateway", "Stripe")
+    System_Ext(notify, "Notification Service", "SendGrid")
 
-Rel(customer, api_gw, "HTTPS", "shops")
-Rel(admin, api_gw, "HTTPS", "manages")
-Rel(api_gw, order_svc, "gRPC")
-Rel(api_gw, catalog_svc, "gRPC")
-Rel(api_gw, payment_svc, "gRPC")
-Rel(order_svc, order_db, "SQL")
-Rel(catalog_svc, catalog_db, "SQL")
-Rel(payment_svc, payment_db, "SQL")
-Rel(order_svc, catalog_svc, "gRPC", "checks inventory")
-Rel(order_svc, payment_svc, "gRPC", "processes payment")
-Rel(payment_svc, pay_gw, "HTTPS", "charges")
-Rel(order_svc, notify, "AMQP", "sends confirmations")
-Rel(order_svc, monomart, "REST", "syncs account data")
-Rel(catalog_svc, monomart, "REST", "syncs reviews")
-
-@enduml
+    Rel(customer, api_gw, "shops", "HTTPS")
+    Rel(admin, api_gw, "manages", "HTTPS")
+    Rel(api_gw, order_svc, "gRPC")
+    Rel(api_gw, catalog_svc, "gRPC")
+    Rel(api_gw, payment_svc, "gRPC")
+    Rel(order_svc, order_db, "SQL")
+    Rel(catalog_svc, catalog_db, "SQL")
+    Rel(payment_svc, payment_db, "SQL")
+    Rel(order_svc, catalog_svc, "checks inventory", "gRPC")
+    Rel(order_svc, payment_svc, "processes payment", "gRPC")
+    Rel(payment_svc, pay_gw, "charges", "HTTPS")
+    Rel(order_svc, notify, "sends confirmations", "AMQP")
+    Rel(order_svc, monomart, "syncs account data", "REST")
+    Rel(catalog_svc, monomart, "syncs reviews", "REST")
 ```
 
 > **C2 Explanation**: ShopMesh has three microservices — Order, Catalog, and Payment — behind a Kong API Gateway. Each service owns its own PostgreSQL database. The Order service orchestrates checkout by calling Catalog (inventory check) and Payment (charge). Async notifications go through RabbitMQ to SendGrid. The legacy MonolithMart is called for account data and reviews.
@@ -114,11 +112,11 @@ MonolithMart, our legacy e-commerce monolith, can no longer scale to meet 10x or
 
 ### 2.1 C2 — Container Diagram
 
-[C2 PlantUML code + explanation]
+[C2 Mermaid diagram + explanation]
 
 ### 2.2 C3 — Component Diagram: Order Service
 
-[C3 PlantUML code + explanation]
+[C3 Mermaid diagram + explanation]
 
 ## 3. Interaction Details (Sequence Diagrams)
 

@@ -44,27 +44,16 @@
 **Agent output — updated decision driver map**:
 > Updated: added the "EU data residency" hard constraint to the driver map.
 
-```plantuml
-@startuml
-rectangle "Decision drivers" as Root
-rectangle "Hard constraints" as Hard
-rectangle "Soft preferences" as Soft
-rectangle "At-least-once delivery" as H1
-rectangle "GCP integration" as H2
-rectangle "EU data residency" as H3
-rectangle "Team familiarity" as S1
-rectangle "Low cost" as S2
-rectangle "Managed service" as S3
-
-Root --> Hard
-Root --> Soft
-Hard --> H1
-Hard --> H2
-Hard --> H3
-Soft --> S1
-Soft --> S2
-Soft --> S3
-@enduml
+```mermaid
+flowchart TD
+    Root["Decision drivers"] --> Hard["Hard constraints"]
+    Root --> Soft["Soft preferences"]
+    Hard --> H1["At-least-once delivery"]
+    Hard --> H2["GCP integration"]
+    Hard --> H3["EU data residency"]
+    Soft --> S1["Team familiarity"]
+    Soft --> S2["Low cost"]
+    Soft --> S3["Managed service"]
 ```
 
 **Agent output — updated comparison matrix + elimination tree**:
@@ -79,25 +68,16 @@ Soft --> S3
 | Low cost | ⚠️ | ✅ | ✅ | ⚠️ |
 | Managed service | ❌ | ✅ | ✅ | ❌ |
 
-```plantuml
-@startuml
-rectangle "All options" as All
-rectangle "Kafka (self-hosted)" as A
-rectangle "Pub/Sub" as B
-rectangle "RabbitMQ" as C
-rectangle "Redpanda" as D
-rectangle "Eliminated" as X
-rectangle "Chosen: Kafka (self-hosted)" as W
-
-All --> A
-All --> B
-All --> C
-All --> D
-B --> X : fails EU data residency
-C --> X : throughput ceiling
-D --> X : no managed service, partial GCP
-A --> W : passes all hard constraints
-@enduml
+```mermaid
+flowchart TD
+    All["All options"] --> A["Kafka (self-hosted)"]
+    All --> B["Pub/Sub"]
+    All --> C["RabbitMQ"]
+    All --> D["Redpanda"]
+    B -->|"fails EU data residency"| X["Eliminated"]
+    C -->|"throughput ceiling"| X
+    D -->|"no managed service, partial GCP"| X
+    A -->|"passes all hard constraints"| W["Chosen: Kafka (self-hosted)"]
 ```
 
 > The corrected picture now points to Kafka (self-hosted) as the recommendation, since it is the only option satisfying the new EU residency hard constraint — the recommendation flipped from Pub/Sub.
@@ -112,25 +92,19 @@ A --> W : passes all hard constraints
 **Agent response (applies sync-diagrams — new context, no existing diagram covers it)**:
 > This is new context not covered by the existing diagrams, so I'll add a new diagram for it:
 
-```plantuml
-@startuml
-start
-:Consumer processes message;
-if (Process succeeds?) then (yes)
-  :Acknowledge message;
-  stop
-else (no)
-  if (Retry budget exhausted?) then (yes)
-    :Route to dead-letter topic;
-    :Alert on-call;
-    stop
-  else (no)
-    :Retry with backoff;
-    :Requeue message;
-    stop
-  endif
-endif
-@enduml
+```mermaid
+flowchart TD
+    A([Start]) --> B[Consumer processes message]
+    B --> C{Process succeeds?}
+    C -->|yes| D[Acknowledge message]
+    D --> E([End])
+    C -->|no| F{Retry budget exhausted?}
+    F -->|yes| G[Route to dead-letter topic]
+    G --> H[Alert on-call]
+    H --> E
+    F -->|no| I[Retry with backoff]
+    I --> J[Requeue message]
+    J --> E
 ```
 
 > This dead-letter flowchart will be embedded in the ADR's Context section alongside the other diagrams.

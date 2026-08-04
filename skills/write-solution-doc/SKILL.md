@@ -34,7 +34,7 @@ The C4 model provides a hierarchical approach to software architecture diagrams:
 - **C2 (Container Diagram)**: Shows the high-level technical building blocks — applications, data stores, microservices, etc. — and how they interact. Think "docker-compose" level.
 - **C3 (Component Diagram)**: Zooms into a single container to show its internal components and their interactions. Think "Spring components" or "React component tree" level.
 
-Use PlantUML with the C4-PlantUML macros/snippets (`!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml` etc.) for C4 diagrams. Fall back to vanilla PlantUML if C4 macros are not available.
+Draw all diagrams with Mermaid. Use Mermaid's native C4 diagram types for architecture: `C4Context` (context), `C4Container` (C2), and `C4Component` (C3), with C4-PlantUML-compatible syntax (`Person`, `System`, `Container`, `ContainerDb`, `Component`, `System_Boundary`, `Container_Boundary`, `Rel`). See **reference/mermaid-standards.md** for the full syntax and snippets.
 </c4-model>
 
 <diagram-selection-guide>
@@ -46,16 +46,16 @@ Use the following decision matrix to choose the right diagram type for each inte
 | Business process with decision branches and conditional paths (e.g., order approval workflow, refund eligibility logic, state transitions) | **Flowchart** | Shows decision diamonds, branching paths, and process steps — best for logic and control flow |
 | Data pipeline with transformation stages and branching (e.g., ETL steps, data routing rules, enrichment logic) | **Flowchart** | Pipeline stages are process steps; routing rules are decision nodes — naturally fits flowchart syntax |
 | Multi-participant orchestration with both runtime calls AND decision logic (e.g., saga orchestration with compensating actions, complex checkout flow) | **Both** — sequence diagram for the happy-path call chain + flowchart for the decision/compensation logic | Use sequence to show who-calls-whom, flowchart to show what-decisions-are-made |
-| State machine transitions (e.g., order status lifecycle, user onboarding states) | **Flowchart** (state diagram style) — use PlantUML `state` diagram syntax if the focus is on states and transitions; use flowchart activity syntax if decision logic is the emphasis | States as nodes, transitions as arrows with conditions — choose syntax based on whether states or decisions dominate |
-| Pure state/status lifecycle with no decision branching (e.g., entity status flow, deployment states) | **State Diagram** (PlantUML `state` syntax or Mermaid `stateDiagram-v2`) | Cleaner than flowchart for state-centric views — use when the primary question is "what states exist and what triggers transitions?" |
+| State machine transitions (e.g., order status lifecycle, user onboarding states) | **Flowchart** (state diagram style) — use Mermaid `stateDiagram-v2` if the focus is on states and transitions; use `flowchart` if decision logic is the emphasis | States as nodes, transitions as arrows with conditions — choose syntax based on whether states or decisions dominate |
+| Pure state/status lifecycle with no decision branching (e.g., entity status flow, deployment states) | **State Diagram** (Mermaid `stateDiagram-v2`) | Cleaner than flowchart for state-centric views — use when the primary question is "what states exist and what triggers transitions?" |
 | Algorithm or processing logic within a single component (e.g., rate limiting algorithm, caching strategy) | **Flowchart** | No cross-component participants — purely internal logic flow |
 
 <diagram-interop>
 When receiving existing diagrams (from prior investigation, other tools, or user-provided sources) that use different conventions:
-- **C4 diagrams**: Accept C4-PlantUML diagrams regardless of `!include` path style; normalize to the `https://raw.githubusercontent.com/...` convention when embedding in the final document.
+- **C4 diagrams**: Accept Mermaid C4 diagrams regardless of element or boundary style; normalize to the native `C4Context` / `C4Container` / `C4Component` syntax in **mermaid-standards** when embedding in the final document.
 - **Sequence diagrams**: Accept both numbered and unnumbered message styles. Preserve existing numbering when present (useful for traceability); add a brief note explaining the numbering scheme.
-- **Flowcharts**: Accept both PlantUML activity syntax and Mermaid `flowchart` syntax. Render whichever the user provides; offer conversion only if the user wants unified diagramming across the document.
-- **State diagrams**: Accept both PlantUML `state` syntax and Mermaid `stateDiagram-v2` syntax.
+- **Flowcharts**: Accept Mermaid `flowchart` syntax. Normalize labels and shapes to the **mermaid-standards** conventions when embedding.
+- **State diagrams**: Accept Mermaid `stateDiagram-v2` syntax.
 </diagram-interop>
 
 **Decision rule**: If the primary question is "who talks to whom and in what order?" → use a sequence diagram. If the primary question is "what decisions are made and what paths exist?" → use a flowchart. When both questions matter, produce both diagrams.
@@ -77,9 +77,9 @@ Add a new diagram when:
 Never leave a stale diagram: after each change, every diagram either reflects the latest confirmed state or is replaced by a new one that does.
 </diagram-sync>
 
-<plantuml-standards>
-PlantUML diagram conventions and formatting rules for all diagram types (C4, sequence, flowchart, etc.). Load **reference/plantuml-standards.md** for the full standards.
-</plantuml-standards>
+<mermaid-standards>
+Mermaid diagram conventions and formatting rules for all diagram types (C4, sequence, flowchart, state diagram). Load **reference/mermaid-standards.md** for the full standards.
+</mermaid-standards>
 
 <api-design-standards>
 API and event schema design conventions. Load **reference/api-design-standards.md** for the full standards.
@@ -98,7 +98,7 @@ The assistant supports both English and Chinese (中文) output:
 - Detect the user's language from their initial input and respond in that language.
 - Allow the user to switch languages at any point (e.g., "请用中文输出" or "switch to English").
 - Diagram labels can be in either language based on audience preference.
-- Technical terms (API, RAID, RACI, C4, PlantUML) remain in English unless the user explicitly requests translation.
+- Technical terms (API, RAID, RACI, C4, Mermaid) remain in English unless the user explicitly requests translation.
 </bilingual-support>
 
 <context-loading-guide>
@@ -109,7 +109,7 @@ The assistant supports both English and Chinese (中文) output:
 | User focuses on producing C4, sequence, and flowchart diagrams | Diagram-heavy workflow with C2, C3, sequence diagram, and flowchart outputs | [examples/c4-and-interaction-diagrams.md](examples/c4-and-interaction-diagrams.md) |
 | User needs API/event contract definitions | Detailed API schema and event schema design output | [examples/api-contracts.md](examples/api-contracts.md) |
 | User needs to list related documents, external deps, and maintainers | Document-listing and dependency-tracking workflow | [examples/dependencies-and-maintainers.md](examples/dependencies-and-maintainers.md) |
-| Writing PlantUML diagrams (C4, sequence, flowchart) | Diagram syntax, formatting rules, and conventions for all diagram types | [reference/plantuml-standards.md](reference/plantuml-standards.md) |
+| Writing Mermaid diagrams (C4, sequence, flowchart) | Diagram syntax, formatting rules, and conventions for all diagram types | [reference/mermaid-standards.md](reference/mermaid-standards.md) |
 | Designing API/event contracts | REST, gRPC, and async event schema conventions | [reference/api-design-standards.md](reference/api-design-standards.md) |
 | Performing RAID analysis | RAID framework definition and item schema | [reference/raid-framework.md](reference/raid-framework.md) |
 | Building a RACI matrix | RACI framework definition and table format | [reference/raci-framework.md](reference/raci-framework.md) |
@@ -141,9 +141,9 @@ The assistant supports both English and Chinese (中文) output:
    - Which systems/services/applications participate in the solution.
    - How they communicate (sync HTTP, async messaging, gRPC, etc.).
    - External systems and users that interact with the solution.
-3. Produce a C2 Container diagram in PlantUML using C4-PlantUML macros with a brief explanation.
+3. Produce a C2 Container diagram in Mermaid (`C4Container`) with a brief explanation.
 4. Ask the user to confirm the C2 diagram, then zoom into the most critical container to produce a C3 Component diagram.
-5. Produce the C3 Component diagram in PlantUML with a brief explanation.
+5. Produce the C3 Component diagram in Mermaid (`C4Component`) with a brief explanation.
 6. Ask the user to confirm. Offer to produce additional C3 diagrams for other containers if needed.
 7. Refine diagrams based on user feedback until confirmed.
 </draw-c4-topology>
@@ -155,7 +155,7 @@ The assistant supports both English and Chinese (中文) output:
    - Which scenarios/flows are most critical to document.
    - For sequence diagrams: the exact sequence of calls/messages between components, synchronous vs. asynchronous interactions, error and edge-case flows.
    - For flowcharts: the decision points, branching conditions, process steps, and start/end states.
-4. Produce one diagram per critical flow in PlantUML, choosing the appropriate type per the selection guide.
+4. Produce one diagram per critical flow in Mermaid, choosing the appropriate type per the selection guide.
 5. **Sequence diagram requirements**: clearly show participants, message ordering, activation bars, and notes for important details.
 6. **Flowchart requirements**: clearly show start/stop nodes, process steps (rectangles), decision nodes (diamonds), and labeled arrows for each branch condition.
 7. Ask the user to confirm each diagram. Refine based on feedback.
@@ -240,12 +240,12 @@ The assistant supports both English and Chinese (中文) output:
 
 ## 2. System Topology (C4 Model)
 ### 2.1 C2 — Container Diagram
-[PlantUML diagram + explanation]
+[Mermaid diagram + explanation]
 ### 2.2 C3 — Component Diagram(s)
-[PlantUML diagram(s) + explanation]
+[Mermaid diagram(s) + explanation]
 
 ## 3. Interaction Details
-[One subsection per critical flow with PlantUML diagram(s) + explanation. Use sequence diagrams for runtime message flows, flowcharts for process logic/decision branches, or both when needed.]
+[One subsection per critical flow with Mermaid diagram(s) + explanation. Use sequence diagrams for runtime message flows, flowcharts for process logic/decision branches, or both when needed.]
 
 ## 4. API / Event Schema
 [Structured schema definitions]
@@ -266,9 +266,9 @@ The assistant supports both English and Chinese (中文) output:
 [RACI matrix table]
 ```
 
-2. Use clear heading hierarchy, tables for structured data, and fenced code blocks for PlantUML and JSON/YAML schemas.
+2. Use clear heading hierarchy, tables for structured data, and fenced code blocks for Mermaid diagrams and JSON/YAML schemas.
 3. For any section that was explicitly skipped, mark it as `[Skipped]`.
-4. Ensure all PlantUML diagrams use correct syntax and are renderable.
+4. Ensure all Mermaid diagrams use correct syntax and are renderable.
 5. Match the user's language preference (English or Chinese) for explanatory text.
 6. Present the final document and offer to refine any section.
 </structure-solution-doc>
@@ -309,7 +309,7 @@ The assistant supports both English and Chinese (中文) output:
 
 <rule>If the user provides pre-existing content for any section, incorporate it directly into the relevant capability instead of re-gathering that information. Confirm understanding of the provided content before proceeding.</rule>
 
-<rule>For PlantUML diagrams, always provide the complete, renderable PlantUML code inside a fenced code block with `plantuml` language tag. Include both the diagram code and a written explanation.</rule>
+<rule>For Mermaid diagrams, always provide the complete, renderable Mermaid code inside a fenced code block with `mermaid` language tag. Include both the diagram code and a written explanation.</rule>
 
 <rule>When the user switches language mid-session (e.g., "请用中文"), immediately switch all subsequent output to the requested language while preserving already-confirmed content in its original language.</rule>
 </rules>

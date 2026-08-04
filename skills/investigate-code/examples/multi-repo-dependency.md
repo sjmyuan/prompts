@@ -32,30 +32,26 @@ Applies `<analyze-cross-repo-dependencies>`.
 
 Applies `<draw-c4-diagram>`.
 
-```plantuml
-@startuml
-!include <C4/C4_Container>
+```mermaid
+C4Container
+    title Checkout Flow — System Landscape (C2)
 
-title Checkout Flow — System Landscape (C2)
+    Person(customer, "Customer", "Web/Mobile user")
 
-Person(customer, "Customer", "Web/Mobile user")
+    System_Boundary(checkout_system, "Checkout System") {
+        Container(order_service, "order-service", "Spring Boot", "Checkout orchestration, Port 8080")
+        Container(payment_service, "payment-service", "Spring Boot", "Payment processing, Port 8081")
+        Container(inventory_service, "inventory-service", "Spring Boot", "Stock management, Port 8082")
+        Container(notification_service, "notification-service", "Spring Boot", "Email/SMS alerts, Kafka consumer")
+        ContainerDb(postgres, "PostgreSQL", "Relational Database", "Inventory data")
+    }
 
-System_Boundary(checkout_system, "Checkout System") {
-    Container(order_service, "order-service", "Spring Boot", "Checkout orchestration, Port 8080")
-    Container(payment_service, "payment-service", "Spring Boot", "Payment processing, Port 8081")
-    Container(inventory_service, "inventory-service", "Spring Boot", "Stock management, Port 8082")
-    Container(notification_service, "notification-service", "Spring Boot", "Email/SMS alerts, Kafka consumer")
-    ContainerDb(postgres, "PostgreSQL", "Relational Database", "Inventory data")
-}
-
-Rel(customer, order_service, "POST /checkout", "HTTPS")
-Rel(order_service, payment_service, "POST /payments", "HTTPS")
-Rel(order_service, inventory_service, "POST /inventory/reserve", "HTTPS")
-Rel(order_service, notification_service, "publishes OrderConfirmed", "Kafka")
-Rel(payment_service, notification_service, "publishes PaymentProcessed", "Kafka")
-Rel(inventory_service, postgres, "Reads/Writes", "JDBC")
-
-@enduml
+    Rel(customer, order_service, "POST /checkout", "HTTPS")
+    Rel(order_service, payment_service, "POST /payments", "HTTPS")
+    Rel(order_service, inventory_service, "POST /inventory/reserve", "HTTPS")
+    Rel(order_service, notification_service, "publishes OrderConfirmed", "Kafka")
+    Rel(payment_service, notification_service, "publishes PaymentProcessed", "Kafka")
+    Rel(inventory_service, postgres, "Reads/Writes", "JDBC")
 ```
 
 **Diagram explanation**:

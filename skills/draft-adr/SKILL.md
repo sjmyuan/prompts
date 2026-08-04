@@ -42,7 +42,7 @@ When the user has only one option, prompt them to consider alternatives from the
 </option-brainstorming-prompts>
 
 <diagram-selection>
-Use diagrams proactively whenever explaining context or a solution — never wait to be asked. Choose the diagram type by the context you want to explain, not by which ADR step you are in. Prefer PlantUML wherever the platform supports it, and fall back to Mermaid, SVG, or ASCII when it does not.
+Use diagrams proactively whenever explaining context or a solution — never wait to be asked. Choose the diagram type by the context you want to explain, not by which ADR step you are in. Draw all diagrams with Mermaid.
 
 | Diagram | Draw when explaining | Shows |
 |---|---|---|
@@ -54,7 +54,7 @@ Use diagrams proactively whenever explaining context or a solution — never wai
 | Decision driver map | The trade-off space that drives the decision | Hard constraints vs soft preferences |
 | Option comparison matrix + elimination tree | How options compare against the drivers, or why options were dropped | Driver satisfaction per option, elimination reasoning |
 
-Zoom in level by level: C4 context → container → component for structure, then a flowchart or sequence diagram for a specific flow or interaction. The solution architecture is simply a C4/flowchart view of the target state — no separate diagram type is required. Draw C4 diagrams with the C4-PlantUML macros (`Person`, `System`, `System_Ext`, `Container`, `ContainerDb`, `Component`, `Rel`, `System_Boundary`, `Container_Boundary`). Keep each diagram to a single message. Load **reference/diagram-guide.md** for the include paths, notation, and snippets.
+Zoom in level by level: C4 context → container → component for structure, then a flowchart or sequence diagram for a specific flow or interaction. The solution architecture is simply a C4/flowchart view of the target state — no separate diagram type is required. Draw C4 diagrams with Mermaid's native C4 types — `C4Context` (context), `C4Container` (container), `C4Component` (component) — with C4-PlantUML-compatible syntax (`Person`, `System`, `System_Ext`, `Container`, `ContainerDb`, `Component`, `Rel`, `System_Boundary`, `Container_Boundary`). Keep each diagram to a single message. Load **reference/diagram-guide.md** for the notation and snippets.
 </diagram-selection>
 
 <diagram-sync>
@@ -78,7 +78,7 @@ Never leave a stale diagram: after each change, every diagram either reflects th
 | Load when | Provides | File |
 |---|---|---|
 | Compiling the final ADR document (compile-adr capability step 3) | Complete ADR markdown template with all sections and placeholder annotations | [reference/adr-template.md](reference/adr-template.md) |
-| Drawing any diagram (any capability) | PlantUML-first notation for C4 (context / container / component), flowchart, sequence, driver map, and comparison diagrams, with fallback snippets | [reference/diagram-guide.md](reference/diagram-guide.md) |
+| Drawing any diagram (any capability) | Mermaid notation for C4 (context / container / component), flowchart, sequence, driver map, and comparison diagrams, with snippets | [reference/diagram-guide.md](reference/diagram-guide.md) |
 | User provides a complete, well-formed problem statement and wants to see a full end-to-end walkthrough | Full walkthrough of all 5 capabilities for a database selection decision | [examples/database-selection.md](examples/database-selection.md) |
 | User has partial notes or rough ideas and needs help structuring them into an ADR | Full walkthrough of all 5 capabilities starting from unstructured input | [examples/from-rough-notes.md](examples/from-rough-notes.md) |
 | User corrects content or new findings emerge mid-session and diagrams need to stay current | Walkthrough of **sync-diagrams** updating affected diagrams and adding new ones | [examples/diagram-sync.md](examples/diagram-sync.md) |

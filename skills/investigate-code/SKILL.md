@@ -34,7 +34,7 @@ Discover cross-repo dependencies:
 | **API contracts** | OpenAPI/Swagger specs, Protobuf files, GraphQL schemas |
 </multi-repo-discovery>
 <diagram-conventions>
-Choose the most appropriate diagram type for what you're explaining: C4 for architecture, sequence for interactions, flowchart for decision logic, state diagram for lifecycles, class/ER for data models. Use PlantUML or Mermaid — whichever communicates more clearly. See [reference/diagram-quick-reference.md](reference/diagram-quick-reference.md) for syntax quick-reference, [reference/c4-model-conventions.md](reference/c4-model-conventions.md) for C4 layout and colors, and [reference/sequence-diagram-conventions.md](reference/sequence-diagram-conventions.md) for sequence diagram patterns.
+Choose the most appropriate diagram type for what you're explaining: C4 for architecture, sequence for interactions, flowchart for decision logic, state diagram for lifecycles, class/ER for data models. Draw all diagrams with Mermaid — use native `C4Container`/`C4Component` for C4. See [reference/diagram-quick-reference.md](reference/diagram-quick-reference.md) for syntax quick-reference, [reference/c4-model-conventions.md](reference/c4-model-conventions.md) for C4 element types and layout, and [reference/sequence-diagram-conventions.md](reference/sequence-diagram-conventions.md) for sequence diagram patterns.
 </diagram-conventions>
 <progressive-disclosure-levels>
 Guide investigations from high-level to detail: C2 Container ("What systems exist?") → C3 Component ("What's inside?") → Sequence/Flowchart ("What's the message order or decision logic?") → Call Stack ("What happens in this method?"). Supplement with state diagrams (lifecycles), class diagrams (data models), or other types whenever they clarify the explanation better than the default level. Start at the level matching user familiarity — Level 1 for unfamiliar systems, Level 3-4 for specific flows.
@@ -54,9 +54,9 @@ See [reference/pattern-discovery-strategies.md](reference/pattern-discovery-stra
 | Load when | Provides | File |
 |---|---|---|
 | Conducting a typical investigation (any question type) | End-to-end example with clarification, discovery, tracing, and synthesis | [examples/investigation-workflow.md](examples/investigation-workflow.md) |
-| Needing a PlantUML syntax quick-reference for any diagram type | C2/C3/Sequence syntax cheat-sheet | [reference/diagram-quick-reference.md](reference/diagram-quick-reference.md) |
-| Drawing C2 or C3 diagrams | Full element types, color palettes, PlantUML patterns | [reference/c4-model-conventions.md](reference/c4-model-conventions.md) |
-| Drawing sequence diagrams | Message numbering, PlantUML syntax, cross-reference conventions | [reference/sequence-diagram-conventions.md](reference/sequence-diagram-conventions.md) |
+| Needing a Mermaid syntax quick-reference for any diagram type | C2/C3/Sequence syntax cheat-sheet | [reference/diagram-quick-reference.md](reference/diagram-quick-reference.md) |
+| Drawing C2 or C3 diagrams | Full element types, boundaries, `C4Container`/`C4Component` patterns | [reference/c4-model-conventions.md](reference/c4-model-conventions.md) |
+| Drawing sequence diagrams | Message numbering, Mermaid syntax, cross-reference conventions | [reference/sequence-diagram-conventions.md](reference/sequence-diagram-conventions.md) |
 | Tracing method-level call stacks | Frame format, cross-repo annotation, correlation with sequence diagrams | [reference/call-stack-trace-conventions.md](reference/call-stack-trace-conventions.md) |
 | Discovering patterns or detecting inconsistencies | Structural fingerprint format, comparison matrix, severity levels | [reference/pattern-discovery-strategies.md](reference/pattern-discovery-strategies.md) |
 | Investigating across multiple repos | Dependency matrix, C2 diagram, cross-repo call traces | [examples/multi-repo-dependency.md](examples/multi-repo-dependency.md) |
@@ -92,8 +92,8 @@ See [reference/pattern-discovery-strategies.md](reference/pattern-discovery-stra
 1. **Determine level**: C2 (Container) for system landscape across repos; C3 (Component) to zoom into one container's internals.
 2. **Load conventions**: Load [reference/c4-model-conventions.md](reference/c4-model-conventions.md).
 3. **Define content**: List all elements (containers/components, databases, external systems, actors) and connections with protocol labels.
-4. **Create PlantUML**: Use the appropriate `!include` for the level. For C3, wrap components in `Container_Boundary()`; for C2, group with `System_Boundary()`. Label connections with protocols (e.g., `"POST /payments (HTTPS)"`).
-5. **Render and explain**: Render to PNG/SVG (or present `.puml` source), then describe each element's role and key connections.
+4. **Create Mermaid**: Use `C4Container` for C2 and `C4Component` for C3. For C3, wrap components in a `Container_Boundary()`; for C2, group containers with `System_Boundary()`. Label connections with protocols (e.g., `Rel(a, b, "POST /payments", "HTTPS")`).
+5. **Render and explain**: Present the Mermaid source, then describe each element's role and key connections.
 6. **Offer next level**: For C2, ask which container to zoom into (C3). For C3, ask which interaction to sequence-diagram.
 7. **Validate**: Verify that every container and connection in the diagram appears in the dependency matrix, and that connection labels include protocol and endpoint.
 </draw-c4-diagram>
@@ -102,7 +102,7 @@ See [reference/pattern-discovery-strategies.md](reference/pattern-discovery-stra
 1. **Select the operation**: Based on user choice or the key interaction from the C2/C3 diagram.
 2. **Load conventions**: Load [reference/sequence-diagram-conventions.md](reference/sequence-diagram-conventions.md).
 3. **Trace the message flow**: Identify all participants, message order with method signatures, sync vs. async calls, and return values.
-4. **Create PlantUML**: Use native sequence syntax. Number messages sequentially for call-stack cross-referencing. Use `->` for sync, `-->>` for async, `-->` for returns. Add `alt/loop/par` blocks for branching.
+4. **Create Mermaid**: Use `sequenceDiagram` syntax. Number messages sequentially for call-stack cross-referencing. Use `->>` for sync, `-->>` for async and returns. Add `alt/loop/par` blocks for branching.
 5. **Render and explain**: Walk through numbered messages highlighting key interactions.
 6. **Offer method detail**: Ask which message to trace at the call-stack level via trace-call-stack.
 7. **Validate**: Verify that message numbers are sequential, return arrows exist for every call, and all participants match containers from the C2/C3 diagram.
@@ -130,7 +130,7 @@ See [reference/pattern-discovery-strategies.md](reference/pattern-discovery-stra
 1. **Determine scope**: Ask if user wants all levels or a subset.
 2. **Load example**: Load [examples/markdown-report.md](examples/markdown-report.md) for structure reference.
 3. **Assemble sections**: System overview (C2 + dependency matrix) → Component internals (C3 per container) → Interaction flows (sequence diagrams) → Method details (call stacks) → Key decisions → Edge cases → Next steps.
-4. **Embed diagrams**: PlantUML source blocks with brief text descriptions.
+4. **Embed diagrams**: Mermaid source blocks with brief text descriptions.
 5. **Validate**: Ensure all file paths and line numbers are accurate, and every investigation level is represented.
 </compile-markdown-report>
 

@@ -9,30 +9,26 @@
 
 Applies `<draw-c4-diagram>` (C2 level).
 
-```plantuml
-@startuml
-!include <C4/C4_Container>
+```mermaid
+C4Container
+    title Checkout Flow — System Landscape (C2)
 
-title Checkout Flow — System Landscape (C2)
+    Person(customer, "Customer", "Web/Mobile user")
 
-Person(customer, "Customer", "Web/Mobile user")
+    System_Boundary(checkout_system, "Checkout System") {
+        Container(order_service, "order-service", "Spring Boot", "Checkout orchestration")
+        Container(payment_service, "payment-service", "Spring Boot", "Payment processing")
+        Container(inventory_service, "inventory-service", "Spring Boot", "Stock management")
+        Container(notification_service, "notification-service", "Spring Boot", "Email/SMS, Kafka consumer")
+        ContainerDb(postgres, "PostgreSQL", "Relational Database", "Inventory data")
+    }
 
-System_Boundary(checkout_system, "Checkout System") {
-    Container(order_service, "order-service", "Spring Boot", "Checkout orchestration")
-    Container(payment_service, "payment-service", "Spring Boot", "Payment processing")
-    Container(inventory_service, "inventory-service", "Spring Boot", "Stock management")
-    Container(notification_service, "notification-service", "Spring Boot", "Email/SMS, Kafka consumer")
-    ContainerDb(postgres, "PostgreSQL", "Relational Database", "Inventory data")
-}
-
-Rel(customer, order_service, "POST /checkout", "HTTPS")
-Rel(order_service, payment_service, "POST /payments", "HTTPS")
-Rel(order_service, inventory_service, "POST /inventory/reserve", "HTTPS")
-Rel(order_service, notification_service, "publishes OrderConfirmed", "Kafka")
-Rel(payment_service, notification_service, "publishes PaymentProcessed", "Kafka")
-Rel(inventory_service, postgres, "Reads/Writes", "JDBC")
-
-@enduml
+    Rel(customer, order_service, "POST /checkout", "HTTPS")
+    Rel(order_service, payment_service, "POST /payments", "HTTPS")
+    Rel(order_service, inventory_service, "POST /inventory/reserve", "HTTPS")
+    Rel(order_service, notification_service, "publishes OrderConfirmed", "Kafka")
+    Rel(payment_service, notification_service, "publishes PaymentProcessed", "Kafka")
+    Rel(inventory_service, postgres, "Reads/Writes", "JDBC")
 ```
 
 **Key observations**:
@@ -46,37 +42,34 @@ Rel(inventory_service, postgres, "Reads/Writes", "JDBC")
 
 Applies `<draw-c4-diagram>` (C3 level).
 
-```plantuml
-@startuml
-!include <C4/C4_Component>
+```mermaid
+C4Component
+    title order-service — Component Diagram (C3)
 
-title order-service — Component Diagram (C3)
+    Container_Boundary(order_service, "order-service") {
+        Component(checkout_ctrl, "CheckoutController", "REST Controller", "POST /checkout endpoint")
+        Component(order_listener, "OrderEventListener", "Kafka Consumer", "Listens for PaymentProcessed")
+        Component(checkout_orch, "CheckoutOrchestrator", "Application Service", "Orchestrates checkout flow")
+        Component(order_svc, "OrderService", "Domain Service", "Order creation and lifecycle")
+        Component(payment_adapter, "PaymentAdapter", "HTTP Client", "Calls payment-service")
+        Component(inventory_adapter, "InventoryAdapter", "HTTP Client", "Calls inventory-service")
+        Component(event_publisher, "EventPublisher", "Kafka Publisher", "Publishes domain events")
+        ComponentDb(order_db, "Order DB", "PostgreSQL", "Order persistence")
 
-Container_Boundary(order_service, "order-service") {
-    Component(checkout_ctrl, "CheckoutController", "REST Controller", "POST /checkout endpoint")
-    Component(order_listener, "OrderEventListener", "Kafka Consumer", "Listens for PaymentProcessed")
-    Component(checkout_orch, "CheckoutOrchestrator", "Application Service", "Orchestrates checkout flow")
-    Component(order_svc, "OrderService", "Domain Service", "Order creation and lifecycle")
-    Component(payment_adapter, "PaymentAdapter", "HTTP Client", "Calls payment-service")
-    Component(inventory_adapter, "InventoryAdapter", "HTTP Client", "Calls inventory-service")
-    Component(event_publisher, "EventPublisher", "Kafka Publisher", "Publishes domain events")
-    ComponentDb(order_db, "Order DB", "PostgreSQL", "Order persistence")
-}
+        Rel(checkout_ctrl, checkout_orch, "checkout()")
+        Rel(checkout_orch, order_svc, "createOrder(), confirmOrder()")
+        Rel(checkout_orch, payment_adapter, "processPayment()")
+        Rel(checkout_orch, inventory_adapter, "reserveItems()")
+        Rel(checkout_orch, event_publisher, "publish(OrderConfirmed)")
+        Rel(order_svc, order_db, "Reads/Writes", "JDBC")
+        Rel(order_listener, checkout_orch, "onPaymentProcessed()")
+    }
 
-Container(payment_service, "payment-service", "Spring Boot", "External payment service", $external=true)
-Container(inventory_service, "inventory-service", "Spring Boot", "External inventory service", $external=true)
+    Container_Ext(payment_service, "payment-service", "Spring Boot", "External payment service")
+    Container_Ext(inventory_service, "inventory-service", "Spring Boot", "External inventory service")
 
-Rel(checkout_ctrl, checkout_orch, "checkout()")
-Rel(checkout_orch, order_svc, "createOrder(), confirmOrder()")
-Rel(checkout_orch, payment_adapter, "processPayment()")
-Rel(checkout_orch, inventory_adapter, "reserveItems()")
-Rel(checkout_orch, event_publisher, "publish(OrderConfirmed)")
-Rel(order_svc, order_db, "Reads/Writes", "JDBC")
-Rel(payment_adapter, payment_service, "POST /payments", "HTTPS")
-Rel(inventory_adapter, inventory_service, "POST /inventory/reserve", "HTTPS")
-Rel(order_listener, checkout_orch, "onPaymentProcessed()")
-
-@enduml
+    Rel(payment_adapter, payment_service, "POST /payments", "HTTPS")
+    Rel(inventory_adapter, inventory_service, "POST /inventory/reserve", "HTTPS")
 ```
 
 **Component responsibilities**:
@@ -93,40 +86,37 @@ Rel(order_listener, checkout_orch, "onPaymentProcessed()")
 
 Applies `<draw-sequence-diagram>`.
 
-```plantuml
-@startuml
-title Checkout Flow — Sequence Diagram
+```mermaid
+sequenceDiagram
+    %% Checkout Flow — Sequence Diagram
+    actor Customer
+    participant Ctrl as CheckoutController
+    participant Orch as CheckoutOrchestrator
+    participant OrderSvc as OrderService
+    participant PayAdptr as PaymentAdapter
+    participant InvAdptr as InventoryAdapter
+    participant Kafka
 
-actor Customer
-participant "CheckoutController" as Ctrl
-participant "CheckoutOrchestrator" as Orch
-participant "OrderService" as OrderSvc
-participant "PaymentAdapter" as PayAdptr
-participant "InventoryAdapter" as InvAdptr
-participant "Kafka" as Kafka
+    Customer->>Ctrl: 1: POST /checkout
+    Ctrl->>Orch: 2: checkout(request)
+    Orch->>OrderSvc: 3: createOrder(customerId, items)
+    OrderSvc-->>Orch: 4: return Order
 
-Customer -> Ctrl: 1: POST /checkout
-Ctrl -> Orch: 2: checkout(request)
-Orch -> OrderSvc: 3: createOrder(customerId, items)
-OrderSvc --> Orch: 4: <return Order
+    par parallel
+        Orch->>PayAdptr: 5: processPayment(orderId, paymentMethod)
+        PayAdptr->>PayAdptr: 6: POST /payments (HTTPS)<br/>[cross-repo → payment-service]
+        PayAdptr-->>Orch: 9: return paymentOK
+    and
+        Orch->>InvAdptr: 7: reserveItems(orderId, items)
+        InvAdptr->>InvAdptr: 8: POST /inventory/reserve (HTTPS)<br/>[cross-repo → inventory-service]
+        InvAdptr-->>Orch: 10: return inventoryOK
+    end
 
-par parallel
-    Orch -> PayAdptr: 5: processPayment(orderId, paymentMethod)
-    PayAdptr -> PayAdptr: 6: POST /payments (HTTPS)\n[cross-repo → payment-service]
-    PayAdptr --> Orch: 9: <return paymentOK
-and
-    Orch -> InvAdptr: 7: reserveItems(orderId, items)
-    InvAdptr -> InvAdptr: 8: POST /inventory/reserve (HTTPS)\n[cross-repo → inventory-service]
-    InvAdptr --> Orch: 10: <return inventoryOK
-end
-
-Orch -> OrderSvc: 11: confirmOrder(orderId)
-OrderSvc --> Orch: 12: <return confirmed
-Orch -> Kafka: 13: publish(OrderConfirmedEvent)\ntopic: order.confirmed
-Orch --> Ctrl: 14: <return OrderSummary
-Ctrl --> Customer: 15: <return 200 OK
-
-@enduml
+    Orch->>OrderSvc: 11: confirmOrder(orderId)
+    OrderSvc-->>Orch: 12: return confirmed
+    Orch->>Kafka: 13: publish(OrderConfirmedEvent)<br/>topic: order.confirmed
+    Orch-->>Ctrl: 14: return OrderSummary
+    Ctrl-->>Customer: 15: return 200 OK
 ```
 
 **Numbered message sequence**:
