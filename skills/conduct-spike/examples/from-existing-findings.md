@@ -140,6 +140,6 @@
 - ADR-001: Cache Topology (Two-tier: Caffeine + Redis)
 - ADR-002: Cache Invalidation (CDC-based)
 
-### Closing Notes
+### Wrap-Up (conversation level — not written into any artifact)
 
-> Note: This spike skipped the investigation phase because you provided existing findings. If any investigation gaps are discovered during ADR review, you can re-run the investigation phase for specific areas.
+> This spike skipped the investigation phase because you provided existing findings. If any investigation gaps are discovered during ADR review, we can re-run the investigation phase for specific areas.

@@ -47,14 +47,15 @@ Ask the user to share the context from the previous spike. This may include:
 - If an ADR already exists for the area: load it, update the investigation findings, re-evaluate the options if needed, and revise the chosen option and consequences accordingly. Preserve the ADR's existing structure and metadata.
 - If no ADR exists yet for the area: apply the draft-area-adrs capability to produce a new ADR.
 - Ensure each ADR references the relevant findings document(s) for evidence.
-- Keep the ADR clean: it contains only the revised decision (problem, drivers, options, chosen option, consequences). No logs or raw investigation data — any corrected facts live in the findings document.
+- **Rewrite the ADR in place per the latest-state protocol**: delete the superseded decision text entirely, then state the new decision as the decision — no "updated", "changed from", "previously", or version markers. Corrected facts live in the findings document; the ADR carries only the current decision.
+- Run the **no-note scan** from clean-artifact-principle: scan for "Note:", "Updated", "v2", "As of", "Previously", status parentheticals, and process narration. Rewrite until none remain.
 
 ## Step 7: Optionally update the solution document
 
 - Ask: "Do the new or updated ADRs change the overall system-level view?"
 - If yes, apply the compile-solution-doc capability to refresh the solution document, incorporating the updated ADR decisions.
 - If no, note that the existing solution document remains valid. The new/updated ADRs supplement it.
-- Keep the refreshed solution document clean: update only the affected target-state sections (diagrams, contracts, RAID, RACI). No logs, no change notes, no investigation history — those stay in the findings document.
+- **Rewrite the affected sections in place** per the latest-state protocol: delete superseded target-state text, then state the new target state as-is — no "v2", no change lists, no investigation history (those stay in the findings document and in the conversation). Run the no-note scan before presenting.
 
 ## Step 8: Present the deep-dive results
 

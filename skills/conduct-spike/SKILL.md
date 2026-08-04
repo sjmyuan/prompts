@@ -78,6 +78,12 @@ During ADR discussion (drafting, reviewing, or adjusting a decision — inside t
 This is the "Untested assumption in ADR" go-deeper heuristic from **reference/spike-direction-suggestions-guide.md**, applied while the ADR is still being discussed rather than only after an investigation round.
 </adr-uncertainty-signals>
 
+<latest-state-doctrine>
+ADRs and the solution document are **single-source-of-truth documents maintained at the latest state**. When a decision or fact changes, rewrite the affected sections **in place** so the document reads as if the current decision was always the decision — never annotate the change. Superseded content is **deleted**, not marked. Version control (git) is the document's only history; the document itself has no memory of its own past.
+
+This permits **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously", or "we used to…" language inside ADRs or the solution document, and no in-document changelog or closing-notes sections. Where notes are legitimately allowed (change summary, findings docs, conversation), see **reference/clean-artifact-principle.md**. The rewrite-in-place procedure and the **no-note scan** validation gate are defined there.
+</latest-state-doctrine>
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -93,13 +99,14 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
 | Producing or understanding findings documents (format, per-area vs consolidated strategy, artifact relationships) | Findings doc format and strategy selection | [reference/findings-document-guide.md](reference/findings-document-guide.md) |
 | Compiling or maintaining the code reference (7-section structure, confidence tags, searched-negatives rules) | Full code reference structure and maintenance rules | [reference/code-reference-guide.md](reference/code-reference-guide.md) |
 | Seeing a worked code reference with entry points, call chains, evidence ledger, and searched-negatives | Worked example of a structured code reference for a 4-area spike | [examples/code-reference-example.md](examples/code-reference-example.md) |
-| Drafting ADRs or compiling the solution document — keeping decision docs free of logs and investigation detail | Clean-document rules for ADRs and the solution doc | [reference/clean-artifact-principle.md](reference/clean-artifact-principle.md) |
+| Drafting, revising, or compiling ADRs and the solution doc — keeping them at the latest state, free of logs and process language | Latest-state rewrite-in-place protocol, allowed vs banned notes map, and the no-note scan checklist | [reference/clean-artifact-principle.md](reference/clean-artifact-principle.md) |
 | Entering or executing deep-dive mode (continuing a previous spike on unresolved areas) | Mode comparison guide and deep-dive procedure | [reference/deep-dive-mode-guide.md](reference/deep-dive-mode-guide.md), [reference/deep-dive-procedure.md](reference/deep-dive-procedure.md) |
 | Generating a change summary (code-level changes required to implement the solution) | Format, categories, and code-access guidance | [reference/change-summary-guide.md](reference/change-summary-guide.md) |
 | Assessing and splitting a large solution document into modular, AI-friendly pieces | Splitting heuristics, patterns, and validation checklist | [reference/solution-doc-modularity-guide.md](reference/solution-doc-modularity-guide.md) |
 | Producing a concrete change summary with code access, demonstrating all change categories | End-to-end change summary with code-verified scope estimates | [examples/change-summary-example.md](examples/change-summary-example.md) |
 | Suggesting candidate questions to narrow or broaden a spike after a round completes | Candidate-generation heuristics, go-deeper vs go-broader patterns, and output format | [reference/spike-direction-suggestions-guide.md](reference/spike-direction-suggestions-guide.md) |
 | Seeing a worked example of direction suggestions — 3 go-deeper and 3 go-broader candidates grounded in investigation evidence | Walkthrough of generating direction candidates after a spike round, with rationale for each | [examples/spike-direction-suggestions.md](examples/spike-direction-suggestions.md) |
+| Revising an existing ADR or solution doc after a deep-dive or decision change — seeing how rewrite-in-place replaces the old decision cleanly | Before → after walkthrough of an ADR rewritten in place, with the banned-language absent list | [examples/update-artifact-in-place.md](examples/update-artifact-in-place.md) |
 | Suggesting a spike when ADR discussion reveals a decision hinges on unverified assumptions or unknown facts | Worked example of detecting ADR uncertainty and offering a focused spike before finalizing the ADR | [examples/adr-uncertainty-spike-suggestion.md](examples/adr-uncertainty-spike-suggestion.md) |
 
 </context-loading-guide>
@@ -182,8 +189,8 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
    - Prepare per-area briefs (area name/description, complete evaluation results — decision drivers, options with pros/cons, assumed solution — **the area's code reference slice**, and instructions to load `draft-adr` to produce a self-contained ADR), detect available agents, dispatch all briefs concurrently, then collect and review each ADR for completeness and consistency. See **multi-agent-orchestration** for the dispatch pattern.
 
 4. After all ADRs are drafted (via either method), present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?" If the user raises uncertainty about any ADR's decision — an unverified assumption, unknown feasibility, or unresolved comparison — apply **suggest-spike-on-adr-uncertainty** before finalizing.
-5. Keep each ADR clean per **clean-artifact-principle** (see **reference/clean-artifact-principle.md**): it contains only the decision — problem, decision drivers, considered options, chosen option, and consequences. No logs, raw data, evidence dumps, or process history. Cite the findings document for evidence rather than embedding it.
-6. Validate each ADR: confirm the chosen option follows logically from the decision drivers, all evaluated options are fairly represented, consequences include both positive and negative impacts, and the ADR can be understood without reading other ADRs.
+5. Keep each ADR at the latest state per **latest-state-doctrine** and **clean-artifact-principle** (see **reference/clean-artifact-principle.md**): it contains only the decision — problem, decision drivers, considered options, chosen option, and consequences. When an ADR is revised, **rewrite the affected sections in place** — delete superseded text, never annotate it. No logs, raw data, evidence dumps, process history, version markers, or change notes. Cite the findings document for evidence rather than embedding it.
+6. Validate each ADR: confirm the chosen option follows logically from the decision drivers, all evaluated options are fairly represented, consequences include both positive and negative impacts, and the ADR can be understood without reading other ADRs. Then run the **no-note scan** from **clean-artifact-principle** — scan for banned process language ("Note:", "Updated", "Changed", "v2", "As of", "Previously", status parentheticals, in-document changelogs) and rewrite in place until none remain.
 7. Note: The chosen option in each ADR is the **assumed solution**. The solution document will adopt these. If an ADR decision changes later, the solution document should be updated accordingly.
 </draft-area-adrs>
 
@@ -192,8 +199,8 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
 2. **Assess solution doc size and modularity**: Apply the heuristics in **solution-doc-modularity**. If the doc exceeds ~3000 words, has 5+ major sections, or has independently useful sections for different audiences, identify candidate sections for extraction.
 3. **Extract independent sections**: For each candidate, create a standalone doc with standalone context and back-reference, replace it in the hub with a 2–4 sentence summary and cross-reference link per **solution-doc-modularity**. Skip extraction for small, single-service solutions.
 4. Compile the final output bundle: Findings Documents, N ADRs, 1 Solution Document (hub), and modular sub-documents (if extracted).
-5. Keep the solution document clean per **clean-artifact-principle** (see **reference/clean-artifact-principle.md**): it contains only the target-state architecture — business context, C4/sequence diagrams, API contracts, RAID, RACI. No logs, raw investigation data, process history, or change notes. Where supporting detail exists, it lives in the findings document — cross-reference it rather than copying it in.
-6. Validate the bundle: every ADR's chosen solution is reflected in the solution doc, cross-references between all artifacts are consistent, diagrams match assumed solutions, and extracted sub-docs have correct back-references.
+5. Keep the solution document at the latest state per **latest-state-doctrine** and **clean-artifact-principle** (see **reference/clean-artifact-principle.md**): it contains only the target-state architecture — business context, C4/sequence diagrams, API contracts, RAID, RACI. When refreshed, **rewrite the affected sections in place** — delete superseded text, never annotate it. No logs, raw investigation data, process history, version markers, or change notes. Where supporting detail exists, it lives in the findings document — cross-reference it rather than copying it in.
+6. Validate the bundle: every ADR's chosen solution is reflected in the solution doc, cross-references between all artifacts are consistent, diagrams match assumed solutions, and extracted sub-docs have correct back-references. Then run the **no-note scan** from **clean-artifact-principle** on the solution doc — scan for banned process language and rewrite in place until none remain.
 7. Present the complete bundle. Remind the user:
    - Findings docs are the current-state record — keep them even if decisions change.
    - ADRs are formal decision records — review and approve with the team.
@@ -246,7 +253,7 @@ This is the "Untested assumption in ADR" go-deeper heuristic from **reference/sp
 1. **Gather existing context** and **confirm the deep-dive scope** — which areas to revisit, what questions remain, which areas stay as-is.
 2. **Deep-dive per selected area**: investigate deeper with targeted focus, **starting from the existing code reference** (entry points, call chains, searched-negatives) so covered code is not re-scanned → update the code reference with new locations and verdicts → update findings doc with any new facts or corrections → evaluate solutions with new findings → update or produce ADRs.
 3. **Optionally update the solution document** if ADR changes affect the system-level view.
-4. **Present the deep-dive results** — updated findings, new/updated ADRs, refreshed solution doc (if applicable). ADRs and the solution doc are updated cleanly with the corrected decisions and facts, without logs or change notes (see **reference/clean-artifact-principle.md**).
+4. **Present the deep-dive results** — updated findings, new/updated ADRs, refreshed solution doc (if applicable). ADRs and the solution doc are **rewritten in place** to the latest state: delete superseded text, never annotate it, no "Updated"/"v2"/"previously" markers or change notes (see **latest-state-doctrine** and **reference/clean-artifact-principle.md**). Run the **no-note scan** on each updated artifact before presenting; narrate the delta in conversation, never inside the document.
 5. After presenting the results, apply **suggest-spike-directions** to present direction candidates for the next spike round.
 
 For the full step-by-step procedure with prompts and validation checks per step, load **reference/deep-dive-procedure.md**.
@@ -289,7 +296,7 @@ For the full step-by-step procedure with prompts and validation checks per step,
 2. Name the uncertainty precisely: "This decision seems to hinge on [the unverified assumption / the unknown fact / the unresolved comparison]." Explain why it matters for the chosen option.
 3. Offer a spike: "Would you like to spike this before finalizing the ADR?" Do not start one without explicit confirmation.
 4. If the user agrees, define a focused spike scope: a single goal (the uncertainty to resolve) and 1–3 investigation areas, then apply **define-spike-scope** to confirm before proceeding. Treat the ADR as provisional until the spike resolves the uncertainty.
-5. If the user declines, continue the current ADR flow and record the uncertainty as an open question in the ADR's consequences so it isn't lost.
+5. If the user declines, continue the current ADR flow and record the uncertainty as a **risk** in the ADR's Consequences section (a legitimate ADR section) so it isn't lost — never as a free-form note or open-question log.
 </suggest-spike-on-adr-uncertainty>
 
 </capabilities>

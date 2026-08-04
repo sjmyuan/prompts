@@ -129,11 +129,11 @@
 
 *[draft-area-adrs skill applied to update the existing ADR]*
 
-### Updated ADR-003: Database Decomposition Strategy for Payment Microservices
+### ADR-003: Database Decomposition Strategy for Payment Microservices
 
 **Title**: ADR-003: Gradual Database Decomposition with Settlement Extraction
 
-**Status**: Draft (updated from unresolved)
+**Status**: Draft
 
 **Problem**: The payment monolith uses a single PostgreSQL database (~80 tables) shared across all payment types. Decomposing into microservices requires a database strategy that maintains data consistency while allowing services to evolve independently. The nightly settlement batch (45 min, 500K transactions) is the critical coupling point — its stored procedures span all payment types.
 
@@ -158,7 +158,7 @@
 - (-) Eventual consistency between payment capture and settlement processing — requires monitoring and alerting.
 - (-) Shared DB remains in the short term — full per-service databases deferred to Phase 2.
 
-> *Note: The deep-dive corrections (stored procedure dependency graph, settlement batch profiling) were applied directly to the findings document. The ADR itself carries only the updated decision and its rationale — no logs or investigation history appear in the ADR or the solution document (see **reference/clean-artifact-principle.md**).*
+*[The ADR above was **rewritten in place**: the old unresolved draft's content was deleted and replaced by this single coherent decision. The deep-dive corrections (stored procedure dependency graph, settlement batch profiling) live in the findings document. The ADR carries no logs, no "updated" markers, and no version history — the delta is narrated here in conversation, not inside the document (see **reference/clean-artifact-principle.md**).]*
 
 ---
 
@@ -174,11 +174,13 @@
 
 *[compile-solution-doc applied to refresh the solution document]*
 
-**Changes to Solution Document**:
-- **C2 Container Diagram**: Added Settlement Service container, connected to Kafka (inbound events) and PostgreSQL (owns `transactions` + `accounts` tables).
-- **Sequence Diagram (Nightly Settlement)**: Updated to show: Payment Services → Kafka → Settlement Service → PostgreSQL (settlement batch), replacing the old monolith-internal stored procedure call.
-- **RAID Analysis**: Added risk about Settlement Service being a critical dependency; added assumption that Kafka topic partitioning aligns with payment types for ordered processing.
-- **Dependencies**: Added Settlement Service to the service inventory; noted it depends on Kafka cluster availability.
+*[The affected sections of the solution document are **rewritten in place** — the doc now reads as if the Settlement Service was always part of the target state. No version markers or change notes appear in the document; the delta is described here in conversation.]*
+
+**Solution document (affected sections, rewritten in place)**:
+- **C2 Container Diagram**: Settlement Service container, connected to Kafka (inbound events) and PostgreSQL (owns `transactions` + `accounts` tables).
+- **Sequence Diagram (Nightly Settlement)**: Payment Services → Kafka → Settlement Service → PostgreSQL (settlement batch).
+- **RAID Analysis**: Risk — Settlement Service is a critical dependency; Assumption — Kafka topic partitioning aligns with payment types for ordered processing.
+- **Dependencies**: Settlement Service depends on Kafka cluster availability.
 
 ---
 
@@ -186,19 +188,17 @@
 
 ### Final Output Bundle
 
-**Updated ADR**:
-- ADR-003: Database Decomposition Strategy (now resolved — Option C: shared DB + settlement extraction)
+**Revised ADR**:
+- ADR-003: Database Decomposition Strategy (resolved — Option C: shared DB + settlement extraction)
 
-**Updated Solution Document**: `solution-doc-payment-migration.md` (v2)
-- Added Settlement Service to C2 and sequence diagrams
-- Updated RAID and dependencies
+**Solution Document**: `solution-doc-payment-migration.md` — C2 and sequence diagrams now include the Settlement Service; RAID and dependencies refreshed (rewritten in place, no version markers)
 
 **Unchanged ADRs** (not revisited):
-- ADR-001: Service Decomposition Boundaries (payment-type services) — unchanged
-- ADR-002: Inter-service Communication (hybrid REST + Kafka) — unchanged, leveraged by new ADR-003
-- ADR-004: Migration Strategy (strangler fig) — unchanged
+- ADR-001: Service Decomposition Boundaries (payment-type services)
+- ADR-002: Inter-service Communication (hybrid REST + Kafka) — leveraged by ADR-003
+- ADR-004: Migration Strategy (strangler fig)
 
-### Closing Notes
+### Wrap-Up (conversation level — not written into any artifact)
 
 > **Deep-dive complete.** ADR-003 is now resolved with a concrete recommendation: shared DB + settlement extraction, phased incrementally. The settlement service reuses the Kafka infrastructure already decided in ADR-002. The other three ADRs were not revisited — their decisions remain valid.
 

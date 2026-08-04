@@ -237,6 +237,6 @@ Similar structured ADRs produced for communication strategy (ADR-002: Hybrid syn
 - ADR-003: Database Decomposition (Database per service)
 - ADR-004: Migration Strategy (Strangler Fig)
 
-### Closing Notes
+### Wrap-Up (conversation level — not written into any artifact)
 
-> The solution document adopts the assumed solutions from all four ADRs. If any ADR decision changes during team review, update the corresponding section in the solution document. All artifacts should be version-controlled in `docs/architecture/decisions/` and `docs/architecture/solutions/`.
+> The solution document adopts the assumed solutions from all four ADRs. If any ADR decision changes during team review, the corresponding section of the solution document is rewritten in place. All artifacts should be version-controlled in `docs/architecture/decisions/` and `docs/architecture/solutions/`.
