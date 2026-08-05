@@ -1,12 +1,13 @@
 ---
 name: draft-adr
-description: Guide users through drafting well-structured ADRs, proactively visualizing context and solutions with diagrams. Use when creating, writing, drafting, or authoring an ADR, documenting decisions, evaluating options, or compiling a record from raw notes.
+description: Guide users through drafting well-structured ADRs, proactively visualizing context and solutions with diagrams, and detailing each option's technical implementation. Use when creating, writing, drafting, or authoring an ADR, documenting decisions, evaluating options or their technical implementation, or compiling a record from raw notes.
 ---
 
 <when-to-use-this-skill>
 - User wants to create, write, draft, or author an Architecture Decision Record (ADR)
 - User needs to document an architectural or technical decision
 - User wants to evaluate and compare architecture options for a decision
+- User wants to evaluate each option by its technical implementation — target-state diagrams and concrete code changes with locations
 - User needs help structuring unstructured thoughts or notes into an ADR format
 - User wants to compile a polished ADR document from raw discussion points
 - User is conducting a spike investigation (via the `conduct-spike` skill) and needs an ADR drafted per decision area
@@ -73,6 +74,10 @@ Add a new diagram when:
 Never leave a stale diagram: after each change, every diagram either reflects the latest confirmed state or is replaced by a new one that does.
 </diagram-sync>
 
+<option-tech-details>
+Tech details make each option's implementation concrete in the ADR: **target-state diagrams** (C4 + sequence, option-specific) and a **code change profile** (per change: `file:line` location, current code, git-style diff block, how-to, confidence). Produced per option by **detail-options-tech** and rendered as a `#### Tech Details` subsection in each option's evaluation section (omit when absent). **Grounding contract**: tech details must trace to code investigation evidence — a code reference or findings from the `conduct-spike` pipeline, or an on-demand evidence map built via `investigate-code`. Without evidence they stay architectural-level and unverified, and a spike is recommended before relying on them. See **reference/option-tech-details-guide.md**.
+</option-tech-details>
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -82,6 +87,8 @@ Never leave a stale diagram: after each change, every diagram either reflects th
 | User provides a complete, well-formed problem statement and wants to see a full end-to-end walkthrough | Full walkthrough of all 5 capabilities for a database selection decision | [examples/database-selection.md](examples/database-selection.md) |
 | User has partial notes or rough ideas and needs help structuring them into an ADR | Full walkthrough of all 5 capabilities starting from unstructured input | [examples/from-rough-notes.md](examples/from-rough-notes.md) |
 | User corrects content or new findings emerge mid-session and diagrams need to stay current | Walkthrough of **sync-diagrams** updating affected diagrams and adding new ones | [examples/diagram-sync.md](examples/diagram-sync.md) |
+| Detailing each option's technical implementation (diagrams + code changes) during evaluation, or rendering tech details in the ADR | Per-option tech details format, grounding contract, and code-access handling | [reference/option-tech-details-guide.md](reference/option-tech-details-guide.md) |
+| Seeing per-option tech details with C4/sequence diagrams and code diffs grounded in a code reference | Worked example of detailing two options for one area, and how they render in the ADR | [examples/option-tech-details-example.md](examples/option-tech-details-example.md) |
 
 </context-loading-guide>
 
@@ -118,15 +125,27 @@ Never leave a stale diagram: after each change, every diagram either reflects th
    - "What are the main advantages or strengths of this option?"
    - "What are the main disadvantages, risks, or trade-offs?"
 2. Relate each pro/con back to the decision drivers defined earlier — highlight which drivers are satisfied and which are compromised.
-3. Summarize the evaluation of the current option with a Pros/Cons list and ask for confirmation.
-4. After all options are evaluated, draw the diagram that best explains the comparison (per **diagram-selection**, the option comparison matrix with an elimination tree), highlighting any knock-out criteria and why each option was dropped.
-5. Guide the user toward a recommendation by asking: "Given the evaluations, which option best satisfies the decision drivers?"
+3. If the user wants to evaluate options by their technical implementation — or code investigation evidence (code reference / findings) is available — apply **detail-options-tech** for each option to produce its tech details (target-state diagrams + code change profile), then present them so pros/cons are judged against the concrete implementation (see **option-tech-details**).
+4. Summarize the evaluation of the current option with a Pros/Cons list and ask for confirmation.
+5. After all options are evaluated, draw the diagram that best explains the comparison (per **diagram-selection**, the option comparison matrix with an elimination tree), highlighting any knock-out criteria and why each option was dropped.
+6. Guide the user toward a recommendation by asking: "Given the evaluations, which option best satisfies the decision drivers?"
 </evaluate-options>
+
+<detail-options-tech>
+1. Determine the evidence base: check for an existing code reference or investigation findings (e.g., from the `conduct-spike` pipeline) and whether the current codebase is accessible.
+2. If no evidence base exists but the codebase is accessible, build a lightweight evidence map first (apply the `investigate-code` skill): entry points, key locations with `file:line`, and call chains for the affected flows.
+3. For each option, draw its **target-state diagrams**: evolve the current-state C4 view (container/component) as-is → to-be for this option, and add the sequence diagram(s) for the key flow(s) this option changes. Diagrams are option-specific — never reuse another option's diagram.
+4. For each option, build its **code change profile**: for every change the option requires, record — location (`file:line` + symbol), current code (quoted from the evidence map), proposed **diff** (git-style diff code block — `diff --git` header, `--- a/` / `+++ b/`, `@@` hunk, `-` / `+` lines — focused on the existing code), and a 1–2 sentence "how to change it". Spell out every change explicitly — never assume the user already knows one. List new files briefly (name + purpose) without diffing them.
+5. Ground every entry: each change must trace to an evidence-map entry point or key location; tag confidence **verified / inferred / unverified**; never invent APIs, symbols, or files — if a change needs something the investigation did not establish, mark it unverified and offer to investigate.
+6. If no evidence base and no code access: produce architectural-level change profiles, mark every location/scope **unverified**, and recommend a spike (`conduct-spike`) to ground the tech details before relying on them.
+7. Present each option's tech details (diagrams + code change profile) and ask whether any need correction or deeper investigation.
+8. Keep the confirmed tech details for the ADR — they render as a `#### Tech Details` subsection in each option's evaluation section (see **reference/option-tech-details-guide.md**).
+</detail-options-tech>
 
 <compile-adr>
 1. Gather all confirmed outputs from the preceding capabilities: problem statement, decision drivers, considered options, and evaluations.
 2. Prompt the user for metadata: preferred title, owners, and status (draft | adopt | declined | superseded).
-3. Load **reference/adr-template.md** and populate the template with all collected information, using the user's recommended option as "Chosen option" with a synthesized justification.
+3. Load **reference/adr-template.md** and populate the template with all collected information, using the user's recommended option as "Chosen option" with a synthesized justification. Include each option's `#### Tech Details` subsection when tech details were provided (see **option-tech-details**).
 4. Draw a C4/flowchart view of the target state with the chosen option integrated (per **diagram-selection**), and embed it alongside the session's other diagrams in the Context and Decision Outcome sections.
 5. Fill in the Consequences section based on the evaluated pros/cons and risks discussed.
 6. Verify the completed ADR against this quality checklist:
@@ -134,6 +153,7 @@ Never leave a stale diagram: after each change, every diagram either reflects th
    - [ ] Decision drivers include both hard constraints and soft preferences
    - [ ] At least 2 distinct options were evaluated
    - [ ] Each option has pros/cons explicitly tied to decision drivers
+   - [ ] Each option with provided tech details carries a `#### Tech Details` subsection (diagrams + code changes)
    - [ ] Chosen option justification references specific drivers
    - [ ] Consequences section addresses risks and positive impacts
    - [ ] Context and solution are visualized with diagrams (context diagram + target-state C4/flowchart view)
@@ -165,5 +185,7 @@ Never leave a stale diagram: after each change, every diagram either reflects th
 <rule>After each user confirmation, update any in-progress ADR draft so nothing is lost.</rule>
 <rule>When the user corrects previously confirmed content or reveals new context at any point (e.g., a new option, a revised driver, a changed chosen option, a newly discovered flow), apply **sync-diagrams** to update the affected diagrams and add new diagrams to explain the new context.</rule>
 <rule>Whenever explaining context or a solution during any capability, proactively draw the matching diagram from **diagram-selection** — do not wait for the user to ask.</rule>
+
+<rule>When the user wants to evaluate options by their technical implementation — or asks for diagrams, code diffs, or change locations per option — apply **detail-options-tech** for each option during **evaluate-options**.</rule>
 
 </rules>

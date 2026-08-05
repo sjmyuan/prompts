@@ -2,7 +2,7 @@
 
 When producing the final ADR document, use the exact structure below. Wrap placeholders in `{{ }}` and fill them in based on the discussion with the user.
 
-```markdown
+````markdown
 # YYYY-MM-DD-{{TITLE}}
 
 * Status: {{STATUS:draft | adopt | declined | superseded}}
@@ -63,6 +63,24 @@ Chosen option: "[ option 1 ]", because [ justification e.g. only option which me
 
 [ example | description | pointer to more information | scenario | strengths | impact | ... ] <!-- required -->
 
+#### Tech Details <!-- optional: include when tech details were provided from a spike's code investigation -->
+
+[ Target-state diagram(s) for this option: C4 view + sequence diagram(s) showing the flow this option changes. ]
+
+**Code changes** (grounded in the code reference — `file:line`, one git-style diff block per change):
+
+1. `file:line` symbol (confidence: verified / inferred / unverified) — [how to change it]
+
+```diff
+diff --git a/<file> b/<file>
+--- a/<file>
++++ b/<file>
+@@ -<start>,<count> +<start>,<count> @@
+ context line
+-removed line
++added line
+```
+
 #### Pros
 
 * Good, because [ argument 1 ]
@@ -78,6 +96,23 @@ Chosen option: "[ option 1 ]", because [ justification e.g. only option which me
 ### [ option 2 ]
 
 [ example | description | pointer to more information | scenario | strengths | impact | ... ] <!-- required -->
+#### Tech Details <!-- optional: include when tech details were provided from a spike's code investigation -->
+
+[ Target-state diagram(s) for this option: C4 view + sequence diagram(s) showing the flow this option changes. ]
+
+**Code changes** (grounded in the code reference — `file:line`, one git-style diff block per change):
+
+1. `file:line` symbol (confidence: verified / inferred / unverified) — [how to change it]
+
+```diff
+diff --git a/<file> b/<file>
+--- a/<file>
++++ b/<file>
+@@ -<start>,<count> +<start>,<count> @@
+ context line
+-removed line
++added line
+```
 
 #### Pros
 
@@ -92,4 +127,4 @@ Chosen option: "[ option 1 ]", because [ justification e.g. only option which me
 * ... <!-- number of cons can vary -->
 
 ## References <!-- optional -->
-```
+````

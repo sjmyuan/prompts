@@ -39,6 +39,10 @@ A code reference is the spike's living evidence map — entry points, key code l
 A change summary translates the delta between findings (current state) and solution doc (target state) into concrete change items grouped by category — New, Modified, Retired, Configuration, Data, Dependency, Test — traceable to ADRs. Estimate quality depends on code access; always be transparent about which mode applies. For full format and guidance, see **reference/change-summary-guide.md**.
 </change-summary>
 
+<option-tech-details>
+Tech details (target-state diagrams + code change profiles) per ADR option are produced by the `draft-adr` skill's **detail-options-tech** capability, grounded in this spike's code reference and findings doc. During evaluation and ADR drafting, delegate to `draft-adr` rather than producing them directly (see **professional-doc-authoring**).
+</option-tech-details>
+
 <solution-doc-modularity>
 When a solution document exceeds ~3000 words or 5+ major sections, split independently understandable sections into standalone reference documents. The main doc becomes a hub with 2–4 sentence summaries and cross-references; each extracted doc must stand alone and back-reference the hub. See **reference/solution-doc-modularity-guide.md** for full heuristics and validation checklist.
 </solution-doc-modularity>
@@ -166,11 +170,12 @@ This permits **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously", 
 
 <evaluate-solutions-per-area>
 1. For each area, guide the user through solution evaluation: ask what options they see, use **solution-brainstorming-prompts** if only one option is offered, capture each option's description/pros/cons/feasibility, identify decision drivers, and relate pros/cons to them.
-2. After all options are evaluated, ask: "Which option do you recommend as the assumed solution for [area name]?" If unsure, help compare top contenders against decision drivers. Record the **assumed solution** — provisional, may change after ADR review.
-3. **Check for findings gaps**: If any option revealed a constraint, risk, or fact not captured in the findings document, update the affected sections and note the correction when presenting the evaluation summary.
-4. Repeat for each investigation area.
-5. Validate each area's evaluation: confirm at least 2 options were considered, pros/cons relate to decision drivers, and the assumed solution follows logically from the comparison.
-6. Present a summary table of all areas with their assumed solutions and any findings corrections made.
+2. For each option, load the `draft-adr` skill and apply its **detail-options-tech** capability to produce the option's tech details — target-state diagrams and a code change profile (location, diff, how-to) — seeding it with the code reference and findings doc. Present them per option so the user can compare options on technical feasibility. Skip only if the user declines or the option has no code impact.
+3. After all options are evaluated and tech-detailed, ask: "Which option do you recommend as the assumed solution for [area name]?" If unsure, help compare top contenders against decision drivers and their tech details. Record the **assumed solution** — provisional, may change after ADR review.
+4. **Check for findings gaps**: If any option revealed a constraint, risk, or fact not captured in the findings document, update the affected sections and note the correction when presenting the evaluation summary.
+5. Repeat for each investigation area.
+6. Validate each area's evaluation: confirm at least 2 options were considered, pros/cons relate to decision drivers, each option's tech details are grounded in the code reference (no invented code), and the assumed solution follows logically from the comparison.
+7. Present a summary table of all areas with their assumed solutions and any findings corrections made.
 </evaluate-solutions-per-area>
 
 <draft-area-adrs>
@@ -178,16 +183,16 @@ This permits **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously", 
 
 2. **For single ADR drafting or revising (direct execution)**:
    - Load the `draft-adr` skill's SKILL.md and apply its capabilities (define-problem → define-decision-drivers → define-considered-options → evaluate-options → compile-adr) to produce a complete, self-contained ADR for the area.
-   - Seed each capability with the evaluation results: problem from the area scope, drivers/options/assumed solution from the evaluation.
+   - Seed each capability with the evaluation results: problem from the area scope, drivers/options/assumed solution, **and each option's tech details (already produced via `draft-adr` during evaluation)** from the evaluation.
    - **Revising is the same procedure**: re-load `draft-adr` and re-apply its capabilities, seeding with the existing ADR plus the changed decision. Never hand-edit an ADR — every write goes through `draft-adr` (see **professional-doc-authoring**).
 
 3. **For multi-ADR drafting (parallel dispatch)**:
    - Announce: "Dispatching ADR drafting for [N] areas to sub-agents in parallel."
-   - Prepare per-area briefs (area name/description, evaluation results — drivers, options with pros/cons, assumed solution, **the area's code reference slice** — and instructions to load `draft-adr`), detect available agents, dispatch concurrently, then collect and review each ADR. See **multi-agent-orchestration**.
+   - Prepare per-area briefs (area name/description, evaluation results — drivers, options with pros/cons, **tech details per option**, assumed solution, **the area's code reference slice** — and instructions to load `draft-adr`), detect available agents, dispatch concurrently, then collect and review each ADR. See **multi-agent-orchestration**.
 
 4. After all ADRs are drafted (via either method), present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?" If the user raises uncertainty about any ADR's decision — an unverified assumption, unknown feasibility, or unresolved comparison — apply **suggest-spike-on-adr-uncertainty** before finalizing.
 5. Keep each ADR at the latest state per **latest-state-doctrine** and **clean-artifact-principle** (see **reference/clean-artifact-principle.md**): only the decision — no process history or change notes. On revision, route through `draft-adr` (step 2) and rewrite affected sections in place — delete superseded text, never annotate; cite the findings document for evidence.
-6. Validate each ADR: confirm the chosen option follows logically from the decision drivers, all evaluated options are fairly represented, consequences include both positive and negative impacts, and the ADR can be understood without reading other ADRs. Then run the **no-note scan** from **clean-artifact-principle** — scan for banned process language ("Note:", "Updated", "Changed", "v2", "As of", "Previously", status parentheticals, in-document changelogs) and rewrite in place until none remain.
+6. Validate each ADR: confirm the chosen option follows logically from the decision drivers, all evaluated options are fairly represented, **each option's provided tech details are carried into its evaluation section**, consequences include both positive and negative impacts, and the ADR can be understood without reading other ADRs. Then run the **no-note scan** from **clean-artifact-principle** — scan for banned process language ("Note:", "Updated", "Changed", "v2", "As of", "Previously", status parentheticals, in-document changelogs) and rewrite in place until none remain.
 7. Note: The chosen option in each ADR is the **assumed solution**. The solution document will adopt these. If an ADR decision changes later, the solution document should be updated accordingly.
 </draft-area-adrs>
 
@@ -289,5 +294,8 @@ For the full step-by-step procedure with prompts and validation checks per step,
 <rule>When updating or revising an ADR — deep-dive continuation, decision change, in-place rewrite — always apply **draft-area-adrs** so the change goes through the `draft-adr` skill; never hand-edit the ADR (see **professional-doc-authoring**).</rule>
 
 <rule>When updating or refreshing the solution document — deep-dive, ADR decision change, modular split — always apply **compile-solution-doc** so the change goes through the `write-solution-doc` skill; never hand-edit the solution doc (see **professional-doc-authoring**).</rule>
+
+<rule>When the user wants to evaluate options by their technical implementation — or asks for diagrams, code diffs, or change locations per option — delegate tech-detail production to `draft-adr`'s **detail-options-tech** during **evaluate-solutions-per-area** (see **option-tech-details**).</rule>
+<rule>When drafting ADRs, seed `draft-adr` with each option's tech details so the ADR's option evaluation sections carry the diagrams and code changes.</rule>
 
 </rules>
