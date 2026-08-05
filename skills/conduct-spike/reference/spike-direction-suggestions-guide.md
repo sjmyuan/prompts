@@ -58,7 +58,25 @@ Heuristics for generating go-broader candidates:
 
 ### Step 4: Present as a Direction Menu
 
-Use the table format from the capability, grouped into "Go Deeper" and "Go Broader" sections. Each row: candidate question, evidence anchor, rationale.
+Use this template, grouped into "Go Deeper" and "Go Broader" sections. Each row: candidate question, evidence anchor, rationale.
+
+```markdown
+## Where to take this spike next?
+
+### Go Deeper (narrow the focus)
+| # | Candidate question | Based on (evidence from this round) | Why it matters |
+|---|---|---|---|
+| D1 | [concrete question] | [specific finding] | [1-sentence rationale] |
+| D2 | [concrete question] | [specific finding] | [1-sentence rationale] |
+| D3 | [concrete question] | [specific finding] | [1-sentence rationale] |
+
+### Go Broader (expand the scope)
+| # | Candidate question | Based on (evidence from this round) | Why it matters |
+|---|---|---|---|
+| B1 | [concrete question] | [specific finding or gap] | [1-sentence rationale] |
+| B2 | [concrete question] | [specific finding or gap] | [1-sentence rationale] |
+| B3 | [concrete question] | [specific finding or gap] | [1-sentence rationale] |
+```
 
 ### Step 5: Let the User Choose
 
