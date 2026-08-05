@@ -93,22 +93,20 @@ Controller → Orchestrator → EventPublisher interface → KafkaTemplate → K
 
 ```mermaid
 sequenceDiagram
-    %% Event Publishing Pattern — Canonical Example
-    participant Orch as CheckoutOrchestrator
-    participant Pub as EventPublisher
-    participant Kafka as KafkaTemplate
-    database Broker as Kafka
+    %% Level: code — cross-file / class
+    participant Orch as "checkout/CheckoutOrchestrator.java"
+    participant Pub as "event/EventPublisher.java : EventPublisher"
+    participant Kafka as "org.springframework.kafka.core.KafkaTemplate"
+    database Broker as "Kafka (broker)"
 
     Orch->>Pub: 1: publish(event)
-    activate Pub
-    Pub->>Kafka: 2: send(topic, key, event)
-    activate Kafka
+    Pub-)Kafka: 2: send(topic, key, event)<br/>async write to the broker
+    Kafka->>Broker: 3: send (acks)
+    Broker-->>Kafka: 4: RecordMetadata
     loop retry 3 times
-        Kafka-->>Pub: success/exception
+        Kafka-->>Pub: exception
     end
-    Pub-->>Orch: return
-    deactivate Pub
-    deactivate Kafka
+    Pub-->>Orch: 5: published
 ```
 
 **Pattern 2 (Variant — 1 service)** — Direct usage, no abstraction:

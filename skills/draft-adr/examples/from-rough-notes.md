@@ -80,16 +80,17 @@
 >
 > ```mermaid
 > sequenceDiagram
+>     %% Level: container — cross-system flow
 >     actor User
 >     actor Sec as "Security Team"
 >     participant BE as "Node.js Backend"
->     participant AUTH as AuthN
+>     participant AUTH as "AuthN Service (external)"
 >
->     User->>BE: API call with token
->     BE->>AUTH: validate token
->     AUTH-->>BE: valid / invalid
->     Sec->>BE: report compromised account
->     BE->>AUTH: revoke access now
+>     User->>BE: request (Bearer token)
+>     BE->>AUTH: verifyToken(token)
+>     AUTH-->>BE: TokenStatus
+>     Sec->>BE: reportCompromised(userId)
+>     BE->>AUTH: revokeAccess(userId)
 >     AUTH-->>BE: revoked
 > ```
 

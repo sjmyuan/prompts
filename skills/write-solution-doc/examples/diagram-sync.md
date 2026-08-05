@@ -68,44 +68,59 @@ C4Container
 > Updated: removed the S3 Client component from the Chat Service; file operations now belong to the Media Service. A C3 diagram for the Media Service can be added on request.
 
 **Updated Send DM sequence diagram**:
-> Updated: file-upload steps now go through the Media Service and return a signed URL to the sender before the message is sent.
+> Updated: file-upload steps now go through the Media Service and return a signed URL to the sender before the message is sent. The flow has 8 participants, so it is split into upload / intake / delivery diagrams to stay within the 6-lifeline budget.
+
+**Send DM — file upload**:
 
 ```mermaid
 sequenceDiagram
+    %% Level: container — cross-system flow
     actor Sender as "Sender SPA"
     participant Media as "Media Service"
+    database S3 as "AWS S3 (external)"
+
+    Sender->>Media: POST /upload
+    Media->>Media: signUploadUrl()<br/>creates a time-limited signed URL
+    Media->>S3: PUT object (stream)
+    S3-->>Media: 200 OK
+    Media-->>Sender: signed_url
+```
+
+**Send DM — intake & validation**:
+
+```mermaid
+sequenceDiagram
+    %% Level: container — cross-system flow
+    actor Sender as "Sender SPA"
     participant GW as "WebSocket Gateway"
     database Redis
     participant Chat as "Chat Service"
     participant User as "User Service"
-    database Mongo as MongoDB
-    actor Recipient as "Recipient SPA"
+    database Mongo as "MongoDB"
 
-    Sender->>Media: POST /upload
-    activate Media
-    Media->>Media: Sign upload URL
-    Media->>Media: Stream to S3
-    Media-->>Sender: signed_url
-    deactivate Media
-
-    Sender->>GW: WS: {"type":"dm","to":"user2","text":"Hi","file":"signed_url"}
-    activate GW
+    Sender->>GW: WS {"type":"dm","to":"user2","text":"Hi","file":"signed_url"}
     GW->>Redis: PUBLISH dm:events
-    deactivate GW
-
     Chat->>Redis: SUBSCRIBE dm:events
-    activate Chat
-    Chat->>Chat: Validate message
+    Chat->>Chat: validateMessage()<br/>checks sender & content size
     Chat->>Mongo: INSERT messages
     Chat->>User: gRPC GetProfile(user2)
-    User-->>Chat: profile
+    User-->>Chat: Profile
     Chat->>Redis: PUBLISH dm:delivery
-    deactivate Chat
+```
 
+**Send DM — delivery**:
+
+```mermaid
+sequenceDiagram
+    %% Level: container — cross-system flow
+    participant Chat as "Chat Service"
+    database Redis
+    participant GW as "WebSocket Gateway"
+    actor Recipient as "Recipient SPA"
+
+    Chat->>Redis: PUBLISH dm:delivery
     GW->>Redis: SUBSCRIBE dm:delivery
-    activate GW
-    GW->>Recipient: WS: {"type":"new_message",...}
-    deactivate GW
+    GW->>Recipient: WS {"type":"new_message",...}
 ```
 
 ---
@@ -120,20 +135,19 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant Mod as "Moderation Service"
+    %% Level: container — cross-system flow
+    participant Mod as "Moderation Service (external)"
     participant Chat as "Chat Service"
-    database Mongo as MongoDB
+    database Mongo as "MongoDB"
     participant GW as "WebSocket Gateway"
     actor Recipient as "Recipient SPA"
 
     Mod->>Chat: POST /webhooks/moderation {"message_id":"m_1","verdict":"flagged"}
-    activate Chat
-    Chat->>Chat: Validate webhook signature
+    Chat->>Chat: verifyWebhookSignature()<br/>rejects forged callbacks
     Chat->>Mongo: UPDATE messages SET status="flagged"
     Chat->>GW: WS publish dm:moderated
-    GW->>Recipient: WS: {"type":"message_moderated",...}
+    GW->>Recipient: WS {"type":"message_moderated",...}
     Chat-->>Mod: 200 OK
-    deactivate Chat
 ```
 
 > This moderation webhook sequence diagram will be added to the Interaction Details section.

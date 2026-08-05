@@ -110,53 +110,70 @@ C4Component
 
 ## 3. Sequence Diagram: User Registration
 
+**The flow spans two concerns, so it is split into two code-level diagrams (registration core + email notification) to stay within the 6-lifeline budget.**
+
+### Registration core
+
 ```mermaid
 sequenceDiagram
-    %% User Registration Flow — Sequence Diagram
+    %% Level: code — cross-file / class
     actor Browser
-    participant RegCtrl as RegistrationController
-    participant RegOrch as RegistrationOrchestrator
-    participant UserSvc as UserService
-    participant TokenSvc as VerificationTokenService
-    participant EmailAdptr as EmailAdapter
-    participant NotifSvc as "notification-service"
+    participant Ctrl as "auth/RegistrationController.java"
+    participant Orch as "auth/RegistrationOrchestrator.java"
+    participant UserSvc as "auth/UserService.java"
+    participant TokenSvc as "auth/VerificationTokenService.java"
 
-    Browser->>RegCtrl: 1: POST /register<br/>{email, password, name}
-    RegCtrl->>RegOrch: 2: register(request)
-    RegOrch->>UserSvc: 3: validateRegistration(email)
-    UserSvc-->>RegOrch: 4: return valid
-    RegOrch->>UserSvc: 5: createUser(request)
-    UserSvc->>UserSvc: 6: INSERT INTO users
-    UserSvc-->>RegOrch: 7: return User(id=42)
-    RegOrch->>TokenSvc: 8: generateToken(userId)
-    TokenSvc->>TokenSvc: 9: INSERT INTO verification_tokens
-    TokenSvc-->>RegOrch: 10: return token("abc123def456")
-    RegOrch->>EmailAdptr: 11: sendVerificationEmail(email, token)
-    EmailAdptr->>NotifSvc: 12: POST /emails (HTTPS)<br/>[cross-repo]
-    NotifSvc-->>EmailAdptr: 13: return emailSent
-    EmailAdptr-->>RegOrch: 14: return emailSent
-    RegOrch-->>RegCtrl: 15: return RegistrationResult
-    RegCtrl-->>Browser: 16: return 201 Created
+    Browser->>Ctrl: 1: POST /register<br/>{email, password, name}
+    Ctrl->>Orch: 2: register(request)
+    Orch->>UserSvc: 3: validateRegistration(email)
+    UserSvc-->>Orch: 4: valid
+    Orch->>UserSvc: 5: createUser(request)
+    UserSvc->>UserSvc: 6: save(user)<br/>INSERT INTO users
+    UserSvc-->>Orch: 7: User(id=42)
+    Orch->>TokenSvc: 8: generateToken(userId)
+    TokenSvc->>TokenSvc: 9: persist(token)<br/>INSERT INTO verification_tokens
+    TokenSvc-->>Orch: 10: token
+    Orch-->>Ctrl: 11: RegistrationResult
+    Ctrl-->>Browser: 12: 201 Created
 ```
 
-**Message sequence**:
+### Email notification
+
+```mermaid
+sequenceDiagram
+    %% Level: code — cross-file / class
+    participant Orch as "auth/RegistrationOrchestrator.java"
+    participant Adptr as "notif/EmailAdapter.java"
+    participant NotifSvc as "notification-service (external repo)"
+
+    Orch->>Adptr: 1: sendVerificationEmail(email, token)
+    Adptr->>NotifSvc: 2: POST /emails (HTTPS)<br/>[cross-repo → notification-service]
+    NotifSvc-->>Adptr: 3: EmailSent
+    Adptr-->>Orch: 4: sent
+```
+
+**Message sequence — Registration core**:
 ```
  1: POST /register (Body: {email, password, name})
  2: RegistrationOrchestrator.register(request)
  3:   UserService.validateRegistration(email) — check duplicate
  4:   ← valid
  5:   UserService.createUser(request) — persist user
- 6:     INSERT INTO users
+ 6:     save(user) → INSERT INTO users
  7:   ← User(id=42, email="user@example.com")
  8:   VerificationTokenService.generateToken(userId) — persist token
- 9:     INSERT INTO verification_tokens
+ 9:     persist(token) → INSERT INTO verification_tokens
 10:   ← token("abc123def456")
-11:   EmailAdapter.sendVerificationEmail(email, token)
-12:     POST /emails (HTTPS) [cross-repo → notification-service]
-13:   ← emailSent
-14: ← emailSent
-15: ← RegistrationResult(userId=42, status=VERIFICATION_PENDING)
-16: ← 201 Created (Location: /users/42)
+11: ← RegistrationResult(userId=42, status=VERIFICATION_PENDING)
+12: ← 201 Created (Location: /users/42)
+```
+
+**Message sequence — Email notification**:
+```
+ 1: EmailAdapter.sendVerificationEmail(email, token)
+ 2:   POST /emails (HTTPS) [cross-repo → notification-service]
+ 3:   ← EmailSent
+ 4: ← sent
 ```
 
 ---

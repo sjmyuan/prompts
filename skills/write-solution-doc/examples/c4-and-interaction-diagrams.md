@@ -98,40 +98,46 @@ C4Component
 - **Message moderation workflow** → Flowchart (decision logic with branching)
 - **Group chat invite acceptance flow** → Flowchart (decision logic with multiple branches)
 
-### Direct Message Flow (Sequence Diagram)
+### Direct Message Flow (Sequence Diagrams)
+
+**The flow has 8 participants, so it is split into two diagrams (intake + delivery) to stay within the 6-lifeline budget.**
+
+**Send DM — intake & validation**:
 
 ```mermaid
 sequenceDiagram
+    %% Level: container — cross-system flow
     actor Sender as "Sender SPA"
     participant GW as "WebSocket Gateway"
     database Redis
     participant Chat as "Chat Service"
     participant User as "User Service"
-    database Mongo as MongoDB
-    actor Recipient as "Recipient SPA"
-    participant Pusher
+    database Mongo as "MongoDB"
 
-    Sender->>GW: WS: {"type":"dm","to":"user2","text":"Hi"}
-    activate GW
+    Sender->>GW: WS {"type":"dm","to":"user2","text":"Hi"}
     GW->>Redis: PUBLISH dm:events
-    deactivate GW
-
     Chat->>Redis: SUBSCRIBE dm:events
-    activate Chat
-    Chat->>Chat: Validate message
+    Chat->>Chat: validateMessage()<br/>checks sender & content size
     Chat->>Mongo: INSERT messages
     Chat->>User: gRPC GetProfile(user2)
-    User-->>Chat: profile
+    User-->>Chat: Profile
     Chat->>Redis: PUBLISH dm:delivery
-    deactivate Chat
+```
 
+**Send DM — delivery**:
+
+```mermaid
+sequenceDiagram
+    %% Level: container — cross-system flow
+    participant Chat as "Chat Service"
+    database Redis
+    participant GW as "WebSocket Gateway"
+    actor Recipient as "Recipient SPA"
+
+    Chat->>Redis: PUBLISH dm:delivery
     GW->>Redis: SUBSCRIBE dm:delivery
-    activate GW
-    GW->>Recipient: WS: {"type":"new_message",...}
-    deactivate GW
-
-    Chat->>Pusher: POST /push {"to":"user2","title":"New message"}
-    Note right of Chat: Only if recipient is offline
+    GW->>Recipient: WS {"type":"new_message",...}
+    Note right of Chat: offline recipient → POST /push via Pusher
 ```
 
 > **DM Flow**: Sender sends via WS to Gateway → published to Redis `dm:events` → Chat Service subscribes, validates, persists to MongoDB, fetches recipient profile from User Service, publishes to `dm:delivery` → Gateway pushes to recipient's WS connection. If recipient is offline, Chat Service falls back to Pusher for mobile push notification.
@@ -140,20 +146,19 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
+    %% Level: container — cross-system flow
     actor Creator as "Creator SPA"
     participant GW as "WebSocket Gateway"
     participant Chat as "Chat Service"
     participant User as "User Service"
-    database Mongo as MongoDB
+    database Mongo as "MongoDB"
     database Redis
 
-    Creator->>GW: WS: {"type":"create_group","name":"Team A","members":["u1","u2","u3"]}
-    activate GW
+    Creator->>GW: WS {"type":"create_group","name":"Team A","members":["u1","u2","u3"]}
     GW->>Chat: gRPC CreateGroup(req)
-    activate Chat
-    Chat->>Chat: Validate creator & members
+    Chat->>Chat: validateMembers()<br/>checks creator is allowed & member list valid
     Chat->>User: gRPC GetProfilesBatch(["u1","u2","u3"])
-    User-->>Chat: [profiles]
+    User-->>Chat: profiles
     Chat->>Mongo: INSERT groups
     Chat->>Redis: PUBLISH group:notifications
 
@@ -162,9 +167,7 @@ sequenceDiagram
     end
 
     Chat-->>GW: CreateGroupResponse{group_id}
-    deactivate Chat
-    GW-->>Creator: WS: {"type":"group_created","group_id":"g_abc"}
-    deactivate GW
+    GW-->>Creator: WS {"type":"group_created","group_id":"g_abc"}
 ```
 
 > **Group Creation Flow**: Creator sends request via WS → Gateway forwards via gRPC to Chat Service → Chat Service validates, fetches member profiles in batch from User Service, persists group to MongoDB, publishes notifications to each member, and returns group_id to creator.

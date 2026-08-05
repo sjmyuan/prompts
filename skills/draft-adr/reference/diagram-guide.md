@@ -67,9 +67,17 @@ Rules:
 
 ## Sequence Diagram
 
-- Name each participant (actor, system, component) as a lifeline with `actor` / `participant`.
-- Show messages top-to-bottom in time order.
-- Use `->>` for synchronous calls and `-->>` for asynchronous calls/returns.
+Every sequence diagram follows the **sequence diagram contract** — one zoom level, traceable participants, contract-accurate messages, and a strict noise budget. Core rules:
+
+- **One zoom level per diagram (hard rule)**: container (cross-system) / component (cross-module) / code (cross-file / class). Never mix a whole service with a single class in one diagram; declare the level in a `%%` comment and the caption.
+- **Traceable participants**: encode the identity path in the label, matching the level:
+  - Cross-system: `participant OMS as "Order Service"`
+  - Cross-file / class: `participant OR as "orders/repo.ts<br/>OrderRepository : IOrderRepository"`
+  - Always include the **file path** at component/code level — easiest to locate. Group ownership with an alias prefix per system (`OMS_*`, `PS_*`); use `actor` for humans/external, `database` for stores.
+- **Messages are the contract**: real API / event / method — `POST /orders`, `gRPC ReserveStock`, `createOrder(dto)`. Use `->>` for sync, `-)` for async messages, `-->>` for returns only.
+- **Events and self-calls carry a short explanation**: append `<br/>` + what it does after the actual call, so intent is readable without the schema (e.g. `publish OrderCreated<br/>notifies downstream services`).
+- **Self-calls ≤ 2 per lifeline**; larger internal logic moves to a flowchart or a `Note over`.
+- **Noise budget**: 4–6 lifelines max; one diagram = one flow; show returns only when the next step needs the data; skip activation bars unless nesting matters.
 - Highlight the interaction that matters for the decision (e.g., a revocation path, a payment flow).
 
 ## Decision Driver Map
@@ -173,14 +181,17 @@ flowchart TD
 
 ```mermaid
 sequenceDiagram
+    %% Level: container — cross-system flow
     actor Customer
-    participant OMS as "Order Management Service"
-    participant PS as "Payment Processor"
+    participant OMS as "Order Service"
+    participant PS as "Payment Gateway (external)"
+    database DB as "Order DB"
 
-    Customer->>OMS: place order
-    OMS->>PS: charge payment
-    PS-->>OMS: payment result
-    OMS->>OMS: persist order
+    Customer->>OMS: POST /orders
+    OMS->>PS: POST /v1/charges
+    PS-->>OMS: 201 {chargeId}
+    OMS->>DB: INSERT orders
+    OMS-->>Customer: 201 {orderId}
 ```
 
 ### Decision driver map

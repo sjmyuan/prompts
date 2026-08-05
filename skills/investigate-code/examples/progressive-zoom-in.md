@@ -84,59 +84,73 @@ C4Component
 
 ### Level 3: Sequence Diagram — Checkout Flow
 
-Applies `<draw-sequence-diagram>`.
+Applies `<draw-sequence-diagram>`. The flow has 7 participants, so it is split into two code-level diagrams (order creation + parallel fulfillment) to stay within the 6-lifeline budget.
+
+**Checkout — order creation**:
 
 ```mermaid
 sequenceDiagram
-    %% Checkout Flow — Sequence Diagram
+    %% Level: code — cross-file / class
     actor Customer
-    participant Ctrl as CheckoutController
-    participant Orch as CheckoutOrchestrator
-    participant OrderSvc as OrderService
-    participant PayAdptr as PaymentAdapter
-    participant InvAdptr as InventoryAdapter
-    participant Kafka
+    participant Ctrl as "checkout/CheckoutController.java"
+    participant Orch as "checkout/CheckoutOrchestrator.java"
+    participant OrderSvc as "order/OrderService.java"
 
     Customer->>Ctrl: 1: POST /checkout
     Ctrl->>Orch: 2: checkout(request)
     Orch->>OrderSvc: 3: createOrder(customerId, items)
-    OrderSvc-->>Orch: 4: return Order
-
-    par parallel
-        Orch->>PayAdptr: 5: processPayment(orderId, paymentMethod)
-        PayAdptr->>PayAdptr: 6: POST /payments (HTTPS)<br/>[cross-repo → payment-service]
-        PayAdptr-->>Orch: 9: return paymentOK
-    and
-        Orch->>InvAdptr: 7: reserveItems(orderId, items)
-        InvAdptr->>InvAdptr: 8: POST /inventory/reserve (HTTPS)<br/>[cross-repo → inventory-service]
-        InvAdptr-->>Orch: 10: return inventoryOK
-    end
-
-    Orch->>OrderSvc: 11: confirmOrder(orderId)
-    OrderSvc-->>Orch: 12: return confirmed
-    Orch->>Kafka: 13: publish(OrderConfirmedEvent)<br/>topic: order.confirmed
-    Orch-->>Ctrl: 14: return OrderSummary
-    Ctrl-->>Customer: 15: return 200 OK
+    OrderSvc-->>Orch: 4: Order
 ```
 
-**Numbered message sequence**:
+**Checkout — parallel fulfillment, confirm & publish**:
+
+```mermaid
+sequenceDiagram
+    %% Level: code — cross-file / class
+    participant Orch as "checkout/CheckoutOrchestrator.java"
+    participant PayAdptr as "pay/PaymentAdapter.java"
+    participant InvAdptr as "inv/InventoryAdapter.java"
+    participant OrderSvc as "order/OrderService.java"
+    participant Pub as "event/EventPublisher.java : EventPublisher"
+    participant Kafka as "org.springframework.kafka.core.KafkaTemplate"
+
+    Orch->>PayAdptr: 1: processPayment(orderId, paymentMethod)
+    Orch->>InvAdptr: 2: reserveItems(orderId, items)
+
+    par parallel
+        PayAdptr->>PayAdptr: 3: POST /payments<br/>[cross-repo → payment-service]
+        PayAdptr-->>Orch: 4: paymentOK
+    and
+        InvAdptr->>InvAdptr: 5: POST /inventory/reserve<br/>[cross-repo → inventory-service]
+        InvAdptr-->>Orch: 6: inventoryOK
+    end
+
+    Orch->>OrderSvc: 7: confirmOrder(orderId)
+    OrderSvc-->>Orch: 8: confirmed
+    Orch->>Pub: 9: publish(OrderConfirmedEvent)
+    Pub-)Kafka: 10: send(topic, key, event)<br/>async write to broker<br/>topic: order.confirmed
+```
+
+**Numbered message sequence — order creation**:
 ```
  1: POST /checkout (Customer → CheckoutController)
  2: checkout() (CheckoutController → CheckoutOrchestrator)
  3: createOrder() (CheckoutOrchestrator → OrderService)
- 4: ← return Order
- 5: processPayment() (CheckoutOrchestrator → PaymentAdapter)
- 6:   POST /payments (PaymentAdapter → payment-service)     [parallel]
- 7: reserveInventory() (CheckoutOrchestrator → InventoryAdapter)
- 8:   POST /inventory/reserve (InventoryAdapter → inventory-service)  [parallel]
- 9: ← 200 OK (payment-service → PaymentAdapter)
-10: ← paymentOK
-11: ← reserved (inventory-service → InventoryAdapter)
-12: ← inventoryOK
-13: confirmOrder() (CheckoutOrchestrator → OrderService)
-14: ← confirmed
-15: publishEvent(OrderConfirmed) (CheckoutOrchestrator → Kafka)
-16: ← 200 OK (CheckoutController → Customer)
+ 4: ← Order
+```
+
+**Numbered message sequence — parallel fulfillment, confirm & publish**:
+```
+ 1: processPayment() (CheckoutOrchestrator → PaymentAdapter)
+ 2: reserveItems() (CheckoutOrchestrator → InventoryAdapter)
+ 3:   POST /payments (PaymentAdapter → payment-service)     [parallel]
+ 4:   ← paymentOK
+ 5:   POST /inventory/reserve (InventoryAdapter → inventory-service)  [parallel]
+ 6:   ← inventoryOK
+ 7: confirmOrder() (CheckoutOrchestrator → OrderService)
+ 8: ← confirmed
+ 9: publish(OrderConfirmedEvent) (CheckoutOrchestrator → EventPublisher)
+10:   send() (EventPublisher → KafkaTemplate)     [async]
 ```
 
 ---
