@@ -22,6 +22,7 @@ description: Classify, clarify, and generate TDD-based step-by-step plans for bu
 - **No new behavior, just restructuring?** → This is a **refactor** — apply **plan-refactor**
 - **Something is broken?** → This is a **bug fix** — apply **plan-bug-fix**
 - **Both restructure AND add new behavior?** → Apply **plan-refactor** first to stabilize, then **plan-feature-implementation** for the new behavior
+- **Multi-feature / multi-repo decomposition of spike results?** → Do NOT plan a whole breakdown here — apply **orchestrate-feature-delivery** first to split, sequence, and orchestrate features, then plan each feature × repo cell with this skill
 </when-to-use-this-skill>
 
 <knowledge>
@@ -119,7 +120,7 @@ Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its
 1. After the user confirms the plan, ask whether they would like to persist it to a feature folder for later execution by **execute-plan**.
 2. If the user agrees, determine the storage location (ask the user, or default to `docs/feature-implementations/`).
 3. Derive a short kebab-case feature name from the plan's objective (e.g., `fix-null-pointer-in-transformer`).
-4. Create the feature folder: `{location}/{feature-name}/`.
+4. Determine the repo name when the plan belongs to a specific repo (an **orchestrate-feature-delivery** cell); create the feature folder **repo-first**: `{location}/{repo}/{feature-name}/` (fall back to `{location}/{feature-name}/` when no repo applies) so all plans for one repo live together.
 5. Write `plan.md` — the complete numbered step list with objectives, using the plan's steps as generated.
 6. Write `context.md` — capture all background: the user's original request, the classified change type, root cause or requirement summary, TDD approach rationale, constraints, assumptions, and any codebase references gathered.
 7. Inform the user of the saved location so they can invoke **execute-plan** to carry it out.

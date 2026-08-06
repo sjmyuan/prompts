@@ -9,6 +9,7 @@ description: Execute structured development plans step-by-step with progress tra
 - A previously started plan needs to be resumed after interruption or context reset
 - All plan steps are complete and a post-execution review with the review-code skill is needed
 - A step has failed or is blocked and needs error recovery before proceeding
+- A delivery index from orchestrate-feature-delivery points to planned feature × repo cells ready for execution
 - Do NOT load when no plan has been generated yet — if the user describes a problem without referencing an existing plan, let plan-development-task handle it first
 </when-to-use-this-skill>
 
@@ -43,12 +44,13 @@ Record each step in the plan file using this format:
 Each feature implementation lives in its own folder with two files:
 
 ```
-{location}/{feature-name}/
+{location}/{repo}/{feature-name}/
 ├── plan.md      # Step-by-step execution plan with live status tracking
 └── context.md   # All context, references, requirements, constraints that define the plan
 ```
 
 - **Location**: Ask the user where to store the plan. If not specified, default to `docs/feature-implementations/`.
+- **Repo-first layout**: When a plan belongs to a specific repo (a cell from **orchestrate-feature-delivery**), use `{location}/{repo}/{feature-name}/` so all plans for one repo live in one location; fall back to `{location}/{feature-name}/` when no repo applies.
 - **Feature name**: Derive a short, descriptive kebab-case name from the plan's objective (e.g., `add-auth-system`, `refactor-validation-handler`, `fix-null-pointer-in-transformer`).
 - **Plan file**: Contains the numbered step list with status emojis, updated in real-time as execution progresses. Serves as the live execution dashboard.
 - **Context file**: Captures all background material that informed the plan — requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, and decisions. Written once at plan creation and not modified during execution.
@@ -89,7 +91,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 <track-plan>
 1. Determine where to store the plan. Ask the user where they'd like the plan saved, or default to `doc/feature-implementations/` if not specified.
 2. Derive a descriptive, short name for the feature from the plan's objective (e.g., `add-auth-system`, `refactor-validation-handler`, `fix-null-pointer-in-transformer`). Use kebab-case.
-3. Create the feature folder: `{location}/{feature-name}/`. Inside it, create two files:
+3. Create the feature folder repo-first: `{location}/{repo}/{feature-name}/` when the plan belongs to a specific repo (an **orchestrate-feature-delivery** cell), else `{location}/{feature-name}/`. Inside it, create two files:
    - `plan.md` — the step-by-step execution plan with status tracking (see **step-tracking-format**)
    - `context.md` — all context, references, requirements, constraints, and decisions that define the plan (captured from the plan source so the reasoning is preserved alongside the plan)
 4. Before creating a new plan, check if the feature folder already exists with a plan file. If a plan file has steps with ❌ failed or 🚫 blocked status, ask the user whether to **resume** from the last known state or **start fresh** (create a new folder/overwrite).

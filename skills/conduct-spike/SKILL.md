@@ -36,7 +36,7 @@ A code reference is the spike's living evidence map — entry points, key code l
 </code-reference>
 
 <change-summary>
-A change summary translates the delta between findings (current state) and solution doc (target state) into concrete change items grouped by category — New, Modified, Retired, Configuration, Data, Dependency, Test — traceable to ADRs. Estimate quality depends on code access; always be transparent about which mode applies. For full format and guidance, see **reference/change-summary-guide.md**.
+A change summary translates the delta between findings (current state) and solution doc (target state) into concrete change items grouped by category — New, Modified, Retired, Configuration, Data, Dependency, Test — traceable to ADRs. Estimate quality depends on code access; always be transparent about which mode applies. For full format and guidance, see **reference/change-summary-guide.md**. It is consumed by **orchestrate-feature-delivery** to split the spiked work into features/phases and orchestrate delivery.
 </change-summary>
 
 <option-tech-details>
