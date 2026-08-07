@@ -56,7 +56,7 @@ When there is no existing implementation (greenfield): research industry approac
 </greenfield-scenarios>
 
 <multi-agent-orchestration>
-For spikes with multiple investigation areas, dispatch independent work to sub-agents in parallel for Phases 2 (investigate) and 4 (draft ADRs). See the full dispatch pattern and parallelization rules in **reference/multi-agent-orchestration.md**.
+Dispatch task execution to sub-agents whenever one is available — for Phases 2 (investigate) and 4 (draft ADRs) — including single-task spikes (single area, single ADR). This keeps the orchestrating agent's context small; parallel speed is a secondary benefit. Only execute directly when no suitable sub-agent is available. See **reference/multi-agent-orchestration.md** for the full dispatch pattern and fallback rules.
 </multi-agent-orchestration>
 
 <problem-decomposition-guide>
@@ -103,7 +103,7 @@ This permits **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously", 
 | Decomposing a complex problem into investigation areas | Decomposition rubric with examples and edge cases | [reference/decomposition-rubric.md](reference/decomposition-rubric.md) |
 | Conducting a heavy multi-area spike that benefits from parallel sub-agent execution | Multi-area parallel dispatch walkthrough | [examples/multi-agent-investigation.md](examples/multi-agent-investigation.md) |
 | Continuing a previous spike by digging deeper into specific unresolved areas | Deep-dive walkthrough: load context, focus investigation, update ADRs | [examples/deep-dive-continuation.md](examples/deep-dive-continuation.md) |
-| Dispatching investigation or ADR drafting to sub-agents in parallel | Dispatch pattern and parallelization rules | [reference/multi-agent-orchestration.md](reference/multi-agent-orchestration.md) |
+| Dispatching investigation or ADR drafting to sub-agents (single or multiple tasks) | Dispatch pattern, context-preservation rationale, and fallback rules | [reference/multi-agent-orchestration.md](reference/multi-agent-orchestration.md) |
 | Brainstorming solution options during the evaluate phase | Solution-brainstorming prompt set | [reference/solution-brainstorming-prompts.md](reference/solution-brainstorming-prompts.md) |
 | Producing or understanding findings documents (format, per-area vs consolidated strategy, artifact relationships) | Findings doc format and strategy selection | [reference/findings-document-guide.md](reference/findings-document-guide.md) |
 | Compiling or maintaining the code reference (7-section structure, confidence tags, searched-negatives rules) | Full code reference structure and maintenance rules | [reference/code-reference-guide.md](reference/code-reference-guide.md) |
@@ -126,7 +126,7 @@ This permits **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously", 
 
 <run-spike-workflow>
 1. Apply **define-spike-scope** to establish the spike goal and decompose the problem into investigation areas. Do not proceed until the scope is confirmed by the user.
-2. Apply **investigate-per-area** to understand the current implementation per area. For multi-area spikes, dispatch investigation to sub-agents in parallel per **multi-agent-orchestration**. Investigation always records **code references**, never narrative only; direction suggestions (3 go-deeper, 3 go-broader) follow the investigation summary.
+2. Apply **investigate-per-area** to understand the current implementation per area. Dispatch investigation to a sub-agent whenever one is available — even for a single area — per **multi-agent-orchestration**, to preserve the orchestrating agent's context. Investigation always records **code references**, never narrative only; direction suggestions (3 go-deeper, 3 go-broader) follow the investigation summary.
    - **If the user selects a direction candidate**: treat it as a new spike scope — loop back to step 1 with the selected question as the goal.
    - **If the user confirms the investigation is complete**: proceed to step 3.
 3. Apply **compile-code-reference** to consolidate the recorded code references into one structured document before formalizing findings.
@@ -148,17 +148,17 @@ This permits **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously", 
 </define-spike-scope>
 
 <investigate-per-area>
-1. Determine the execution strategy: **single area** → investigate directly (step 2); **multiple areas** → dispatch to code-exploration sub-agents in parallel (step 3, see **multi-agent-orchestration**).
+1. Determine the execution strategy: **dispatch to a code-exploration sub-agent whenever one is available** — even for a single area (step 2). Only fall back to direct investigation when no suitable sub-agent exists (step 3). See **multi-agent-orchestration**.
 
-2. **For single-area investigation (direct execution)**:
+2. **For sub-agent dispatch (preferred — single or multiple areas)**:
+   - Announce: "Dispatching investigation of [N] area(s) to a sub-agent."
+   - Prepare per-area briefs (area name/description, spike goal, brownfield/greenfield designation, **the existing code reference if one exists**, expected output **including a per-area code reference**), detect available agents, dispatch (concurrently for multiple areas, individually for a single area), then collect and synthesize — resolving cross-area inconsistencies and **merging the returned per-area code references**. See **multi-agent-orchestration**.
+
+3. **For direct investigation (fallback — no sub-agent available)**:
    - Announce: "Investigating area: [area name]"
    - Load the `investigate-code` skill's SKILL.md and apply its capabilities to understand the current implementation relevant to this area.
    - **Record the area's code reference as you investigate** (entry points, key locations, call chains, searched-negatives). See **reference/code-reference-guide.md**.
    - Compile findings into a structured summary: **current state** (what exists today), **constraints & pain points** (what's limiting or broken), and **relevant diagrams** (C4/sequence showing current architecture).
-
-3. **For multi-area investigation (parallel dispatch)**:
-   - Announce: "Dispatching investigation of [N] areas to sub-agents in parallel for faster completion."
-   - Prepare per-area briefs (area name/description, spike goal, brownfield/greenfield designation, **the existing code reference if one exists**, expected output **including a per-area code reference**), detect available agents, dispatch concurrently, then collect and synthesize — resolving cross-area inconsistencies and **merging the returned per-area code references**. See **multi-agent-orchestration**.
 
 4. Present a consolidated investigation summary, flagging any facts that contradict or refine prior assumptions.
 5. After presenting the investigation summary, apply **suggest-spike-directions** to present 3 go-deeper and 3 go-broader candidate questions grounded in the investigation evidence.
@@ -179,16 +179,16 @@ This permits **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously", 
 </evaluate-solutions-per-area>
 
 <draft-area-adrs>
-1. Determine the execution strategy: **single ADR** → draft directly (step 2); **multiple ADRs** → dispatch evaluation results to sub-agents in parallel (step 3, see **multi-agent-orchestration**).
+1. Determine the execution strategy: **dispatch to a sub-agent whenever one is available** — even for a single ADR (step 2). Only fall back to direct drafting when no suitable sub-agent exists (step 3). See **multi-agent-orchestration**.
 
-2. **For single ADR drafting or revising (direct execution)**:
+2. **For sub-agent dispatch (preferred — single or multiple ADRs)**:
+   - Announce: "Dispatching ADR drafting for [N] area(s) to a sub-agent."
+   - Prepare per-area briefs (area name/description, evaluation results — drivers, options with pros/cons, **tech details per option**, assumed solution, **the area's code reference slice** — and instructions to load `draft-adr`), detect available agents, dispatch (concurrently for multiple ADRs, individually for a single ADR), then collect and review each ADR. See **multi-agent-orchestration**.
+
+3. **For direct drafting or revising (fallback — no sub-agent available)**:
    - Load the `draft-adr` skill's SKILL.md and apply its capabilities (define-problem → define-decision-drivers → define-considered-options → evaluate-options → compile-adr) to produce a complete, self-contained ADR for the area.
    - Seed each capability with the evaluation results: problem from the area scope, drivers/options/assumed solution, **and each option's tech details (already produced via `draft-adr` during evaluation)** from the evaluation.
    - **Revising is the same procedure**: re-load `draft-adr` and re-apply its capabilities, seeding with the existing ADR plus the changed decision. Never hand-edit an ADR — every write goes through `draft-adr` (see **professional-doc-authoring**).
-
-3. **For multi-ADR drafting (parallel dispatch)**:
-   - Announce: "Dispatching ADR drafting for [N] areas to sub-agents in parallel."
-   - Prepare per-area briefs (area name/description, evaluation results — drivers, options with pros/cons, **tech details per option**, assumed solution, **the area's code reference slice** — and instructions to load `draft-adr`), detect available agents, dispatch concurrently, then collect and review each ADR. See **multi-agent-orchestration**.
 
 4. After all ADRs are drafted (via either method), present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?" If the user raises uncertainty about any ADR's decision — an unverified assumption, unknown feasibility, or unresolved comparison — apply **suggest-spike-on-adr-uncertainty** before finalizing.
 5. Keep each ADR at the latest state per **latest-state-doctrine** and **clean-artifact-principle** (see **reference/clean-artifact-principle.md**): only the decision — no process history or change notes. On revision, route through `draft-adr` (step 2) and rewrite affected sections in place — delete superseded text, never annotate; cite the findings document for evidence.
@@ -240,7 +240,7 @@ This permits **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously", 
 
 <deep-dive-specific-areas>
 1. **Gather existing context** and **confirm the deep-dive scope** — which areas to revisit, what questions remain, which areas stay as-is.
-2. **Deep-dive per selected area**: investigate deeper with targeted focus, **starting from the existing code reference** (entry points, call chains, searched-negatives) so covered code is not re-scanned → update the code reference with new locations and verdicts → update findings doc with any new facts or corrections → evaluate solutions with new findings → apply **draft-area-adrs** to update or produce ADRs (every ADR write goes through `draft-adr` — see **professional-doc-authoring**).
+2. **Deep-dive per selected area**: dispatch the deeper investigation to a code-exploration sub-agent whenever one is available (even for a single area — see **multi-agent-orchestration**), seeding it with the existing code reference (entry points, call chains, searched-negatives) so covered code is not re-scanned; collect and synthesize the result → update the code reference with new locations and verdicts → update findings doc with any new facts or corrections → evaluate solutions with new findings → apply **draft-area-adrs** to update or produce ADRs (every ADR write goes through `draft-adr` — see **professional-doc-authoring**).
 3. **Optionally update the solution document** if ADR changes affect the system-level view — apply **compile-solution-doc** (every write goes through `write-solution-doc`).
 4. **Present the deep-dive results** — updated findings, new/updated ADRs, refreshed solution doc (if applicable). ADRs and the solution doc are **rewritten in place** to the latest state: delete superseded text, never annotate it, no "Updated"/"v2"/"previously" markers or change notes (see **latest-state-doctrine** and **reference/clean-artifact-principle.md**). Run the **no-note scan** on each updated artifact before presenting; narrate the delta in conversation, never inside the document.
 5. After presenting the results, apply **suggest-spike-directions** to present direction candidates for the next spike round.
@@ -283,7 +283,9 @@ For the full step-by-step procedure with prompts and validation checks per step,
 
 <rule>Mid-spike modifications: to add a new area, apply **define-spike-scope** (step 4) then remaining capabilities; to revise an area's assumed solution, re-apply **draft-area-adrs** then **compile-solution-doc**; to deep-dive unresolved areas, apply **deep-dive-specific-areas**.</rule>
 
-<rule>If the user asks for a quick recommendation without formal documentation, decline — direct them to a regular conversation instead (see **inappropriate-scenarios**). If sub-agents are not available, fall back to sequential execution.</rule>
+<rule>If the user asks for a quick recommendation without formal documentation, decline — direct them to a regular conversation instead (see **inappropriate-scenarios**). If sub-agents are not available, fall back to direct execution.</rule>
+
+<rule>When executing investigation or ADR-drafting work, dispatch to a sub-agent whenever one is available — even for single-area or single-ADR spikes — to keep the orchestrating agent's context small. Fall back to direct execution only when no suitable sub-agent exists (see **multi-agent-orchestration**).</rule>
 
 <rule>When dispatching any work to a sub-agent, always include the relevant code reference in the brief and instruct it to skip already-covered code.</rule>
 

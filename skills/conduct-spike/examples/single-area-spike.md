@@ -4,7 +4,7 @@
 
 **Applies**: All capabilities — `define-spike-scope` → `investigate-per-area` → `compile-findings-doc` → `evaluate-solutions-per-area` → `draft-area-adrs` → `compile-solution-doc`
 
-**What makes this distinct**: Single investigation area with greenfield context (no existing implementation to investigate). Demonstrates the workflow still applies in full but with a lighter touch.
+**What makes this distinct**: Single investigation area with greenfield context (no existing implementation to investigate). Demonstrates the workflow still applies in full but with a lighter touch — and that even a **single** task is dispatched to a sub-agent to keep the orchestrating agent's context small (see `reference/multi-agent-orchestration.md`).
 
 ---
 
@@ -25,11 +25,13 @@
 
 ---
 
-## Phase 2: Investigate Per Area
+## Phase 2: Investigate Per Area — SINGLE-TASK DISPATCH
 
 ### Area 1: Database Selection
 
-*[investigate-code skill applied — adapted for greenfield]*
+*[Single task — still dispatched to a sub-agent to preserve the orchestrating agent's context; see `reference/multi-agent-orchestration.md`. The sub-agent applies `investigate-code`, adapted for greenfield.]*
+
+> "Dispatching investigation of 1 area to a sub-agent."
 
 **Current State**: No existing analytics service. However, the organization has:
 - PostgreSQL for all relational workloads (team has deep expertise)
@@ -117,11 +119,13 @@
 
 ---
 
-## Phase 4: Draft ADR
+## Phase 4: Draft ADR — SINGLE-TASK DISPATCH
 
 ### ADR-001: Database Selection for Analytics Service
 
-*[draft-adr skill applied]*
+*[Single task — dispatched to a sub-agent that loads `draft-adr` and produces the ADR; the orchestrator reviews the result.]*
+
+> "Dispatching ADR drafting for 1 area to a sub-agent."
 
 **Title**: ADR-001: Select ClickHouse Cloud as the Database for the Analytics Service
 

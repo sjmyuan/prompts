@@ -21,7 +21,8 @@ Ask the user to share the context from the previous spike. This may include:
 
 ## Step 3: Investigate deeper (per selected area)
 
-- For each selected area, announce: "Deep-diving into area: [area name] — [specific unresolved question]."
+- For each selected area, dispatch the deep-dive investigation to a code-exploration sub-agent whenever one is available — even for a single area — seeding it with the existing code reference so covered code is not re-scanned (see **multi-agent-orchestration.md**). Fall back to direct execution only when no suitable sub-agent exists.
+- Announce: "Deep-diving into area: [area name] — [specific unresolved question]."
 - Load and apply the `investigate-code` skill (or adapt for greenfield per the greenfield-scenarios guidance), but with a **targeted, narrow focus**:
   - Scope investigation strictly to what's needed to answer the unresolved question.
   - Don't re-investigate what was already confirmed — reference existing findings and only fill gaps.

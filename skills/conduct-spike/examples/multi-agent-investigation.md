@@ -4,7 +4,7 @@
 
 **Applies**: `define-spike-scope` → `investigate-per-area` (parallel dispatch) → `compile-findings-doc` → `evaluate-solutions-per-area` → `draft-area-adrs` (parallel dispatch) → `compile-solution-doc`
 
-**What makes this distinct**: This example demonstrates the multi-agent orchestration pattern where the orchestrating agent delegates independent work units to sub-agents that run concurrently, then synthesizes their results. Contrast with `end-to-end-spike.md` where investigation runs sequentially.
+**What makes this distinct**: This example demonstrates the multi-agent orchestration pattern where the orchestrating agent delegates independent work units to sub-agents that run concurrently, then synthesizes their results. Note that dispatch to sub-agents is the default for **all** spikes — including single-area/single-ADR ones — primarily to preserve the orchestrating agent's context; parallel speed is a secondary benefit (see `reference/multi-agent-orchestration.md`).
 
 ---
 
@@ -273,12 +273,13 @@ Load draft-adr skill and produce a complete ADR.
 
 ---
 
-## Key Takeaways: Multi-Agent vs. Sequential
+## Key Takeaways: Direct vs. Sub-Agent Dispatch
 
-| Aspect | Sequential (end-to-end-spike) | Multi-Agent (this example) |
+| Aspect | Direct Execution (fallback only) | Sub-Agent Dispatch (default) |
 |---|---|---|
-| Investigation time | Sum of all areas (4x single-area time) | Max of any single area (~1x) |
-| ADR drafting time | Sum of all ADRs (4x single-ADR time) | Max of any single ADR (~1x) |
+| Orchestrator context usage | High — all reading/reasoning stays in the orchestrator's window | Low — work happens in isolated sub-agent contexts |
+| Investigation time | Sum of all areas (4x single-area time) | Max of any single area (~1x) when concurrent |
+| ADR drafting time | Sum of all ADRs (4x single-ADR time) | Max of any single ADR (~1x) when concurrent |
 | Coordination overhead | None | Brief preparation + synthesis |
-| Best for | 1-2 areas, simple problems | 3+ areas, heavy codebases |
-| Risk | None | Sub-agents may need re-prompting if briefs are incomplete |
+| When used | Only when no suitable sub-agent is available | Always — even single-area/single-ADR spikes |
+| Risk | Orchestrator context bloat degrades later synthesis | Sub-agents may need re-prompting if briefs are incomplete |

@@ -58,7 +58,7 @@
 
 ## Step 3: Investigate Deeper
 
-*[investigate-code skill applied with narrow, targeted focus]*
+*[Single deep-dive task — dispatched to a code-exploration sub-agent seeded with the existing code reference to keep the orchestrating agent's context small (see `reference/multi-agent-orchestration.md`). The sub-agent applies `investigate-code` with narrow, targeted focus.]*
 
 ### Assistant Output
 
