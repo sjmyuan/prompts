@@ -75,7 +75,7 @@ Never leave a stale diagram: after each change, every diagram either reflects th
 </diagram-sync>
 
 <option-tech-details>
-Tech details make each option's implementation concrete in the ADR: **target-state diagrams** (C4 + sequence, option-specific) and a **code change profile** (per change: `file:line` location, current code, git-style diff block, how-to, confidence). Produced per option by **detail-options-tech** and rendered as a `#### Tech Details` subsection in each option's evaluation section (omit when absent). **Grounding contract**: tech details must trace to code investigation evidence — a code reference or findings from the `conduct-spike` pipeline, or an on-demand evidence map built via `investigate-code`. Without evidence they stay architectural-level and unverified, and a spike is recommended before relying on them. See **reference/option-tech-details-guide.md**.
+Tech details make each option's implementation concrete in the ADR: **target-state diagrams** (C4 + sequence, option-specific) and a **code change profile** (per change: `file:line` location, current code, git-style diff block, how-to, confidence). Produced per option by **detail-options-tech** and rendered as a `#### Tech Details` subsection in each option's evaluation section (omit when absent). **Grounding contract**: tech details must trace to code investigation evidence — findings from the `conduct-spike` pipeline (their embedded evidence map), or an on-demand evidence map built via `investigate-code`. Without evidence they stay architectural-level and unverified, and a spike is recommended before relying on them. See **reference/option-tech-details-guide.md**.
 </option-tech-details>
 
 <context-loading-guide>
@@ -125,14 +125,14 @@ Tech details make each option's implementation concrete in the ADR: **target-sta
    - "What are the main advantages or strengths of this option?"
    - "What are the main disadvantages, risks, or trade-offs?"
 2. Relate each pro/con back to the decision drivers defined earlier — highlight which drivers are satisfied and which are compromised.
-3. If the user wants to evaluate options by their technical implementation — or code investigation evidence (code reference / findings) is available — apply **detail-options-tech** for each option to produce its tech details (target-state diagrams + code change profile), then present them so pros/cons are judged against the concrete implementation (see **option-tech-details**).
+3. If the user wants to evaluate options by their technical implementation — or code investigation evidence (findings from the spike pipeline) is available — apply **detail-options-tech** for each option to produce its tech details (target-state diagrams + code change profile), then present them so pros/cons are judged against the concrete implementation (see **option-tech-details**).
 4. Summarize the evaluation of the current option with a Pros/Cons list and ask for confirmation.
 5. After all options are evaluated, draw the diagram that best explains the comparison (per **diagram-selection**, the option comparison matrix with an elimination tree), highlighting any knock-out criteria and why each option was dropped.
 6. Guide the user toward a recommendation by asking: "Given the evaluations, which option best satisfies the decision drivers?"
 </evaluate-options>
 
 <detail-options-tech>
-1. Determine the evidence base: check for an existing code reference or investigation findings (e.g., from the `conduct-spike` pipeline) and whether the current codebase is accessible.
+1. Determine the evidence base: check for investigation findings (e.g., a findings doc from the `conduct-spike` pipeline) and whether the current codebase is accessible.
 2. If no evidence base exists but the codebase is accessible, build a lightweight evidence map first (apply the `investigate-code` skill): entry points, key locations with `file:line`, and call chains for the affected flows.
 3. For each option, draw its **target-state diagrams**: evolve the current-state C4 view (container/component) as-is → to-be for this option, and add the sequence diagram(s) for the key flow(s) this option changes. Diagrams are option-specific — never reuse another option's diagram.
 4. For each option, build its **code change profile**: for every change the option requires, record — location (`file:line` + symbol), current code (quoted from the evidence map), proposed **diff** (git-style diff code block — `diff --git` header, `--- a/` / `+++ b/`, `@@` hunk, `-` / `+` lines — focused on the existing code), and a 1–2 sentence "how to change it". Spell out every change explicitly — never assume the user already knows one. List new files briefly (name + purpose) without diffing them.

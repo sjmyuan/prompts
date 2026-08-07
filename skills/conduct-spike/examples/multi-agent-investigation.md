@@ -29,14 +29,14 @@
 
 ### Orchestrator: Prepare Briefs
 
-The orchestrator prepares 4 self-contained briefs, one per investigation area. Each brief includes the area description, the overall spike goal, and the expected output format — and **requires the sub-agent to return a per-area code reference** (entry points, key code locations with file:line, call chains, searched-negatives). No code reference exists yet, so this first round seeds the map (see `reference/code-reference-guide.md`).
+The orchestrator prepares 4 self-contained briefs, one per investigation area. Each brief includes the area description, the overall spike goal, and the expected output format — and **requires the sub-agent to return a per-area evidence map** (entry points, key code locations with file:line, call chains, evidence verdicts, searched-negatives). No findings doc exists yet, so this first round seeds the evidence map (see `reference/findings-document-guide.md`).
 
 **Brief 1 — Service Decomposition Boundaries**:
 ```
 Investigate: How should the payment monolith be split into services?
 Context: Single Spring Boot app, ~200K LOC. Payment types: CreditCard, BankTransfer, Wallet.
 Scope: Identify bounded contexts, current package dependencies, team ownership boundaries.
-Expected output: Current state of code organization, domain coupling points, constraints & pain points + per-area code reference.
+Expected output: Current state of code organization, domain coupling points, constraints & pain points + per-area evidence map.
 ```
 
 **Brief 2 — Inter-service Communication**:
@@ -44,7 +44,7 @@ Expected output: Current state of code organization, domain coupling points, con
 Investigate: What communication patterns exist and what will the new services need?
 Context: Currently all in-process calls. External integrations use REST, gRPC, and SOAP.
 Scope: Map current integration points, assess team familiarity with async patterns.
-Expected output: Current communication landscape, constraints, existing infrastructure (message brokers, gateways) + per-area code reference.
+Expected output: Current communication landscape, constraints, existing infrastructure (message brokers, gateways) + per-area evidence map.
 ```
 
 **Brief 3 — Database Decomposition Strategy**:
@@ -52,7 +52,7 @@ Expected output: Current communication landscape, constraints, existing infrastr
 Investigate: How is the monolithic database structured and how can it be decomposed?
 Context: Single PostgreSQL, ~80 tables. Shared tables across payment types.
 Scope: Analyze table ownership, stored procedures, data access patterns.
-Expected output: Current database topology, cross-domain table dependencies, constraints & pain points + per-area code reference.
+Expected output: Current database topology, cross-domain table dependencies, constraints & pain points + per-area evidence map.
 ```
 
 **Brief 4 — Migration Strategy**:
@@ -60,7 +60,7 @@ Expected output: Current database topology, cross-domain table dependencies, con
 Investigate: What deployment infrastructure exists and what migration patterns are feasible?
 Context: Kubernetes on AWS, Kong API Gateway, GitHub Actions CI/CD.
 Scope: Assess current deployment pipeline, traffic routing capability, feature flag infrastructure.
-Expected output: Current deployment architecture, constraints, migration feasibility assessment + per-area code reference.
+Expected output: Current deployment architecture, constraints, migration feasibility assessment + per-area evidence map.
 ```
 
 ### Orchestrator: Dispatch
@@ -138,7 +138,7 @@ Expected output: Current deployment architecture, constraints, migration feasibi
 >
 > *The orchestrator compiles the synthesized investigation summary and presents it to the user.*
 >
-> *It also merges the 4 returned per-area code references into a consolidated `code-reference-payment-migration.md` — the structured evidence map used by the findings doc, ADRs, and every later sub-agent brief. See `examples/code-reference-example.md` for the full document.*
+> *It embeds each returned per-area evidence map into the consolidated findings doc below — `file:line` entry points and key locations annotated inline, plus the Evidence & Verification section (ledger + searched-negatives). See `reference/findings-document-guide.md` for the embedding format.*
 
 ---
 
@@ -188,7 +188,27 @@ Expected output: Current deployment architecture, constraints, migration feasibi
 - 3 external protocols (REST, gRPC, SOAP)
 - Team: 3 sub-teams, no Kafka experience
 
-> *Findings consolidated from 4 parallel sub-agent investigations. Cross-area consistency verified — no contradictions found. This document is the current-state baseline for evaluation.*
+**Evidence & Verification** (per-area evidence maps embedded inline):
+
+**Evidence Ledger**
+
+| Claim / Question | Verdict | Evidence (file:line) | Confidence |
+|---|---|---|---|
+| Is there a circuit breaker around external calls? | No | `grep "CircuitBreaker\|Resilience4j\|fallback"` across `payment-service` — no matches | Verified (negative) |
+| Are all internal calls in-process? | Yes | `service/PaymentOrchestrator.java:88` calls services directly; no internal HTTP client found | Verified |
+| Does `transactions` hold all payment types? | Yes | `db/schema.sql:201` — no payment-type discriminator at table level | Verified |
+| Can Kong split traffic? | Unknown | `kong/kong.yml:34` — single upstream, no weighted upstreams | Inferred |
+| Team has async messaging experience? | N/A | from user conversation, not code | Unverified |
+
+**Searched-Negatives**
+
+| Area | Search performed | Result | Next step |
+|---|---|---|---|
+| Communication | `grep -ri "kafka\|rabbit\|mq"` in `payment-service` | No message broker usage | Prototype async feasibility (direction D2) |
+| Migration | `grep -ri "featureflag\|trafficsplit"` in `infra-configs` | None found | Verify Kong weighted-upstream capability in docs |
+| Service decomposition | Search for `*Module` / bounded-context markers | None — package-by-layer only | Deep-dive into domain import graph (D1) |
+
+> *Entry points and key locations (`file:line`) also annotate the C2/sequence diagrams above. Findings consolidated from 4 parallel sub-agent investigations. Cross-area consistency verified — no contradictions found. This document is the current-state baseline and evidence home for evaluation.*
 
 ---
 
@@ -222,11 +242,11 @@ Options:
   B: Domain-driven services — Pros: cleaner dependencies. Cons: team restructuring
   C: Strangler extraction — Pros: lowest risk. Cons: temporary hybrid complexity
 Assumed solution: Option A (Payment-type services)
-Code reference: code-reference-payment-migration.md §3 (key locations), §5 (evidence), §6 (coupling) — cite evidence without re-scanning
+Findings doc: findings-payment-migration.md — Evidence & Verification section (key locations, ledger, coupling) — cite evidence without re-scanning
 Load draft-adr skill and produce a complete ADR.
 ```
 
-*[Similar briefs prepared for areas 2-4 — each includes its area's code reference slice.]*
+*[Similar briefs prepared for areas 2-4 — each includes its area's findings doc (evidence sections).]*
 
 ### Orchestrator: Dispatch
 
@@ -264,8 +284,8 @@ Load draft-adr skill and produce a complete ADR.
 
 ### Final Output Bundle
 
-- **Code Reference**: `code-reference-payment-migration.md` (entry points, key locations, call chains, evidence ledger, searched-negatives)
-- **Solution Document**: `solution-doc-payment-migration.md` (C4 diagrams, API contracts, RAID, RACI)
+- **Findings Document**: `findings-payment-migration.md` (current-state architecture + embedded per-area evidence map: `file:line` key locations, evidence ledger, searched-negatives)
+- **Solution Document**: `solution-doc-payment-migration.md` (C4 diagrams, API contracts, RAID, RACI — decision-only, no code references)
 - **ADR-001**: Service Decomposition (Payment-type services)
 - **ADR-002**: Inter-service Communication (Hybrid sync/async)
 - **ADR-003**: Database Decomposition (Database per service)

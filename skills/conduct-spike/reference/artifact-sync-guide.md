@@ -5,17 +5,16 @@ Spike artifacts form a dependency chain. Any change — new evidence, corrected 
 ## Dependency chain
 
 ```
-Code Reference → Findings Docs → ADRs → Solution Doc → Change Summary
+Findings Docs → ADRs → Solution Doc → Change Summary
 ```
 
-Each artifact cites the one before it: findings cite the code reference, ADRs cite findings, the solution doc mirrors ADR decisions, and the change summary diffs findings (baseline) against the solution doc (target).
+Each artifact cites the one before it: ADRs cite findings (which embed the evidence map), the solution doc mirrors ADR decisions, and the change summary diffs findings (baseline) against the solution doc (target).
 
 ## Propagation matrix
 
 | Change origin | Propagate to | Stopping condition |
 |---|---|---|
-| Code reference (new evidence) | Findings doc → ADR → solution doc → change summary | Evidence only confirms existing facts and decisions |
-| Findings doc correction | ADR → solution doc → change summary | Correction doesn't affect any decision |
+| Findings doc (new evidence or correction) | ADR → solution doc → change summary | Evidence only confirms existing facts and decisions |
 | ADR decision change | Solution doc → change summary | Decision has no target-state or code impact |
 | Solution doc change | Change summary | Change has no code impact |
 
@@ -25,7 +24,7 @@ Propagation always stops at the first artifact the change does not affect.
 
 1. Capture the change: what changed, which artifact is the origin, and what triggered it.
 2. Trace the propagation path; identify every affected downstream artifact.
-3. Apply the change at the origin through its owning skill — `draft-adr` for ADRs, `write-solution-doc` for findings/solution docs, `compile-code-reference` for the evidence map. Never hand-edit.
+3. Apply the change at the origin through its owning skill — `draft-adr` for ADRs, `write-solution-doc` for findings/solution docs (the findings doc carries the evidence map). Never hand-edit.
 4. Propagate downstream one artifact at a time, seeding each with the current artifact plus the delta.
 5. For the change summary, recompute the affected clusters against the updated baseline (findings) and target (solution doc); refresh ADR citations and cross-cutting concerns. If no change summary exists, ask whether one is needed.
 6. Validate consistency and present the delta in conversation.

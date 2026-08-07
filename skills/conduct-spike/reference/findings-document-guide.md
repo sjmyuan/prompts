@@ -21,6 +21,28 @@ Either approach is valid:
 
 Findings documents are produced by the `write-solution-doc` skill, applied to the **current state** instead of the target state. Load that skill to access its full document structure, diagramming, and formatting capabilities. The key difference: label all diagrams as "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings.
 
+## Embedded evidence map (the spike's code evidence)
+
+The findings doc is the spike's **evidence home** — the single place where code evidence lives. Each area's evidence map is embedded inline, close to the code it describes:
+
+- **Entry points & key locations**: annotate the current-state sections and diagrams with `file:line` beside the component or flow they describe. Preserve `file:line` precision — never vague references like "the service layer".
+- **Call chains**: the findings doc's sequence diagrams express call chains; annotate each step with `file:line`.
+- **Evidence & Verification section** (per area): an evidence ledger table and a searched-negatives table.
+
+**Evidence ledger**
+
+| Claim / Question | Verdict | Evidence (file:line) | Confidence |
+
+Claims are the spike's questions ("Is there a circuit breaker?"); the verdict is the answer; evidence is the exact location; confidence is **verified** / **inferred** / **unverified**. Never present inference as evidence — an unverified claim is a gap, not evidence.
+
+**Searched-negatives**
+
+| Area | Search performed (pattern/query) | Result | Next step |
+
+Dead-end searches recorded so later sub-agents don't repeat them; open questions still to investigate.
+
+**Maintenance**: update the embedded evidence map the moment new evidence is found during any later work (deep-dive, follow-ups) — no round/version tracking, never rebuilt from scratch. Pass the findings doc (or its evidence sections) to sub-agents so covered code is not re-scanned.
+
 ## Relationship to other artifacts
 
 - **ADRs** reference findings docs for evidence: "The current C2 topology (Findings Doc §2) shows all payment types sharing a single database..."

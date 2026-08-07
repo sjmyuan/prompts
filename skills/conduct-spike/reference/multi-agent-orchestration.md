@@ -1,6 +1,6 @@
 # Sub-Agent Orchestration for Spikes
 
-Dispatch task execution to sub-agents whenever one is available — for Phases 2 (investigate) and 4 (draft ADRs) — **even when the spike has only a single task**. The primary goal is **preserving the orchestrating agent's context**: running a task directly consumes the orchestrator's context window with file reads, search output, and intermediate reasoning, crowding out the cross-cutting state it must hold (scope, code reference, findings, decisions). Parallel speed is a secondary benefit that applies automatically when multiple units are dispatched at once.
+Dispatch task execution to sub-agents whenever one is available — for Phases 2 (investigate) and 4 (draft ADRs) — **even when the spike has only a single task**. The primary goal is **preserving the orchestrating agent's context**: running a task directly consumes the orchestrator's context window with file reads, search output, and intermediate reasoning, crowding out the cross-cutting state it must hold (scope, findings, decisions). Parallel speed is a secondary benefit that applies automatically when multiple units are dispatched at once.
 
 | Phase | Dispatchable? | Mechanism |
 |---|---|---|
@@ -17,21 +17,21 @@ Dispatch task execution to sub-agents whenever one is available — for Phases 2
 
 1. Identify independent work units (one per investigation area or ADR — including a single unit).
 2. For each unit, prepare a focused brief with the unit's context, scope, and expected output format.
-3. **Include the code reference in every brief**: pass the existing code reference (or the relevant slice) so the sub-agent starts from verified `file:line` locations instead of scanning from scratch. Instruct it to treat verified claims as settled and only dig into marked gaps and searched-negatives.
-4. **Require a code reference back**: every investigation brief asks the sub-agent to return a per-area code reference (entry points, key code locations with file:line, call chains, evidence verdicts, searched-negatives) alongside its narrative findings.
+3. **Include the findings doc in every brief**: pass the area's findings doc (or its evidence sections) so the sub-agent starts from verified `file:line` locations instead of scanning from scratch. Instruct it to treat verified claims as settled and only dig into marked gaps and searched-negatives.
+4. **Require an evidence map back**: every investigation brief asks the sub-agent to return a per-area evidence map (entry points, key code locations with file:line, call chains, evidence verdicts, searched-negatives) alongside its narrative findings — it will be embedded in the area's findings doc.
 5. Dispatch the briefs — all units concurrently when there are multiple, or the single unit on its own when there is one. Sub-agents operate independently and do not communicate with each other.
 6. Collect results from all sub-agents when they complete.
-7. Synthesize the collected results into the consolidated format required by the next phase. Review for completeness and consistency across areas, and merge the returned per-area code references into the consolidated code reference (see **reference/code-reference-guide.md**).
+7. Synthesize the collected results into the consolidated format required by the next phase. Review for completeness and consistency across areas, and embed the returned per-area evidence maps into the findings doc(s) (see **reference/findings-document-guide.md**).
 
-## Code Reference in Sub-Agent Briefs
+## Evidence Map in Sub-Agent Briefs
 
-The code reference is the input/output contract between the orchestrator and sub-agents:
+The evidence map (embedded in findings docs) is the input/output contract between the orchestrator and sub-agents:
 
-- **Input**: every brief carries the code reference (or its area slice). Sub-agents start from entry points, follow existing call chains, and treat the evidence ledger's **verified** claims as settled — they verify only `inferred`/`unverified` claims or marked gaps.
-- **Output**: every investigation brief returns a per-area code reference slice so the orchestrator can grow the consolidated document (see **compile-code-reference**).
-- **Searched-negatives travel with the map**: a documented "not found" tells the next sub-agent not to repeat the scan.
-- **ADR-drafting briefs** include the area's code reference so ADRs can cite evidence locations without re-reading code.
-- **First pass is the seed**: when no code reference exists yet, briefs omit the input but still require the output — the first investigation builds the map.
+- **Input**: every brief carries the area's findings doc (or its evidence sections). Sub-agents start from entry points, follow existing call chains, and treat the evidence ledger's **verified** claims as settled — they verify only `inferred`/`unverified` claims or marked gaps.
+- **Output**: every investigation brief returns a per-area evidence map so the orchestrator can embed it in the area's findings doc (see **compile-findings-doc**).
+- **Searched-negatives travel with the findings doc**: a documented "not found" tells the next sub-agent not to repeat the scan.
+- **ADR-drafting briefs** include the area's findings doc (evidence sections) so ADRs can cite evidence locations without re-reading code.
+- **First pass is the seed**: when no findings doc exists yet, briefs omit the input but still require the evidence-map output — the first investigation builds the map the findings doc embeds.
 
 ## When NOT to Dispatch
 

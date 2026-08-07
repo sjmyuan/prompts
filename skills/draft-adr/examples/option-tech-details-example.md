@@ -4,7 +4,7 @@
 
 **Applies**: `detail-options-tech` (within `evaluate-options`), rendered into the ADR by `compile-adr`.
 
-**What makes this distinct**: Per-option tech details grounded in an existing evidence base (the spike's code reference) — every diff carries a `file:line`, every claim a confidence tag, nothing assumed.
+**What makes this distinct**: Per-option tech details grounded in an existing evidence base (the spike's findings doc) — every diff carries a `file:line`, every claim a confidence tag, nothing assumed.
 
 ---
 
@@ -18,7 +18,7 @@
 | B: Async events (Kafka) | Services communicate via event streams | Loose coupling; resilience | Learning curve; eventual consistency |
 | C: Hybrid | REST for queries, events for commands | Best of both worlds | Two patterns to maintain |
 
-### Evidence base — code reference slice (from the spike)
+### Evidence base — findings doc evidence map (from the spike)
 
 | Location | Symbol | Role |
 |---|---|---|

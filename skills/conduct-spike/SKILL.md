@@ -21,7 +21,7 @@ description: Conduct spike investigations to produce and keep consistent ADRs, f
 <spike-definition>
 A spike is an investigation activity aimed at reducing uncertainty around a technical problem. Unlike a full implementation, a spike focuses on research, prototyping, and decision-making. The output is knowledge and documented decisions — not production code.
 
-A well-conducted spike produces: **Findings Documents** (current-state architecture baseline per area or consolidated), **1 Code Reference** (evidence map — entry points, key code locations, call chains, evidence ledger, searched-negatives), **N ADRs** (one per area with evaluated options and recommendations), **1 Solution Document** (target-state architecture with C4, API contracts, RAID, RACI), and optionally **1 Change Summary** (code-level changes traceable to ADRs).
+A well-conducted spike produces: **Findings Documents** (current-state architecture baseline per area or consolidated, each embedding its area's evidence map — `file:line` entry points and key locations, call chains, evidence ledger, searched-negatives), **N ADRs** (one per area with evaluated options, recommendations, and per-option code changes), **1 Solution Document** (target-state architecture with C4, API contracts, RAID, RACI — decision-only, no code references), and optionally **1 Change Summary** (code-level changes traceable to ADRs).
 </spike-definition>
 
 <inappropriate-scenarios>
@@ -29,19 +29,15 @@ Do NOT use this skill for: quick answers without formal documentation, already-d
 </inappropriate-scenarios>
 
 <findings-document>
-A findings document captures the **current-state architecture** using the `write-solution-doc` skill's format (C4, sequence, API/event contracts) but as-is rather than to-be, making it directly transformable into the solution doc and giving ADRs a precise baseline. See **reference/findings-document-guide.md**.
+A findings document captures the **current-state architecture** using the `write-solution-doc` skill's format (C4, sequence, API/event contracts) but as-is rather than to-be, making it directly transformable into the solution doc and giving ADRs a precise baseline. It is also the spike's **evidence home**: each findings doc embeds its area's evidence map — `file:line` entry points and key locations annotated inline, sequence diagrams for call chains, an evidence ledger (claim → verdict → confidence), and searched-negatives. ADRs, change summaries, and dispatched sub-agents cite findings docs for code evidence without re-scanning. See **reference/findings-document-guide.md**.
 </findings-document>
-
-<code-reference>
-A code reference is the spike's living evidence map — entry points, key code locations (file:line), call chains, claim→evidence verdicts, cross-area coupling, searched-negatives — so findings docs, ADRs, change summaries, and dispatched sub-agents cite evidence without re-scanning. Kept continuously up to date (no round/version tracking) and **always included in sub-agent briefs**. See **reference/code-reference-guide.md**.
-</code-reference>
 
 <change-summary>
 A change summary translates the delta between findings (current state) and solution doc (target state) into concrete change items grouped by category — New, Modified, Retired, Configuration, Data, Dependency, Test — traceable to ADRs. Estimate quality depends on code access; always be transparent about which mode applies. For full format and guidance, see **reference/change-summary-guide.md**. It is consumed by **orchestrate-feature-delivery** to split the spiked work into features/phases and orchestrate delivery.
 </change-summary>
 
 <option-tech-details>
-Tech details (target-state diagrams + code change profiles) per ADR option are produced by the `draft-adr` skill's **detail-options-tech** capability, grounded in this spike's code reference and findings doc. During evaluation and ADR drafting, delegate to `draft-adr` rather than producing them directly (see **professional-doc-authoring**).
+Tech details (target-state diagrams + code change profiles) per ADR option are produced by the `draft-adr` skill's **detail-options-tech** capability, grounded in this spike's findings doc (its embedded evidence map). During evaluation and ADR drafting, delegate to `draft-adr` rather than producing them directly (see **professional-doc-authoring**).
 </option-tech-details>
 
 <solution-doc-modularity>
@@ -97,12 +93,11 @@ This permits **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously", 
 <artifact-sync-doctrine>
 Artifacts form a dependency chain — a change to any artifact must propagate to every downstream artifact so the user always sees one consistent picture:
 
-**Code Reference → Findings Docs → ADRs → Solution Doc → Change Summary**
+**Findings Docs → ADRs → Solution Doc → Change Summary**
 
 | Change origin | Propagate to |
 |---|---|
-| Code reference (new evidence) | Findings doc → ADR → solution doc → change summary |
-| Findings doc correction | ADR → solution doc → change summary |
+| Findings doc (new evidence or correction) | ADR → solution doc → change summary |
 | ADR decision change | Solution doc → change summary |
 | Solution doc change | Change summary |
 
@@ -117,13 +112,11 @@ Propagation stops at the first artifact a change does not affect. The change sum
 | Conducting a single-area spike with narrow scope | Single-area workflow with one ADR + solution doc | [examples/single-area-spike.md](examples/single-area-spike.md) |
 | Working from pre-existing investigation findings without re-investigating | Workflow starting from existing investigation results | [examples/from-existing-findings.md](examples/from-existing-findings.md) |
 | Decomposing a complex problem into investigation areas | Decomposition rubric with examples and edge cases | [reference/decomposition-rubric.md](reference/decomposition-rubric.md) |
-| Conducting a heavy multi-area spike that benefits from parallel sub-agent execution | Multi-area parallel dispatch walkthrough | [examples/multi-agent-investigation.md](examples/multi-agent-investigation.md) |
+| Conducting a heavy multi-area spike that benefits from parallel sub-agent execution | Multi-area parallel dispatch walkthrough with per-area evidence maps embedded in the findings doc | [examples/multi-agent-investigation.md](examples/multi-agent-investigation.md) |
 | Continuing a previous spike by digging deeper into specific unresolved areas | Deep-dive walkthrough: load context, focus investigation, update ADRs | [examples/deep-dive-continuation.md](examples/deep-dive-continuation.md) |
 | Dispatching investigation or ADR drafting to sub-agents (single or multiple tasks) | Dispatch pattern, context-preservation rationale, and fallback rules | [reference/multi-agent-orchestration.md](reference/multi-agent-orchestration.md) |
 | Brainstorming solution options during the evaluate phase | Solution-brainstorming prompt set | [reference/solution-brainstorming-prompts.md](reference/solution-brainstorming-prompts.md) |
-| Producing or understanding findings documents (format, per-area vs consolidated strategy, artifact relationships) | Findings doc format and strategy selection | [reference/findings-document-guide.md](reference/findings-document-guide.md) |
-| Compiling or maintaining the code reference (7-section structure, confidence tags, searched-negatives rules) | Full code reference structure and maintenance rules | [reference/code-reference-guide.md](reference/code-reference-guide.md) |
-| Seeing a worked code reference with entry points, call chains, evidence ledger, and searched-negatives | Worked example of a structured code reference for a 4-area spike | [examples/code-reference-example.md](examples/code-reference-example.md) |
+| Producing or understanding findings documents (format, per-area vs consolidated strategy, embedded evidence map — `file:line` annotations, evidence ledger, searched-negatives) | Findings doc format, strategy selection, and evidence-map embedding rules | [reference/findings-document-guide.md](reference/findings-document-guide.md) |
 | Drafting, revising, or compiling ADRs and the solution doc — keeping them at the latest state, free of logs and process language | Latest-state rewrite-in-place protocol, allowed vs banned notes map, and the no-note scan checklist | [reference/clean-artifact-principle.md](reference/clean-artifact-principle.md) |
 | Entering or executing deep-dive mode (continuing a previous spike on unresolved areas) | Mode comparison guide and deep-dive procedure | [reference/deep-dive-mode-guide.md](reference/deep-dive-mode-guide.md), [reference/deep-dive-procedure.md](reference/deep-dive-procedure.md) |
 | Generating a change summary (code-level changes required to implement the solution) | Format, categories, and code-access guidance | [reference/change-summary-guide.md](reference/change-summary-guide.md) |
@@ -144,15 +137,14 @@ Propagation stops at the first artifact a change does not affect. The change sum
 
 <run-spike-workflow>
 1. Apply **define-spike-scope** to establish the spike goal and decompose the problem into investigation areas. Do not proceed until the scope is confirmed by the user.
-2. Apply **investigate-per-area** to understand the current implementation per area. Dispatch investigation to a sub-agent whenever one is available — even for a single area — per **multi-agent-orchestration**, to preserve the orchestrating agent's context. Investigation always records **code references**, never narrative only; direction suggestions (3 go-deeper, 3 go-broader) follow the investigation summary.
+2. Apply **investigate-per-area** to understand the current implementation per area. Dispatch investigation to a sub-agent whenever one is available — even for a single area — per **multi-agent-orchestration**, to preserve the orchestrating agent's context. Investigation always records **evidence maps** (entry points, key locations, call chains, searched-negatives), never narrative only; direction suggestions (3 go-deeper, 3 go-broader) follow the investigation summary.
    - **If the user selects a direction candidate**: treat it as a new spike scope — loop back to step 1 with the selected question as the goal.
    - **If the user confirms the investigation is complete**: proceed to step 3.
-3. Apply **compile-code-reference** to consolidate the recorded code references into one structured document before formalizing findings.
-4. Apply **compile-findings-doc** to formalize the investigation results into a structured findings document, citing the code reference as its evidence source.
-5. After findings are confirmed, apply **evaluate-solutions-per-area** to brainstorm, compare, and select an assumed solution for each area.
-6. After evaluation, apply **draft-area-adrs** to produce one formal ADR per area documenting the decision.
-7. After all ADRs are finalized, apply **compile-solution-doc** to consolidate all ADRs into a system-level solution document.
-8. Pause for user confirmation after each phase; do not skip phases unless the user requests it or an override rule applies.
+3. Apply **compile-findings-doc** to formalize the investigation results into a structured findings document, embedding each area's evidence map inline as its evidence source.
+4. After findings are confirmed, apply **evaluate-solutions-per-area** to brainstorm, compare, and select an assumed solution for each area.
+5. After evaluation, apply **draft-area-adrs** to produce one formal ADR per area documenting the decision.
+6. After all ADRs are finalized, apply **compile-solution-doc** to consolidate all ADRs into a system-level solution document.
+7. Pause for user confirmation after each phase; do not skip phases unless the user requests it or an override rule applies.
 </run-spike-workflow>
 
 <define-spike-scope>
@@ -170,12 +162,12 @@ Propagation stops at the first artifact a change does not affect. The change sum
 
 2. **For sub-agent dispatch (preferred — single or multiple areas)**:
    - Announce: "Dispatching investigation of [N] area(s) to a sub-agent."
-   - Prepare per-area briefs (area name/description, spike goal, brownfield/greenfield designation, **the existing code reference if one exists**, expected output **including a per-area code reference**), detect available agents, dispatch (concurrently for multiple areas, individually for a single area), then collect and synthesize — resolving cross-area inconsistencies and **merging the returned per-area code references**. See **multi-agent-orchestration**.
+   - Prepare per-area briefs (area name/description, spike goal, brownfield/greenfield designation, **the area's existing findings doc / evidence map if one exists**, expected output **including a per-area evidence map**), detect available agents, dispatch (concurrently for multiple areas, individually for a single area), then collect and synthesize — resolving cross-area inconsistencies for the findings doc. See **multi-agent-orchestration**.
 
 3. **For direct investigation (fallback — no sub-agent available)**:
    - Announce: "Investigating area: [area name]"
    - Load the `investigate-code` skill's SKILL.md and apply its capabilities to understand the current implementation relevant to this area.
-   - **Record the area's code reference as you investigate** (entry points, key locations, call chains, searched-negatives). See **reference/code-reference-guide.md**.
+   - **Record the area's evidence map as you investigate** (entry points, key locations with `file:line`, call chains, evidence verdicts, searched-negatives) — it will be embedded in the area's findings doc. See **reference/findings-document-guide.md**.
    - Compile findings into a structured summary: **current state** (what exists today), **constraints & pain points** (what's limiting or broken), and **relevant diagrams** (C4/sequence showing current architecture).
 
 4. Present a consolidated investigation summary, flagging any facts that contradict or refine prior assumptions.
@@ -183,16 +175,16 @@ Propagation stops at the first artifact a change does not affect. The change sum
 6. Ask the user: "Would you like to pursue any of these directions, or is the investigation complete?"
    - If the user selects a direction: the workflow loops back to scope definition with the selected question as the new spike goal.
    - If the user confirms the investigation is complete: proceed to step 7.
-7. Hand off to the workflow orchestrator for **compile-code-reference** (consolidate the recorded evidence map), then **compile-findings-doc**.
+7. Hand off to the workflow orchestrator for **compile-findings-doc**, which embeds the recorded evidence maps inline.
 </investigate-per-area>
 
 <evaluate-solutions-per-area>
 1. For each area, guide the user through solution evaluation: ask what options they see, use **solution-brainstorming-prompts** if only one option is offered, capture each option's description/pros/cons/feasibility, identify decision drivers, and relate pros/cons to them.
-2. For each option, load the `draft-adr` skill and apply its **detail-options-tech** capability to produce the option's tech details — target-state diagrams and a code change profile (location, diff, how-to) — seeding it with the code reference and findings doc. Present them per option so the user can compare options on technical feasibility. Skip only if the user declines or the option has no code impact.
+2. For each option, load the `draft-adr` skill and apply its **detail-options-tech** capability to produce the option's tech details — target-state diagrams and a code change profile (location, diff, how-to) — seeding it with the area's findings doc (its embedded evidence map). Present them per option so the user can compare options on technical feasibility. Skip only if the user declines or the option has no code impact.
 3. After all options are evaluated and tech-detailed, ask: "Which option do you recommend as the assumed solution for [area name]?" If unsure, help compare top contenders against decision drivers and their tech details. Record the **assumed solution** — provisional, may change after ADR review.
 4. **Check for findings gaps**: If any option revealed a constraint, risk, or fact not captured in the findings document, update the affected sections and note the correction when presenting the evaluation summary.
 5. Repeat for each investigation area.
-6. Validate each area's evaluation: confirm at least 2 options were considered, pros/cons relate to decision drivers, each option's tech details are grounded in the code reference (no invented code), and the assumed solution follows logically from the comparison.
+6. Validate each area's evaluation: confirm at least 2 options were considered, pros/cons relate to decision drivers, each option's tech details are grounded in the findings doc's evidence map (no invented code), and the assumed solution follows logically from the comparison.
 7. Present a summary table of all areas with their assumed solutions and any findings corrections made.
 </evaluate-solutions-per-area>
 
@@ -201,7 +193,7 @@ Propagation stops at the first artifact a change does not affect. The change sum
 
 2. **For sub-agent dispatch (preferred — single or multiple ADRs)**:
    - Announce: "Dispatching ADR drafting for [N] area(s) to a sub-agent."
-   - Prepare per-area briefs (area name/description, evaluation results — drivers, options with pros/cons, **tech details per option**, assumed solution, **the area's code reference slice** — and instructions to load `draft-adr`), detect available agents, dispatch (concurrently for multiple ADRs, individually for a single ADR), then collect and review each ADR. See **multi-agent-orchestration**.
+   - Prepare per-area briefs (area name/description, evaluation results — drivers, options with pros/cons, **tech details per option**, assumed solution, **the area's findings doc (evidence sections)** — and instructions to load `draft-adr`), detect available agents, dispatch (concurrently for multiple ADRs, individually for a single ADR), then collect and review each ADR. See **multi-agent-orchestration**.
 
 3. **For direct drafting or revising (fallback — no sub-agent available)**:
    - Load the `draft-adr` skill's SKILL.md and apply its capabilities (define-problem → define-decision-drivers → define-considered-options → evaluate-options → compile-adr) to produce a complete, self-contained ADR for the area.
@@ -224,31 +216,23 @@ Propagation stops at the first artifact a change does not affect. The change sum
 7. Present the complete bundle and remind the user: findings docs are the current-state record (keep even if decisions change); ADRs are formal decision records (review and approve with the team); the solution doc is the target-state architecture (if an ADR decision changes, apply **sync-update-artifacts** to refresh it and the change summary); version-control all artifacts in the project repository.
 </compile-solution-doc>
 
-<compile-code-reference>
-1. Gather the per-area code references recorded during investigation (or the existing code reference when continuing a deep-dive).
-2. Consolidate them into one structured document following **reference/code-reference-guide.md** (scope, entry points, key locations, call chains, evidence ledger, cross-area dependencies, searched-negatives).
-3. Preserve file:line precision — every code-derived claim must carry a verifiable location, never vague references like "the service layer".
-4. Tag confidence on every evidence verdict: **verified** (directly read), **inferred** (derived from surrounding code), or **unverified** (assumption). Never present inference as evidence.
-5. Record searched-negatives — searches that returned nothing — so later sub-agents do not repeat dead-end scans.
-6. Keep it always current: update it the moment new evidence is found during any subsequent work (deep-dive, follow-ups) — no round/version tracking, never rebuilt from scratch.
-7. Present it alongside the findings doc; it is the evidence source that findings, ADRs, and the change summary cite.
-</compile-code-reference>
-
 <compile-findings-doc>
 1. Determine document strategy: **per-area** (recommended for 2+ loosely-coupled areas) or **one consolidated doc** (tightly-coupled or single-area). Ask the user which they prefer.
 
-2. For each findings document to produce, load the `write-solution-doc` skill's SKILL.md and apply its capabilities to produce a **current-state document**. The key adaptation: label all diagrams as "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings. Seed with Phase 2 results (investigation summaries **and their code references**) rather than gathering context from scratch; cite the code reference for evidence locations instead of re-reading code.
+2. For each findings document to produce, load the `write-solution-doc` skill's SKILL.md and apply its capabilities to produce a **current-state document**. The key adaptation: label all diagrams as "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings. Seed with Phase 2 results (investigation summaries **and their evidence maps**) rather than gathering context from scratch.
 
-3. Cross-reference between findings docs (if per-area): Note where one area's current state creates constraints for another. For example: "Area 1 (service boundaries): the monolithic `PaymentOrchestrator` → constrains Area 2 (communication): all calls are in-process, no service mesh exists."
+3. **Embed each area's evidence map inline** per **reference/findings-document-guide.md**: annotate entry points and key locations with `file:line` beside the sections that use them, express call chains as sequence diagrams, and add an **Evidence & Verification** section per area — evidence ledger (claim → verdict → evidence `file:line` → confidence **verified**/**inferred**/**unverified**) and searched-negatives. Preserve `file:line` precision — never vague references like "the service layer"; never present inference as evidence.
 
-4. Present each findings document to the user and ask: "Does this accurately capture the current state? Anything to add, correct, or remove?"
+4. Cross-reference between findings docs (if per-area): Note where one area's current state creates constraints for another. For example: "Area 1 (service boundaries): the monolithic `PaymentOrchestrator` → constrains Area 2 (communication): all calls are in-process, no service mesh exists."
 
-5. The findings docs are now the **current-state baseline**: evaluation compares options against them, ADRs cite them as evidence, and the solution doc evolves their diagrams from as-is → to-be.
+5. Present each findings document to the user and ask: "Does this accurately capture the current state? Anything to add, correct, or remove?"
+
+6. The findings docs are now the **current-state baseline and evidence home**: evaluation compares options against them, ADRs cite them as evidence, sub-agent briefs carry their evidence sections, and the solution doc evolves their diagrams from as-is → to-be. Update the embedded evidence map the moment new evidence is found during any later work — no round/version tracking.
 </compile-findings-doc>
 
 <summarize-required-changes>
 1. Confirm prerequisites: the findings documents and solution document must be finalized. Ask: "Would you like me to generate a summary of the concrete code changes required to implement this solution?" Do not produce this artifact unless the user wants it — it is optional.
-2. Determine code access: ask "Can I access the current codebase to verify the scope of changes?" **With code access**: trace the code paths from the code reference's key locations and call chains, estimate scope concretely (file counts, LOC ranges, classes to modify), mark as code-verified. **Without code access**: generate at architectural level, mark estimates as unverified approximations, note where code access would improve accuracy.
+2. Determine code access: ask "Can I access the current codebase to verify the scope of changes?" **With code access**: trace the code paths from the findings doc's key locations and call chains, estimate scope concretely (file counts, LOC ranges, classes to modify), mark as code-verified. **Without code access**: generate at architectural level, mark estimates as unverified approximations, note where code access would improve accuracy.
 3. For each area/ADR, map the delta from current state to target state using the categories in **change-summary-guide**.
 4. Group changes by area/service, labeling each cluster with its ADR reference for traceability. Identify cross-cutting concerns that span multiple areas (e.g., shared library changes, auth integration, logging standards).
 5. Compile the change summary document following the format in **change-summary-guide**. Include a notes section for caveats, assumptions, and open questions.
@@ -257,9 +241,9 @@ Propagation stops at the first artifact a change does not affect. The change sum
 </summarize-required-changes>
 
 <sync-update-artifacts>
-1. Identify the change and its origin artifact: new evidence (code reference), corrected fact (findings doc), changed decision (ADR), or target-state change (solution doc).
+1. Identify the change and its origin artifact: new evidence or corrected fact (findings doc), changed decision (ADR), or target-state change (solution doc).
 2. Trace the propagation path with **artifact-sync-doctrine** to determine which downstream artifacts the change affects.
-3. Apply the change to the origin artifact through its owning skill — `draft-adr` for ADRs, `write-solution-doc` for findings/solution docs, **compile-code-reference** for the evidence map (see **professional-doc-authoring**).
+3. Apply the change to the origin artifact through its owning skill — `draft-adr` for ADRs, `write-solution-doc` for findings/solution docs (the findings doc carries the evidence map — see **professional-doc-authoring**).
 4. Propagate to each affected downstream artifact in order, re-running the owning capability seeded with the current artifact plus the delta. For the change summary, recompute the affected clusters against the updated baseline (findings) and target (solution doc), and refresh cross-cutting concerns.
 5. Validate consistency: every artifact reflects the latest facts and decisions; ADRs cite only current findings; the solution doc mirrors every ADR; the change summary traces to current ADRs. Run the **no-note scan** on each touched ADR and solution doc.
 6. Present the delta in conversation — what changed in each artifact and how they now agree; never inside the artifacts (see **latest-state-doctrine**).
@@ -267,7 +251,7 @@ Propagation stops at the first artifact a change does not affect. The change sum
 
 <deep-dive-specific-areas>
 1. **Gather existing context** and **confirm the deep-dive scope** — which areas to revisit, what questions remain, which areas stay as-is.
-2. **Deep-dive per selected area**: dispatch the deeper investigation to a code-exploration sub-agent whenever one is available (even for a single area — see **multi-agent-orchestration**), seeding it with the existing code reference (entry points, call chains, searched-negatives) so covered code is not re-scanned; collect and synthesize the result → update the code reference with new locations and verdicts → update findings doc with any new facts or corrections → evaluate solutions with new findings → apply **draft-area-adrs** to update or produce ADRs (every ADR write goes through `draft-adr` — see **professional-doc-authoring**).
+2. **Deep-dive per selected area**: dispatch the deeper investigation to a code-exploration sub-agent whenever one is available (even for a single area — see **multi-agent-orchestration**), seeding it with the area's findings doc (evidence map — entry points, call chains, searched-negatives) so covered code is not re-scanned; collect and synthesize the result → update the findings doc's evidence map with new locations and verdicts, plus any new facts or corrections → evaluate solutions with new findings → apply **draft-area-adrs** to update or produce ADRs (every ADR write goes through `draft-adr` — see **professional-doc-authoring**).
 3. **Sync downstream artifacts** — apply **sync-update-artifacts**: refresh the solution doc via **compile-solution-doc** (every write goes through `write-solution-doc`) if ADR changes affect the system-level view, and refresh the change summary if one exists.
 4. **Present the deep-dive results** — updated findings, new/updated ADRs, refreshed solution doc and change summary (if applicable). ADRs and the solution doc are **rewritten in place** to the latest state: delete superseded text, never annotate it, no "Updated"/"v2"/"previously" markers or change notes (see **latest-state-doctrine** and **reference/clean-artifact-principle.md**). Run the **no-note scan** on each updated artifact before presenting; narrate the delta in conversation, never inside the document.
 5. After presenting the results, apply **suggest-spike-directions** to present direction candidates for the next spike round.
@@ -314,7 +298,7 @@ For the full step-by-step procedure with prompts and validation checks per step,
 
 <rule>When executing investigation or ADR-drafting work, dispatch to a sub-agent whenever one is available — even for single-area or single-ADR spikes — to keep the orchestrating agent's context small. Fall back to direct execution only when no suitable sub-agent exists (see **multi-agent-orchestration**).</rule>
 
-<rule>When dispatching any work to a sub-agent, always include the relevant code reference in the brief and instruct it to skip already-covered code.</rule>
+<rule>When dispatching any work to a sub-agent, always include the relevant findings doc (or its evidence sections) in the brief and instruct it to skip already-covered code.</rule>
 
 <rule>After the solution doc is compiled: if the user wants implementation scope, apply **summarize-required-changes**; if the doc is large, apply modularity steps in **compile-solution-doc** to split independent sections.</rule>
 

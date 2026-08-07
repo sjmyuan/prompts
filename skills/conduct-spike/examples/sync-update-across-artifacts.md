@@ -25,15 +25,14 @@ Artifacts after the original spike:
 
 | Origin | Affected downstream |
 |---|---|
-| Code reference (new evidence: 3K/sec measured limit) | Findings doc → ADR-002 → solution doc → change summary |
+| Findings doc (new evidence: 3K/sec measured limit) | ADR-002 → solution doc → change summary |
 
 ## What the assistant does, artifact by artifact
 
-1. **Code reference** (via `compile-code-reference`): records the measured 3K/sec throttle with `file:line` and a **verified** confidence tag.
-2. **Findings doc** (via `write-solution-doc`): replaces the "peak load unmeasured" assumption with the measured 3K/sec limit; adds the REST throttle to constraints & pain points.
-3. **ADR-002** (via `draft-adr`): decision changes to "Event-driven Kafka" — chosen option, justification, and consequences rewritten in place (see `update-artifact-in-place.md` for the before/after shape).
-4. **Solution doc** (via `write-solution-doc`): inter-service communication section evolves from REST contracts to Kafka topics; C4/sequence diagrams updated; no "changed from REST" language.
-5. **Change summary**: ADR-002 cluster updated — "Add Kafka client library" (Dependency), "Provision Kafka topics" (Configuration), "Refactor `PaymentOrchestrator` to publish events" (Modified); REST server/client items retired; cross-cutting "team Kafka training" added.
+1. **Findings doc** (via `write-solution-doc`): replaces the "peak load unmeasured" assumption with the measured 3K/sec limit; records the REST throttle in the Evidence & Verification section with `file:line` and a **verified** confidence tag; adds it to constraints & pain points.
+2. **ADR-002** (via `draft-adr`): decision changes to "Event-driven Kafka" — chosen option, justification, and consequences rewritten in place (see `update-artifact-in-place.md` for the before/after shape).
+3. **Solution doc** (via `write-solution-doc`): inter-service communication section evolves from REST contracts to Kafka topics; C4/sequence diagrams updated; no "changed from REST" language.
+4. **Change summary**: ADR-002 cluster updated — "Add Kafka client library" (Dependency), "Provision Kafka topics" (Configuration), "Refactor `PaymentOrchestrator` to publish events" (Modified); REST server/client items retired; cross-cutting "team Kafka training" added.
 
 ## Consistency check
 
