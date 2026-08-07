@@ -71,6 +71,20 @@ The plan may be provided as:
 This skill is responsible for materializing the plan into `plan.md` with the **step-tracking-format** if it does not already exist as a file.
 </plan-input-schema>
 
+<commit-conventions>
+Small-step commit rules applied throughout execution:
+
+| Rule | Detail |
+|---|---|
+| Commit frequency | One commit per step, after the step is validated and marked ✅ |
+| Commit size | A single logical change — the step's objective only |
+| Message format | Follow the repo's existing convention (check recent `git log`); default to `type(scope): summary` |
+| Message content | Neutral description of the change. NEVER include AI-related words or hints: `AI`, `Copilot`, `assistant`, `agent`, `LLM`, `model`, `generated`, `automated`, or any reference to how the change was produced |
+| Staging | Stage only the files belonging to this step (`git add <file>...`); never blind `git add -A` |
+| Push gating | Never push to remote without explicit user confirmation (see **request-push-approval**) |
+| Pre-commit check | Commit only after the step's validation checkpoint (tests/lint) passes |
+</commit-conventions>
+
 <context-loading-guide>
 Load only the example most relevant to the current execution scenario to minimize context size.
 
@@ -82,6 +96,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 | Executing a plan with 10+ steps requiring context preservation | Output model: long plan progress tracking and context continuity | [examples/long-plan-execution.md](examples/long-plan-execution.md) |
 | All plan steps are complete and post-execution review is needed | Output model: applying review-code after completion, adding fix steps, keeping plan as permanent record | [examples/post-execution-review.md](examples/post-execution-review.md) |
 | A step is ambiguous, requires user input, or cannot proceed due to a missing dependency or external blocker | Output model: pausing execution at a blocked step, informing the user, and resuming after input | [examples/handling-failed-steps.md](examples/handling-failed-steps.md) |
+| Executing a plan with prerequisite checks, one commit per step, and push approval at the end | Output model: verify-prerequisites, commit-step, and request-push-approval in action | [examples/small-step-commits.md](examples/small-step-commits.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -151,11 +166,34 @@ Load only the example most relevant to the current execution scenario to minimiz
 
 
 
+<verify-prerequisites>
+1. Before starting the first step, verify the environment is ready: the correct feature branch is checked out (create it if the plan requires one and the user confirms the branch name and base, naming it per the **repo's branch convention** — detect from existing branches / git config / team docs, or ask the user; never assume a prefix), the working tree has no unrelated uncommitted changes, dependencies and toolchain are available, and baseline tests/lint pass.
+2. If anything is missing or failing, STOP and raise it to the user: state exactly what is not ready, what is needed to proceed, and ask how to proceed. Do not start executing steps until it is resolved.
+3. Record the outcome (ready or blockers) in the plan file before execution begins.
+</verify-prerequisites>
+
+<commit-step>
+1. After a step is validated and marked ✅, run `git status` and `git diff` to identify the files changed by this step.
+2. Stage only those files — never unrelated or pre-existing changes.
+3. Write a small commit message following **commit-conventions**: repo convention if known, else `type(scope): summary`, describing the change neutrally.
+4. Scan the message for AI-related words (see **commit-conventions**) and rewrite until none remain.
+5. Commit locally; report the commit hash and message. Never push.
+6. If the step produced no code change (e.g., documentation-only), note that no commit is needed.
+</commit-step>
+
+<request-push-approval>
+1. When all steps are ✅ complete — or the user asks to sync — summarize the local state: branch name, commits created, and how many commits are ahead of the remote base.
+2. Ask the user explicitly: "Push branch [branch name] to remote?" Wait for a decision.
+3. Push only after the user confirms; report success or any errors.
+4. If the user declines or defers, leave the branch local and tell them the commits are ready to push whenever they choose.
+</request-push-approval>
+
 <manage-user-interaction>
 1. Execute the full plan autonomously without asking for permission at each step.
 2. If a step is ambiguous or requires user input, pause and ask before proceeding.
 3. If blocked on a step due to missing information or external dependencies, inform the user and wait for guidance.
 4. If deviating from the plan due to unforeseen issues, explain why and how you're adapting.
+5. Never push to remote without explicit user confirmation — apply **request-push-approval** before any push.
 </manage-user-interaction>
 
 </capabilities>
@@ -171,5 +209,8 @@ Load only the example most relevant to the current execution scenario to minimiz
 <rule> **At Validation Points**: Apply **run-validation-checkpoints** after code changes and at major milestones. Validate incrementally, not just at the end. </rule>
 <rule> **When Facing Ambiguity or Blockers**: Apply **manage-user-interaction** — pause and ask rather than assuming. </rule>
 <rule> **After All Steps Complete**: Apply **review-post-execution**. Keep the plan file and context file as a permanent record — do not delete them. </rule>
+<rule> **Before Starting the First Step**: Apply **verify-prerequisites** — if the branch or environment is not ready, raise it to the user and wait. </rule>
+<rule> **After Each ✅ Step**: Apply **commit-step** to record the change as one small commit. </rule>
+<rule> **Before Any Push**: Apply **request-push-approval** — never push to remote without the user's confirmation. </rule>
 
 </rules>

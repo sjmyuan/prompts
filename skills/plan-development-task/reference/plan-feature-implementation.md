@@ -1,6 +1,6 @@
 # plan-feature-implementation
 
-1. **Validate Baseline**: Run existing tests, linting, and type-checking to ensure the codebase is in a clean state before implementation begins.
+1. **Prepare Environment (Prerequisites)**: Apply **plan-prerequisites** from the SKILL.md — ensure the feature branch exists, named per the **repo's branch convention** (detect from existing branches / git config / team docs, or ask the user; never assume a prefix), based on the correct base; the working tree is clean, dependencies and toolchain are installed, and baseline tests, linting, and type-checking pass. If any check is not ready, stop and raise it to the user before continuing.
 2. Break down high-level software requirements into specific, independently testable functionalities.
 3. Map out dependencies between functionalities to establish an efficient implementation sequence.
 4. **Consolidate Steps**: Group related functionalities together when they share context or can be tested together, reducing the total step count while maintaining clarity. Consolidation strategies: (a) merge test-and-implement steps for simple getters/setters or config properties into a single step, (b) combine Clean Up Unused Code + Clean Up Tests + Verify Cleanup into one cleanup step when changes are small, (c) group Validate Linting, Formatting and Type Checking across multiple functionalities into one final quality gate step.

@@ -43,6 +43,19 @@ When unsure, ask the user: "Is the goal to fix something that's broken (bug), ad
 Load **[reference/tdd-approach-selection.md](reference/tdd-approach-selection.md)** and select the appropriate TDD variant based on the change type and sub-type. Document the rationale for the chosen variant in the plan.
 </tdd-approach-selection>
 
+<plan-prerequisites>
+Every plan starts with a **Prepare Environment** step (Step 1) that covers:
+
+| Check | Not ready → |
+|---|---|
+| Feature branch exists, based on the correct base branch, named per the **repo's branch convention** (detect from existing branches / git config / team docs, or ask the user — never assume a prefix) | Ask the user for the branch name and base; create the branch as part of Step 1 |
+| Working tree is clean (no unrelated uncommitted changes) | Stop and raise to the user before proceeding |
+| Dependencies and toolchain installed | Stop and raise to the user (request install or confirmation) |
+| Baseline tests / lint / type-check pass | Stop and raise to the user (decide: fix baseline first or proceed) |
+
+If any check is not ready, the agent must **stop and raise it to the user** — never start execution silently. The branch name and base are recorded so **export-plan** can persist them to `context.md`.
+</plan-prerequisites>
+
 <context-loading-guide>
 Load only the examples directly relevant to the current change type to minimize context size.
 
@@ -122,7 +135,7 @@ Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its
 3. Derive a short kebab-case feature name from the plan's objective (e.g., `fix-null-pointer-in-transformer`).
 4. Determine the repo name when the plan belongs to a specific repo (an **orchestrate-feature-delivery** cell); create the feature folder **repo-first**: `{location}/{repo}/{feature-name}/` (fall back to `{location}/{feature-name}/` when no repo applies) so all plans for one repo live together.
 5. Write `plan.md` — the complete numbered step list with objectives, using the plan's steps as generated.
-6. Write `context.md` — capture all background: the user's original request, the classified change type, root cause or requirement summary, TDD approach rationale, constraints, assumptions, and any codebase references gathered.
+6. Write `context.md` — capture all background: the user's original request, the classified change type, root cause or requirement summary, TDD approach rationale, the target branch name and base branch (see **plan-prerequisites**), constraints, assumptions, and any codebase references gathered.
 7. Inform the user of the saved location so they can invoke **execute-plan** to carry it out.
 </export-plan>
 
@@ -136,5 +149,6 @@ Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its
 <rule> If the classified type is **Refactor**: apply **define-refactor-scope** to clarify the scope and constraints, then apply **plan-refactor** to generate the refactoring plan. </rule>
 <rule> When both restructuring and new behavior are needed: apply **plan-refactor** first to stabilize the structure, then apply **plan-feature-implementation** for the new behavior. </rule>
 <rule> After the plan is confirmed by the user: optionally apply **export-plan** to persist the plan to files for later execution by execute-plan. </rule>
+<rule> When generating any plan (bug fix, feature, or refactor): always include the **Prepare Environment** prerequisites step first per **plan-prerequisites**; if any check is not ready, raise it to the user instead of starting execution. </rule>
 
 </rules>

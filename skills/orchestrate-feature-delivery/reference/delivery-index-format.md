@@ -36,11 +36,11 @@ The delivery index is written next to the spike artifacts (same folder as the ch
 - F2 (after F1 merges)
 
 ## Cell plan status
-| Cell | Status | Agent | Plan location |
-|---|---|---|---|
-| repo-a/F1 | planned | agent-A | docs/feature-implementations/repo-a/f1/ |
-| repo-b/F2 | in-progress | agent-B | docs/feature-implementations/repo-b/f2/ |
-| repo-c/F4 | unplanned | — | — |
+| Cell | Branch | Status | Agent | Plan location |
+|---|---|---|---|---|
+| repo-a/F1 | 1234-f1-api | planned | agent-A | docs/feature-implementations/repo-a/f1/ |
+| repo-b/F2 | f2-schema | in-progress | agent-B | docs/feature-implementations/repo-b/f2/ |
+| repo-c/F4 | — | unplanned | — | — |
 ```
 
 ## Per-cell scope brief
@@ -53,6 +53,7 @@ Each cell carries a brief that seeds **plan-development-task**:
 - **Spike references**: the file paths + section pointers (from **Spike References**) the agent should load for full context
 - **Dependency context**: what must be merged before this cell's PR (other repos / features)
 - **Constraints**: one PR per repo per feature (soft — may merge with other features when convenient)
+- **Branch**: the branch name to use for this cell, matching the **repo's branch convention** (per **branch-and-push-conventions**); created during the agent's Prepare Environment step, pushed only after user confirmation
 
 ## Status lifecycle
 

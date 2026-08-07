@@ -1,6 +1,6 @@
 # plan-refactor
 
-1. **Validate Baseline**: Run existing tests, linting, and type-checking to ensure the codebase is in a clean state before refactoring begins.
+1. **Prepare Environment (Prerequisites)**: Apply **plan-prerequisites** from the SKILL.md — ensure the feature branch exists, named per the **repo's branch convention** (detect from existing branches / git config / team docs, or ask the user; never assume a prefix), based on the correct base; the working tree is clean, dependencies and toolchain are installed, and baseline tests, linting, and type-checking pass. If any check is not ready, stop and raise it to the user before continuing.
 2. Break down the refactor request into specific, measurable objectives and clearly defined constraints.
 3. Identify and map dependencies between objectives to establish an efficient and logical refactoring sequence.
 4. **Consolidate Steps**: Group related objectives together when they share context or can be tested together, reducing the total step count while maintaining clarity. Consolidation strategies: (a) merge test-and-refactor steps for simple extractions or renames into a single step, (b) combine Clean Up Unused Code + Clean Up Tests + Verify Cleanup into one cleanup step when changes are small, (c) group Validate Linting, Formatting and Type Checking across multiple objectives into one final quality gate step.

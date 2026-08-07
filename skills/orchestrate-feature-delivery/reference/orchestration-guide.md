@@ -12,6 +12,8 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
   - **No conflict in parallel**: never run two cells that touch the same repo with a conflict edge at the same time — serialize them.
   - **Capacity**: match the number of parallel agents to what the platform supports; ask the user when unsure.
 - Use the platform's agent/sub-agent mechanism — detect what is available (e.g., coding-assistant agents) and dispatch accordingly.
+- **Branches**: one branch per repo per cell, named to match the **repo's branch convention** (detect from existing branches / git config / team docs, or ask the user — never assume a prefix); recorded in the delivery index and included in the agent brief; execution agents create the branch during their Prepare Environment step and commit small-step locally (see **branch-and-push-conventions**).
+- **Push gating**: never push a branch or open a PR automatically — after a cell's work is complete and ready to integrate, ask the user for confirmation first.
 
 ## Orchestration loop
 

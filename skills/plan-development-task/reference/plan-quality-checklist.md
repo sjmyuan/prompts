@@ -2,6 +2,11 @@
 
 Before presenting a development plan to the user, verify all items below.
 
+## Prerequisites
+- [ ] Plan starts with a **Prepare Environment** step (branch exists or to be created, clean working tree, dependencies installed, baseline tests/lint/type-check pass)
+- [ ] Branch name and base branch are captured (for export-plan persistence)
+- [ ] If any prerequisite is not ready, the plan raises it to the user rather than starting execution
+
 ## Coverage
 - [ ] Every identified issue/functionality/objective has a corresponding TDD cycle in the plan
 - [ ] All acceptance criteria from the user request are addressed

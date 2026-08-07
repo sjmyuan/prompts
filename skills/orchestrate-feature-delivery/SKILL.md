@@ -61,6 +61,18 @@ Per-repo plans use a **repo-first** layout so all plans for one repo live in one
 Default location: `docs/feature-implementations/`. Plans are produced by **plan-development-task** and executed by **execute-plan**.
 </plan-layout>
 
+<branch-and-push-conventions>
+Execution agents commit locally and small-step; pushing branches or opening PRs happens only after user confirmation. One branch per repo per cell.
+
+| Concern | Convention |
+|---|---|
+| Branch naming | One branch per repo per cell, named to match the **repo's branch convention** (detect it from existing branches, git config, or team docs — or ask the user); never assume a prefix like `feat/` |
+| Branch creation | Created during the execution agent's **Prepare Environment** step (see **plan-development-task** prerequisites) |
+| Committing | Execution agents commit after each ✅ step, with messages that contain no AI-related wording (see **execute-plan** commit-conventions) |
+| Pushing / PRs | Never automatic — the orchestrator asks the user for confirmation before pushing any branch or opening a PR |
+| Cell done | A cell is **done** only after its PR merges or the user confirms the code is verified; pushing alone is not done |
+</branch-and-push-conventions>
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -115,7 +127,7 @@ This skill decomposes, sequences, orchestrates, and tracks — it does not write
 <update-delivery-index>
 1. After every agent result, update the cell's status per the **delivery-state-machine**: unplanned → planned (plan written), planned → in-progress (execution started), in-progress → done (PR merged or code verified), plus failed or blocked with the reason.
 2. When a cell's PR merges, re-check its downstream cells — any now wave-ready move to dispatchable.
-3. Record the agent assignment and plan location for each cell.
+3. Record the agent assignment, plan location, and branch name for each cell (per **branch-and-push-conventions**).
 4. Always keep the index as the single source of truth; never leave status changes only in conversation.
 </update-delivery-index>
 
@@ -123,9 +135,10 @@ This skill decomposes, sequences, orchestrates, and tracks — it does not write
 1. Load the delivery index — or create it first via **decompose-change-into-features** → **map-features-to-repos** → **order-feature-delivery** → **produce-delivery-index** if it does not exist.
 2. Assess current state from the index: per-cell statuses, completed waves, ready cells, blocked cells.
 3. Select ready cells: wave dependencies done and status unplanned (→ dispatch a planning agent) or planned (→ dispatch an execution agent); skip done cells.
-4. Dispatch parallel agents, one per cell, respecting wave gating and no-conflict rules (**reference/orchestration-guide.md**); include each cell's scope brief and its **spike references** in the agent brief so the agent has full context.
+4. Dispatch parallel agents, one per cell, respecting wave gating and no-conflict rules (**reference/orchestration-guide.md**); include each cell's scope brief, its **spike references**, and its **branch name** (per **branch-and-push-conventions**) in the agent brief so the agent has full context and the branch to use.
 5. Collect results and apply **update-delivery-index**.
-6. Re-assess and report next actions; repeat until all cells are done or the user pauses.
+6. When a cell's work is complete and ready to integrate, ask the user for confirmation before pushing its branch or opening a PR (per **branch-and-push-conventions**); do not push or open PRs automatically.
+7. Re-assess and report next actions; repeat until all cells are done or the user pauses.
 </orchestrate-delivery>
 
 <resume-delivery>

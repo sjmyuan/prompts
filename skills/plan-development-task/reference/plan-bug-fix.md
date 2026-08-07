@@ -1,6 +1,6 @@
 # plan-bug-fix
 
-1. **Validate Baseline**: Run existing tests, linting, and type-checking to ensure the codebase is in a clean state before bug fixing begins.
+1. **Prepare Environment (Prerequisites)**: Apply **plan-prerequisites** from the SKILL.md — ensure the feature branch exists, named per the **repo's branch convention** (detect from existing branches / git config / team docs, or ask the user; never assume a prefix), based on the correct base; the working tree is clean, dependencies and toolchain are installed, and baseline tests, linting, and type-checking pass. If any check is not ready, stop and raise it to the user before continuing.
 2. Break down the identified bug root cause into specific, independently testable issues.
 3. Map out dependencies between issues to establish an efficient bug-fixing sequence.
 4. **Consolidate Steps**: Group related issues together when they share context or can be tested together, reducing the total step count while maintaining clarity.
