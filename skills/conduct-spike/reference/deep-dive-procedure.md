@@ -51,12 +51,15 @@ Ask the user to share the context from the previous spike. This may include:
 - **Rewrite the ADR in place per the latest-state protocol**: delete the superseded decision text entirely, then state the new decision as the decision — no "updated", "changed from", "previously", or version markers. Corrected facts live in the findings document; the ADR carries only the current decision.
 - Run the **no-note scan** from clean-artifact-principle: scan for "Note:", "Updated", "v2", "As of", "Previously", status parentheticals, and process narration. Rewrite until none remain.
 
-## Step 7: Optionally update the solution document
+## Step 7: Sync downstream artifacts (solution doc + change summary)
+
+Apply **sync-update-artifacts** to propagate the ADR changes downstream.
 
 - Ask: "Do the new or updated ADRs change the overall system-level view?"
 - If yes, apply the compile-solution-doc capability to refresh the solution document, incorporating the updated ADR decisions.
 - If no, note that the existing solution document remains valid. The new/updated ADRs supplement it.
 - **Rewrite the affected sections in place** per the latest-state protocol: delete superseded target-state text, then state the new target state as-is — no "v2", no change lists, no investigation history (those stay in the findings document and in the conversation). Run the no-note scan before presenting.
+- If a change summary exists, recompute the affected clusters against the updated findings (baseline) and solution doc (target) per `artifact-sync-guide.md` — never leave the change summary stale.
 
 ## Step 8: Present the deep-dive results
 
@@ -64,6 +67,7 @@ Ask the user to share the context from the previous spike. This may include:
 - The updated findings document(s) (or updated sections).
 - The new or updated ADRs.
 - The updated solution document (if applicable).
+- The refreshed change summary (if one exists).
 - Remind the user: "Other areas from the previous spike were not revisited. If those areas also need deeper investigation, we can deep-dive into them next."
 
 ## Step 9: Suggest spike directions for the next round

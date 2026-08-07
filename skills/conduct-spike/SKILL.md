@@ -1,6 +1,6 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations to produce ADRs, findings, solution docs, and change summaries. Use when scoping, investigating, evaluating, discussing ADRs needing investigation, formalizing, continuing, deep-diving, modularizing, summarizing changes, or suggesting direction.
+description: Conduct spike investigations to produce and keep consistent ADRs, findings, solution docs, and change summaries. Use when scoping, investigating, evaluating, discussing ADRs needing investigation, formalizing, continuing, deep-diving, modularizing, summarizing changes, syncing artifact updates, or suggesting direction.
 ---
 
 <when-to-use-this-skill>
@@ -12,6 +12,7 @@ description: Conduct spike investigations to produce ADRs, findings, solution do
 - User has pre-existing investigation findings and wants to formalize them into ADRs and a solution document
 - User wants to continue a previous spike by digging deeper into one or more specific investigation areas that were not fully resolved
 - User wants to summarize the concrete code changes required to implement the chosen solution (change summary) or get suggestions for the next steps in the spike (direction candidates)
+- User found new evidence or changed a decision and wants every artifact — findings doc, ADR, solution doc, change summary — updated together and kept consistent
 - Do NOT load for plain ADR drafting, solution-doc writing, or code investigation — `draft-adr`, `write-solution-doc`, and `investigate-code` handle those directly; load only when a decision needs investigation first
 </when-to-use-this-skill>
 
@@ -93,6 +94,21 @@ ADRs and the solution document are **single-source-of-truth documents maintained
 This permits **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously", or "we used to…" language inside ADRs or the solution document, and no in-document changelog or closing-notes sections. Where notes are legitimately allowed (change summary, findings docs, conversation), see **reference/clean-artifact-principle.md**. The rewrite-in-place procedure and the **no-note scan** validation gate are defined there.
 </latest-state-doctrine>
 
+<artifact-sync-doctrine>
+Artifacts form a dependency chain — a change to any artifact must propagate to every downstream artifact so the user always sees one consistent picture:
+
+**Code Reference → Findings Docs → ADRs → Solution Doc → Change Summary**
+
+| Change origin | Propagate to |
+|---|---|
+| Code reference (new evidence) | Findings doc → ADR → solution doc → change summary |
+| Findings doc correction | ADR → solution doc → change summary |
+| ADR decision change | Solution doc → change summary |
+| Solution doc change | Change summary |
+
+Propagation stops at the first artifact a change does not affect. The change summary is **never final** — recompute it whenever its baseline (findings) or target (solution doc) changes. See **reference/artifact-sync-guide.md**.
+</artifact-sync-doctrine>
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -117,6 +133,8 @@ This permits **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously", 
 | Seeing a worked example of direction suggestions — 3 go-deeper and 3 go-broader candidates grounded in investigation evidence | Walkthrough of generating direction candidates after a spike round, with rationale for each | [examples/spike-direction-suggestions.md](examples/spike-direction-suggestions.md) |
 | Revising an existing ADR or solution doc after a deep-dive or decision change — seeing how rewrite-in-place replaces the old decision cleanly | Before → after walkthrough of an ADR rewritten in place, with the banned-language absent list | [examples/update-artifact-in-place.md](examples/update-artifact-in-place.md) |
 | Suggesting a spike when ADR discussion reveals a decision hinges on unverified assumptions or unknown facts | Worked example of detecting ADR uncertainty and offering a focused spike before finalizing the ADR | [examples/adr-uncertainty-spike-suggestion.md](examples/adr-uncertainty-spike-suggestion.md) |
+| Synchronizing artifacts after a fact or decision change (new evidence, ADR revision, deep-dive) | Propagation matrix, sync procedure, and consistency checklist | [reference/artifact-sync-guide.md](reference/artifact-sync-guide.md) |
+| Seeing a decision change propagated through ADR, solution doc, and change summary together | Walkthrough of syncing all artifacts after new evidence flips an ADR decision | [examples/sync-update-across-artifacts.md](examples/sync-update-across-artifacts.md) |
 
 </context-loading-guide>
 
@@ -193,7 +211,7 @@ This permits **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously", 
 4. After all ADRs are drafted (via either method), present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?" If the user raises uncertainty about any ADR's decision — an unverified assumption, unknown feasibility, or unresolved comparison — apply **suggest-spike-on-adr-uncertainty** before finalizing.
 5. Keep each ADR at the latest state per **latest-state-doctrine** and **clean-artifact-principle** (see **reference/clean-artifact-principle.md**): only the decision — no process history or change notes. On revision, route through `draft-adr` (step 2) and rewrite affected sections in place — delete superseded text, never annotate; cite the findings document for evidence.
 6. Validate each ADR: confirm the chosen option follows logically from the decision drivers, all evaluated options are fairly represented, **each option's provided tech details are carried into its evaluation section**, consequences include both positive and negative impacts, and the ADR can be understood without reading other ADRs. Then run the **no-note scan** from **clean-artifact-principle** — scan for banned process language ("Note:", "Updated", "Changed", "v2", "As of", "Previously", status parentheticals, in-document changelogs) and rewrite in place until none remain.
-7. Note: The chosen option in each ADR is the **assumed solution**. The solution document will adopt these. If an ADR decision changes later, the solution document should be updated accordingly.
+7. Note: The chosen option in each ADR is the **assumed solution**. The solution document will adopt these. If an ADR decision changes later, apply **sync-update-artifacts** so the solution doc and change summary are updated together.
 </draft-area-adrs>
 
 <compile-solution-doc>
@@ -203,7 +221,7 @@ This permits **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously", 
 4. Compile the final output bundle: Findings Documents, N ADRs, 1 Solution Document (hub), and modular sub-documents (if extracted).
 5. Keep the solution document at the latest state per **latest-state-doctrine** and **clean-artifact-principle** (see **reference/clean-artifact-principle.md**): only the target-state architecture — no process history or change notes. On refresh, route through `write-solution-doc` (step 1) and rewrite affected sections in place — delete superseded text, never annotate; cross-reference the findings document for supporting detail.
 6. Validate the bundle: every ADR's chosen solution is reflected in the solution doc, cross-references between all artifacts are consistent, diagrams match assumed solutions, and extracted sub-docs have correct back-references. Then run the **no-note scan** from **clean-artifact-principle** on the solution doc — scan for banned process language and rewrite in place until none remain.
-7. Present the complete bundle and remind the user: findings docs are the current-state record (keep even if decisions change); ADRs are formal decision records (review and approve with the team); the solution doc is the target-state architecture (update if an ADR decision changes); version-control all artifacts in the project repository.
+7. Present the complete bundle and remind the user: findings docs are the current-state record (keep even if decisions change); ADRs are formal decision records (review and approve with the team); the solution doc is the target-state architecture (if an ADR decision changes, apply **sync-update-artifacts** to refresh it and the change summary); version-control all artifacts in the project repository.
 </compile-solution-doc>
 
 <compile-code-reference>
@@ -235,14 +253,23 @@ This permits **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously", 
 4. Group changes by area/service, labeling each cluster with its ADR reference for traceability. Identify cross-cutting concerns that span multiple areas (e.g., shared library changes, auth integration, logging standards).
 5. Compile the change summary document following the format in **change-summary-guide**. Include a notes section for caveats, assumptions, and open questions.
 6. Present the summary and ask: "Does this change scope look accurate? Anything missing, overestimated, or underestimated?"
-7. Note: the change summary is a planning aid tracing back to ADR decisions and solution doc sections. For sprint planning, use it as input — not the final word.
+7. Note: the change summary is a planning aid tracing back to ADR decisions and solution doc sections. It is **never final** — if findings or the solution doc change afterwards, apply **sync-update-artifacts** to refresh it. For sprint planning, use it as input — not the final word.
 </summarize-required-changes>
+
+<sync-update-artifacts>
+1. Identify the change and its origin artifact: new evidence (code reference), corrected fact (findings doc), changed decision (ADR), or target-state change (solution doc).
+2. Trace the propagation path with **artifact-sync-doctrine** to determine which downstream artifacts the change affects.
+3. Apply the change to the origin artifact through its owning skill — `draft-adr` for ADRs, `write-solution-doc` for findings/solution docs, **compile-code-reference** for the evidence map (see **professional-doc-authoring**).
+4. Propagate to each affected downstream artifact in order, re-running the owning capability seeded with the current artifact plus the delta. For the change summary, recompute the affected clusters against the updated baseline (findings) and target (solution doc), and refresh cross-cutting concerns.
+5. Validate consistency: every artifact reflects the latest facts and decisions; ADRs cite only current findings; the solution doc mirrors every ADR; the change summary traces to current ADRs. Run the **no-note scan** on each touched ADR and solution doc.
+6. Present the delta in conversation — what changed in each artifact and how they now agree; never inside the artifacts (see **latest-state-doctrine**).
+</sync-update-artifacts>
 
 <deep-dive-specific-areas>
 1. **Gather existing context** and **confirm the deep-dive scope** — which areas to revisit, what questions remain, which areas stay as-is.
 2. **Deep-dive per selected area**: dispatch the deeper investigation to a code-exploration sub-agent whenever one is available (even for a single area — see **multi-agent-orchestration**), seeding it with the existing code reference (entry points, call chains, searched-negatives) so covered code is not re-scanned; collect and synthesize the result → update the code reference with new locations and verdicts → update findings doc with any new facts or corrections → evaluate solutions with new findings → apply **draft-area-adrs** to update or produce ADRs (every ADR write goes through `draft-adr` — see **professional-doc-authoring**).
-3. **Optionally update the solution document** if ADR changes affect the system-level view — apply **compile-solution-doc** (every write goes through `write-solution-doc`).
-4. **Present the deep-dive results** — updated findings, new/updated ADRs, refreshed solution doc (if applicable). ADRs and the solution doc are **rewritten in place** to the latest state: delete superseded text, never annotate it, no "Updated"/"v2"/"previously" markers or change notes (see **latest-state-doctrine** and **reference/clean-artifact-principle.md**). Run the **no-note scan** on each updated artifact before presenting; narrate the delta in conversation, never inside the document.
+3. **Sync downstream artifacts** — apply **sync-update-artifacts**: refresh the solution doc via **compile-solution-doc** (every write goes through `write-solution-doc`) if ADR changes affect the system-level view, and refresh the change summary if one exists.
+4. **Present the deep-dive results** — updated findings, new/updated ADRs, refreshed solution doc and change summary (if applicable). ADRs and the solution doc are **rewritten in place** to the latest state: delete superseded text, never annotate it, no "Updated"/"v2"/"previously" markers or change notes (see **latest-state-doctrine** and **reference/clean-artifact-principle.md**). Run the **no-note scan** on each updated artifact before presenting; narrate the delta in conversation, never inside the document.
 5. After presenting the results, apply **suggest-spike-directions** to present direction candidates for the next spike round.
 
 For the full step-by-step procedure with prompts and validation checks per step, load **reference/deep-dive-procedure.md**.
@@ -296,6 +323,8 @@ For the full step-by-step procedure with prompts and validation checks per step,
 <rule>When updating or revising an ADR — deep-dive continuation, decision change, in-place rewrite — always apply **draft-area-adrs** so the change goes through the `draft-adr` skill; never hand-edit the ADR (see **professional-doc-authoring**).</rule>
 
 <rule>When updating or refreshing the solution document — deep-dive, ADR decision change, modular split — always apply **compile-solution-doc** so the change goes through the `write-solution-doc` skill; never hand-edit the solution doc (see **professional-doc-authoring**).</rule>
+
+<rule>When a fact or decision changes — new evidence, findings correction, ADR revision, deep-dive, or solution-doc refresh — apply **sync-update-artifacts** to propagate the change through every affected downstream artifact so the bundle never goes stale.</rule>
 
 <rule>When the user wants to evaluate options by their technical implementation — or asks for diagrams, code diffs, or change locations per option — delegate tech-detail production to `draft-adr`'s **detail-options-tech** during **evaluate-solutions-per-area** (see **option-tech-details**).</rule>
 <rule>When drafting ADRs, seed `draft-adr` with each option's tech details so the ADR's option evaluation sections carry the diagrams and code changes.</rule>

@@ -89,3 +89,7 @@ The quality of the change summary depends on whether the current codebase is acc
 - **Without code access**: Describe changes at the architectural level based on findings and solution docs. Mark scope estimates as unverified. Note where code access would improve accuracy.
 
 Always be transparent with the user about whether scope estimates are code-verified or architectural approximations.
+
+## Keeping it current
+
+The change summary is **never final**: it derives from the delta between findings (baseline) and the solution doc (target). Whenever either changes — new evidence, findings correction, ADR decision change, deep-dive — recompute the affected clusters via **sync-update-artifacts** (see `artifact-sync-guide.md`) so the summary always reflects the current artifacts.
