@@ -50,8 +50,8 @@ Each feature implementation lives in its own folder with two files:
 └── context.md   # All context, references, requirements, constraints that define the plan
 ```
 
-- **Location**: Ask the user where to store the plan. If not specified, default to `docs/feature-implementations/`.
-- **Repo-first layout**: When a plan belongs to a specific repo (a cell from **orchestrate-feature-delivery**), use `{location}/{repo}/{feature-name}/` so all plans for one repo live in one location; fall back to `{location}/{feature-name}/` when no repo applies.
+- **Location**: For an **orchestrate-feature-delivery** cell use the epic's delivery folder `deliveries/<epic-name>/{repo}/{feature-name}/` (already created by the orchestrator); otherwise ask the user or default to `docs/feature-implementations/`.
+- **Repo-first layout**: When a plan belongs to a specific repo (a cell from **orchestrate-feature-delivery**), use `deliveries/<epic-name>/{repo}/{feature-name}/`; fall back to `{location}/{feature-name}/` when no repo applies.
 - **Feature name**: Derive a short, descriptive kebab-case name from the plan's objective (e.g., `add-auth-system`, `refactor-validation-handler`, `fix-null-pointer-in-transformer`).
 - **Plan file**: Contains the numbered step list with status emojis, updated in real-time as execution progresses. Serves as the live execution dashboard.
 - **Context file**: Captures all background material that informed the plan — requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, and decisions. Written once at plan creation and not modified during execution.
@@ -65,7 +65,7 @@ A plan consumed by this skill consists of numbered steps. Each step must have:
 - **Objective** (optional but recommended): What the step achieves
 
 The plan may be provided as:
-- An existing `plan.md` file in a feature folder (created by **export-plan** in plan-development-task, or a previous execution)
+- An existing `plan.md` file in a feature folder (created by **export-plan** in plan-development-task, an **orchestrate-feature-delivery** cell folder, or a previous execution)
 - A plan summarized in the conversation by plan-development-task
 - A plan described ad-hoc by the user
 
@@ -114,9 +114,9 @@ Load only the example most relevant to the current execution scenario to minimiz
 <capabilities>
 
 <track-plan>
-1. Determine where to store the plan. Ask the user where they'd like the plan saved, or default to `doc/feature-implementations/` if not specified.
+1. Determine where to store the plan. For an **orchestrate-feature-delivery** cell, use the existing epic folder `deliveries/<epic-name>/{repo}/{feature-name}/`; otherwise ask the user or default to `docs/feature-implementations/`.
 2. Derive a descriptive, short name for the feature from the plan's objective (e.g., `add-auth-system`, `refactor-validation-handler`, `fix-null-pointer-in-transformer`). Use kebab-case.
-3. Create the feature folder repo-first: `{location}/{repo}/{feature-name}/` when the plan belongs to a specific repo (an **orchestrate-feature-delivery** cell), else `{location}/{feature-name}/`. Inside it, create two files:
+3. Locate the feature folder: for an **orchestrate-feature-delivery** cell use the existing `deliveries/<epic-name>/{repo}/{feature-name}/`; otherwise create it repo-first `{location}/{repo}/{feature-name}/` (or `{location}/{feature-name}/` when no repo applies). Inside it, ensure two files:
    - `plan.md` — the step-by-step execution plan with status tracking (see **step-tracking-format**)
    - `context.md` — all context, references, requirements, constraints, and decisions that define the plan (captured from the plan source so the reasoning is preserved alongside the plan)
 4. Before creating a new plan, check if the feature folder already exists with a plan file. If it contains an appended `## Rework <date>` section, execute only the rework steps (see **rework-plan-execution**) — never re-run or modify the completed original steps. If a plan file has steps with ❌ failed or 🚫 blocked status, ask the user whether to **resume** from the last known state or **start fresh** (create a new folder/overwrite).

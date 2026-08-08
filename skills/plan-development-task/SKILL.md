@@ -142,11 +142,11 @@ Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its
 
 <export-plan>
 1. After the user confirms the plan, ask whether they would like to persist it to a feature folder for later execution by **execute-plan**.
-2. If the user agrees, determine the storage location (ask the user, or default to `docs/feature-implementations/`).
+2. If the user agrees, determine the storage location: for an **orchestrate-feature-delivery** cell use the epic's delivery folder `deliveries/<epic-name>/{repo}/{feature-name}/` (created by the orchestrator); otherwise ask the user or default to `docs/feature-implementations/`.
 3. Derive a short kebab-case feature name from the plan's objective (e.g., `fix-null-pointer-in-transformer`).
-4. Determine the repo name when the plan belongs to a specific repo (an **orchestrate-feature-delivery** cell); create the feature folder **repo-first**: `{location}/{repo}/{feature-name}/` (fall back to `{location}/{feature-name}/` when no repo applies) so all plans for one repo live together.
+4. Determine the repo name when the plan belongs to a specific repo (an **orchestrate-feature-delivery** cell); use the **repo-first** layout `{location}/{repo}/{feature-name}/` — the delivery folder already exists, write into it; fall back to `{location}/{feature-name}/` when no repo applies so all plans for one repo live together.
 5. Write `plan.md` — the complete numbered step list with objectives, using the plan's steps as generated. When appending a rework plan (per **rework-plan-convention**), append a `## Rework <date>` section to the existing `plan.md` instead of overwriting it.
-6. Write `context.md` — capture all background: the user's original request, the classified change type, root cause or requirement summary, TDD approach rationale, the target branch name and base branch (see **plan-prerequisites**), constraints, assumptions, and any codebase references gathered.
+6. Write `context.md` — capture all background: the user's original request, the classified change type, root cause or requirement summary, TDD approach rationale, the target branch name and base branch (see **plan-prerequisites**), constraints, assumptions, and any codebase references gathered. For an **orchestrate-feature-delivery** cell, also record the spike references from the agent brief (change-summary items, ADR files, solution-doc sections) so execution/resume agents can load full context on demand.
 7. Inform the user of the saved location so they can invoke **execute-plan** to carry it out.
 </export-plan>
 
