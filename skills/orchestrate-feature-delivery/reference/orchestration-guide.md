@@ -14,7 +14,7 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 | Update solution doc | **solution-doc-writer** | **write-solution-doc** | revised sections, rewrite in place |
 | Update ADR | **adr-writer** | **draft-adr** | revised ADR, rewrite in place |
 
-- **One cell per agent.** Planning agents apply **plan-development-task** and write `{location}/{repo}/{feature}/plan.md` + `context.md`. Execution agents apply **execute-plan** and run the plan.
+- **One cell per agent.** Planning agents apply **plan-development-task** and write `deliveries/<epic-name>/{repo}/{feature-name}/plan.md` + `context.md` (feature folder named by the kebab-case feature name, e.g. `wallet-contracts`). Execution agents apply **execute-plan** and run the plan.
 - **Artifact updates are delegated too.** When a plan or execution surfaces changes to the spike's solution doc or ADRs, dispatch a **solution-doc-writer** / **adr-writer** agent for the update — never edit those artifacts from the orchestrator.
 - **Full context in every brief.** Each agent brief carries the cell's scope brief plus its **spike references** (paths to the relevant change-summary items, ADR files, and solution-doc section). Agents load these on demand — do not inline entire solution docs into the brief.
 - **Persist references to context.md.** Planning agents record the spike references in `context.md`, so execution and resume agents have durable distilled context and can load referenced artifacts when needed.

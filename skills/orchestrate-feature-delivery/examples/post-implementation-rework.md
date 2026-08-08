@@ -27,14 +27,14 @@
 
 | Cell | Status | Agent | Plan location |
 |---|---|---|---|
-| order-service/F2 | done · Rework: F2-r1 · ADR-002 spike · appended plan | spike-conductor | docs/feature-implementations/order-service/f2/ |
-| order-service/F2-r1 | unplanned | — | docs/feature-implementations/order-service/f2/ (append) |
+| order-service/F2 | done · Rework: F2-r1 · ADR-002 spike · appended plan | spike-conductor | deliveries/payment-migration/order-service/wallet-service/ |
+| order-service/F2-r1 | unplanned | — | deliveries/payment-migration/order-service/wallet-service/ (append) |
 
 New **Wave 3**: `F2-r1` (after F2 merged). New change-summary items 9–11 trace to ADR-002.
 
 ## 4. Append the plan (never modify implemented steps)
 
-`plan-development-task` appends to the existing `docs/feature-implementations/order-service/f2/plan.md`:
+`plan-development-task` appends to the existing `deliveries/payment-migration/order-service/wallet-service/plan.md`:
 
 ```markdown
 ## Rework 2026-08-08

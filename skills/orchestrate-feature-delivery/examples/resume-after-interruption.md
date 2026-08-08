@@ -33,9 +33,9 @@
 
 | Cell | Status | Agent | Location |
 |---|---|---|---|
-| shared-contracts/F1 | done | agent-A | docs/feature-implementations/shared-contracts/f1/ |
-| order-service/F2 | in-progress (step 4 🔄) | agent-A | docs/feature-implementations/order-service/f2/ |
-| api-gateway/F3 | in-progress | agent-B | docs/feature-implementations/api-gateway/f3/ |
+| shared-contracts/F1 | done | agent-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
+| order-service/F2 | in-progress (step 4 🔄) | agent-A | deliveries/payment-migration/order-service/wallet-service/ |
+| api-gateway/F3 | in-progress | agent-B | deliveries/payment-migration/api-gateway/wallet-api-gateway/ |
 | api-gateway/F5 | failed (pending) | — | — |
 | order-service/F4 | unplanned (blocked-by F2/F3) | — | — |
 

@@ -38,6 +38,8 @@
 
 ## 4. Delivery index (excerpt, initial state)
 
+Written to `deliveries/payment-migration/index.md` (see **delivery-layout**); plan folders will appear under `deliveries/payment-migration/{repo}/{feature-name}/` — the feature folder uses the kebab-case name (e.g. `wallet-contracts`), never the ID (`F1`).
+
 ```markdown
 # Delivery Index: Payment Migration
 

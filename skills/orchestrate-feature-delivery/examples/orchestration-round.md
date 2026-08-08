@@ -21,7 +21,7 @@
 
 | Cell | Status | Agent | Location |
 |---|---|---|---|
-| shared-contracts/F1 | **planned** | agent-A | docs/feature-implementations/shared-contracts/f1/ |
+| shared-contracts/F1 | **planned** | agent-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
 
 F2 and F3 become develop-ready (F1 planned; contract-first allows planning in parallel).
 
@@ -35,9 +35,9 @@ F2 and F3 become develop-ready (F1 planned; contract-first allows planning in pa
 
 | Cell | Status | Agent | Location |
 |---|---|---|---|
-| shared-contracts/F1 | **done** | agent-A | docs/feature-implementations/shared-contracts/f1/ |
-| order-service/F2 | **planned** | agent-B | docs/feature-implementations/order-service/f2/ |
-| api-gateway/F3 | **planned** | agent-C | docs/feature-implementations/api-gateway/f3/ |
+| shared-contracts/F1 | **done** | agent-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
+| order-service/F2 | **planned** | agent-B | deliveries/payment-migration/order-service/wallet-service/ |
+| api-gateway/F3 | **planned** | agent-C | deliveries/payment-migration/api-gateway/wallet-api-gateway/ |
 | order-service/F4 | unplanned | — | — |
 | api-gateway/F4 | unplanned | — | — |
 

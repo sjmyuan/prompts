@@ -1,6 +1,18 @@
 # Delivery Index Format
 
-The delivery index is written at the **spike folder root** — the per-spike artifact folder from **conduct-spike**'s **spike-artifact-layout** (`spikes/<spike-name>/`; ADRs in `adrs/`, solution + change summary at the root, findings in `docs/`). It is the epic's **single source of truth for state** — the orchestrator reads it to decide next actions, updates it as agents report, and uses its **Spike References** so every agent brief can point agents at the full spike output.
+The delivery index is written at **`deliveries/<epic-name>/index.md`** — one folder per epic (no `docs/` prefix), named after the spiked epic (`<epic-name>` = spike name). The spike's own artifacts stay untouched in the spike folder (`spikes/<spike-name>/`; ADRs in `adrs/`, solution + change summary at the root, findings in `docs/`) and are referenced from the index via **Spike References**. The index is the epic's **single source of truth for state** — the orchestrator reads it to decide next actions, updates it as agents report, and uses its **Spike References** so every agent brief can point agents at the full spike output.
+
+## Delivery layout
+
+```
+deliveries/<epic-name>/               # one folder per epic (no docs/ prefix)
+├── <repo-name>/                      # one folder per repo
+│   ├── <feature-name>/               # one folder per feature for this repo
+│   │   ├── context.md                # distilled spike context + spike references
+│   │   └── plan.md                   # TDD plan (plan-development-task)
+│   └── ...
+└── index.md                          # delivery index (single source of truth)
+```
 
 ## Structure
 
@@ -38,10 +50,12 @@ The delivery index is written at the **spike folder root** — the per-spike art
 ## Cell plan status
 | Cell | Branch | Status | Agent | Plan location |
 |---|---|---|---|---|
-| repo-a/F1 | 1234-f1-api | planned | agent-A | docs/feature-implementations/repo-a/f1/ |
-| repo-b/F2 | f2-schema | in-progress | agent-B | docs/feature-implementations/repo-b/f2/ |
+| repo-a/F1 | 1234-f1-api | planned | agent-A | deliveries/<epic-name>/repo-a/wallet-contracts/ |
+| repo-b/F2 | f2-schema | in-progress | agent-B | deliveries/<epic-name>/repo-b/wallet-service/ |
 | repo-c/F4 | — | unplanned | — | — |
 ```
+
+Plan locations use the feature's **kebab-case name** (e.g. `wallet-contracts` for F1), never its ID (`F1`).
 
 ## Per-cell scope brief
 
@@ -84,6 +98,6 @@ Each cell carries a brief that seeds **plan-development-task**:
 
 When an issue is found on a **done** cell, record the rework without erasing history:
 
-- Keep the original cell status **done** and append a **Rework** note, e.g. `Rework: F2-r1 · ADR-002 focused spike · appended plan docs/feature-implementations/order-service/f2/plan.md (## Rework 2026-08-08)`.
+- Keep the original cell status **done** and append a **Rework** note, e.g. `Rework: F2-r1 · ADR-002 focused spike · appended plan deliveries/<epic-name>/order-service/wallet-service/plan.md (## Rework 2026-08-08)`.
 - Add the rework as a new feature/cell (e.g., `F2-r1`) in a **new wave** after the original feature — it depends on the original cell's PR (already merged).
 - The appended plan lives at the end of the feature's existing `plan.md` (or a sibling `rework-plan.md`); implemented steps are never modified.

@@ -28,6 +28,25 @@ A feature is a coherent, independently valuable deliverable spanning one or more
 - IDs: `F1`, `F2`, … with kebab-case names and one-line descriptions.
 </feature-definition>
 
+<delivery-layout>
+All delivery artifacts for an epic live under one top-level folder — one folder per epic (no `docs/` prefix), named after the spiked epic:
+
+```
+deliveries/<epic-name>/               # one folder per epic (epic-name = spike name)
+├── <repo-name>/                      # one folder per repo
+│   ├── <feature-name>/               # one folder per feature for this repo
+│   │   ├── context.md                # distilled spike context + spike references
+│   │   └── plan.md                   # TDD plan from plan-development-task
+│   └── ...
+└── index.md                          # delivery index (single source of truth)
+```
+
+- **index.md** is the delivery index — it lives at the epic folder root, not at the spike folder root (see **reference/delivery-index-format.md**).
+- **Feature folders are named by the feature's kebab-case name** (e.g. `wallet-contracts`), never its ID (`F1`) — IDs are reference shorthand only (waves, dependencies).
+- **context.md** carries the distilled spike context (spike references) that plan and execute agents load.
+- **plan.md** is written by **plan-development-task** and executed by **execute-plan**; rework appends `## Rework <date>` at its end (see **post-implementation-rework**).
+</delivery-layout>
+
 <dependency-edge-types>
 Classify each feature pair: **merge-blocked** (hard — develop after A's contract is known, merge only after A merges) · **contract-first** (soft — develop in parallel, merge after A) · **conflict** (same files/repo — serialize or split) · **independent** (parallel, any order).
 Wave computation and intra-feature merge order: **reference/dependency-ordering-guide.md**.
@@ -93,8 +112,8 @@ When an issue surfaces after a cell is **done**, re-enter investigation for **th
 </order-feature-delivery>
 
 <produce-delivery-index>
-1. Write the **delivery index** at the **spike folder root** (the per-spike artifact folder from **conduct-spike**'s **spike-artifact-layout**, alongside `solution.md`) per **reference/delivery-index-format.md** — include the **Spike References** block (change summary file, ADR files, solution-doc sections).
-2. Create per-repo plan folders in the **repo-first** layout: `{location}/{repo}/{feature-name}/plan.md` + `context.md` (default `docs/feature-implementations/`).
+1. Write the **delivery index** at `deliveries/<epic-name>/index.md` (one folder per epic, no `docs/` prefix — see **delivery-layout**; `<epic-name>` is the spiked epic's name) per **reference/delivery-index-format.md** — include the **Spike References** block (change summary file, ADR files, solution-doc sections).
+2. Create per-repo plan folders in the **repo-first** layout: `deliveries/<epic-name>/{repo}/{feature-name}/plan.md` + `context.md` (see **delivery-layout**).
 3. Mark each cell's initial status **unplanned** and its plan location.
 4. Verify the index against **reference/delivery-index-format.md** — structure, status values, develop/merge readiness — before confirming.
 5. Confirm the index location with the user — from here the epic is driven by **orchestrate-delivery**.
