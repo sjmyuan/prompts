@@ -77,3 +77,11 @@ A cell is ready when: **all wave-dependency cells are done** AND status is **unp
 | **done** | Merged / verified | Skip; unlock downstream cells |
 | **failed** | Agent error (reason recorded) | Ask user: re-plan or retry |
 | **blocked** | Waiting on blocker (recorded) | Wait; re-check when blocker clears |
+
+## Rework after implementation
+
+When an issue is found on a **done** cell, record the rework without erasing history:
+
+- Keep the original cell status **done** and append a **Rework** note, e.g. `Rework: F2-r1 · ADR-002 focused spike · appended plan docs/feature-implementations/order-service/f2/plan.md (## Rework 2026-08-08)`.
+- Add the rework as a new feature/cell (e.g., `F2-r1`) in a **new wave** after the original feature — it depends on the original cell's PR (already merged).
+- The appended plan lives at the end of the feature's existing `plan.md` (or a sibling `rework-plan.md`); implemented steps are never modified.

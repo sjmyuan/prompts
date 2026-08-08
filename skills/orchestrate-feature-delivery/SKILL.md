@@ -1,6 +1,6 @@
 ---
 name: orchestrate-feature-delivery
-description: Orchestrate delivery of a spiked epic: decompose spike output into repo-mapped feature waves, dispatch agents for planning, execution, and solution-doc/ADR updates, and keep the delivery index current. Use when decomposing, sequencing, planning, executing, resuming, or tracking the delivery of spiked work into features, phases, or per-repo pull requests.
+description: Orchestrate delivery of a spiked epic: decompose spike output into repo-mapped feature waves, dispatch agents for planning, execution, spikes, and solution-doc/ADR updates, and keep the delivery index current. Use when decomposing, sequencing, planning, executing, resuming, tracking, or reworking spiked work into features, phases, or per-repo pull requests.
 ---
 
 <when-to-use-this-skill>
@@ -9,14 +9,17 @@ description: Orchestrate delivery of a spiked epic: decompose spike output into 
 - User wants to dispatch parallel agents to plan (via plan-development-task) or execute (via execute-plan) feature × repo cells of an epic
 - User wants to resume or continue delivery of an existing spiked epic at any time — the delivery index is loaded and next actions are derived from its status
 - User wants to review or update the delivery index status (which cells are planned, in progress, done, failed, or blocked)
+- User found an issue after a feature was implemented (a cell is done/merged) and wants a focused re-investigation spike (usually on the feature's governing ADR), an appended plan for the feature, and execution of that extra plan
+- User wants suggestions for which skill handles each part of a post-implementation rework (spike, ADR update, plan append, execution)
 - Do NOT load before a spike's change summary / solution doc exists — let conduct-spike produce them first
 - Do NOT load to plan or execute a single, already-scoped change directly — plan-development-task and execute-plan handle single cells; this skill orchestrates the whole epic
+- Do NOT load to run a standalone spike or re-investigation — conduct-spike runs spikes; this skill only triggers a focused spike to rework a delivered feature
 </when-to-use-this-skill>
 
 <knowledge>
 
 <orchestrator-role>
-This skill is the persistent orchestrator for **one spiked epic**. Its input is always the **delivery index** plus the spike output (change summary, solution doc, ADRs). It decomposes, sequences, dispatches agents, and keeps the index current — it never plans, codes, or edits artifacts itself. **Planning, execution, solution-doc updates, and ADR updates are ALWAYS delegated** to the corresponding agents (see **agent-dispatch**); the orchestrator only dispatches and tracks. The index is the single source of truth; conversation text is not.
+This skill is the persistent orchestrator for **one spiked epic**. Its input is always the **delivery index** plus the spike output (change summary, solution doc, ADRs). It decomposes, sequences, dispatches agents, and keeps the index current — it never plans, codes, or edits artifacts itself. **Spikes, planning, execution, solution-doc updates, and ADR updates are ALWAYS delegated** to the corresponding agents (see **agent-dispatch**); the orchestrator only dispatches and tracks. The index is the single source of truth; conversation text is not.
 </orchestrator-role>
 
 <feature-definition>
@@ -52,6 +55,7 @@ Every delivery task is delegated to a dedicated agent — the orchestrator never
 
 | Task | Delegated agent | Agent applies | Result |
 |---|---|---|---|
+| **Spike** a rework | **spike-conductor** | **conduct-spike** | focused findings / ADR / solution-doc updates + change summary |
 | **Plan** a cell | **coding-assistant** | **plan-development-task** | `plan.md` + `context.md` (spike references persisted into `context.md`) |
 | **Execute** a cell | **coding-assistant** | **execute-plan** | code changes + commits (reads `plan.md` + `context.md`) |
 | **Update solution doc** | **solution-doc-writer** | **write-solution-doc** | revised solution-doc sections, rewritten in place |
@@ -82,6 +86,18 @@ Execution agents commit locally and small-step; pushing branches or opening PRs 
 | Cell done | A cell is **done** only after its PR merges or the user confirms the code is verified; pushing alone is not done |
 </branch-and-push-conventions>
 
+<post-implementation-spike>
+When an issue surfaces after a feature cell is **done** (implemented/merged), delivery re-enters investigation for **that cell only**. The spike is **focused**: scope it to the affected decision — usually the feature's governing ADR — never re-open the whole epic. It is run by the **spike-conductor** agent applying **conduct-spike**; any ADR / solution-doc / change-summary updates it produces are delegated to the owning skills.
+</post-implementation-spike>
+
+<append-only-plan>
+Rework plans are appended, never merged into implemented steps:
+- Append a `## Rework <date>` section at the end of the feature's existing `plan.md` (use a sibling `rework-plan.md` only if the plan is very long); implemented steps stay byte-for-byte unchanged.
+- New steps reference the triggering issue and the reworked ADR decision.
+- Execution runs **only** the appended rework steps — completed steps are never re-run.
+- The delivery index records the appended plan location and the spike's ADR focus.
+</append-only-plan>
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -89,6 +105,7 @@ Execution agents commit locally and small-step; pushing branches or opening PRs 
 | Dispatching parallel agents, wave gating, status transitions, or failure handling | Agent dispatch, orchestration loop, resume, failure rules | [reference/orchestration-guide.md](reference/orchestration-guide.md) |
 | Classifying dependency edges, computing waves, or intra-feature merge order | Edge types, wave algorithm, develop-vs-merge | [reference/dependency-ordering-guide.md](reference/dependency-ordering-guide.md) |
 | Writing or updating the delivery index | Index schema, per-cell briefs, status lifecycle | [reference/delivery-index-format.md](reference/delivery-index-format.md) |
+| Handling an issue discovered after a cell is implemented | Focused rework spike on the governing ADR, append-only plan, execution | [examples/post-implementation-rework.md](examples/post-implementation-rework.md) |
 | Running a full end-to-end decomposition from change summary to index | End-to-end multi-repo example | [examples/multi-repo-feature-decomposition.md](examples/multi-repo-feature-decomposition.md) |
 | Running one orchestration round with parallel agents | Dispatch + status-update walkthrough | [examples/orchestration-round.md](examples/orchestration-round.md) |
 | Continuing an interrupted epic | Resume walkthrough with mixed statuses | [examples/resume-after-interruption.md](examples/resume-after-interruption.md) |
@@ -96,7 +113,7 @@ Execution agents commit locally and small-step; pushing branches or opening PRs 
 </context-loading-guide>
 
 <skill-boundary>
-This skill decomposes, sequences, orchestrates, and tracks — it never plans, codes, or edits artifacts itself. Plan and execution go to the **coding-assistant** agent (**plan-development-task** / **execute-plan**), solution-doc updates to the **solution-doc-writer** agent (**write-solution-doc**), and ADR updates to the **adr-writer** agent (**draft-adr**) — always dispatched, never done here. Resuming an existing epic belongs here.
+This skill decomposes, sequences, orchestrates, and tracks — it never plans, codes, or edits artifacts itself. Spikes go to the **spike-conductor** agent (**conduct-spike**), plan and execution to the **coding-assistant** agent (**plan-development-task** / **execute-plan**), solution-doc updates to the **solution-doc-writer** agent (**write-solution-doc**), and ADR updates to the **adr-writer** agent (**draft-adr**) — always dispatched, never done here. Resuming an existing epic belongs here.
 </skill-boundary>
 
 </knowledge>
@@ -158,6 +175,16 @@ This skill decomposes, sequences, orchestrates, and tracks — it never plans, c
 4. Tell the user exactly what is resumed vs skipped before dispatching.
 </resume-delivery>
 
+<handle-post-implementation-issue>
+1. Identify the affected cell (status **done**) and its governing ADR; scope the re-investigation narrowly to that decision — never the whole epic.
+2. Analyze the issue and present the skill-routing suggestion: **spike-conductor** (conduct-spike) for the focused spike; **adr-writer** (draft-adr) if the ADR decision changes; **solution-doc-writer** (write-solution-doc) if the target state changes; **coding-assistant** (plan-development-task) to append the plan; **coding-assistant** (execute-plan) to run the appended plan. Confirm the routing with the user.
+3. Dispatch the **spike-conductor** agent to run the focused spike, scoped to the governing ADR per **post-implementation-spike**; delegate any artifact updates to **adr-writer** / **solution-doc-writer**.
+4. Apply **update-delivery-index**: record the rework — the spike's ADR focus, new change-summary items, the rework wave/feature, and the appended plan location.
+5. Dispatch **plan-development-task** (coding-assistant) to append the rework plan to the feature's existing plan per **append-only-plan** — implemented steps are never modified.
+6. Dispatch **execute-plan** (coding-assistant) to run only the appended rework steps.
+7. Apply **update-delivery-index**; ask the user before pushing or opening a PR (per **branch-and-push-conventions**).
+</handle-post-implementation-issue>
+
 </capabilities>
 
 <rules>
@@ -167,5 +194,6 @@ This skill decomposes, sequences, orchestrates, and tracks — it never plans, c
 <rule> After any agent reports a result, always apply **update-delivery-index** before dispatching further agents. </rule>
 <rule> When the work is plan or execute → always dispatch the **coding-assistant** agent (applying **plan-development-task** / **execute-plan**); update-solution-doc → **solution-doc-writer** (applying **write-solution-doc**); update-ADR → **adr-writer** (applying **draft-adr**); never perform these tasks directly. </rule>
 <rule> When the user asks about a single cell's plan or status, read the delivery index and route the cell to **plan-development-task** or **execute-plan** — do not re-run the whole orchestration. </rule>
+<rule> When an issue surfaces after a feature was implemented (a cell is **done**), apply **handle-post-implementation-issue** — never re-run **decompose-change-into-features** on the whole epic, and never modify the implemented plan. </rule>
 
 </rules>

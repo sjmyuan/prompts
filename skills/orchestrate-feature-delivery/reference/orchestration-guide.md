@@ -8,6 +8,7 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 
 | Task | Delegated agent | Applies | Result |
 |---|---|---|---|
+| Spike a rework | **spike-conductor** | **conduct-spike** | focused findings / ADR / solution-doc updates + change summary |
 | Plan a cell | **coding-assistant** | **plan-development-task** | `plan.md` + `context.md` |
 | Execute a cell | **coding-assistant** | **execute-plan** | code changes + commits |
 | Update solution doc | **solution-doc-writer** | **write-solution-doc** | revised sections, rewrite in place |
@@ -51,3 +52,14 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 | **failed** | agent hit an error (record reason) | ask the user: re-plan (plan-development-task) or retry |
 | **blocked** | waiting on an unmerged dependency or a user decision (record blocker) | do not dispatch until the blocker clears |
 | **in-progress** | agent was interrupted mid-execution | resume from the last completed step in `plan.md` |
+
+## Post-implementation rework
+
+When an issue is found after a cell is **done** (implemented/merged):
+
+1. **Focused spike**: dispatch the **spike-conductor** agent (conduct-spike), scoped narrowly to the affected decision — usually the feature's governing ADR. Do not re-open the whole epic.
+2. **Delegate artifact updates**: ADR changes → **adr-writer** (draft-adr); solution-doc changes → **solution-doc-writer** (write-solution-doc); change summary recomputed via conduct-spike.
+3. **Update the index**: record the rework — spike's ADR focus, new change-summary items, rework wave/feature, appended plan location.
+4. **Append the plan**: dispatch **plan-development-task** (coding-assistant) to append a `## Rework <date>` section to the feature's existing `plan.md` — implemented steps are never modified.
+5. **Execute the appended plan**: dispatch **execute-plan** (coding-assistant) to run only the new rework steps.
+6. Update the index; ask the user before pushing / opening a PR.
