@@ -24,8 +24,9 @@
 
 ## 3. Dispatch
 
-- **Agent A** → resume `order-service/F2` from step 4 (execute-plan) — works from plan.md + context.md (spike references embedded); reloads ADR-001 / solution-doc from the index's Spike References if a step needs more detail
-- **Agent B** → execute `api-gateway/F3`
+- **Agent A** (coding-assistant) → resume `order-service/F2` from step 4 (execute-plan) — works from plan.md + context.md (spike references embedded); reloads ADR-001 / solution-doc from the index's Spike References if a step needs more detail
+- **Agent B** (coding-assistant) → execute `api-gateway/F3`
+- **Agent C** (solution-doc-writer / adr-writer) → update solution-doc §Wallet and ADR-002 if F2's or F3's execution surfaces artifact changes — the orchestrator never edits them itself
 - F5 pending user decision; F4 waits
 
 ## 4. Update index

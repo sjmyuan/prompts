@@ -1,6 +1,6 @@
 ---
 name: orchestrate-feature-delivery
-description: Orchestrate delivery of a spiked epic: decompose spike output into repo-mapped feature waves, dispatch parallel agents to plan and execute them, and keep the delivery index current. Use when decomposing, sequencing, planning, executing, resuming, or tracking the delivery of spiked work into features, phases, or per-repo pull requests.
+description: Orchestrate delivery of a spiked epic: decompose spike output into repo-mapped feature waves, dispatch agents for planning, execution, and solution-doc/ADR updates, and keep the delivery index current. Use when decomposing, sequencing, planning, executing, resuming, or tracking the delivery of spiked work into features, phases, or per-repo pull requests.
 ---
 
 <when-to-use-this-skill>
@@ -16,7 +16,7 @@ description: Orchestrate delivery of a spiked epic: decompose spike output into 
 <knowledge>
 
 <orchestrator-role>
-This skill is the persistent orchestrator for **one spiked epic**. Its input is always the **delivery index** plus the spike output (change summary, solution doc, ADRs). It never does the code work itself — it decomposes, sequences, dispatches parallel agents, and keeps the index current. The index is the single source of truth; conversation text is not.
+This skill is the persistent orchestrator for **one spiked epic**. Its input is always the **delivery index** plus the spike output (change summary, solution doc, ADRs). It decomposes, sequences, dispatches agents, and keeps the index current — it never plans, codes, or edits artifacts itself. **Planning, execution, solution-doc updates, and ADR updates are ALWAYS delegated** to the corresponding agents (see **agent-dispatch**); the orchestrator only dispatches and tracks. The index is the single source of truth; conversation text is not.
 </orchestrator-role>
 
 <feature-definition>
@@ -48,7 +48,16 @@ Each cell follows: **unplanned → planned → in-progress → done**, with **fa
 </delivery-state-machine>
 
 <agent-dispatch>
-Dispatch one agent per cell, in parallel, subject to **wave gating** (only cells whose dependency cells are done) and **no-conflict** rules (never run conflicting cells on the same repo simultaneously). Each agent brief carries the cell's scope brief **plus its spike references** (change-summary items, ADR files, solution-doc section) so the agent can load full context on demand. Planning agents apply **plan-development-task** (write `plan.md` + `context.md`, persisting the spike references into `context.md`); execution agents apply **execute-plan** (read `plan.md` + `context.md`). Use the platform's agent/sub-agent mechanism — detect what is available. Full rules: **reference/orchestration-guide.md**.
+Every delivery task is delegated to a dedicated agent — the orchestrator never performs these itself:
+
+| Task | Delegated agent | Agent applies | Result |
+|---|---|---|---|
+| **Plan** a cell | **coding-assistant** | **plan-development-task** | `plan.md` + `context.md` (spike references persisted into `context.md`) |
+| **Execute** a cell | **coding-assistant** | **execute-plan** | code changes + commits (reads `plan.md` + `context.md`) |
+| **Update solution doc** | **solution-doc-writer** | **write-solution-doc** | revised solution-doc sections, rewritten in place |
+| **Update ADR** | **adr-writer** | **draft-adr** | revised ADR, rewritten in place |
+
+Dispatch one agent per task, in parallel, subject to **wave gating** (only cells whose dependency cells are done) and **no-conflict** rules (never run conflicting cells on the same repo simultaneously). Each agent brief carries the cell's scope brief **plus its spike references** (change-summary items, ADR files, solution-doc section) so the agent can load full context on demand. When planning or execution surfaces changes to the spike's solution doc or ADRs, dispatch a **solution-doc-writer** / **adr-writer** agent for that update instead of editing artifacts directly. Use the platform's agent/sub-agent mechanism — detect what is available. Full rules: **reference/orchestration-guide.md**.
 </agent-dispatch>
 
 <plan-layout>
@@ -87,7 +96,7 @@ Execution agents commit locally and small-step; pushing branches or opening PRs 
 </context-loading-guide>
 
 <skill-boundary>
-This skill decomposes, sequences, orchestrates, and tracks — it does not write detailed plans or code itself. Single-cell planning and execution are delegated to **plan-development-task** and **execute-plan** (dispatched as agents). Resuming an existing epic belongs here.
+This skill decomposes, sequences, orchestrates, and tracks — it never plans, codes, or edits artifacts itself. Plan and execution go to the **coding-assistant** agent (**plan-development-task** / **execute-plan**), solution-doc updates to the **solution-doc-writer** agent (**write-solution-doc**), and ADR updates to the **adr-writer** agent (**draft-adr**) — always dispatched, never done here. Resuming an existing epic belongs here.
 </skill-boundary>
 
 </knowledge>
@@ -134,11 +143,12 @@ This skill decomposes, sequences, orchestrates, and tracks — it does not write
 <orchestrate-delivery>
 1. Load the delivery index — or create it first via **decompose-change-into-features** → **map-features-to-repos** → **order-feature-delivery** → **produce-delivery-index** if it does not exist.
 2. Assess current state from the index: per-cell statuses, completed waves, ready cells, blocked cells.
-3. Select ready cells: wave dependencies done and status unplanned (→ dispatch a planning agent) or planned (→ dispatch an execution agent); skip done cells.
+3. Select ready cells: wave dependencies done and status unplanned (→ dispatch a **plan** agent) or planned (→ dispatch an **execute** agent); skip done cells.
 4. Dispatch parallel agents, one per cell, respecting wave gating and no-conflict rules (**reference/orchestration-guide.md**); include each cell's scope brief, its **spike references**, and its **branch name** (per **branch-and-push-conventions**) in the agent brief so the agent has full context and the branch to use.
-5. Collect results and apply **update-delivery-index**.
-6. When a cell's work is complete and ready to integrate, ask the user for confirmation before pushing its branch or opening a PR (per **branch-and-push-conventions**); do not push or open PRs automatically.
-7. Re-assess and report next actions; repeat until all cells are done or the user pauses.
+5. When a plan or execution surfaces changes to the spike's solution doc or ADRs, dispatch **solution-doc-writer** / **adr-writer** agents for those updates — never edit the artifacts yourself.
+6. Collect results and apply **update-delivery-index**.
+7. When a cell's work is complete and ready to integrate, ask the user for confirmation before pushing its branch or opening a PR (per **branch-and-push-conventions**); do not push or open PRs automatically.
+8. Re-assess and report next actions; repeat until all cells are done or the user pauses.
 </orchestrate-delivery>
 
 <resume-delivery>
@@ -155,6 +165,7 @@ This skill decomposes, sequences, orchestrates, and tracks — it does not write
 <rule> When spike output exists but no delivery index, apply **decompose-change-into-features** → **map-features-to-repos** → **order-feature-delivery** → **produce-delivery-index**. </rule>
 <rule> When a delivery index exists and the user wants to drive or continue delivery, apply **orchestrate-delivery**; apply **resume-delivery** when continuing an epic interrupted in a previous session. </rule>
 <rule> After any agent reports a result, always apply **update-delivery-index** before dispatching further agents. </rule>
+<rule> When the work is plan or execute → always dispatch the **coding-assistant** agent (applying **plan-development-task** / **execute-plan**); update-solution-doc → **solution-doc-writer** (applying **write-solution-doc**); update-ADR → **adr-writer** (applying **draft-adr**); never perform these tasks directly. </rule>
 <rule> When the user asks about a single cell's plan or status, read the delivery index and route the cell to **plan-development-task** or **execute-plan** — do not re-run the whole orchestration. </rule>
 
 </rules>

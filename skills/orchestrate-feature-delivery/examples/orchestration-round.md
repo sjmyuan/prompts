@@ -12,8 +12,10 @@
 
 ## 2. Dispatch (round 1)
 
-- **Agent A** → plan `shared-contracts/F1` (plan-development-task)
+- **Agent A** (coding-assistant) → plan `shared-contracts/F1` (plan-development-task)
   - Brief: scope brief + spike references — change-summary items 1–3, ADR-001 (`docs/spikes/payment-migration/adr-001-wallet.md`), solution-doc §Wallet. Agent loads them on demand for full context.
+
+> **Delegation rule in action**: when any agent's plan or execution surfaces a solution-doc or ADR change, the orchestrator dispatches a **solution-doc-writer** / **adr-writer** agent for the update — it never edits artifacts itself.
 
 ## 3. Collect + update index
 
@@ -25,9 +27,9 @@ F2 and F3 become wave-ready (F1 planned; contract-first allows planning in paral
 
 ## 4. Dispatch (round 2, parallel)
 
-- **Agent A** → execute `shared-contracts/F1` (execute-plan)
-- **Agent B** → plan `order-service/F2`
-- **Agent C** → plan `api-gateway/F3`
+- **Agent A** (coding-assistant) → execute `shared-contracts/F1` (execute-plan)
+- **Agent B** (coding-assistant) → plan `order-service/F2`
+- **Agent C** (coding-assistant) → plan `api-gateway/F3`
 
 ## 5. Collect + update index
 

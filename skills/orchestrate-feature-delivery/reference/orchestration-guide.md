@@ -4,7 +4,17 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 
 ## Agent dispatch
 
+- **Always delegate — never do the work yourself.** The orchestrator only dispatches and tracks. Every delivery task maps to a dedicated agent:
+
+| Task | Delegated agent | Applies | Result |
+|---|---|---|---|
+| Plan a cell | **coding-assistant** | **plan-development-task** | `plan.md` + `context.md` |
+| Execute a cell | **coding-assistant** | **execute-plan** | code changes + commits |
+| Update solution doc | **solution-doc-writer** | **write-solution-doc** | revised sections, rewrite in place |
+| Update ADR | **adr-writer** | **draft-adr** | revised ADR, rewrite in place |
+
 - **One cell per agent.** Planning agents apply **plan-development-task** and write `{location}/{repo}/{feature}/plan.md` + `context.md`. Execution agents apply **execute-plan** and run the plan.
+- **Artifact updates are delegated too.** When a plan or execution surfaces changes to the spike's solution doc or ADRs, dispatch a **solution-doc-writer** / **adr-writer** agent for the update — never edit those artifacts from the orchestrator.
 - **Full context in every brief.** Each agent brief carries the cell's scope brief plus its **spike references** (paths to the relevant change-summary items, ADR files, and solution-doc section). Agents load these on demand — do not inline entire solution docs into the brief.
 - **Persist references to context.md.** Planning agents record the spike references in `context.md`, so execution and resume agents have durable distilled context and can load referenced artifacts when needed.
 - Dispatch agents **in parallel** across cells, subject to:
