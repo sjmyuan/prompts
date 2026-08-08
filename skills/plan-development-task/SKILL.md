@@ -16,6 +16,7 @@ description: Classify, clarify, and generate TDD-based step-by-step plans for bu
 - User asks for code cleanup, restructuring, or quality improvements
 - User wants to reduce technical debt or improve code organization
 - User requests improvements to maintainability, readability, or performance without changing behavior
+- User wants to append rework steps to an already-implemented feature plan — a focused rework triggered by orchestrate-feature-delivery's handle-post-implementation-issue flow
 
 **Differentiation rules** (when multiple skills could apply):
 - **New behavior being introduced?** → This is a **feature** — apply **plan-feature-implementation**
@@ -23,6 +24,7 @@ description: Classify, clarify, and generate TDD-based step-by-step plans for bu
 - **Something is broken?** → This is a **bug fix** — apply **plan-bug-fix**
 - **Both restructure AND add new behavior?** → Apply **plan-refactor** first to stabilize, then **plan-feature-implementation** for the new behavior
 - **Multi-feature / multi-repo decomposition of spike results?** → Do NOT plan a whole breakdown here — apply **orchestrate-feature-delivery** first to split, sequence, and orchestrate features, then plan each feature × repo cell with this skill
+- **Rework append for an already-delivered feature?** → Apply this skill in append mode per **rework-plan-convention** — orchestrate-feature-delivery triggers it; never rewrite the implemented plan
 </when-to-use-this-skill>
 
 <knowledge>
@@ -56,6 +58,14 @@ Every plan starts with a **Prepare Environment** step (Step 1) that covers:
 If any check is not ready, the agent must **stop and raise it to the user** — never start execution silently. The branch name and base are recorded so **export-plan** can persist them to `context.md`.
 </plan-prerequisites>
 
+<rework-plan-convention>
+When the plan is a **rework append** for an already-implemented feature (triggered by **orchestrate-feature-delivery**'s **handle-post-implementation-issue**), the feature folder already exists with an implemented `plan.md`:
+- **Append, never rewrite**: write a `## Rework <date>` section at the end of the existing `plan.md`; implemented steps stay byte-for-byte unchanged.
+- New steps are numbered within the rework section, reference the triggering issue and the reworked ADR decision, and follow the classified change type (usually a bug-fix/feature plan).
+- **Prepare Environment** (see **plan-prerequisites**) still applies — the rework runs on its own branch per the repo's branch convention (the original branch/PR may already be merged).
+- If the plan is very long, use a sibling `rework-plan.md` and record it in the delivery index.
+</rework-plan-convention>
+
 <context-loading-guide>
 Load only the examples directly relevant to the current change type to minimize context size.
 
@@ -68,6 +78,7 @@ Load only the examples directly relevant to the current change type to minimize 
 | Generating feature implementation plan | Detailed steps for plan-feature-implementation | [reference/plan-feature-implementation.md](reference/plan-feature-implementation.md) |
 | Generating refactor plan | Detailed steps for plan-refactor | [reference/plan-refactor.md](reference/plan-refactor.md) |
 | Validating plan quality | Checklist: coverage, sequencing, steps, TDD, clarity | [reference/plan-quality-checklist.md](reference/plan-quality-checklist.md) |
+| Appending a rework plan to an implemented feature plan | Append-only rework section (shared with the orchestrator) | [../orchestrate-feature-delivery/examples/post-implementation-rework.md](../orchestrate-feature-delivery/examples/post-implementation-rework.md) |
 | Bug: simple logic / timing errors | Full workflow example | [examples/bug-fix-simple-logic.md](examples/bug-fix-simple-logic.md) |
 | Bug: slow responses, N+1 queries | Full workflow example | [examples/bug-fix-performance.md](examples/bug-fix-performance.md) |
 | Feature: complex algorithms or business rules | Full workflow example | [examples/feature-complex-transformation.md](examples/feature-complex-transformation.md) |
@@ -134,7 +145,7 @@ Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its
 2. If the user agrees, determine the storage location (ask the user, or default to `docs/feature-implementations/`).
 3. Derive a short kebab-case feature name from the plan's objective (e.g., `fix-null-pointer-in-transformer`).
 4. Determine the repo name when the plan belongs to a specific repo (an **orchestrate-feature-delivery** cell); create the feature folder **repo-first**: `{location}/{repo}/{feature-name}/` (fall back to `{location}/{feature-name}/` when no repo applies) so all plans for one repo live together.
-5. Write `plan.md` — the complete numbered step list with objectives, using the plan's steps as generated.
+5. Write `plan.md` — the complete numbered step list with objectives, using the plan's steps as generated. When appending a rework plan (per **rework-plan-convention**), append a `## Rework <date>` section to the existing `plan.md` instead of overwriting it.
 6. Write `context.md` — capture all background: the user's original request, the classified change type, root cause or requirement summary, TDD approach rationale, the target branch name and base branch (see **plan-prerequisites**), constraints, assumptions, and any codebase references gathered.
 7. Inform the user of the saved location so they can invoke **execute-plan** to carry it out.
 </export-plan>
@@ -150,5 +161,6 @@ Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its
 <rule> When both restructuring and new behavior are needed: apply **plan-refactor** first to stabilize the structure, then apply **plan-feature-implementation** for the new behavior. </rule>
 <rule> After the plan is confirmed by the user: optionally apply **export-plan** to persist the plan to files for later execution by execute-plan. </rule>
 <rule> When generating any plan (bug fix, feature, or refactor): always include the **Prepare Environment** prerequisites step first per **plan-prerequisites**; if any check is not ready, raise it to the user instead of starting execution. </rule>
+<rule> When appending a rework plan to an already-implemented feature (triggered by **orchestrate-feature-delivery**), apply **rework-plan-convention** and **export-plan** in append mode — never overwrite the implemented steps. </rule>
 
 </rules>

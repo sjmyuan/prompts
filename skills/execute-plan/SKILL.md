@@ -10,6 +10,7 @@ description: Execute structured development plans step-by-step with progress tra
 - All plan steps are complete and a post-execution review with the review-code skill is needed
 - A step has failed or is blocked and needs error recovery before proceeding
 - A delivery index from orchestrate-feature-delivery points to planned feature × repo cells ready for execution
+- You need to execute a plan containing an appended `## Rework <date>` section (a rework triggered by orchestrate-feature-delivery) — run only the rework steps, never re-run the completed original steps
 - Do NOT load when no plan has been generated yet — if the user describes a problem without referencing an existing plan, let plan-development-task handle it first
 </when-to-use-this-skill>
 
@@ -85,6 +86,14 @@ Small-step commit rules applied throughout execution:
 | Pre-commit check | Commit only after the step's validation checkpoint (tests/lint) passes |
 </commit-conventions>
 
+<rework-plan-execution>
+When the plan file contains an appended `## Rework <date>` section (a rework triggered by **orchestrate-feature-delivery**'s **handle-post-implementation-issue**):
+- Execute **only** the rework section — the original steps are all ✅ and are never re-run or modified.
+- Treat the rework steps as a fresh step sequence with **step-status-definitions** statuses (⏳ → 🔄 → ✅).
+- **verify-prerequisites** still applies — the rework runs on its own branch per the repo's branch convention (the original branch/PR may already be merged).
+- Commit conventions, **request-push-approval**, and **review-post-execution** apply exactly as for a normal plan.
+</rework-plan-execution>
+
 <context-loading-guide>
 Load only the example most relevant to the current execution scenario to minimize context size.
 
@@ -97,6 +106,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 | All plan steps are complete and post-execution review is needed | Output model: applying review-code after completion, adding fix steps, keeping plan as permanent record | [examples/post-execution-review.md](examples/post-execution-review.md) |
 | A step is ambiguous, requires user input, or cannot proceed due to a missing dependency or external blocker | Output model: pausing execution at a blocked step, informing the user, and resuming after input | [examples/handling-failed-steps.md](examples/handling-failed-steps.md) |
 | Executing a plan with prerequisite checks, one commit per step, and push approval at the end | Output model: verify-prerequisites, commit-step, and request-push-approval in action | [examples/small-step-commits.md](examples/small-step-commits.md) |
+| Executing a plan with an appended `## Rework` section (run only the rework steps) | Rework execution walkthrough (shared with the orchestrator) | [../orchestrate-feature-delivery/examples/post-implementation-rework.md](../orchestrate-feature-delivery/examples/post-implementation-rework.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -109,7 +119,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 3. Create the feature folder repo-first: `{location}/{repo}/{feature-name}/` when the plan belongs to a specific repo (an **orchestrate-feature-delivery** cell), else `{location}/{feature-name}/`. Inside it, create two files:
    - `plan.md` — the step-by-step execution plan with status tracking (see **step-tracking-format**)
    - `context.md` — all context, references, requirements, constraints, and decisions that define the plan (captured from the plan source so the reasoning is preserved alongside the plan)
-4. Before creating a new plan, check if the feature folder already exists with a plan file. If a plan file has steps with ❌ failed or 🚫 blocked status, ask the user whether to **resume** from the last known state or **start fresh** (create a new folder/overwrite).
+4. Before creating a new plan, check if the feature folder already exists with a plan file. If it contains an appended `## Rework <date>` section, execute only the rework steps (see **rework-plan-execution**) — never re-run or modify the completed original steps. If a plan file has steps with ❌ failed or 🚫 blocked status, ask the user whether to **resume** from the last known state or **start fresh** (create a new folder/overwrite).
 5. List each step in the plan file with its number, title, and initial status ⏳ pending, using the **step-tracking-format** knowledge.
 6. Populate the context file with all relevant background: requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, and any other material that informed the plan.
 7. Update step status in the plan file immediately after each state change (⏳ → 🔄 → ✅, or ❌/🚫 on failure). Refer to **step-status-definitions** knowledge for emoji meanings.
@@ -212,5 +222,6 @@ Load only the example most relevant to the current execution scenario to minimiz
 <rule> **Before Starting the First Step**: Apply **verify-prerequisites** — if the branch or environment is not ready, raise it to the user and wait. </rule>
 <rule> **After Each ✅ Step**: Apply **commit-step** to record the change as one small commit. </rule>
 <rule> **Before Any Push**: Apply **request-push-approval** — never push to remote without the user's confirmation. </rule>
+<rule> **When the Plan Contains a Rework Section**: Apply **rework-plan-execution** — run only the appended `## Rework` steps and never modify the completed original steps. </rule>
 
 </rules>
