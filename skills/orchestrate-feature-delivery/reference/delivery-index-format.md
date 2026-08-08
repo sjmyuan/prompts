@@ -98,6 +98,6 @@ Each cell carries a brief that seeds **plan-development-task**:
 
 When an issue is found on a **done** cell, record the rework without erasing history:
 
-- Keep the original cell status **done** and append a **Rework** note, e.g. `Rework: F2-r1 · ADR-002 focused spike · appended plan deliveries/<epic-name>/order-service/wallet-service/plan.md (## Rework 2026-08-08)`.
+- Keep the original cell status **done** and append a **Rework** note, e.g. `Rework: F2-r1 · ADR-001 focused spike · appended plan deliveries/<epic-name>/order-service/wallet-service/plan.md (## Rework 2026-08-08)`.
 - Add the rework as a new feature/cell (e.g., `F2-r1`) in a **new wave** after the original feature — it depends on the original cell's PR (already merged).
 - The appended plan lives at the end of the feature's existing `plan.md` (or a sibling `rework-plan.md`); implemented steps are never modified.
