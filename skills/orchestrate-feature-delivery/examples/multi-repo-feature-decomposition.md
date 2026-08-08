@@ -13,7 +13,7 @@
 
 ## 1. Decomposition (features)
 
-- **F1 wallet-contracts** — `shared-contracts` only: wallet DTOs + envelope schema. *Small shared change, stays in the first consuming feature.*
+- **F1 wallet-contracts** — `shared-contracts` only: wallet DTOs + envelope schema. *Small but widely-shared (consumed by F2/F3/F4) → extracted as a leading feature so consumers develop against a contract.*
 - **F2 wallet-service** — `order-service`: `WalletService` + `wallet_ledger` migration + tests.
 - **F3 wallet-api-gateway** — `api-gateway`: token endpoint + route.
 - **F4 order-wallet-integration** — `order-service` + `api-gateway`: order flow consumes wallet, retire `BankTransferService`.

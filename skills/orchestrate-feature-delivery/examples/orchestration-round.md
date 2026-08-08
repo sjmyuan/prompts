@@ -23,7 +23,7 @@
 |---|---|---|---|
 | shared-contracts/F1 | **planned** | agent-A | docs/feature-implementations/shared-contracts/f1/ |
 
-F2 and F3 become wave-ready (F1 planned; contract-first allows planning in parallel).
+F2 and F3 become develop-ready (F1 planned; contract-first allows planning in parallel).
 
 ## 4. Dispatch (round 2, parallel)
 
@@ -43,4 +43,4 @@ F2 and F3 become wave-ready (F1 planned; contract-first allows planning in paral
 
 ## 6. Next actions
 
-Execute F2 + F3 in parallel (both wave-ready, no conflict); F4 cells remain wave-2 until F2 + F3 merge. All status changes landed in the index before the next round was dispatched.
+Execute F2 + F3 in parallel (both develop-ready, no conflict); F4 cells remain wave-2 until F2 + F3 merge. All status changes landed in the index before the next round was dispatched.

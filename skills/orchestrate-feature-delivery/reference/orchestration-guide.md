@@ -19,7 +19,8 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 - **Full context in every brief.** Each agent brief carries the cell's scope brief plus its **spike references** (paths to the relevant change-summary items, ADR files, and solution-doc section). Agents load these on demand — do not inline entire solution docs into the brief.
 - **Persist references to context.md.** Planning agents record the spike references in `context.md`, so execution and resume agents have durable distilled context and can load referenced artifacts when needed.
 - Dispatch agents **in parallel** across cells, subject to:
-  - **Wave gating**: only dispatch cells whose dependency cells are **done** (merged).
+  - **Develop-gating**: dispatch cells whose dependency cells are **planned** (contracts agreed); contract-first and independent cells develop in parallel.
+  - **Merge-gating**: a cell merges only after its dependency cells are **done** (merged).
   - **No conflict in parallel**: never run two cells that touch the same repo with a conflict edge at the same time — serialize them.
   - **Capacity**: match the number of parallel agents to what the platform supports; ask the user when unsure.
 - Use the platform's agent/sub-agent mechanism — detect what is available (e.g., coding-assistant agents) and dispatch accordingly.
@@ -29,7 +30,7 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 ## Orchestration loop
 
 1. Load the index, or create it via decompose → map → order → produce.
-2. Assess state (per-cell status + wave gating).
+2. Assess state (per-cell status + develop/merge gating).
 3. Select ready cells: unplanned → plan; planned → execute; skip done; note blocked.
 4. Dispatch parallel agents for the ready cells.
 5. Collect results; apply **update-delivery-index**.
@@ -37,7 +38,7 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 
 ## Status updates
 
-- After every agent result, update the cell status; when a PR merges, mark its cell **done** and re-check downstream cells for wave-readiness.
+- After every agent result, update the cell status; when a PR merges, mark its cell **done** and re-check downstream cells for develop/merge-readiness.
 - Never let conversation text be the source of truth — the delivery index is.
 
 ## Resume

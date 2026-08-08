@@ -65,7 +65,9 @@ Each cell carries a brief that seeds **plan-development-task**:
 
 ## Ready-to-dispatch predicate
 
-A cell is ready when: **all wave-dependency cells are done** AND status is **unplanned** or **planned**.
+- **Ready to develop** (dispatch plan/execute): all dependency cells are **planned** (contracts agreed — contract-first and independent cells develop in parallel; merge-blocked cells wait for the dependency's contract).
+- **Ready to merge**: all dependency cells are **done** (merged).
+- Status must be **unplanned** (→ plan) or **planned** (→ execute).
 
 ## Status semantics
 

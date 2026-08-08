@@ -28,4 +28,4 @@
 
 - **Develop now (all three)**: F2 and F3 build in parallel against the agreed envelope — contract-first, so waves don't block development, only merges.
 - **Merge**: F1 first; F2 and F3 each merge after F1 merges, in either order.
-- **Contrast**: if the envelope could NOT be agreed up front (schema still uncertain), F2/F3 become **merge-blocked** — development itself waits for F1's PR to merge, lengthening the critical path. This contrast is the core "parallel vs wait" decision the capability surfaces, which **orchestrate-delivery** then enforces via wave gating.
+- **Contrast**: if the envelope could NOT be agreed up front (schema still uncertain), F2/F3 become **merge-blocked** — development itself waits for F1's PR to merge, lengthening the critical path. This contrast is the core "parallel vs wait" decision the capability surfaces, which **orchestrate-delivery** then enforces via develop/merge gating.

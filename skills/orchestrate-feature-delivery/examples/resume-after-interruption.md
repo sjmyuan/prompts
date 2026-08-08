@@ -18,7 +18,7 @@
 |---|---|---|
 | shared-contracts/F1 | **skip** | done |
 | order-service/F2 | **resume** | continue execution from step 4 in plan.md |
-| api-gateway/F3 | **execute** | wave-ready now that F1 merged |
+| api-gateway/F3 | **execute** | develop-ready now that F1 merged |
 | api-gateway/F5 | **hold** | failed — ask user: re-plan (plan-development-task) or retry |
 | order-service/F4 | **wait** | blocked-by F2 + F3 |
 
