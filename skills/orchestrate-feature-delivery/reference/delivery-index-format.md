@@ -89,15 +89,23 @@ Each cell carries a brief that seeds **plan-development-task**:
 |---|---|---|
 | **unplanned** | No plan files yet | Dispatch a planning agent (plan-development-task) |
 | **planned** | `plan.md` + `context.md` exist | Dispatch an execution agent (execute-plan) |
-| **in-progress** | Execution running | Resume from the last completed step |
+| **in-progress** | Execution running — incl. implemented-but-not-yet-merged cells awaiting push approval | Resume from the last completed step; pre-merge rework appends like post-merge |
 | **done** | Merged / verified | Skip; unlock downstream cells |
 | **failed** | Agent error (reason recorded) | Ask user: re-plan or retry |
 | **blocked** | Waiting on blocker (recorded) | Wait; re-check when blocker clears |
 
 ## Rework after implementation
 
-When an issue is found on a **done** cell, record the rework without erasing history:
+Record rework according to the cell's status (see **rework-modes** in the SKILL.md knowledge).
+
+**Post-merge (cell done)** — record without erasing history:
 
 - Keep the original cell status **done** and append a **Rework** note, e.g. `Rework: F2-r1 · ADR-001 focused spike · appended plan deliveries/<epic-name>/order-service/wallet-service/plan.md (## Rework 2026-08-08)`.
 - Add the rework as a new feature/cell (e.g., `F2-r1`) in a **new wave** after the original feature — it depends on the original cell's PR (already merged).
 - The appended plan lives at the end of the feature's existing `plan.md` (or a sibling `rework-plan.md`); implemented steps are never modified.
+
+**Pre-merge (cell in-progress — implemented but not merged/committed/pushed)** — same append-only rule, no new feature/wave:
+
+- Keep the cell's identity and **in-progress** status; no new feature/wave.
+- Note the rework, e.g. `Rework: appended plan deliveries/<epic-name>/order-service/order-wallet-integration/plan.md (## Rework 2026-08-08)`.
+- A `## Rework <date>` section is appended to the existing `plan.md` (implemented steps never modified); the cell proceeds to push approval after the rework.

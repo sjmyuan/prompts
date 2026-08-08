@@ -54,13 +54,22 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 | **blocked** | waiting on an unmerged dependency or a user decision (record blocker) | do not dispatch until the blocker clears |
 | **in-progress** | agent was interrupted mid-execution | resume from the last completed step in `plan.md` |
 
-## Post-implementation rework
+## Rework after implementation
 
-When an issue is found after a cell is **done** (implemented/merged):
+Two modes, chosen by the cell's status (see **rework-modes** in the SKILL.md knowledge).
+
+**Post-merge** (cell **done** — merged/verified): history is shipped and preserved.
 
 1. **Focused spike**: dispatch the **spike-conductor** agent (conduct-spike), scoped narrowly to the affected decision — usually the feature's governing ADR. Do not re-open the whole epic.
 2. **Delegate artifact updates**: ADR changes → **adr-writer** (draft-adr); solution-doc changes → **solution-doc-writer** (write-solution-doc); change summary recomputed via conduct-spike.
-3. **Update the index**: record the rework — spike's ADR focus, new change-summary items, rework wave/feature, appended plan location.
+3. **Update the index**: record the rework — spike's ADR focus, new change-summary items, rework feature (e.g. `F2-r1`) in a new wave, appended plan location.
 4. **Append the plan**: dispatch **plan-development-task** (coding-assistant) to append a `## Rework <date>` section to the feature's existing `plan.md` — implemented steps are never modified.
 5. **Execute the appended plan**: dispatch **execute-plan** (coding-assistant) to run only the new rework steps.
 6. Update the index; ask the user before pushing / opening a PR.
+
+**Pre-merge** (cell **in-progress** — implemented but not merged/committed/pushed): nothing is merged yet, same append-only rule.
+
+1. **Scope**: no focused spike unless the issue challenges the governing ADR decision — if it does, dispatch **spike-conductor** and **adr-writer** / **solution-doc-writer** as above.
+2. **Append the plan**: dispatch **plan-development-task** (coding-assistant) to append a `## Rework <date>` section to the existing `plan.md` — implemented steps are never modified; no new rework feature/wave (rework stays on the same cell).
+3. **Execute the appended plan**: dispatch **execute-plan** (coding-assistant) to run only the new rework steps on the unmerged work.
+4. Update the index (cell stays **in-progress**); ask the user before pushing / opening a PR.

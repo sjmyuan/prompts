@@ -27,7 +27,7 @@
 
 | Cell | Status | Agent | Plan location |
 |---|---|---|---|
-| order-service/F2 | done · Rework: F2-r1 · ADR-001 spike · appended plan | spike-conductor | deliveries/payment-migration/order-service/wallet-service/ |
+| order-service/F2 | done · Rework: F2-r1 · ADR-001 spike · appended plan | spike-conductor (rework) | deliveries/payment-migration/order-service/wallet-service/ |
 | order-service/F2-r1 | unplanned | — | deliveries/payment-migration/order-service/wallet-service/ (append) |
 
 New **Wave 3**: `F2-r1` (after F2 merged). New change-summary items 9–11 trace to ADR-001.
@@ -53,3 +53,4 @@ Original steps 1–N remain byte-for-byte unchanged.
 ## 6. Next actions
 
 - After execution, update the index (`F2-r1` → in-progress → done after PR merge); ask the user before pushing or opening a PR.
+- Pre-merge variant: when the cell is implemented but not yet merged/committed/pushed (status **in-progress**), the rework is still **append-only** (implemented steps never modified) but stays on the same cell — see **examples/pre-merge-rework.md**.
