@@ -157,7 +157,7 @@
 
 ### Final Output Bundle
 
-**Solution Document**: `solution-doc-analytics-database.md`
+**Solution Document**: `solution.md`
 - Business context: new analytics service for clickstream data
 - C2 Container Diagram: API Gateway → Analytics Ingestion Service → ClickHouse Cloud; Dashboard Service → ClickHouse Cloud; with PostgreSQL for service metadata
 - C3 Component Diagram: Analytics Ingestion Service (Ingest Controller → Batch Processor → ClickHouse Writer)

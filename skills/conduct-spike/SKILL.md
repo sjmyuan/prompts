@@ -24,6 +24,21 @@ A spike is an investigation activity aimed at reducing uncertainty around a tech
 A well-conducted spike produces: **Findings Documents** (current-state architecture baseline per area or consolidated, each embedding its area's evidence map — `file:line` entry points and key locations, call chains, evidence ledger, searched-negatives), **N ADRs** (one per area with evaluated options, recommendations, and per-option code changes), **1 Solution Document** (target-state architecture with C4, API contracts, RAID, RACI — decision-only, no code references), and optionally **1 Change Summary** (code-level changes traceable to ADRs).
 </spike-definition>
 
+<spike-artifact-layout>
+All spike artifacts are versioned together in **one folder per spike**:
+
+```
+spikes/<spike-name>/          # one folder per spike
+├── adrs/                     # one file per ADR — ADR-001-<kebab-name>.md, …
+├── solution.md               # the solution document (hub), at the spike folder root
+├── change-summary.md         # only when requested, same level as solution.md
+└── docs/                     # findings documents
+    └── findings-<area>.md    # one per area (or one consolidated findings doc)
+```
+
+Modularized solution sub-docs (see **solution-doc-modularity**) live in `solution-doc/` next to the hub. Artifacts cross-reference each other with relative paths inside the spike folder.
+</spike-artifact-layout>
+
 <inappropriate-scenarios>
 Do NOT use this skill for: quick answers without formal documentation, already-decided problems needing only implementation, trivial scope with no architectural impact, or immediate prototyping — spikes produce decisions, not production code.
 </inappropriate-scenarios>
@@ -128,6 +143,7 @@ Propagation stops at the first artifact a change does not affect. The change sum
 | Suggesting a spike when ADR discussion reveals a decision hinges on unverified assumptions or unknown facts | Worked example of detecting ADR uncertainty and offering a focused spike before finalizing the ADR | [examples/adr-uncertainty-spike-suggestion.md](examples/adr-uncertainty-spike-suggestion.md) |
 | Synchronizing artifacts after a fact or decision change (new evidence, ADR revision, deep-dive) | Propagation matrix, sync procedure, and consistency checklist | [reference/artifact-sync-guide.md](reference/artifact-sync-guide.md) |
 | Seeing a decision change propagated through ADR, solution doc, and change summary together | Walkthrough of syncing all artifacts after new evidence flips an ADR decision | [examples/sync-update-across-artifacts.md](examples/sync-update-across-artifacts.md) |
+| Placing produced artifacts into the per-spike folder (`adrs/`, `solution.md`, `change-summary.md`, `docs/`) | Worked example of the spike folder layout with every artifact placed | [examples/spike-artifact-layout.md](examples/spike-artifact-layout.md) |
 
 </context-loading-guide>
 
@@ -200,7 +216,7 @@ Propagation stops at the first artifact a change does not affect. The change sum
    - Seed each capability with the evaluation results: problem from the area scope, drivers/options/assumed solution, **and each option's tech details (already produced via `draft-adr` during evaluation)** from the evaluation.
    - **Revising is the same procedure**: re-load `draft-adr` and re-apply its capabilities, seeding with the existing ADR plus the changed decision. Never hand-edit an ADR — every write goes through `draft-adr` (see **professional-doc-authoring**).
 
-4. After all ADRs are drafted (via either method), present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?" If the user raises uncertainty about any ADR's decision — an unverified assumption, unknown feasibility, or unresolved comparison — apply **suggest-spike-on-adr-uncertainty** before finalizing.
+4. After all ADRs are drafted (via either method), save each to `<spike-folder>/adrs/ADR-00X-<kebab-name>.md` per **spike-artifact-layout** (apply **save-artifacts**), then present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?" If the user raises uncertainty about any ADR's decision — an unverified assumption, unknown feasibility, or unresolved comparison — apply **suggest-spike-on-adr-uncertainty** before finalizing.
 5. Keep each ADR at the latest state per **latest-state-doctrine** and **clean-artifact-principle** (see **reference/clean-artifact-principle.md**): only the decision — no process history or change notes. On revision, route through `draft-adr` (step 2) and rewrite affected sections in place — delete superseded text, never annotate; cite the findings document for evidence.
 6. Validate each ADR: confirm the chosen option follows logically from the decision drivers, all evaluated options are fairly represented, **each option's provided tech details are carried into its evaluation section**, consequences include both positive and negative impacts, and the ADR can be understood without reading other ADRs. Then run the **no-note scan** from **clean-artifact-principle** — scan for banned process language ("Note:", "Updated", "Changed", "v2", "As of", "Previously", status parentheticals, in-document changelogs) and rewrite in place until none remain.
 7. Note: The chosen option in each ADR is the **assumed solution**. The solution document will adopt these. If an ADR decision changes later, apply **sync-update-artifacts** so the solution doc and change summary are updated together.
@@ -210,10 +226,10 @@ Propagation stops at the first artifact a change does not affect. The change sum
 1. Load the `write-solution-doc` skill's SKILL.md and apply its capabilities — for compiling AND revising. Seed with: business context (spike goal), current-state baseline (findings docs — evolve diagrams as-is → to-be), and assumed solutions (chosen option from each ADR). C4 diagrams show the **target architecture**, not current state. **Revising is the same procedure**: re-load `write-solution-doc`, seeding with the existing doc plus the changed decisions (see **professional-doc-authoring**).
 2. **Assess solution doc size and modularity**: Apply the heuristics in **solution-doc-modularity**. If the doc exceeds ~3000 words, has 5+ major sections, or has independently useful sections for different audiences, identify candidate sections for extraction.
 3. **Extract independent sections**: For each candidate, create a standalone doc with standalone context and back-reference, replace it in the hub with a 2–4 sentence summary and cross-reference link per **solution-doc-modularity**. Skip extraction for small, single-service solutions.
-4. Compile the final output bundle: Findings Documents, N ADRs, 1 Solution Document (hub), and modular sub-documents (if extracted).
+4. Compile the final output bundle: Findings Documents, N ADRs, 1 Solution Document (hub), and modular sub-documents (if extracted). Save the bundle into the spike folder per **spike-artifact-layout** (apply **save-artifacts**): findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`.
 5. Keep the solution document at the latest state per **latest-state-doctrine** and **clean-artifact-principle** (see **reference/clean-artifact-principle.md**): only the target-state architecture — no process history or change notes. On refresh, route through `write-solution-doc` (step 1) and rewrite affected sections in place — delete superseded text, never annotate; cross-reference the findings document for supporting detail.
 6. Validate the bundle: every ADR's chosen solution is reflected in the solution doc, cross-references between all artifacts are consistent, diagrams match assumed solutions, and extracted sub-docs have correct back-references. Then run the **no-note scan** from **clean-artifact-principle** on the solution doc — scan for banned process language and rewrite in place until none remain.
-7. Present the complete bundle and remind the user: findings docs are the current-state record (keep even if decisions change); ADRs are formal decision records (review and approve with the team); the solution doc is the target-state architecture (if an ADR decision changes, apply **sync-update-artifacts** to refresh it and the change summary); version-control all artifacts in the project repository.
+7. Present the complete bundle and remind the user: findings docs are the current-state record (keep even if decisions change); ADRs are formal decision records (review and approve with the team); the solution doc is the target-state architecture (if an ADR decision changes, apply **sync-update-artifacts** to refresh it and the change summary); version-control all artifacts together in the spike folder (see **spike-artifact-layout**).
 </compile-solution-doc>
 
 <compile-findings-doc>
@@ -225,17 +241,25 @@ Propagation stops at the first artifact a change does not affect. The change sum
 
 4. Cross-reference between findings docs (if per-area): Note where one area's current state creates constraints for another. For example: "Area 1 (service boundaries): the monolithic `PaymentOrchestrator` → constrains Area 2 (communication): all calls are in-process, no service mesh exists."
 
-5. Present each findings document to the user and ask: "Does this accurately capture the current state? Anything to add, correct, or remove?"
+5. Present each findings document to the user and ask: "Does this accurately capture the current state? Anything to add, correct, or remove?" Then save it to `<spike-folder>/docs/findings-<area>.md` per **spike-artifact-layout** (apply **save-artifacts**).
 
 6. The findings docs are now the **current-state baseline and evidence home**: evaluation compares options against them, ADRs cite them as evidence, sub-agent briefs carry their evidence sections, and the solution doc evolves their diagrams from as-is → to-be. Update the embedded evidence map the moment new evidence is found during any later work — no round/version tracking.
 </compile-findings-doc>
+
+<save-artifacts>
+1. Determine the **spike folder path** — where all of this spike's artifacts will live (e.g. `spikes/<spike-name>/`). Ask the user or detect an existing spike folder; name it after the spike.
+2. Create the folder structure per **spike-artifact-layout**: `<spike-folder>/adrs/` and `<spike-folder>/docs/`.
+3. Save each artifact to its location: findings doc(s) → `<spike-folder>/docs/findings-<area>.md` (or one consolidated findings doc); each ADR → `<spike-folder>/adrs/ADR-00X-<kebab-name>.md`; solution doc → `<spike-folder>/solution.md` (modular sub-docs → `<spike-folder>/solution-doc/`); change summary → `<spike-folder>/change-summary.md` (only when requested).
+4. Rewrite cross-references between artifacts as relative paths inside the spike folder.
+5. Confirm the saved layout with the user before moving to the next phase.
+</save-artifacts>
 
 <summarize-required-changes>
 1. Confirm prerequisites: the findings documents and solution document must be finalized. Ask: "Would you like me to generate a summary of the concrete code changes required to implement this solution?" Do not produce this artifact unless the user wants it — it is optional.
 2. Determine code access: ask "Can I access the current codebase to verify the scope of changes?" **With code access**: trace the code paths from the findings doc's key locations and call chains, estimate scope concretely (file counts, LOC ranges, classes to modify), mark as code-verified. **Without code access**: generate at architectural level, mark estimates as unverified approximations, note where code access would improve accuracy.
 3. For each area/ADR, map the delta from current state to target state using the categories in **change-summary-guide**.
 4. Group changes by area/service, labeling each cluster with its ADR reference for traceability. Identify cross-cutting concerns that span multiple areas (e.g., shared library changes, auth integration, logging standards).
-5. Compile the change summary document following the format in **change-summary-guide**. Include a notes section for caveats, assumptions, and open questions.
+5. Compile the change summary document following the format in **change-summary-guide**. Include a notes section for caveats, assumptions, and open questions. Save it to `<spike-folder>/change-summary.md` per **spike-artifact-layout** (apply **save-artifacts**).
 6. Present the summary and ask: "Does this change scope look accurate? Anything missing, overestimated, or underestimated?"
 7. Note: the change summary is a planning aid tracing back to ADR decisions and solution doc sections. It is **never final** — if findings or the solution doc change afterwards, apply **sync-update-artifacts** to refresh it. For sprint planning, use it as input — not the final word.
 </summarize-required-changes>
@@ -312,5 +336,6 @@ For the full step-by-step procedure with prompts and validation checks per step,
 
 <rule>When the user wants to evaluate options by their technical implementation — or asks for diagrams, code diffs, or change locations per option — delegate tech-detail production to `draft-adr`'s **detail-options-tech** during **evaluate-solutions-per-area** (see **option-tech-details**).</rule>
 <rule>When drafting ADRs, seed `draft-adr` with each option's tech details so the ADR's option evaluation sections carry the diagrams and code changes.</rule>
+<rule>When compiling or updating any artifact — findings docs, ADRs, solution doc, change summary — apply **save-artifacts** to write each artifact into its spike folder location per **spike-artifact-layout**.</rule>
 
 </rules>

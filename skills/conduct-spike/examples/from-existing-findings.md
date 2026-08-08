@@ -130,7 +130,7 @@
 
 ### Final Output Bundle
 
-**Solution Document**: `solution-doc-caching-strategy.md`
+**Solution Document**: `solution.md`
 - C2 diagram showing Product Catalog Service with Caffeine + Redis, CDC pipeline for invalidation
 - Sequence diagrams for read path (cache hit/miss) and write path (DB write → CDC → invalidation)
 - API contracts unaffected (caching is transparent to callers)

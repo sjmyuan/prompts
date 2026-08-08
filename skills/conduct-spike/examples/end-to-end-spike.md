@@ -222,7 +222,7 @@ Similar structured ADRs produced for communication strategy (ADR-002: Hybrid syn
 
 ### Final Output Bundle
 
-**Solution Document**: `solution-doc-payment-migration.md`
+**Solution Document**: `solution.md`
 - Business context: migrate payment monolith to microservices
 - C2 Container Diagram: API Gateway → Wallet Service, Bank Transfer Service, Credit Card Service, each with own DB; Kafka event bus
 - C3 Component Diagrams: per service (e.g., Wallet Service: Controller → Service → Repository → Wallet DB)
@@ -239,4 +239,4 @@ Similar structured ADRs produced for communication strategy (ADR-002: Hybrid syn
 
 ### Wrap-Up (conversation level — not written into any artifact)
 
-> The solution document adopts the assumed solutions from all four ADRs. If any ADR decision changes during team review, the corresponding section of the solution document is rewritten in place. All artifacts should be version-controlled in `docs/architecture/decisions/` and `docs/architecture/solutions/`.
+> The solution document adopts the assumed solutions from all four ADRs. If any ADR decision changes during team review, the corresponding section of the solution document is rewritten in place. All artifacts are version-controlled together in the spike folder — `spikes/payment-migration/` — with the ADRs in `adrs/`, the solution doc (`solution.md`) and change summary at the root, and findings docs in `docs/` (see `examples/spike-artifact-layout.md`).

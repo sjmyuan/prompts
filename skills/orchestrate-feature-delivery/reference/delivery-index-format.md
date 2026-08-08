@@ -1,6 +1,6 @@
 # Delivery Index Format
 
-The delivery index is written next to the spike artifacts (same folder as the change summary / solution doc). It is the epic's **single source of truth for state** — the orchestrator reads it to decide next actions, updates it as agents report, and uses its **Spike References** so every agent brief can point agents at the full spike output.
+The delivery index is written at the **spike folder root** — the per-spike artifact folder from **conduct-spike**'s **spike-artifact-layout** (`spikes/<spike-name>/`; ADRs in `adrs/`, solution + change summary at the root, findings in `docs/`). It is the epic's **single source of truth for state** — the orchestrator reads it to decide next actions, updates it as agents report, and uses its **Spike References** so every agent brief can point agents at the full spike output.
 
 ## Structure
 

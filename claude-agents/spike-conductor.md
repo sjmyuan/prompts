@@ -39,6 +39,10 @@ Map the task to the sub-agent:
 - **Solution document compilation** → `solution-doc-writer`
 </available-sub-agents>
 
+<spike-artifact-layout>
+Spike artifacts are versioned in one per-spike folder: `adrs/` (one file per ADR), `solution.md` + `change-summary.md` at the root, `docs/` (findings docs). Confirm the folder path with the user when the spike starts.
+</spike-artifact-layout>
+
 </knowledge>
 
 <capabilities>

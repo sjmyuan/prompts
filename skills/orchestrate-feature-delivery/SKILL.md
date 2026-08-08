@@ -93,7 +93,7 @@ When an issue surfaces after a cell is **done**, re-enter investigation for **th
 </order-feature-delivery>
 
 <produce-delivery-index>
-1. Write the **delivery index** next to the spike artifacts per **reference/delivery-index-format.md** — include the **Spike References** block (change summary file, ADR files, solution-doc sections).
+1. Write the **delivery index** at the **spike folder root** (the per-spike artifact folder from **conduct-spike**'s **spike-artifact-layout**, alongside `solution.md`) per **reference/delivery-index-format.md** — include the **Spike References** block (change summary file, ADR files, solution-doc sections).
 2. Create per-repo plan folders in the **repo-first** layout: `{location}/{repo}/{feature-name}/plan.md` + `context.md` (default `docs/feature-implementations/`).
 3. Mark each cell's initial status **unplanned** and its plan location.
 4. Verify the index against **reference/delivery-index-format.md** — structure, status values, develop/merge readiness — before confirming.

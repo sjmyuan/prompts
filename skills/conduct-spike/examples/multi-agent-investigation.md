@@ -285,7 +285,7 @@ Load draft-adr skill and produce a complete ADR.
 ### Final Output Bundle
 
 - **Findings Document**: `findings-payment-migration.md` (current-state architecture + embedded per-area evidence map: `file:line` key locations, evidence ledger, searched-negatives)
-- **Solution Document**: `solution-doc-payment-migration.md` (C4 diagrams, API contracts, RAID, RACI — decision-only, no code references)
+- **Solution Document**: `solution.md` (C4 diagrams, API contracts, RAID, RACI — decision-only, no code references)
 - **ADR-001**: Service Decomposition (Payment-type services)
 - **ADR-002**: Inter-service Communication (Hybrid sync/async)
 - **ADR-003**: Database Decomposition (Database per service)

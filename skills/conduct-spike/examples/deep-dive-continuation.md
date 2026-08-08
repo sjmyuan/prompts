@@ -191,7 +191,7 @@
 **Revised ADR**:
 - ADR-003: Database Decomposition Strategy (resolved — Option C: shared DB + settlement extraction)
 
-**Solution Document**: `solution-doc-payment-migration.md` — C2 and sequence diagrams now include the Settlement Service; RAID and dependencies refreshed (rewritten in place, no version markers)
+**Solution Document**: `solution.md` — C2 and sequence diagrams now include the Settlement Service; RAID and dependencies refreshed (rewritten in place, no version markers)
 
 **Unchanged ADRs** (not revisited):
 - ADR-001: Service Decomposition Boundaries (payment-type services)
@@ -220,4 +220,4 @@
 
 > "Noted. D1 and B1 are queued as follow-up spikes. ADR-003 is finalized.
 >
-> As always: ADRs are formal decision records — review and approve with the team. The solution document should be version-controlled alongside the ADRs."
+> As always: ADRs are formal decision records — review and approve with the team. The solution document and ADRs are version-controlled together in the spike folder — ADRs in `adrs/`, solution doc at the root (see `examples/spike-artifact-layout.md`)."

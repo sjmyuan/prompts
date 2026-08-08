@@ -45,9 +45,9 @@
 4 features · 3 repos · 3 waves · critical path: F1 → F2/F3 → F4
 
 ## Spike References
-- **Change summary**: docs/spikes/payment-migration/change-summary.md
-- **Solution doc**: docs/spikes/payment-migration/solution-doc.md
-- **ADRs**: docs/spikes/payment-migration/adr-001-wallet.md · adr-002-cutover.md
+- **Change summary**: spikes/payment-migration/change-summary.md
+- **Solution doc**: spikes/payment-migration/solution.md
+- **ADRs**: spikes/payment-migration/adrs/adr-001-wallet.md · adr-002-cutover.md
 
 ## Cell plan status
 | Cell | Status | Agent | Plan location |
