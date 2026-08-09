@@ -13,7 +13,7 @@ Choose the diagram type that best explains the concept. Draw all diagrams with M
 
 | Diagram | Syntax | Key elements |
 |---|---|---|
-| **Sequence** | Mermaid `sequenceDiagram` | `actor`, `participant`, `database`, `->>` (sync), `-->>` (async/return), `alt/loop/par` |
+| **Sequence** | Mermaid `sequenceDiagram` | `actor`, `participant`, `database`, `->>` (sync), `-)` (async), `-->>` (return), `alt/loop/par` |
 | **Flowchart** | Mermaid `flowchart` | `([...])` (start/end), `[...]` (process), `{...}` (decision), `-->|label|` (arrow) |
 
 ## Other Useful Diagrams

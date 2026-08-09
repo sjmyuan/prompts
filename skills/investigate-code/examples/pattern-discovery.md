@@ -9,7 +9,7 @@
 
 First, investigate one concrete example: the `OrderConfirmed` event publishing in `order-service`.
 
-Applies investigate-codebase → trace-call-stack.
+Applies `<investigate-codebase>` → `<trace-call-stack>`.
 
 ```
 Call chain for OrderConfirmed publishing:

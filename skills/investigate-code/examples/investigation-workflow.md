@@ -7,7 +7,7 @@
 
 ## Step 1 — Clarify & Investigate
 
-Applies investigate-codebase.
+Applies `<investigate-codebase>`.
 
 The question is broad — agent asks: "Which service specifically, and are you asking about the full pipeline or a specific step?" User clarifies: "The `data-import-service`, full pipeline from event arrival to publishing."
 
@@ -53,7 +53,7 @@ Applies `<present-findings-with-confidence>`.
 ### Confidence & Coverage
 - ✅ Verified: entry point, routing, orchestration, publishing calls (file:line above)
 - 🔶 Inferred: `DataTransformer` is the only transformer — no other implementor confirmed
-- 💭 Assumptions: Clean Architecture layering inferred from package names
+- � Inferred: Clean Architecture layering inferred from package names
 - ❓ Gaps: error-handling path (`DataImportedHandler` retry/DLQ) not traced; outbound topic consumer not examined
 - ⚠️ Inconsistencies: none found
 ```
