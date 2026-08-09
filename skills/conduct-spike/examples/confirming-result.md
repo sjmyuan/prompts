@@ -2,7 +2,7 @@
 
 **Scenario**: A code-exploration sub-agent reported that the auth token cache is invalidated on password change, citing `TokenCacheService.java:42`. The finding feeds a security-audit area, so the spike orchestrator runs the verification loop before embedding it in the findings doc.
 
-Applies **question-the-result** (via `question-everything`) → **verify-the-claims** → **accept-or-requestion** (via `conduct-spike`).
+Applies **verify-sub-agent-results** (via `conduct-spike`) — the **question-the-result** (via `question-everything`) → verify → compare → accept loop.
 
 ## Input / Context
 - **Original sub-agent result**: "Password change invalidates cached tokens — `TokenCacheService.java:42` calls `cache.invalidate(userId)`."
@@ -19,10 +19,10 @@ Prioritized challenges:
 - **C2 (Completeness, high)** — Verify whether the refresh-token path also checks the same cache; if not, the claim is incomplete.
 - **C3 (Ambiguity, medium)** — Clarify whether invalidation covers both access and refresh tokens.
 
-## Verification (verify-the-claims)
+## Verification (new same-type sub-agent)
 A NEW coding agent (same type as the original, not the original instance) is dispatched with the original claims plus C1–C3, instructed to answer from the codebase only.
 
-## Comparison (accept-or-requestion)
+## Comparison (verdicts vs. result)
 - **C1** — AGREE: `TokenCacheService.java:42` matches; the controller calls it on password change.
 - **C2** — AGREE: the refresh path re-validates the same cache key; the claim is complete.
 - **C3** — AGREE: invalidation clears both access and refresh entries.

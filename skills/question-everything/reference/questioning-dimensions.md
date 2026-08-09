@@ -20,3 +20,18 @@ Order challenges by impact, not by count:
 - **Scope** — how much of the result depends on the challenged claim
 
 High-impact + plausible = verify first. Low-impact + implausible = note, don't block.
+
+## Output Format
+
+Emit each challenge as a numbered item:
+
+`**C<N> (<Dimension>, <priority>)** — <claim questioned>: <why it is suspect>. Satisfactory answer: <what closes the challenge>.`
+
+- **C<N>** — sequential challenge number
+- **<Dimension>** — one of the six dimensions above
+- **<priority>** — high, medium, or low
+- **<claim questioned>** — one specific claim, never the whole result
+- **<why it is suspect>** — the concrete reason the claim may be wrong
+- **Satisfactory answer** — the evidence or clarification that would close the challenge
+
+When no challenge survives, output: "The result passes initial questioning — no challenges raised."

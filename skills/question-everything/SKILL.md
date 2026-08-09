@@ -1,6 +1,6 @@
 ---
 name: question-everything
-description: Question agent-reported information like a skeptic across completeness, correctness, and ambiguity, raising challenges for others to verify. Use when questioning, challenging, or validating information returned by an agent or sub-agent.
+description: Question agent-reported information like a skeptic across six questioning dimensions, raising challenges for others to verify. Use when questioning, challenging, or validating information returned by an agent or sub-agent.
 ---
 
 <when-to-use-this-skill>
@@ -10,6 +10,7 @@ description: Question agent-reported information like a skeptic across completen
 - Two agents or sub-agents return conflicting results and a resolution is needed
 - User asks to validate the correctness, completeness, or clarity of a returned result
 - User asks to raise questions about sub-agent results inside a spike pipeline — investigation findings or ADR decisions (via `conduct-spike`)
+- Do NOT load to verify or accept a result yourself — this skill only raises challenges; verification belongs to the owning pipeline (e.g., `conduct-spike`)
 </when-to-use-this-skill>
 
 <knowledge>
@@ -25,7 +26,7 @@ Question results across six dimensions: **Completeness** (missing paths/cases), 
 <context-loading-guide>
 | Load when | Provides | File |
 |---|---|---|
-| About to generate challenges on a returned result | Full dimension rubric with concrete questions per dimension | [reference/questioning-dimensions.md](reference/questioning-dimensions.md) |
+| About to generate challenges on a returned result | Six-dimension rubric, prioritization rules, and challenge output format | [reference/questioning-dimensions.md](reference/questioning-dimensions.md) |
 | Seeing a worked questioning pass on a returned result | End-to-end example of raising prioritized challenges only | [examples/raising-challenges.md](examples/raising-challenges.md) |
 </context-loading-guide>
 
@@ -39,9 +40,19 @@ Question results across six dimensions: **Completeness** (missing paths/cases), 
 1. Load [reference/questioning-dimensions.md](reference/questioning-dimensions.md) via the **context-loading-guide**.
 2. Restate the result's key claims so each challenge targets one specific claim, never the result as a whole.
 3. Probe each claim against the six dimensions using the rubric's questions.
-4. Formulate each challenge as: the claim questioned, the dimension, why it is suspect, and what a satisfactory answer looks like.
+4. Formulate each challenge using the rubric's output format — the claim questioned, the dimension, why it is suspect, and a satisfactory answer.
 5. Prioritize by impact — what breaks if the claim is wrong, and how plausible the error is.
 6. Output the ordered challenge list; if no challenge survives, state that the result passes initial questioning.
+7. Validate the output: each challenge names exactly one claim, states its dimension, explains why it is suspect, and defines a satisfactory answer; challenges are ordered by impact. Fix any failure before presenting.
 </question-the-result>
 
 </capabilities>
+
+<rules>
+<rule>When the user asks to question, challenge, or act as a skeptic toward an agent- or sub-agent-returned result, apply **question-the-result**.</rule>
+<rule>When the user asks to validate the correctness, completeness, or clarity of a returned result, apply **question-the-result**.</rule>
+<rule>When a result will be consumed downstream and being wrong is costly, apply **question-the-result** before the result is accepted.</rule>
+<rule>When two agents or sub-agents return conflicting results, apply **question-the-result** to each result to surface the conflict.</rule>
+<rule>When raising questions on sub-agent results inside a spike pipeline (investigation findings or ADR decisions via `conduct-spike`), apply **question-the-result** before verification.</rule>
+<rule>Do NOT apply **question-the-result** to verify or accept a result — verification belongs to the owning pipeline (e.g., `conduct-spike`).</rule>
+</rules>
