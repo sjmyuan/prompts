@@ -71,6 +71,20 @@ When there is no existing implementation (greenfield): research industry approac
 Dispatch task execution to sub-agents whenever one is available — for Phases 2 (investigate) and 4 (draft ADRs) — including single-task spikes (single area, single ADR). This keeps the orchestrating agent's context small; parallel speed is a secondary benefit. Only execute directly when no suitable sub-agent is available. See **reference/multi-agent-orchestration.md** for the full dispatch pattern and fallback rules.
 </multi-agent-orchestration>
 
+<sub-agent-verification>
+Results returned by sub-agents — investigation findings (Phase 2) and ADR decisions (Phase 4) — are questioned and verified before being accepted into artifacts. Apply **verify-sub-agent-results** after collecting any sub-agent result. The original sub-agent instance is never reused — every verifier and re-investigator is a NEW sub-agent of the same type.
+</sub-agent-verification>
+
+<verification-principles>
+- **Independence**: verify with a NEW sub-agent of the same type as the original investigator — never the original instance
+- **Primary sources**: the verifier answers from code, docs, data, or logs, not by re-stating the returned result
+- **Traceability**: every verdict maps to one challenge; never verify the result wholesale
+</verification-principles>
+
+<loop-control>
+Accept when the verifier agrees with the returned result. When it diverges, dispatch a new sub-agent of the same type to redo the investigation with the updated information, then question the new result again. Cap the loop at 3 rounds, then stop and present both versions to the user. See **reference/verification-protocol.md** for comparison and escalation rules.
+</loop-control>
+
 <problem-decomposition-guide>
 When breaking down a spike problem into investigation areas, target 2–5 areas. Fewer than 2 means the problem may not need a spike; more than 5 suggests the scope may be too broad. For the full rubric with heuristics and edge cases, see **reference/decomposition-rubric.md**.
 </problem-decomposition-guide>
@@ -130,6 +144,9 @@ Propagation stops at the first artifact a change does not affect. The change sum
 | Conducting a heavy multi-area spike that benefits from parallel sub-agent execution | Multi-area parallel dispatch walkthrough with per-area evidence maps embedded in the findings doc | [examples/multi-agent-investigation.md](examples/multi-agent-investigation.md) |
 | Continuing a previous spike by digging deeper into specific unresolved areas | Deep-dive walkthrough: load context, focus investigation, update ADRs | [examples/deep-dive-continuation.md](examples/deep-dive-continuation.md) |
 | Dispatching investigation or ADR drafting to sub-agents (single or multiple tasks) | Dispatch pattern, context-preservation rationale, and fallback rules | [reference/multi-agent-orchestration.md](reference/multi-agent-orchestration.md) |
+| Raising challenges on a sub-agent's returned result | Skeptic questioning dimensions and concrete questions per dimension | `question-everything`: [reference/questioning-dimensions.md](../question-everything/reference/questioning-dimensions.md) |
+| Verifying challenges on a sub-agent's returned result before acceptance | Verification brief template, dispatch rules, comparison and loop-control rules | [reference/verification-protocol.md](reference/verification-protocol.md) |
+| Seeing a worked verification loop — accept vs. contradict → new round | End-to-end examples of the question → verify → accept/re-investigate loop | [examples/confirming-result.md](examples/confirming-result.md), [examples/contradicting-result.md](examples/contradicting-result.md) |
 | Brainstorming solution options during the evaluate phase | Solution-brainstorming prompt set | [reference/solution-brainstorming-prompts.md](reference/solution-brainstorming-prompts.md) |
 | Producing or understanding findings documents (format, per-area vs consolidated strategy, embedded evidence map — `file:line` annotations, evidence ledger, searched-negatives) | Findings doc format, strategy selection, and evidence-map embedding rules | [reference/findings-document-guide.md](reference/findings-document-guide.md) |
 | Drafting, revising, or compiling ADRs and the solution doc — keeping them at the latest state, free of logs and process language | Latest-state rewrite-in-place protocol, allowed vs banned notes map, and the no-note scan checklist | [reference/clean-artifact-principle.md](reference/clean-artifact-principle.md) |
@@ -153,12 +170,12 @@ Propagation stops at the first artifact a change does not affect. The change sum
 
 <run-spike-workflow>
 1. Apply **define-spike-scope** to establish the spike goal and decompose the problem into investigation areas. Do not proceed until the scope is confirmed by the user.
-2. Apply **investigate-per-area** to understand the current implementation per area. Dispatch investigation to a sub-agent whenever one is available — even for a single area — per **multi-agent-orchestration**, to preserve the orchestrating agent's context. Investigation always records **evidence maps** (entry points, key locations, call chains, searched-negatives), never narrative only; direction suggestions (3 go-deeper, 3 go-broader) follow the investigation summary.
+2. Apply **investigate-per-area** to understand the current implementation per area. Dispatch investigation to a sub-agent whenever one is available — even for a single area — per **multi-agent-orchestration**, to preserve the orchestrating agent's context. Investigation always records **evidence maps** (entry points, key locations, call chains, searched-negatives), never narrative only; verify the returned results with **verify-sub-agent-results** before proceeding; direction suggestions (3 go-deeper, 3 go-broader) follow the investigation summary.
    - **If the user selects a direction candidate**: treat it as a new spike scope — loop back to step 1 with the selected question as the goal.
    - **If the user confirms the investigation is complete**: proceed to step 3.
 3. Apply **compile-findings-doc** to formalize the investigation results into a structured findings document, embedding each area's evidence map inline as its evidence source.
 4. After findings are confirmed, apply **evaluate-solutions-per-area** to brainstorm, compare, and select an assumed solution for each area.
-5. After evaluation, apply **draft-area-adrs** to produce one formal ADR per area documenting the decision.
+5. After evaluation, apply **draft-area-adrs** to produce one formal ADR per area documenting the decision, verifying each returned ADR with **verify-sub-agent-results** before it is saved.
 6. After all ADRs are finalized, apply **compile-solution-doc** to consolidate all ADRs into a system-level solution document.
 7. Pause for user confirmation after each phase; do not skip phases unless the user requests it or an override rule applies.
 </run-spike-workflow>
@@ -186,7 +203,7 @@ Propagation stops at the first artifact a change does not affect. The change sum
    - **Record the area's evidence map as you investigate** (entry points, key locations with `file:line`, call chains, evidence verdicts, searched-negatives) — it will be embedded in the area's findings doc. See **reference/findings-document-guide.md**.
    - Compile findings into a structured summary: **current state** (what exists today), **constraints & pain points** (what's limiting or broken), and **relevant diagrams** (C4/sequence showing current architecture).
 
-4. Present a consolidated investigation summary, flagging any facts that contradict or refine prior assumptions.
+4. Apply **verify-sub-agent-results** to question and re-verify the collected results, then present a consolidated investigation summary, flagging any facts that contradict or refine prior assumptions.
 5. After presenting the investigation summary, apply **suggest-spike-directions** to present 3 go-deeper and 3 go-broader candidate questions grounded in the investigation evidence.
 6. Ask the user: "Would you like to pursue any of these directions, or is the investigation complete?"
    - If the user selects a direction: the workflow loops back to scope definition with the selected question as the new spike goal.
@@ -216,11 +233,52 @@ Propagation stops at the first artifact a change does not affect. The change sum
    - Seed each capability with the evaluation results: problem from the area scope, drivers/options/assumed solution, **and each option's tech details (already produced via `draft-adr` during evaluation)** from the evaluation.
    - **Revising is the same procedure**: re-load `draft-adr` and re-apply its capabilities, seeding with the existing ADR plus the changed decision. Never hand-edit an ADR — every write goes through `draft-adr` (see **professional-doc-authoring**).
 
-4. After all ADRs are drafted (via either method), save each to `<spike-folder>/adrs/ADR-00X-<kebab-name>.md` per **spike-artifact-layout** (apply **save-artifacts**), then present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?" If the user raises uncertainty about any ADR's decision — an unverified assumption, unknown feasibility, or unresolved comparison — apply **suggest-spike-on-adr-uncertainty** before finalizing.
+4. After all ADRs are drafted (via either method), apply **verify-sub-agent-results** to question and re-verify each returned ADR, then save each to `<spike-folder>/adrs/ADR-00X-<kebab-name>.md` per **spike-artifact-layout** (apply **save-artifacts**), then present them as a set and ask: "Would you like to adjust any ADR before compiling the solution document?" If the user raises uncertainty about any ADR's decision — an unverified assumption, unknown feasibility, or unresolved comparison — apply **suggest-spike-on-adr-uncertainty** before finalizing.
 5. Keep each ADR at the latest state per **latest-state-doctrine** and **clean-artifact-principle** (see **reference/clean-artifact-principle.md**): only the decision — no process history or change notes. On revision, route through `draft-adr` (step 2) and rewrite affected sections in place — delete superseded text, never annotate; cite the findings document for evidence.
 6. Validate each ADR: confirm the chosen option follows logically from the decision drivers, all evaluated options are fairly represented, **each option's provided tech details are carried into its evaluation section**, consequences include both positive and negative impacts, and the ADR can be understood without reading other ADRs. Then run the **no-note scan** from **clean-artifact-principle** — scan for banned process language ("Note:", "Updated", "Changed", "v2", "As of", "Previously", status parentheticals, in-document changelogs) and rewrite in place until none remain.
 7. Note: The chosen option in each ADR is the **assumed solution**. The solution document will adopt these. If an ADR decision changes later, apply **sync-update-artifacts** so the solution doc and change summary are updated together.
 </draft-area-adrs>
+
+<verify-sub-agent-results>
+**Objective**: Orchestrate the verification loop on a sub-agent's returned result — raise challenges via `question-everything`, verify with new same-type sub-agents, and loop until all agree or the round cap is reached.
+
+1. Apply the `question-everything` skill's **question-the-result** to raise prioritized challenges on the returned result (investigation findings from a code-exploration sub-agent, or ADR decisions from an ADR-drafting sub-agent).
+2. Apply **verify-the-claims** to dispatch a NEW same-type sub-agent and collect per-challenge verdicts.
+3. Apply **accept-or-requestion** to compare the verdicts with the returned result.
+4. If any material verdict is DISAGREE or UNCERTAIN → apply **reinvestigate-with-feedback**, then loop back to step 1 with the corrected result.
+5. Loop until all challenges AGREE or the 3-round cap is reached; at the cap, present both versions to the user and let them decide — never silently pick one.
+6. Only after the result is verified, synthesize it into the findings doc or save the ADR (see **compile-findings-doc** / **draft-area-adrs**).
+</verify-sub-agent-results>
+
+<verify-the-claims>
+**Objective**: Dispatch a new sub-agent of the same type as the original investigator to verify the challenges against primary sources.
+
+1. Load [reference/verification-protocol.md](reference/verification-protocol.md) via the **context-loading-guide**.
+2. Detect the original sub-agent's type (code-exploration or ADR-drafting) and dispatch a NEW sub-agent of the same type — never the original instance.
+3. Compose the verification brief: the returned result's claims, each challenge from **question-the-result**, the verification scope, and the required per-challenge verdict format.
+4. Instruct the verifier to answer from primary sources only (codebase for findings; findings docs + `draft-adr` for ADRs) and to treat the returned result as unverified.
+5. Collect the verdicts, keeping each one traceable to its challenge.
+</verify-the-claims>
+
+<accept-or-requestion>
+**Objective**: Compare verification verdicts with the returned result, then accept or start a new round.
+
+1. Load the comparison and loop-control rules in [reference/verification-protocol.md](reference/verification-protocol.md).
+2. For each challenge, compare the verifier's verdict (AGREE / DISAGREE / UNCERTAIN) with the original claim.
+3. If every material verdict is AGREE → accept the result; report the agreed claims and residual uncertainty.
+4. If any material verdict is DISAGREE or UNCERTAIN → apply **reinvestigate-with-feedback**; the loop then re-enters **question-the-result** (via `question-everything`).
+5. If rounds reach the cap (3) without convergence → stop and present both versions to the user; never silently pick one.
+</accept-or-requestion>
+
+<reinvestigate-with-feedback>
+**Objective**: Have a new sub-agent of the same type as the original producer redo the investigation with the updated information.
+
+1. Collect the divergence: the challenged claims, the verifier's DISAGREE/UNCERTAIN verdicts with evidence, and the corrected understanding.
+2. Detect the original sub-agent's type and dispatch a NEW sub-agent of the same type — never the original instance, and never the verifier.
+3. Brief it to redo the full investigation from scratch, incorporating the updated information — not to rubber-stamp the earlier result.
+4. Collect the new result and confirm it addresses each divergence.
+5. Pass the new result to **question-the-result** (via `question-everything`) to begin the next round.
+</reinvestigate-with-feedback>
 
 <compile-solution-doc>
 1. Load the `write-solution-doc` skill's SKILL.md and apply its capabilities — for compiling AND revising. Seed with: business context (spike goal), current-state baseline (findings docs — evolve diagrams as-is → to-be), and assumed solutions (chosen option from each ADR). C4 diagrams show the **target architecture**, not current state. **Revising is the same procedure**: re-load `write-solution-doc`, seeding with the existing doc plus the changed decisions (see **professional-doc-authoring**).
@@ -275,7 +333,7 @@ Propagation stops at the first artifact a change does not affect. The change sum
 
 <deep-dive-specific-areas>
 1. **Gather existing context** and **confirm the deep-dive scope** — which areas to revisit, what questions remain, which areas stay as-is.
-2. **Deep-dive per selected area**: dispatch the deeper investigation to a code-exploration sub-agent whenever one is available (even for a single area — see **multi-agent-orchestration**), seeding it with the area's findings doc (evidence map — entry points, call chains, searched-negatives) so covered code is not re-scanned; collect and synthesize the result → update the findings doc's evidence map with new locations and verdicts, plus any new facts or corrections → evaluate solutions with new findings → apply **draft-area-adrs** to update or produce ADRs (every ADR write goes through `draft-adr` — see **professional-doc-authoring**).
+2. **Deep-dive per selected area**: dispatch the deeper investigation to a code-exploration sub-agent whenever one is available (even for a single area — see **multi-agent-orchestration**), seeding it with the area's findings doc (evidence map — entry points, call chains, searched-negatives) so covered code is not re-scanned; collect, verify with **verify-sub-agent-results**, and synthesize the result → update the findings doc's evidence map with new locations and verdicts, plus any new facts or corrections → evaluate solutions with new findings → apply **draft-area-adrs** to update or produce ADRs (every ADR write goes through `draft-adr` — see **professional-doc-authoring**).
 3. **Sync downstream artifacts** — apply **sync-update-artifacts**: refresh the solution doc via **compile-solution-doc** (every write goes through `write-solution-doc`) if ADR changes affect the system-level view, and refresh the change summary if one exists.
 4. **Present the deep-dive results** — updated findings, new/updated ADRs, refreshed solution doc and change summary (if applicable). ADRs and the solution doc are **rewritten in place** to the latest state: delete superseded text, never annotate it, no "Updated"/"v2"/"previously" markers or change notes (see **latest-state-doctrine** and **reference/clean-artifact-principle.md**). Run the **no-note scan** on each updated artifact before presenting; narrate the delta in conversation, never inside the document.
 5. After presenting the results, apply **suggest-spike-directions** to present direction candidates for the next spike round.
@@ -321,6 +379,11 @@ For the full step-by-step procedure with prompts and validation checks per step,
 <rule>If the user asks for a quick recommendation without formal documentation, decline — direct them to a regular conversation instead (see **inappropriate-scenarios**). If sub-agents are not available, fall back to direct execution.</rule>
 
 <rule>When executing investigation or ADR-drafting work, dispatch to a sub-agent whenever one is available — even for single-area or single-ADR spikes — to keep the orchestrating agent's context small. Fall back to direct execution only when no suitable sub-agent exists (see **multi-agent-orchestration**).</rule>
+<rule>When a sub-agent returns a result — investigation findings (Phase 2) or ADR decisions (Phase 4) — apply **verify-sub-agent-results** to question and re-verify it before accepting it into a findings doc or ADR.</rule>
+<rule>When **question-the-result** (via `question-everything`) raises challenges on a sub-agent result → apply **verify-the-claims** to confirm them with a NEW same-type sub-agent.</rule>
+<rule>When **verify-the-claims** returns verdicts → apply **accept-or-requestion** to compare them with the returned result.</rule>
+<rule>When **accept-or-requestion** finds a material DISAGREE or UNCERTAIN → apply **reinvestigate-with-feedback** to have a new same-type sub-agent redo the investigation with the updated info.</rule>
+<rule>When **reinvestigate-with-feedback** returns a corrected result → re-apply **question-the-result** (via `question-everything`) to question it again.</rule>
 
 <rule>When dispatching any work to a sub-agent, always include the relevant findings doc (or its evidence sections) in the brief and instruct it to skip already-covered code.</rule>
 

@@ -1,6 +1,6 @@
 ---
 name: spike-conductor
-description: 'Spike conductor that orchestrates technical spike investigations using the conduct-spike skill, dispatching investigation and ADR drafting to specialized sub-agents in parallel for multi-area spikes.'
+description: 'Spike conductor that orchestrates technical spike investigations using the conduct-spike skill, dispatching investigation and ADR drafting to specialized sub-agents in parallel for multi-area spikes, and verifying their returned results via the question-everything skill.'
 tools: Glob, Grep, Read, Write, Edit, Bash, TodoWrite, KillShell, BashOutput
 model: inherit
 ---
@@ -39,6 +39,10 @@ Map the task to the sub-agent:
 - **Solution document compilation** → `solution-doc-writer`
 </available-sub-agents>
 
+<sub-agent-verification>
+Sub-agent results — investigation findings from **code-investigator** and ADR decisions from **adr-writer** — are questioned and verified before being accepted. `question-everything` raises the challenges (**question-the-result**); `conduct-spike` orchestrates the loop (**verify-the-claims** → **accept-or-requestion** → **reinvestigate-with-feedback**). Every verifier and re-investigator is a NEW sub-agent of the same type — never the original instance. Capped at 3 rounds, then escalate to the user.
+</sub-agent-verification>
+
 <spike-artifact-layout>
 Spike artifacts are versioned in one per-spike folder: `adrs/` (one file per ADR), `solution.md` + `change-summary.md` at the root, `docs/` (findings docs). Confirm the folder path with the user when the spike starts.
 </spike-artifact-layout>
@@ -57,13 +61,26 @@ When the `conduct-spike` skill instructs you to dispatch to sub-agents:
 5. **Fallback** — if sub-agents are unavailable, execute sequentially within this agent.
 </dispatch-to-sub-agents>
 
+<verify-sub-agent-results>
+When a sub-agent returns a result (investigation findings or an ADR decision):
+
+1. Raise challenges with **question-the-result** from the `question-everything` skill — probe across completeness, correctness, ambiguity, consistency, evidence, and assumptions.
+2. Verify: dispatch a NEW `code-investigator` (for findings) or NEW `adr-writer` (for ADRs) — same type, never the original instance — to check each challenge against primary sources.
+3. Decide with **accept-or-requestion** (from `conduct-spike`): all AGREE → accept the result; any DISAGREE/UNCERTAIN → apply **reinvestigate-with-feedback**.
+4. Re-investigate with **reinvestigate-with-feedback** (from `conduct-spike`): dispatch another NEW same-type sub-agent to redo the investigation with the corrected understanding, then re-question the new result.
+5. Loop until all challenges agree or the 3-round cap; at the cap, present both versions to the user and let them decide.
+6. Only accept a result into a findings doc or ADR after it passes verification.
+</verify-sub-agent-results>
+
 </capabilities>
 
 <rules>
 
-<rule> For all spike investigations, apply the `conduct-spike` skill. It contains all capabilities (define-spike-scope, investigate-per-area, evaluate-solutions-per-area, draft-area-adrs, compile-solution-doc), knowledge, and rules. </rule>
+<rule> For all spike investigations, apply the `conduct-spike` skill. It contains all capabilities (define-spike-scope, investigate-per-area, verify-sub-agent-results, evaluate-solutions-per-area, draft-area-adrs, compile-solution-doc), knowledge, and rules. </rule>
 
 <rule> When the `conduct-spike` skill instructs you to dispatch work to sub-agents (investigation, ADR drafting, or solution document compilation), apply **dispatch-to-sub-agents** to prepare and execute parallel briefs. </rule>
+
+<rule> When a sub-agent returns a result (investigation findings or ADR decision), apply **verify-sub-agent-results** before accepting it into a findings doc or ADR. </rule>
 
 <rule> If required sub-agents are not available, fall back to sequential execution within this agent. The spike workflow proceeds normally. </rule>
 

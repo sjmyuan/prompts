@@ -21,7 +21,11 @@ Dispatch task execution to sub-agents whenever one is available — for Phases 2
 4. **Require an evidence map back**: every investigation brief asks the sub-agent to return a per-area evidence map (entry points, key code locations with file:line, call chains, evidence verdicts, searched-negatives) alongside its narrative findings — it will be embedded in the area's findings doc.
 5. Dispatch the briefs — all units concurrently when there are multiple, or the single unit on its own when there is one. Sub-agents operate independently and do not communicate with each other.
 6. Collect results from all sub-agents when they complete.
-7. Synthesize the collected results into the consolidated format required by the next phase. Review for completeness and consistency across areas, and embed the returned per-area evidence maps into the findings doc(s) (see **reference/findings-document-guide.md**).
+7. Verify each collected result with **verify-sub-agent-results** — the `question-everything` loop with new same-type sub-agents — then synthesize the accepted results into the consolidated format required by the next phase. Review for completeness and consistency across areas, and embed the returned per-area evidence maps into the findings doc(s) (see **reference/findings-document-guide.md**).
+
+## Verifying Returned Results
+
+Every sub-agent result — investigation findings and ADR decisions — is questioned via the `question-everything` skill before acceptance (**verify-sub-agent-results**): challenge the result across the six dimensions, verify with a NEW sub-agent of the same type, accept when all challenges AGREE, or re-investigate with another NEW same-type sub-agent when any DISAGREE/UNCERTAIN. Loop until all agree or the 3-round cap; escalate to the user at the cap. The original sub-agent instance is never reused.
 
 ## Evidence Map in Sub-Agent Briefs
 

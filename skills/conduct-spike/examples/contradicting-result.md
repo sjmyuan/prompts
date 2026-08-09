@@ -1,8 +1,8 @@
-# Example: Verification Contradicts the Original Result (New Round)
+# Example: Verification Contradicts a Sub-Agent's Finding (New Round)
 
-**Scenario**: A research sub-agent concluded "Service X syncs orders to the warehouse via Kafka topic `orders.warehouse`". The result is used for an integration design, so the orchestrating agent runs the skeptic loop before committing to it.
+**Scenario**: A code-exploration sub-agent concluded "Service X syncs orders to the warehouse via Kafka topic `orders.warehouse`". The finding feeds an integration-design area, so the spike orchestrator runs the verification loop before embedding it in the findings doc.
 
-Applies **question-the-result** → **verify-the-claims** → **accept-or-requestion** → **reinvestigate-with-feedback**, repeated across two rounds.
+Applies **question-the-result** (via `question-everything`) → **verify-the-claims** → **accept-or-requestion** → **reinvestigate-with-feedback** (via `conduct-spike`), repeated across two rounds.
 
 ## Input / Context
 - **Original sub-agent result**: "Order sync to the warehouse uses Kafka topic `orders.warehouse`; latency ~2s."
