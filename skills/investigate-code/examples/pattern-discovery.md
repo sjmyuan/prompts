@@ -132,3 +132,14 @@ Controller → Service → KafkaTemplate.send() → Kafka
 2. Add retry handling (consistent with the other 3 services)
 3. Remove custom `KafkaProducerConfig` — use auto-configuration
 4. Consider extracting a shared `EventPublisher` library for all services
+
+Applies `<present-findings-with-confidence>`.
+
+```
+### Confidence & Coverage
+- ✅ Verified: fingerprints of all 4 services (entry/layer/error/config above)
+- 🔶 Inferred: the 3 matching services all use the same Kafka auto-config (config values read, defaults assumed)
+- 💭 Assumptions: services discovered by `*Orchestrator`/`EventPublisher` suffix — differently-named publishers may exist
+- ❓ Gaps: batch/async publishing paths (e.g., @Scheduled jobs) not searched; `inventory-service` retry history unknown
+- ⚠️ Inconsistencies: 1 variant vs 3 matches (Pattern 2 in `inventory-service`)
+```

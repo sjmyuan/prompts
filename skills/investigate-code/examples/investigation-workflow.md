@@ -47,6 +47,17 @@ The `data-import-service` transforms data through a four-layer pipeline:
 
 **Next steps**: For individual field-mapping rules, investigate `DataTransformer.transform()` directly. For error handling, check `DataImportedHandler` for retry/dead-letter routing.
 
+Applies `<present-findings-with-confidence>`.
+
+```
+### Confidence & Coverage
+- ✅ Verified: entry point, routing, orchestration, publishing calls (file:line above)
+- 🔶 Inferred: `DataTransformer` is the only transformer — no other implementor confirmed
+- 💭 Assumptions: Clean Architecture layering inferred from package names
+- ❓ Gaps: error-handling path (`DataImportedHandler` retry/DLQ) not traced; outbound topic consumer not examined
+- ⚠️ Inconsistencies: none found
+```
+
 ---
 
 ## Variation: "Why" Questions

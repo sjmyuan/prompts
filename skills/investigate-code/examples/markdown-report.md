@@ -264,7 +264,30 @@ sequenceDiagram
 
 ---
 
-## 7. Next Steps for Deeper Investigation
+## 7. Confidence & Coverage
+
+### Verified
+- Registration orchestration call chain — `RegistrationOrchestrator.java:28-33`
+- Duplicate-email validation — `UserService.java:45-48`
+- Token generation with 24h expiry — `VerificationTokenService.java:22-25`
+- Email send via REST — `EmailAdapter.java:33-38`
+
+### Inferred
+- Email-failure fallback (`email_send_failed=true`) inferred from the `RegistrationOrchestrator` catch block — retry count not read from config
+
+### Assumptions
+- `notification-service` port 8081 assumed from docker-compose, not confirmed in code
+
+### Gaps
+- Refund / account-closure flows not traced
+- SMTP configuration inside `notification-service` not examined
+
+### Inconsistencies
+- ⚠️ `README.md` states "email retried 5 times", but `EmailAdapter.java` shows 3 retries
+
+---
+
+## 8. Next Steps for Deeper Investigation
 
 - [ ] View `VerificationTokenService` implementation for token expiry and cleanup logic
 - [ ] Examine `notification-service` for email template rendering and SMTP configuration
