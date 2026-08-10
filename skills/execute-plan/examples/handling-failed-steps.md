@@ -1,5 +1,9 @@
 # Plan Executor: Handling Failed Steps Example
 
+**Scenario**: A bug-fix plan hits a compilation error mid-execution; the executor marks the step ❌, analyzes the root cause, applies a recovery fix, and retries. Also covers a step that cannot proceed (blocked → ask the user).
+
+**Applies**: **track-plan**, **execute-step**, **handle-errors**
+
 ## User Request
 "Implement the bug fix plan we created for the null pointer exception in data transformation"
 

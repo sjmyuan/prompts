@@ -1,5 +1,9 @@
 # Plan Executor: Long Plan Execution Example
 
+**Scenario**: A 15-step authentication feature plan requires context preservation across many steps; each step is tracked and the full step list is re-displayed after every change.
+
+**Applies**: **track-plan**, **execute-step**, **report-progress**
+
 ## User Request
 "Execute the comprehensive plan to add user authentication and authorization system"
 

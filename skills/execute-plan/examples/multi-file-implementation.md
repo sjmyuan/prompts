@@ -1,5 +1,9 @@
 # Plan Executor: Multi-File Implementation Example
 
+**Scenario**: A 7-step plan spans domain model, handler, adapter, publisher, and configuration layers; execution tracks status across multiple files and architectural layers.
+
+**Applies**: **track-plan**, **execute-step**
+
 ## User Request
 "Execute the plan to add data category transformation feature"
 

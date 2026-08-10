@@ -1,6 +1,6 @@
 ---
 name: plan-development-task
-description: Classify, clarify, and generate TDD-based step-by-step plans for bug fixes, features, and refactors. Use when planning / investigating / designing changes for bugs, regressions, new features, enhancements, refactoring, or technical debt.
+description: Classify, clarify, and generate TDD-based step-by-step plans for bug fixes, features, and refactors. Use when planning / investigating / designing changes or appending rework for bugs, regressions, new features, enhancements, refactoring, or technical debt.
 ---
 
 <when-to-use-this-skill>

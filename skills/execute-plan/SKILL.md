@@ -1,6 +1,6 @@
 ---
 name: execute-plan
-description: Execute structured development plans step-by-step with progress tracking, validation checkpoints, and error recovery. Use when executing / carrying out / resuming / reviewing the execution of a plan from plan-development-task.
+description: Execute structured development plans step-by-step with progress tracking, validation checkpoints, and error recovery. Use when executing / carrying out / resuming / reviewing a plan from plan-development-task, or a delivery cell / rework from orchestrate-feature-delivery.
 ---
 
 <when-to-use-this-skill>
@@ -62,7 +62,7 @@ Each feature implementation lives in its own folder with two files:
 A plan consumed by this skill consists of numbered steps. Each step must have:
 - **Step number**: Sequential integer starting from 1
 - **Title**: Short descriptive name of the step
-- **Objective** (optional but recommended): What the step achieves
+- **Objective**: What the step achieves
 
 The plan may be provided as:
 - An existing `plan.md` file in a feature folder (created by **export-plan** in plan-development-task, an **orchestrate-feature-delivery** cell folder, or a previous execution)
@@ -122,17 +122,14 @@ Load only the example most relevant to the current execution scenario to minimiz
 <capabilities>
 
 <track-plan>
-1. Determine where to store the plan. For an **orchestrate-feature-delivery** cell, use the existing epic folder `deliveries/<epic-name>/{repo}/{feature-name}/`; otherwise ask the user or default to `docs/feature-implementations/`.
-2. Derive a descriptive, short name for the feature from the plan's objective (e.g., `add-auth-system`, `refactor-validation-handler`, `fix-null-pointer-in-transformer`). Use kebab-case.
-3. Locate the feature folder: for an **orchestrate-feature-delivery** cell use the existing `deliveries/<epic-name>/{repo}/{feature-name}/`; otherwise create it repo-first `{location}/{repo}/{feature-name}/` (or `{location}/{feature-name}/` when no repo applies). Inside it, ensure two files:
-   - `plan.md` — the step-by-step execution plan with status tracking (see **step-tracking-format**)
-   - `context.md` — all context, references, requirements, constraints, and decisions that define the plan (captured from the plan source so the reasoning is preserved alongside the plan)
-4. Before creating a new plan, check if the feature folder already exists with a plan file. If it contains an appended `## Rework <date>` section, execute only the rework steps (see **rework-plan-execution**) — never re-run or modify the completed original steps. If a plan file has steps with ❌ failed or 🚫 blocked status, ask the user whether to **resume** from the last known state or **start fresh** (create a new folder/overwrite).
-5. List each step in the plan file with its number, title, and initial status ⏳ pending, using the **step-tracking-format** knowledge.
-6. Populate the context file with all relevant background: requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, and any other material that informed the plan.
-7. Update step status in the plan file immediately after each state change (⏳ → 🔄 → ✅, or ❌/🚫 on failure). Refer to **step-status-definitions** knowledge for emoji meanings.
-8. Never modify plan structure, objectives, steps, or the **Scope Boundary** block except to update statuses or add clarifying notes.
-9. Always display the complete step list so progress is visible even across context resets.
+1. Locate or create the feature folder and its two files (`plan.md` + `context.md`) per **feature-folder-structure**; for an **orchestrate-feature-delivery** cell use the existing `deliveries/<epic-name>/{repo}/{feature-name}/`, otherwise ask the user or default to `docs/feature-implementations/`.
+2. Derive a short kebab-case feature name from the plan's objective (e.g., `add-auth-system`, `fix-null-pointer-in-transformer`) per **feature-folder-structure**.
+3. Before creating a new plan, check if the feature folder already exists with a plan file. If it contains an appended `## Rework <date>` section, execute only the rework steps (see **rework-plan-execution**) — never re-run or modify the completed original steps. If a plan file has steps with ❌ failed or 🚫 blocked status, ask the user whether to **resume** from the last known state or **start fresh** (create a new folder/overwrite).
+4. Materialize the plan into `plan.md` per **plan-input-schema**: list each step with its number, title, objective, and initial status ⏳ pending, using the **step-tracking-format**.
+5. Populate `context.md` with all relevant background: requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, and any other material that informed the plan.
+6. Update step status in the plan file immediately after each state change (⏳ → 🔄 → ✅, or ❌/🚫 on failure). Refer to **step-status-definitions** for emoji meanings.
+7. Never modify plan structure, objectives, steps, or the **Scope Boundary** block except to update statuses or add clarifying notes.
+8. Always display the complete step list so progress is visible even across context resets.
 </track-plan>
 
 <execute-step>
