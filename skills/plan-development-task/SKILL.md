@@ -58,10 +58,25 @@ Every plan starts with a **Prepare Environment** step (Step 1) that covers:
 If any check is not ready, the agent must **stop and raise it to the user** — never start execution silently. The branch name and base are recorded so **export-plan** can persist them to `context.md`.
 </plan-prerequisites>
 
+<scope-boundary>
+Every plan carries an explicit **Scope Boundary** that the executor checks during execution:
+
+| Field | Content |
+|---|---|
+| **In scope** | Files/areas, behaviors, and (for **orchestrate-feature-delivery** cells) ADR decisions the plan may change |
+| **Out of scope** | Files/areas, behaviors, and ADR decisions that must NOT change — the plan's non-goals |
+| **Rule** | No step, error-recovery fix, or review fix may require changes beyond **In scope**. If one does, the executor refuses and asks the user — never adapts silently |
+| **Minor exceptions** | Proceed without asking: doc/comment-only edits; changes confined to files already in **In scope**; test-only changes for this plan's own tests |
+
+Derive the boundary from the classified change type, the confirmed scope, and (for orchestrator cells) the governing ADR decision. Present it to the user for ratification during plan confirmation, then persist it via **export-plan**. Rework sections inherit the original boundary and tighten it to the governing ADR.
+</scope-boundary>
+
 <rework-plan-convention>
 When the plan is a **rework append** for an already-implemented feature (triggered by **orchestrate-feature-delivery**'s **handle-post-implementation-issue**), the feature folder already exists with an implemented `plan.md`:
 - **Append, never rewrite**: write a `## Rework <date>` section at the end of the existing `plan.md`; implemented steps stay byte-for-byte unchanged.
 - New steps are numbered within the rework section, reference the triggering issue and the reworked ADR decision, and follow the classified change type (usually a bug-fix/feature plan).
+- The rework section carries its own **Scope Boundary** (see **scope-boundary**): it inherits the original **In scope** and tightens it to the governing ADR decision.
+- Before appending, check the rework request against the original boundary: if it would change something in the original **Out of scope** or reopen another ADR, refuse and ask the user — this may be a new feature cell rather than a rework append.
 - **Prepare Environment** (see **plan-prerequisites**) still applies — the rework runs on its own branch per the repo's branch convention (the original branch/PR may already be merged).
 - If the plan is very long, use a sibling `rework-plan.md` and record it in the delivery index.
 </rework-plan-convention>
@@ -79,6 +94,7 @@ Load only the examples directly relevant to the current change type to minimize 
 | Generating refactor plan | Detailed steps for plan-refactor | [reference/plan-refactor.md](reference/plan-refactor.md) |
 | Validating plan quality | Checklist: coverage, sequencing, steps, TDD, clarity | [reference/plan-quality-checklist.md](reference/plan-quality-checklist.md) |
 | Appending a rework plan to an implemented feature plan | Append-only rework section (shared with the orchestrator) | [../orchestrate-feature-delivery/examples/post-implementation-rework.md](../orchestrate-feature-delivery/examples/post-implementation-rework.md) |
+| Rework append that risks exceeding the feature's scope boundary | Boundary definition + refusal with decision options | [examples/rework-scope-boundary.md](examples/rework-scope-boundary.md) |
 | Bug: simple logic / timing errors | Full workflow example | [examples/bug-fix-simple-logic.md](examples/bug-fix-simple-logic.md) |
 | Bug: slow responses, N+1 queries | Full workflow example | [examples/bug-fix-performance.md](examples/bug-fix-performance.md) |
 | Feature: complex algorithms or business rules | Full workflow example | [examples/feature-complex-transformation.md](examples/feature-complex-transformation.md) |
@@ -140,13 +156,21 @@ Load **[reference/plan-feature-implementation.md](reference/plan-feature-impleme
 Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its steps.
 </plan-refactor>
 
+<define-scope-boundary>
+1. Derive the boundary from the classified change type, the confirmed scope, and (for **orchestrate-feature-delivery** cells) the governing ADR decision.
+2. List **In scope**: the files/areas, behaviors, and ADR decisions the plan may change.
+3. List **Out of scope**: non-goals — other behaviors, other ADRs, other modules, unrelated cleanup.
+4. Present both lists to the user and request ratification or adjustment.
+5. Hand the ratified boundary to the plan for inclusion as a `## Scope Boundary` block and to **export-plan** for persistence.
+</define-scope-boundary>
+
 <export-plan>
 1. After the user confirms the plan, ask whether they would like to persist it to a feature folder for later execution by **execute-plan**.
 2. If the user agrees, determine the storage location: for an **orchestrate-feature-delivery** cell use the epic's delivery folder `deliveries/<epic-name>/{repo}/{feature-name}/` (created by the orchestrator); otherwise ask the user or default to `docs/feature-implementations/`.
 3. Derive a short kebab-case feature name from the plan's objective (e.g., `fix-null-pointer-in-transformer`).
 4. Determine the repo name when the plan belongs to a specific repo (an **orchestrate-feature-delivery** cell); use the **repo-first** layout `{location}/{repo}/{feature-name}/` — the delivery folder already exists, write into it; fall back to `{location}/{feature-name}/` when no repo applies so all plans for one repo live together.
-5. Write `plan.md` — the complete numbered step list with objectives, using the plan's steps as generated. When appending a rework plan (per **rework-plan-convention**), append a `## Rework <date>` section to the existing `plan.md` instead of overwriting it.
-6. Write `context.md` — capture all background: the user's original request, the classified change type, root cause or requirement summary, TDD approach rationale, the target branch name and base branch (see **plan-prerequisites**), constraints, assumptions, and any codebase references gathered. For an **orchestrate-feature-delivery** cell, also record the spike references from the agent brief (change-summary items, ADR files, solution-doc sections) so execution/resume agents can load full context on demand.
+5. Write `plan.md` — start with the ratified `## Scope Boundary` block (see **scope-boundary**), then the complete numbered step list with objectives. When appending a rework plan (per **rework-plan-convention**), append a `## Rework <date>` section (with its own boundary) to the existing `plan.md` instead of overwriting it.
+6. Write `context.md` — capture all background: the user's original request, the classified change type, root cause or requirement summary, TDD approach rationale, the scope boundary rationale (see **scope-boundary**), the target branch name and base branch (see **plan-prerequisites**), constraints, assumptions, and any codebase references gathered. For an **orchestrate-feature-delivery** cell, also record the spike references from the agent brief (change-summary items, ADR files, solution-doc sections) so execution/resume agents can load full context on demand.
 7. Inform the user of the saved location so they can invoke **execute-plan** to carry it out.
 </export-plan>
 
@@ -161,6 +185,8 @@ Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its
 <rule> When both restructuring and new behavior are needed: apply **plan-refactor** first to stabilize the structure, then apply **plan-feature-implementation** for the new behavior. </rule>
 <rule> After the plan is confirmed by the user: optionally apply **export-plan** to persist the plan to files for later execution by execute-plan. </rule>
 <rule> When generating any plan (bug fix, feature, or refactor): always include the **Prepare Environment** prerequisites step first per **plan-prerequisites**; if any check is not ready, raise it to the user instead of starting execution. </rule>
+<rule> When generating any plan: apply **define-scope-boundary** and include the ratified boundary as a `## Scope Boundary` block so the executor can check against it. </rule>
 <rule> When appending a rework plan to an already-implemented feature (triggered by **orchestrate-feature-delivery**), apply **rework-plan-convention** and **export-plan** in append mode — never overwrite the implemented steps. </rule>
+<rule> When appending a rework: check the rework request against the original boundary (see **rework-plan-convention**); if it exceeds it, refuse and ask the user — never append silently. </rule>
 
 </rules>

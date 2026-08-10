@@ -7,6 +7,11 @@ Before presenting a development plan to the user, verify all items below.
 - [ ] Branch name and base branch are captured (for export-plan persistence)
 - [ ] If any prerequisite is not ready, the plan raises it to the user rather than starting execution
 
+## Scope Boundary
+- [ ] Plan includes a `## Scope Boundary` block with **In scope** and **Out of scope** lists
+- [ ] Boundary derived from the change type and governing ADR (for orchestrator cells) and ratified by the user
+- [ ] Rework sections carry their own boundary — inherits the original **In scope**, tightened to the governing ADR
+
 ## Coverage
 - [ ] Every identified issue/functionality/objective has a corresponding TDD cycle in the plan
 - [ ] All acceptance criteria from the user request are addressed

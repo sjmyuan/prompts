@@ -39,6 +39,7 @@ New **Wave 3**: `F2-r1` (after F2 merged). New change-summary items 9–11 trace
 ```markdown
 ## Rework 2026-08-08
 Trigger: partial-payment failure handling (ADR-001 revised)
+Boundary: confined to the ADR-001 decision + original **In scope**; original **Out of scope** unchanged
 - [ ] Add compensating-transaction rollback on partial failure
 - [ ] Update payment-gateway client error mapping
 - [ ] Update checkout integration test for partial failures

@@ -94,6 +94,13 @@ When the plan file contains an appended `## Rework <date>` section (a rework tri
 - Commit conventions, **request-push-approval**, and **review-post-execution** apply exactly as for a normal plan.
 </rework-plan-execution>
 
+<scope-boundary-check>
+The plan file's `## Scope Boundary` block (written by **export-plan** in plan-development-task) defines what execution may change. If the plan has no boundary block, treat the plan's listed steps and files as the boundary.
+- Within **In scope** or a **Minor exception** → proceed without asking.
+- Beyond **In scope** (touching an **Out of scope** file, behavior, or ADR decision) → STOP, refuse, and ask the user with options: (a) extend the boundary, (b) record as a follow-up and stay in scope, (c) proceed anyway with a recorded deviation note.
+- Never adapt silently to out-of-scope changes.
+</scope-boundary-check>
+
 <context-loading-guide>
 Load only the example most relevant to the current execution scenario to minimize context size.
 
@@ -107,6 +114,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 | A step is ambiguous, requires user input, or cannot proceed due to a missing dependency or external blocker | Output model: pausing execution at a blocked step, informing the user, and resuming after input | [examples/handling-failed-steps.md](examples/handling-failed-steps.md) |
 | Executing a plan with prerequisite checks, one commit per step, and push approval at the end | Output model: verify-prerequisites, commit-step, and request-push-approval in action | [examples/small-step-commits.md](examples/small-step-commits.md) |
 | Executing a plan with an appended `## Rework` section (run only the rework steps) | Rework execution walkthrough (shared with the orchestrator) | [../orchestrate-feature-delivery/examples/post-implementation-rework.md](../orchestrate-feature-delivery/examples/post-implementation-rework.md) |
+| A step, recovery fix, or review fix risks exceeding the plan's scope boundary | Output model: refusal + decision options | [examples/refusing-out-of-scope-rework.md](examples/refusing-out-of-scope-rework.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -123,12 +131,12 @@ Load only the example most relevant to the current execution scenario to minimiz
 5. List each step in the plan file with its number, title, and initial status ⏳ pending, using the **step-tracking-format** knowledge.
 6. Populate the context file with all relevant background: requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, and any other material that informed the plan.
 7. Update step status in the plan file immediately after each state change (⏳ → 🔄 → ✅, or ❌/🚫 on failure). Refer to **step-status-definitions** knowledge for emoji meanings.
-8. Never modify plan structure, objectives, or steps except to update statuses or add clarifying notes.
+8. Never modify plan structure, objectives, steps, or the **Scope Boundary** block except to update statuses or add clarifying notes.
 9. Always display the complete step list so progress is visible even across context resets.
 </track-plan>
 
 <execute-step>
-1. Before starting a step, mark it as 🔄 in-progress in the plan file and briefly explain your approach.
+1. Before starting a step, mark it as 🔄 in-progress in the plan file and briefly explain your approach. Apply **check-scope-boundary** — if the step's required changes exceed the plan's scope boundary, refuse and ask instead of adapting.
 2. Execute the step fully — no partial implementations.
 3. After completing the step, validate the outcome meets the step's objectives.
 4. Mark the step as ✅ completed; document files changed, implementation details, and validation results in the plan file.
@@ -148,12 +156,20 @@ Load only the example most relevant to the current execution scenario to minimiz
 1. Mark the failed step as ❌ with error details in the plan file.
 2. Document the error clearly.
 3. Analyze the root cause.
-4. Attempt to fix and retry the step.
+4. Apply **check-scope-boundary** to the recovery fix; if the only viable fix exceeds the plan's scope boundary, refuse and ask the user (with options) instead of silently changing out-of-scope code. Otherwise fix and retry the step.
 5. Update step status to ✅ if resolved, or 🚫 blocked if unresolvable.
 6. If blocked, consult the user before proceeding.
 7. Display the updated full step list with current statuses.
 8. Never skip a failed step or failed validation — address issues before proceeding.
 </handle-errors>
+
+<check-scope-boundary>
+1. Read the plan's **Scope Boundary** block (see **scope-boundary-check**); fall back to the plan's steps/files if absent.
+2. Evaluate the required change (a planned step, an error-recovery fix, or a review fix) against **In scope** and **Minor exceptions**.
+3. If within scope → proceed normally.
+4. If beyond scope → mark the step 🚫 blocked (or hold), refuse, and ask the user with options: extend the boundary, file a follow-up and stay in scope, or proceed anyway with a recorded deviation.
+5. Act on the user's decision; if the boundary is extended, update the plan's boundary block and proceed.
+</check-scope-boundary>
 
 <run-validation-checkpoints>
 1. After code changes, run relevant tests to confirm correctness.
@@ -166,7 +182,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 1. After ALL plan steps are marked ✅ completed, apply the **review-code** skill on all files changed or created during execution.
 2. Evaluate correctness, security, performance, maintainability, and test coverage.
 3. If 🚫 Blocker or 🔴 Major issues are found:
-   1. Record each finding as a new fix step in the plan file with ⏳ pending status.
+   1. Apply **check-scope-boundary** to each finding's required fix — if a fix exceeds the plan's scope boundary, refuse and ask the user before adding it. Otherwise record the finding as a new fix step in the plan file with ⏳ pending status.
    2. Apply **execute-step** for each fix step.
    3. Re-run the **review-code** skill on the affected files.
    4. Repeat until no 🚫 Blockers or 🔴 Majors remain.
@@ -202,7 +218,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 1. Execute the full plan autonomously without asking for permission at each step.
 2. If a step is ambiguous or requires user input, pause and ask before proceeding.
 3. If blocked on a step due to missing information or external dependencies, inform the user and wait for guidance.
-4. If deviating from the plan due to unforeseen issues, explain why and how you're adapting.
+4. If deviating from the plan due to unforeseen issues, first apply **check-scope-boundary**; if the deviation exceeds the plan's scope boundary, refuse and ask the user with options — otherwise explain why and how you're adapting.
 5. Never push to remote without explicit user confirmation — apply **request-push-approval** before any push.
 </manage-user-interaction>
 
@@ -223,5 +239,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 <rule> **After Each ✅ Step**: Apply **commit-step** to record the change as one small commit. </rule>
 <rule> **Before Any Push**: Apply **request-push-approval** — never push to remote without the user's confirmation. </rule>
 <rule> **When the Plan Contains a Rework Section**: Apply **rework-plan-execution** — run only the appended `## Rework` steps and never modify the completed original steps. </rule>
+<rule> **When a Step, Recovery Fix, or Review Fix Exceeds the Boundary**: Apply **check-scope-boundary** — refuse and ask the user with options, never adapt silently. </rule>
+<rule> **When Deviating from the Plan**: Apply **check-scope-boundary** before adapting. </rule>
 
 </rules>
