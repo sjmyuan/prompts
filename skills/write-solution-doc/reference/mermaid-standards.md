@@ -8,6 +8,19 @@
 - Support both English and Chinese labels based on user preference.
 - Always provide complete, renderable Mermaid code.
 
+## Writing Robust Labels
+
+Most broken diagrams come from special characters in labels — a semicolon (`;`) in a description is the #1 cause. Mermaid parses `; " # ( ) [ ] { } |` as **syntax, not text**, so they can end a statement or change the shape mid-label.
+
+In order of preference:
+1. **Reword** — never put risky characters in a label. Replace `;` with `,` / `，` / `·` (e.g. "handles orders; manages refunds" → "handles orders, manages refunds"); drop or reword `()`; avoid `#` and `"`. Rewording is version-proof — no escaping, no parser quirks.
+2. **Quote** — when real syntax is required (API paths, method calls), wrap the text in quotes: `A["POST /orders"]`, `-->|"creates order"|`, `Rel(a, b, "charges", "HTTPS")`. Never emit unquoted text containing syntax characters.
+3. **Escape** — only inside a quoted string, use Mermaid HTML entities: `#quot;` for `"`, `#35;` for `#`, `#40;` / `#41;` for `(` / `)`, `#59;` for `;`.
+4. **Line breaks** — use `<br/>` in labels; a raw newline inside a label breaks the statement.
+5. **Self-check** — before output, scan every label for `; " # ( ) [ ] { } |`; reword or escape any hit. If a label still feels risky, shorten it and move detail to the caption.
+
+C4: `;` in C4 descriptions (`Person(c, "Customer", "Places orders; queries")`) is a common breaker — always reword the description instead of escaping.
+
 ## C4 Diagrams
 
 Mermaid has native C4 support: `C4Context` (system context), `C4Container` (C2 container), `C4Component` (C3 component), `C4Dynamic`, and `C4Deployment`. Syntax is C4-PlantUML-compatible — start the diagram with the type name (no `@startuml`/`@enduml`) and add an optional `title`:

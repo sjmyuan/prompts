@@ -10,6 +10,16 @@ This guide supports the **diagram-selection** knowledge entry. Load it when actu
 - Draw all diagrams with Mermaid inside a fenced code block with `mermaid` language tag.
 - Keep diagrams small: 4–9 nodes for context diagrams; use sub-packages instead of merging messages.
 
+## Writing Robust Labels
+
+Most broken diagrams come from a semicolon (`;`) or another special character in a label. Mermaid parses `; " # ( ) [ ] { } |` as **syntax, not text**.
+
+- **Reword first**: never put `;` in a label — replace with `,` / `，` / `·` ("places orders; queries history" → "places orders, queries history"). Drop or reword `()`; avoid `"` and `#`.
+- **Quote when needed**: API/method text goes in quotes — `Rel(a, b, "POST /orders")`, `A["createOrder(dto)"]`.
+- **Escape as last resort** inside quotes: `#59;` for `;`, `#quot;` for `"`, `#35;` for `#`, `#40;` / `#41;` for `(` / `)`.
+- **Line breaks**: use `<br/>`, never a raw newline inside a label.
+- **Self-check**: scan every label for `; " # ( ) [ ] { } |` before output; reword or shorten any risky label. Move detail to the caption.
+
 ## Zooming In
 
 Start with a C4 context diagram for the big picture, then zoom into the part of the context you are explaining:

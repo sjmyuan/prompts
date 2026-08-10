@@ -30,7 +30,7 @@
 >     title Order Management — System Context
 >
 >     Person(customer, "Customer", "Places orders and queries order history")
->     System(oms, "Order Management Service", "Handles ~10K orders/day, ACID payments; storage backend TBD")
+>     System(oms, "Order Management Service", "Handles ~10K orders/day, ACID payments, storage backend TBD")
 >     System_Ext(ps, "Payment Processor", "Charges payments")
 >     System_Ext(iam, "GCP IAM", "AuthN / authZ")
 >
