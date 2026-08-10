@@ -83,15 +83,15 @@ diff --git a/<file> b/<file>
 
 #### Pros
 
-* Good, because [ argument 1 ]
-* Good, because [ argument 2 ]
-* ... <!-- number of pros can vary -->
+* [ key point 1 ]
+* [ key point 2 ]
+* ...
 
 #### Cons
 
-* Bad, because [ argument 3 ]
-* Bad, because [ argument 4 ]
-* ... <!-- number of cons can vary -->
+* [ key point 3 ]
+* [ key point 4 ]
+* ...
 
 ### [ option 2 ]
 
@@ -116,15 +116,15 @@ diff --git a/<file> b/<file>
 
 #### Pros
 
-* Good, because [ argument 1 ]
-* Good, because [ argument 2 ]
-* ... <!-- number of pros can vary -->
+* [ key point 1 ]
+* [ key point 2 ]
+* ...
 
 #### Cons
 
-* Bad, because [ argument 3 ]
-* Bad, because [ argument 4 ]
-* ... <!-- number of cons can vary -->
+* [ key point 3 ]
+* [ key point 4 ]
+* ...
 
 ## References <!-- optional -->
 ````

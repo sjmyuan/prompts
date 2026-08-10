@@ -139,13 +139,13 @@
 > | Managed service ✅ | Fully managed with automatic backups — satisfies #6 |
 >
 > **Pros**:
-> - Good, because team expertise eliminates ramp-up time
-> - Good, because full SQL + extensions cover all query patterns
-> - Good, because mature ecosystem with tooling and monitoring
+> - Team already knows PostgreSQL — zero ramp-up
+> - Full SQL + extensions cover all query patterns
+> - Mature ecosystem: tooling, monitoring, community
 >
 > **Cons**:
-> - Bad, because connection pooling needed at scale (adds operational complexity)
-> - Bad, because vertical scaling has an upper bound; read replicas introduce eventual consistency for reads
+> - Connection pooling needed at scale
+> - Vertical scaling has an upper bound; read replicas add eventual consistency
 >
 > Does this evaluation look accurate?
 
@@ -169,13 +169,13 @@
 > | Managed service ✅ | Fully managed — satisfies #6 |
 >
 > **Pros**:
-> - Good, because unlimited horizontal scaling with no sharding
-> - Good, because 99.999% SLA for critical workloads
+> - Unlimited horizontal scaling with no sharding
+> - 99.999% SLA for critical workloads
 >
 > **Cons**:
-> - Bad, because minimum cost is prohibitive for early-stage use
-> - Bad, because team has zero experience; significant ramp-up required
-> - Bad, because massive overkill for 10K orders/day — 2+ driver misses
+> - Minimum cost prohibitive for early-stage ($600+/month)
+> - Team has zero experience; significant ramp-up
+> - Massive overkill for 10K orders/day
 >
 > Does this evaluation look accurate?
 
@@ -199,13 +199,13 @@
 > | Managed service ✅ | Serverless, zero ops — satisfies #6 |
 >
 > **Pros**:
-> - Good, because serverless pricing is ideal for early-stage
-> - Good, because real-time sync could power live order-tracking features
+> - Serverless pricing ideal for early-stage
+> - Real-time sync enables live order-tracking features
 >
 > **Cons**:
-> - Bad, because **fails the hard constraint of ACID transactions** — payment processing requires multi-document atomicity
-> - Bad, because complex order-history queries (filtering, aggregation) require denormalization and composite indexes
-> - Bad, because no JOINs force application-level data assembly
+> - **Fails ACID hard constraint** — no cross-collection transactions for payment
+> - Complex queries require denormalization and composite indexes
+> - No JOINs — application-level data assembly
 >
 > Does this evaluation look accurate?
 
@@ -321,14 +321,14 @@ Fully managed relational database on GCP. Supports full PostgreSQL with ACID tra
 
 #### Pros
 
-* Good, because team expertise eliminates ramp-up time
-* Good, because full SQL + extensions cover all query patterns
-* Good, because mature ecosystem with tooling and monitoring
+* Team already knows PostgreSQL — zero ramp-up
+* Full SQL + extensions cover all query patterns
+* Mature ecosystem: tooling, monitoring, community
 
 #### Cons
 
-* Bad, because connection pooling needed at scale (adds operational complexity)
-* Bad, because vertical scaling has an upper bound; read replicas introduce eventual consistency for reads
+* Connection pooling needed at scale
+* Vertical scaling has an upper bound; read replicas add eventual consistency
 
 ### Cloud Spanner
 
@@ -336,14 +336,14 @@ Globally distributed relational database with strong consistency and unlimited h
 
 #### Pros
 
-* Good, because unlimited horizontal scaling with no sharding
-* Good, because 99.999% SLA for critical workloads
+* Unlimited horizontal scaling with no sharding
+* 99.999% SLA for critical workloads
 
 #### Cons
 
-* Bad, because minimum cost (~$600/month) is prohibitive for early-stage use
-* Bad, because team has zero experience; significant ramp-up required
-* Bad, because massive overkill for 10K orders/day
+* Minimum cost prohibitive for early-stage ($600+/month)
+* Team has zero experience; significant ramp-up
+* Massive overkill for 10K orders/day
 
 ### Firestore
 
@@ -351,14 +351,14 @@ Serverless NoSQL document database with real-time sync and pay-per-use pricing.
 
 #### Pros
 
-* Good, because serverless pricing is ideal for early-stage
-* Good, because real-time sync could power live order-tracking features
+* Serverless pricing ideal for early-stage
+* Real-time sync enables live order-tracking features
 
 #### Cons
 
-* Bad, because fails the hard constraint of ACID transactions — payment processing requires multi-document atomicity
-* Bad, because complex order-history queries require denormalization and composite indexes
-* Bad, because no JOINs force application-level data assembly
+* Fails ACID hard constraint — no cross-collection transactions for payment
+* Complex queries require denormalization and composite indexes
+* No JOINs — application-level data assembly
 
 ## References
 ```

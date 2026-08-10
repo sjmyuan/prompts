@@ -124,9 +124,9 @@ Tech details make each option's implementation concrete in the ADR: **target-sta
 1. For each option, ask the user:
    - "What are the main advantages or strengths of this option?"
    - "What are the main disadvantages, risks, or trade-offs?"
-2. Relate each pro/con back to the decision drivers defined earlier — highlight which drivers are satisfied and which are compromised.
+2. Map the pros/cons against the decision drivers in a driver-impact table (which drivers are satisfied, which are compromised). Then list the pros and cons as **short, scannable key points** — one sentence each, no analysis or justification. The table handles the analysis; the bullet list just states the key takeaways.
 3. If the user wants to evaluate options by their technical implementation — or code investigation evidence (findings from the spike pipeline) is available — apply **detail-options-tech** for each option to produce its tech details (target-state diagrams + code change profile), then present them so pros/cons are judged against the concrete implementation (see **option-tech-details**).
-4. Summarize the evaluation of the current option with a Pros/Cons list and ask for confirmation.
+4. Summarize the evaluation of the current option with the driver-impact table and a short Pros/Cons key-points list, then ask for confirmation.
 5. After all options are evaluated, draw the diagram that best explains the comparison (per **diagram-selection**, the option comparison matrix with an elimination tree), highlighting any knock-out criteria and why each option was dropped.
 6. Guide the user toward a recommendation by asking: "Given the evaluations, which option best satisfies the decision drivers?"
 </evaluate-options>
