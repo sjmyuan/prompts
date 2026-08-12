@@ -87,6 +87,10 @@ Small-step commit rules applied throughout execution:
 | Pre-commit check | Commit only after the step's validation checkpoint (tests/lint) passes |
 </commit-conventions>
 
+<code-comment-conventions>
+Generated code must match the repo's existing comment style: detect it first, then follow it. Comment the **why** (non-obvious intent, workarounds, invariants, edge cases), never restate the **what**; never narrate the change (no plan-step references, "added/generated" markers, section banners, or AI mentions); match the repo's density — a sparse repo gets sparse comments, docstrings only where the repo already uses them (public API only); keep line comments ≤ 15 words. Detect the repo's convention during **verify-prerequisites** and enforce it in **commit-step**. Full rubric: **reference/code-comment-style.md**.
+</code-comment-conventions>
+
 <rework-plan-execution>
 When the plan file contains an appended `## Rework <date>` section (a rework triggered by **orchestrate-feature-delivery**'s **handle-post-implementation-issue**):
 - Execute **only** the rework section — the original steps are all ✅ and are never re-run or modified.
@@ -110,6 +114,8 @@ Load only the example most relevant to the current execution scenario to minimiz
 
 | Load when | Provides | File |
 |---|---|---|
+| Executing any step that writes or modifies code | Code comment doctrine: why-not-what, banned patterns, density matching, pre-commit self-check | [reference/code-comment-style.md](reference/code-comment-style.md) |
+| Generating code that needs to match the repo's comment style before committing | Output model: convention detection + pre-commit comment scan in action | [examples/comment-hygiene.md](examples/comment-hygiene.md) |
 | Executing a small, focused plan (single component or focused task) | Output model: detailed progress updates for a simple focused execution | [examples/single-component-refactor.md](examples/single-component-refactor.md) |
 | Executing a plan that spans multiple files and architectural layers | Output model: execution tracking across multiple files and layers | [examples/multi-file-implementation.md](examples/multi-file-implementation.md) |
 | A step fails with compilation errors or unexpected output | Output model: error recovery, ❌→✅ status transitions, and retry patterns | [examples/handling-failed-steps.md](examples/handling-failed-steps.md) |
@@ -188,7 +194,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 
 
 <verify-prerequisites>
-1. Before starting the first step, verify the environment is ready: the correct feature branch is checked out (create it if the plan requires one and the user confirms the branch name and base, naming it per the **repo's branch convention** — detect from existing branches / git config / team docs, or ask the user; never assume a prefix), the working tree has no unrelated uncommitted changes, dependencies and toolchain are available, and baseline tests/lint pass.
+1. Before starting the first step, verify the environment is ready: the correct feature branch is checked out (create it if the plan requires one and the user confirms the branch name and base, naming it per the **repo's branch convention** — detect from existing branches / git config / team docs, or ask the user; never assume a prefix), the working tree has no unrelated uncommitted changes, dependencies and toolchain are available, and baseline tests/lint pass. Also detect the repo's comment style per **code-comment-conventions** (sample recently modified files, `.editorconfig`, CONTRIBUTING docs) and record a one-line convention note in the plan file.
 2. If anything is missing or failing, STOP and raise it to the user: state exactly what is not ready, what is needed to proceed, and ask how to proceed. Do not start executing steps until it is resolved.
 3. Record the outcome (ready or blockers) in the plan file before execution begins.
 </verify-prerequisites>
@@ -196,10 +202,11 @@ Load only the example most relevant to the current execution scenario to minimiz
 <commit-step>
 1. After a step is validated and marked ✅, run `git status` and `git diff` to identify the files changed by this step.
 2. Stage only those files — never unrelated or pre-existing changes.
-3. Write a small commit message following **commit-conventions**: repo convention if known, else `type(scope): summary`, describing the change neutrally.
-4. Scan the message for AI-related words (see **commit-conventions**) and rewrite until none remain.
-5. Commit locally; report the commit hash and message. Never push.
-6. If the step produced no code change (e.g., documentation-only), note that no commit is needed.
+3. Scan the staged diff against **code-comment-conventions**: remove or shorten restating comments, process-narration markers (plan-step references, "added/generated" notes, section banners, AI mentions), and comments that exceed the repo's density; re-stage after trimming.
+4. Write a small commit message following **commit-conventions**: repo convention if known, else `type(scope): summary`, describing the change neutrally.
+5. Scan the message for AI-related words (see **commit-conventions**) and rewrite until none remain.
+6. Commit locally; report the commit hash and message. Never push.
+7. If the step produced no code change (e.g., documentation-only), note that no commit is needed.
 </commit-step>
 
 <produce-poc-report>
