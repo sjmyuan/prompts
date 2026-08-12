@@ -20,7 +20,7 @@ Before presenting a development plan to the user, verify all items below.
 
 ## Sequencing
 - [ ] Dependency ordering is correct — no step depends on a later step
-- [ ] Validate Baseline is always Step 1
+- [ ] Prepare Environment is always Step 1
 - [ ] Validate Linting, Formatting and Type Checking is the final step for each issue/functionality/objective group
 
 ## Step Management

@@ -135,7 +135,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 5. Populate `context.md` with all relevant background: requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, and any other material that informed the plan.
 6. Update step status in the plan file immediately after each state change (⏳ → 🔄 → ✅, or ❌/🚫 on failure). Refer to **step-status-definitions** for emoji meanings.
 7. Never modify plan structure, objectives, steps, or the **Scope Boundary** block except to update statuses or add clarifying notes.
-8. Always display the complete step list so progress is visible even across context resets.
+8. Report progress: at plan start show all steps with ⏳ pending; after each step completion show the full list with current statuses and per-step details (files, implementation, validation); never summarize multiple steps together; at plan end show the final all-✅ list with a summary of accomplishments.
 </track-plan>
 
 <execute-step>
@@ -146,14 +146,6 @@ Load only the example most relevant to the current execution scenario to minimiz
 5. Confirm the prerequisite step is fully ✅ completed before starting a step that depends on it.
 6. Display the full updated step list with current statuses after each completion.
 </execute-step>
-
-<report-progress>
-1. At plan start, display all steps with ⏳ pending status.
-2. After each step completion, update that step to ✅ and show the full step list with all current statuses.
-3. Include detailed information per step: files changed, implementation notes, validation results.
-4. Never summarize multiple steps together — each step must be listed individually with its own status and details.
-5. At plan end, show the final step list with all ✅ completed and provide a summary of accomplishments.
-</report-progress>
 
 <handle-errors>
 1. Mark the failed step as ❌ with error details in the plan file.
@@ -227,8 +219,8 @@ Load only the example most relevant to the current execution scenario to minimiz
 1. Execute the full plan autonomously without asking for permission at each step.
 2. If a step is ambiguous or requires user input, pause and ask before proceeding.
 3. If blocked on a step due to missing information or external dependencies, inform the user and wait for guidance.
-4. If deviating from the plan due to unforeseen issues, first apply **check-scope-boundary**; if the deviation exceeds the plan's scope boundary, refuse and ask the user with options — otherwise explain why and how you're adapting.
-5. Never push to remote without explicit user confirmation — apply **request-push-approval** before any push.
+4. When deviating from the plan, apply **check-scope-boundary** and explain the adaptation — never deviate silently.
+5. Before any push, apply **request-push-approval** — never push without the user's confirmation.
 </manage-user-interaction>
 
 </capabilities>
@@ -239,11 +231,11 @@ Load only the example most relevant to the current execution scenario to minimiz
 
 <rule> **At Plan Start**: Apply **track-plan** to create the feature folder with plan and context files before executing any step. </rule>
 <rule> **During Each Step**: Apply **execute-step** for every step in the plan. </rule>
-<rule> **Throughout Execution**: Apply **report-progress** — show the full step list with current statuses after every step. </rule>
+<rule> **Throughout Execution**: Apply **track-plan** — keep the step list current and show the full list with statuses after every step. </rule>
 <rule> **When a Step Fails**: Apply **handle-errors** immediately. </rule>
 <rule> **At Validation Points**: Apply **run-validation-checkpoints** after code changes and at major milestones. Validate incrementally, not just at the end. </rule>
 <rule> **When Facing Ambiguity or Blockers**: Apply **manage-user-interaction** — pause and ask rather than assuming. </rule>
-<rule> **After All Steps Complete**: Apply **review-post-execution**. Keep the plan file and context file as a permanent record — do not delete them. </rule>
+<rule> **After All Steps Complete**: Apply **review-post-execution**. </rule>
 <rule> **Before Starting the First Step**: Apply **verify-prerequisites** — if the branch or environment is not ready, raise it to the user and wait. </rule>
 <rule> **After Each ✅ Step**: Apply **commit-step** to record the change as one small commit. </rule>
 <rule> **Before Any Push**: Apply **request-push-approval** — never push to remote without the user's confirmation. </rule>

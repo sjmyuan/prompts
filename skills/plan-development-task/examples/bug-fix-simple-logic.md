@@ -19,7 +19,7 @@ Applies **classify-change-type**.
 
 ## Bug Scope Definition
 
-Applies **define-bug-scope**.
+Applies **define-scope** (bug fix).
 
 **Agent gathers information** — reads `DataImportedHandler.java` and the event publishing tests. Finds: the handler calls `dataTransformer.transform(record)` and then passes `transformedData.getId()` (the transformed ID) to the publisher instead of the original `record.getId()`.
 
@@ -46,7 +46,7 @@ Applies **plan-bug-fix**.
 **TDD Approach**: Full TDD cycle (simple logic error — test-first provides safety for data correctness)
 
 **Steps:**
-- **Step 1**: Validate Baseline (run tests, Spotless, Checkstyle)
+- **Step 1**: Prepare Environment (run tests, Spotless, Checkstyle)
 - **Step 2**: Write Tests for correct ID handling in DataImportedHandler
 - **Step 3**: Confirm Test Failure
 - **Step 4**: Fix ID mapping logic in DataImportedHandler

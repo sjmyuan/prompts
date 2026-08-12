@@ -19,7 +19,7 @@ Applies **classify-change-type**.
 
 ## Bug Scope Definition
 
-Applies **define-bug-scope**.
+Applies **define-scope** (bug fix).
 
 **Agent gathers information** — reads `ProductController.java`, `ProductRepository.java`, and runs a query-count diagnostic. Finds: `ProductRepository.findByKeyword()` returns product entities with lazy-loaded `category` and `tags` associations. The serializer accesses those fields for each product, triggering a separate DB query per record.
 
@@ -46,7 +46,7 @@ Applies **plan-bug-fix**.
 **TDD Approach**: Full TDD cycle extended with performance benchmarks — performance bugs require both a failing benchmark and a query-count assertion
 
 **Steps:**
-- **Step 1**: Validate Baseline (run existing tests, linting, type-checking; capture current p99 latency with a benchmark)
+- **Step 1**: Prepare Environment (run existing tests, linting, type-checking; capture current p99 latency with a benchmark)
 - **Step 2**: Write performance test that asserts the endpoint completes within 500 ms for a 100-product result and issues no more than 3 database queries total
 - **Step 3**: Confirm Test Failure — run benchmark to verify the test fails under current implementation
 - **Step 4**: Fix Code — rewrite the repository query to use a JOIN FETCH (or equivalent eager-load) for `category` and `tags`; add a query-count assertion using a SQL counter interceptor

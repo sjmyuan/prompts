@@ -20,9 +20,6 @@ description: Classify, clarify, and generate TDD-based step-by-step plans for bu
 - User wants to append rework steps to an already-implemented feature plan — a focused rework triggered by orchestrate-feature-delivery's handle-post-implementation-issue flow
 
 **Differentiation rules** (when multiple skills could apply):
-- **New behavior being introduced?** → This is a **feature** — apply **plan-feature-implementation**
-- **No new behavior, just restructuring?** → This is a **refactor** — apply **plan-refactor**
-- **Something is broken?** → This is a **bug fix** — apply **plan-bug-fix**
 - **Both restructure AND add new behavior?** → Apply **plan-refactor** first to stabilize, then **plan-feature-implementation** for the new behavior
 - **Multi-feature / multi-repo decomposition of spike results?** → Do NOT plan a whole breakdown here — apply **orchestrate-feature-delivery** first to split, sequence, and orchestrate features, then plan each feature × repo cell with this skill
 - **Rework append for an already-delivered feature?** → Apply this skill in append mode per **rework-plan-convention** — orchestrate-feature-delivery triggers it; never rewrite the implemented plan
@@ -86,10 +83,14 @@ When the plan is a **rework append** for an already-implemented feature (trigger
 - If the plan is very long, use a sibling `rework-plan.md` and record it in the delivery index.
 </rework-plan-convention>
 
+<concise-writing>
+All prose in plans and context files follows **reference/writing-style.md** — BLUF takeaways, hard caps (step objective 1 sentence, bullet 1 claim, paragraph ≤ 3 sentences, sentence ≤ 20 words), atomic bullets, no banned phrases, So-what test.
+</concise-writing>
+
 <context-loading-guide>
 Load only the examples directly relevant to the current change type to minimize context size.
 
-**Bug fix examples** — cover the full workflow: classify → define-bug-scope → plan-bug-fix.
+**Bug fix examples** — cover the full workflow: classify → define-scope → plan-bug-fix.
 
 | Load when | Provides | File |
 |---|---|---|
@@ -126,41 +127,27 @@ This skill produces a **plan** but does not execute changes. After the plan is c
 3. If the type is ambiguous, ask the user targeted clarifying questions to disambiguate.
 4. Present the classified type and reasoning to the user.
 5. Route to the appropriate pair of capabilities based on the classified type:
-   - **Bug Fix** → apply **define-bug-scope**, then **plan-bug-fix**
-   - **Feature** → apply **define-feature-scope**, then **plan-feature-implementation**
-   - **Refactor** → apply **define-refactor-scope**, then **plan-refactor**
+   - **Bug Fix** → apply **define-scope**, then **plan-bug-fix**
+   - **Feature** → apply **define-scope**, then **plan-feature-implementation**
+   - **Refactor** → apply **define-scope**, then **plan-refactor**
    - **POC** → apply **plan-poc**
 </classify-change-type>
 
-<define-bug-scope>
-1. Gather relevant information from the codebase, knowledge base, test results and user input to clearly identify the bug.
-2. Analyze the information to identify patterns, inconsistencies, or anomalies that may indicate the root cause of the bug.
-3. Formulate hypotheses about potential causes and systematically test them through code inspection, debugging, or additional logging.
-4. Ask questions to the user to narrow down the possibilities until the most likely root cause is identified.
-5. Present the identified root cause and the reasoning process to the user and request confirmation or refinements.
-</define-bug-scope>
+<define-scope>
+1. Gather relevant information from the codebase, knowledge base, test results, and user input to define the scope for the classified change type.
+2. **Bug fix**: analyze for root-cause patterns and test hypotheses through code inspection, debugging, or logging. **Feature / refactor**: identify and clarify ambiguous terms and implicit assumptions.
+3. Ask the user targeted questions until the scope is well-defined — root cause confirmed for bugs; requirement or constraints confirmed for features/refactors.
+4. Present the result (root cause + reasoning, or a structured scope summary) and request confirmation or refinements.
+5. Hand the confirmed scope to the corresponding plan capability and **define-scope-boundary**.
+</define-scope>
 
 <plan-bug-fix>
 Load **[reference/plan-bug-fix.md](reference/plan-bug-fix.md)** and follow its steps.
 </plan-bug-fix>
 
-<define-feature-scope>
-1. Gather relevant information from the codebase, knowledge base, and user input to clearly define the software requirement.
-2. Identify and clarify any ambiguous terms or implicit assumptions to ensure proper understanding.
-3. Ask questions to the user to refine and narrow down the focus of the software requirement as needed.
-4. Present a structured summary of the requirement to the user and request confirmation or refinements.
-</define-feature-scope>
-
 <plan-feature-implementation>
 Load **[reference/plan-feature-implementation.md](reference/plan-feature-implementation.md)** and follow its steps.
 </plan-feature-implementation>
-
-<define-refactor-scope>
-1. Gather relevant information from the codebase, knowledge base, and user input to clearly define the refactor request.
-2. Identify and clarify any ambiguous terms or implicit assumptions to ensure proper understanding.
-3. Ask questions to the user to refine and narrow down the focus of the refactor request as needed.
-4. Present a structured summary of the refactor request to the user and request confirmation or refinements.
-</define-refactor-scope>
 
 <plan-refactor>
 Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its steps.
@@ -197,9 +184,9 @@ Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its
 <rules>
 
 <rule> When the user makes a request about code changes, first apply **classify-change-type** to determine whether it is a bug fix, feature, or refactor. </rule>
-<rule> If the classified type is **Bug Fix**: apply **define-bug-scope** to identify the root cause, then apply **plan-bug-fix** to generate the fix plan. </rule>
-<rule> If the classified type is **Feature**: apply **define-feature-scope** to clarify the requirement, then apply **plan-feature-implementation** to generate the implementation plan. </rule>
-<rule> If the classified type is **Refactor**: apply **define-refactor-scope** to clarify the scope and constraints, then apply **plan-refactor** to generate the refactoring plan. </rule>
+<rule> If the classified type is **Bug Fix**: apply **define-scope** to identify the root cause, then apply **plan-bug-fix** to generate the fix plan. </rule>
+<rule> If the classified type is **Feature**: apply **define-scope** to clarify the requirement, then apply **plan-feature-implementation** to generate the implementation plan. </rule>
+<rule> If the classified type is **Refactor**: apply **define-scope** to clarify the scope and constraints, then apply **plan-refactor** to generate the refactoring plan. </rule>
 <rule> If the classified type is **POC**: apply **plan-poc** to generate the proof-of-concept plan. </rule>
 <rule> When both restructuring and new behavior are needed: apply **plan-refactor** first to stabilize the structure, then apply **plan-feature-implementation** for the new behavior. </rule>
 <rule> After the plan is confirmed by the user: optionally apply **export-plan** to persist the plan to files for later execution by execute-plan. </rule>

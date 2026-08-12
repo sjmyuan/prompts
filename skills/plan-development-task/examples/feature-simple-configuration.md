@@ -19,7 +19,7 @@ Applies **classify-change-type**.
 
 ## Feature Scope Definition
 
-Applies **define-feature-scope**.
+Applies **define-scope** (feature).
 
 **Agent asks clarifying questions:**
 > 1. What are the defaults for max retry count and retry delay?
@@ -43,7 +43,7 @@ Applies **plan-feature-implementation**.
 **TDD Approach**: Streamlined — simple configuration changes with minimal logic; test loading, defaults, and application of settings
 
 **Steps:**
-- Step 1: Validate Baseline (run tests, linting, type-checking)
+- Step 1: Prepare Environment (run tests, linting, type-checking)
 - Step 2: Write Tests for retry configuration properties
 - Step 3: Confirm Test Failure
 - Step 4: Add retry properties to application.yaml and configuration class

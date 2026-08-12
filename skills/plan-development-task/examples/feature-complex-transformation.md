@@ -19,7 +19,7 @@ Applies **classify-change-type**.
 
 ## Feature Scope Definition
 
-Applies **define-feature-scope**.
+Applies **define-scope** (feature).
 
 **Agent asks clarifying questions:**
 > 1. What format are locale codes in — BCP 47 (`en-US`) or ISO 639-1 (`en`)?
@@ -47,7 +47,7 @@ Applies **plan-feature-implementation**.
 **Consolidation rationale**: `LocaleAttributeTransformer` and `FallbackLocaleResolver` form a single cohesive unit — the transformer delegates entirely to the resolver and they share test fixtures. Consolidating them into one TDD cycle reduces the total step count.
 
 **Steps:**
-- Step 1: Validate Baseline (run tests, linting, type-checking)
+- Step 1: Prepare Environment (run tests, linting, type-checking)
 - Step 2-11: Full TDD cycle for LocaleAttributeTransformer + FallbackLocaleResolver (consolidated)
   - Step 2: Write Tests for LocaleAttributeTransformer and FallbackLocaleResolver
   - Step 3: Confirm Test Failure

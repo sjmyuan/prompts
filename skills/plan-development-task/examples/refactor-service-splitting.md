@@ -19,7 +19,7 @@ Applies **classify-change-type**.
 
 ## Refactor Scope Definition
 
-Applies **define-refactor-scope**.
+Applies **define-scope** (refactor).
 
 **Agent asks clarifying questions:**
 > 1. Should the extracted services be stateless utilities or Spring-managed beans injected into the handler?
@@ -44,7 +44,7 @@ Applies **plan-refactor**.
 **TDD Approach**: Full TDD cycle for each service extraction — preserving existing behavior requires thorough test coverage
 
 **Steps:**
-- Step 1: Validate Baseline (run tests, mvn spotless:check, mvn checkstyle:check, mvn compile)
+- Step 1: Prepare Environment (run tests, mvn spotless:check, mvn checkstyle:check, mvn compile)
 - Step 2: Write Tests for CategoryMappingService
 - Step 3: Confirm Test Failure
 - Step 4: Extract CategoryMappingService from DataImportedHandler
