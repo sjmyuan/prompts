@@ -43,19 +43,38 @@ Confirm: the chosen option follows logically from the decision drivers; all eval
 ## Compile findings doc (compile-findings-doc)
 
 1. Determine document strategy: **per-area** (recommended for 2+ loosely-coupled areas) or **one consolidated doc** (tightly-coupled or single-area). Ask the user which they prefer.
-2. For each findings document, load the `write-solution-doc` skill's SKILL.md and apply its capabilities to produce a **current-state document**: label all diagrams "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings. Seed with Phase 2 results (investigation summaries and their evidence maps) rather than gathering context from scratch.
-3. **Embed each area's evidence map inline** per **reference/findings-document-guide.md**: annotate entry points and key locations with `file:line` beside the sections that use them, express call chains as sequence diagrams, and add an **Evidence & Verification** section per area — evidence ledger (claim → verdict → evidence `file:line` → confidence **verified**/**inferred**/**unverified**) and searched-negatives. Preserve `file:line` precision — never vague references like "the service layer"; never present inference as evidence.
-4. Cross-reference between findings docs (if per-area): note where one area's current state creates constraints for another.
-5. Present each findings document and ask: "Does this accurately capture the current state? Anything to add, correct, or remove?" Then save it to `<spike-folder>/docs/findings-<area>.md` (apply **save-artifacts**).
-6. Findings docs are the **current-state baseline and evidence home**: evaluation compares options against them, ADRs cite them as evidence, sub-agent briefs carry their evidence sections, and the solution doc evolves their diagrams as-is → to-be. Update the embedded evidence map the moment new evidence is found — no round/version tracking.
+2. Choose the execution strategy: dispatch to a sub-agent whenever one is available; fall back to direct compilation only when none exists (see **multi-agent-orchestration.md**).
+
+### Sub-agent dispatch — brief template
+
+Each brief carries: document strategy, Phase 2 results (investigation summaries **and their evidence maps**), and instructions to load `write-solution-doc` and produce a **current-state document** — diagrams labeled "current state," RAID/RACI replaced with **constraints & pain points** and **raw data & metrics**, evidence maps embedded per **findings-document-guide.md**. Announce: "Dispatching findings-doc compilation to a sub-agent." After collection, review for evidence-map fidelity and cross-area consistency.
+
+### Direct compilation (fallback — no sub-agent available)
+
+Load the `write-solution-doc` skill's SKILL.md and apply its capabilities to produce a **current-state document**: label all diagrams "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings. Seed with Phase 2 results (investigation summaries and their evidence maps) rather than gathering context from scratch.
+
+### Evidence-map embedding and validation (both paths)
+
+**Embed each area's evidence map inline** per **reference/findings-document-guide.md**: annotate entry points and key locations with `file:line` beside the sections that use them, express call chains as sequence diagrams, and add an **Evidence & Verification** section per area — evidence ledger (claim → verdict → evidence `file:line` → confidence **verified**/**inferred**/**unverified**) and searched-negatives. Preserve `file:line` precision — never vague references like "the service layer"; never present inference as evidence. Cross-reference between findings docs (if per-area): note where one area's current state creates constraints for another. Present each findings document and ask: "Does this accurately capture the current state? Anything to add, correct, or remove?" Then save it to `<spike-folder>/docs/findings-<area>.md` (apply **save-artifacts**). Findings docs are the **current-state baseline and evidence home**: evaluation compares options against them, ADRs cite them as evidence, sub-agent briefs carry their evidence sections, and the solution doc evolves their diagrams as-is → to-be. Update the embedded evidence map the moment new evidence is found — no round/version tracking.
 
 ## Compile solution doc (compile-solution-doc)
 
-1. Load the `write-solution-doc` skill's SKILL.md and apply its capabilities — for compiling AND revising. Seed with: business context (spike goal), current-state baseline (findings docs — evolve diagrams as-is → to-be), and assumed solutions (chosen option from each ADR). C4 diagrams show the **target architecture**, not current state. Revising is the same procedure seeded with the existing doc plus the changed decisions (see **professional-doc-authoring**).
+1. Choose the execution strategy: dispatch to a sub-agent whenever one is available; fall back to direct compilation only when none exists (see **multi-agent-orchestration.md**).
+
+### Sub-agent dispatch — brief template
+
+Each brief carries: business context (spike goal), current-state baseline (findings docs — evolve diagrams as-is → to-be), assumed solutions (chosen option from each ADR), and instructions to load `write-solution-doc` and produce a **target-state** document (C4 diagrams show the target architecture, not current state). Announce: "Dispatching solution-doc compilation to a sub-agent." After collection, review for completeness and consistency with the ADRs.
+
+### Direct compilation (fallback — no sub-agent available)
+
+Load the `write-solution-doc` skill's SKILL.md and apply its capabilities — for compiling AND revising. Seed with: business context (spike goal), current-state baseline (findings docs — evolve diagrams as-is → to-be), and assumed solutions (chosen option from each ADR). C4 diagrams show the **target architecture**, not current state. Revising is the same procedure seeded with the existing doc plus the changed decisions (see **professional-doc-authoring**).
+
+### Modularity, validation, presentation (both paths)
+
 2. **Assess size and modularity** per **solution-doc-modularity**: if the doc exceeds ~3000 words, has 5+ major sections, or has independently useful sections for different audiences, identify candidate sections for extraction.
 3. **Extract independent sections**: for each candidate, create a standalone doc with standalone context and back-reference, replace it in the hub with a 2–4 sentence summary and cross-reference link. Skip extraction for small, single-service solutions.
 4. Compile the output bundle — findings docs, N ADRs, 1 solution doc (hub), modular sub-docs (if extracted) — and save per **spike-artifact-layout** (apply **save-artifacts**): findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`.
-5. Keep the solution doc at the latest state per **latest-state-doctrine** (see **reference/clean-artifact-principle.md**): only the target-state architecture, no process notes. On refresh, route through `write-solution-doc` (step 1) and rewrite affected sections in place — delete superseded text, never annotate; cross-reference the findings document.
+5. Keep the solution doc at the latest state per **latest-state-doctrine** (see **reference/clean-artifact-principle.md**): only the target-state architecture, no process notes. On refresh, route through `write-solution-doc` and rewrite affected sections in place — delete superseded text, never annotate; cross-reference the findings document.
 6. Validate the bundle: every ADR's chosen solution is reflected, cross-references between all artifacts are consistent, diagrams match assumed solutions, extracted sub-docs have correct back-references. Run the **no-note scan** on the solution doc and rewrite until none remain.
 7. Present the bundle and remind the user: findings docs are the current-state record (keep even if decisions change); ADRs are formal decision records (review and approve with the team); the solution doc is the target-state architecture; version-control all artifacts together in the spike folder.
 

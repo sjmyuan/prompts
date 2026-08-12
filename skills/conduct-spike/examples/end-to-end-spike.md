@@ -4,7 +4,7 @@
 
 **Applies**: All capabilities in sequence — `define-spike-scope` → `investigate-per-area` → `compile-findings-doc` → `evaluate-solutions-per-area` → `draft-area-adrs` → `compile-solution-doc`
 
-**What makes this distinct**: This is a full multi-area spike on a brownfield system with complex dependencies, demonstrating the complete 5-phase workflow. It runs investigation and ADR drafting directly in the orchestrating agent to keep the walkthrough readable; in practice these steps dispatch to sub-agents whenever available — including for single tasks — to preserve the orchestrating agent's context (see `reference/multi-agent-orchestration.md` and `examples/multi-agent-investigation.md`).
+**What makes this distinct**: This is a full multi-area spike on a brownfield system with complex dependencies, demonstrating the complete 5-phase workflow. It runs investigation, ADR drafting, and findings/solution-doc compilation directly in the orchestrating agent to keep the walkthrough readable; in practice these steps dispatch to sub-agents whenever available — including for single tasks — to preserve the orchestrating agent's context (see `reference/multi-agent-orchestration.md` and `examples/multi-agent-investigation.md`).
 
 ---
 

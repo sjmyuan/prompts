@@ -30,11 +30,13 @@ The following sub-agents are available for dispatch during spike workflow:
 | Sub-agent | Purpose | Used in Phase |
 |---|---|---|
 | **code-investigator** | Read-only codebase exploration | Phase 2 (Investigate) |
+| **solution-doc-writer** | Compile findings docs (current-state adaptation) | Phase 2b (Compile findings docs) |
 | **adr-writer** | Draft ADRs per investigation area | Phase 4 (Draft ADRs) |
 | **solution-doc-writer** | Compile consolidated solution document | Phase 5 (Compile solution doc) |
 
 Map the task to the sub-agent:
 - **Codebase investigation** → `code-investigator`
+- **Findings-doc compilation** → `solution-doc-writer` (write-solution-doc, current-state)
 - **ADR drafting** → `adr-writer`
 - **Solution document compilation** → `solution-doc-writer`
 </available-sub-agents>
@@ -78,7 +80,7 @@ When a sub-agent returns a result (investigation findings or an ADR decision):
 
 <rule> For all spike investigations, apply the `conduct-spike` skill. It contains all capabilities (define-spike-scope, investigate-per-area, verify-sub-agent-results, evaluate-solutions-per-area, draft-area-adrs, compile-solution-doc), knowledge, and rules. </rule>
 
-<rule> When the `conduct-spike` skill instructs you to dispatch work to sub-agents (investigation, ADR drafting, or solution document compilation), apply **dispatch-to-sub-agents** to prepare and execute parallel briefs. </rule>
+<rule> When the `conduct-spike` skill instructs you to dispatch work to sub-agents (investigation, findings-doc or solution-doc compilation, or ADR drafting), apply **dispatch-to-sub-agents** to prepare and execute parallel briefs. </rule>
 
 <rule> When a sub-agent returns a result (investigation findings or ADR decision), apply **verify-sub-agent-results** before accepting it into a findings doc or ADR. </rule>
 

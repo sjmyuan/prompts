@@ -276,11 +276,13 @@ Load draft-adr skill and produce a complete ADR.
 
 ---
 
-## Phase 5: Compile Solution Doc
+## Phase 5: Compile Solution Doc — SINGLE-TASK DISPATCH
 
-*The solution document compilation runs sequentially (not parallelizable — it synthesizes all ADRs into one cohesive document).*
+*The solution document is a single unit (it synthesizes all ADRs into one cohesive document), so it is dispatched as one task — context preservation, not parallelism.*
 
-*[Solution document produced as in the standard example.]*
+*[Orchestrator prepares a brief: business context, findings doc, and the 4 assumed solutions, with instructions to load `write-solution-doc` and produce the target-state document. Dispatched to a solution-doc sub-agent; the orchestrator reviews the result.]*
+
+> "Dispatching solution-doc compilation to a sub-agent."
 
 ### Final Output Bundle
 
@@ -301,5 +303,6 @@ Load draft-adr skill and produce a complete ADR.
 | Investigation time | Sum of all areas (4x single-area time) | Max of any single area (~1x) when concurrent |
 | ADR drafting time | Sum of all ADRs (4x single-ADR time) | Max of any single ADR (~1x) when concurrent |
 | Coordination overhead | None | Brief preparation + synthesis |
-| When used | Only when no suitable sub-agent is available | Always — even single-area/single-ADR spikes |
+| Findings/solution-doc compilation | Done in the orchestrator — large writes crowd its context | Single dispatch per doc (one unit) — the write happens in the sub-agent |
+| When used | Only when no suitable sub-agent is available | Always — even single-area/single-ADR/single-document spikes |
 | Risk | Orchestrator context bloat degrades later synthesis | Sub-agents may need re-prompting if briefs are incomplete |

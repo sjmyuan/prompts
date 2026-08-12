@@ -1,11 +1,13 @@
 # Sub-Agent Orchestration for Spikes
 
-Dispatch task execution to sub-agents whenever one is available — for Phases 2 (investigate) and 4 (draft ADRs) — **even when the spike has only a single task**. The primary goal is **preserving the orchestrating agent's context**: running a task directly consumes the orchestrator's context window with file reads, search output, and intermediate reasoning, crowding out the cross-cutting state it must hold (scope, findings, decisions). Parallel speed is a secondary benefit that applies automatically when multiple units are dispatched at once.
+Dispatch task execution to sub-agents whenever one is available — for Phases 2 (investigate), 2b (compile findings docs), 4 (draft ADRs), and 5 (compile solution doc) — **even when the spike has only a single task**. The primary goal is **preserving the orchestrating agent's context**: running a task directly consumes the orchestrator's context window with file reads, search output, and intermediate reasoning, crowding out the cross-cutting state it must hold (scope, findings, decisions). Parallel speed is a secondary benefit that applies automatically when multiple units are dispatched at once.
 
 | Phase | Dispatchable? | Mechanism |
 |---|---|---|
 | 2. Investigate | Yes — each area, even a single one | Dispatch each investigation area to a code-exploration sub-agent with a focused investigation brief |
+| 2b. Compile findings docs | Yes — each doc, even a single one | Dispatch the document strategy + Phase 2 results (with evidence maps) to a sub-agent with instructions to load `write-solution-doc` and produce the current-state findings doc(s) |
 | 4. Draft ADRs | Yes — each ADR, even a single one | Dispatch each area's evaluation results to a sub-agent with instructions to load `draft-adr` and produce a complete ADR |
+| 5. Compile solution doc | Yes — each doc, even a single one | Dispatch business context + findings docs + assumed solutions to a sub-agent with instructions to load `write-solution-doc` and produce the target-state solution doc |
 
 ## Why Dispatch Even a Single Task
 
@@ -22,10 +24,11 @@ Dispatch task execution to sub-agents whenever one is available — for Phases 2
 5. Dispatch the briefs — all units concurrently when there are multiple, or the single unit on its own when there is one. Sub-agents operate independently and do not communicate with each other.
 6. Collect results from all sub-agents when they complete.
 7. Verify each collected result with **verify-sub-agent-results** — the `question-everything` loop with new same-type sub-agents — then synthesize the accepted results into the consolidated format required by the next phase. Review for completeness and consistency across areas, and embed the returned per-area evidence maps into the findings doc(s) (see **reference/findings-document-guide.md**).
+8. **Document-compilation briefs** (findings and solution docs) carry the full synthesis context — document strategy, Phase 2 results with evidence maps, or business context + findings docs + assumed solutions — plus instructions to load `write-solution-doc`. The orchestrator still reviews, validates, and presents the returned doc.
 
 ## Verifying Returned Results
 
-Every sub-agent result — investigation findings and ADR decisions — is questioned via the `question-everything` skill before acceptance (**verify-sub-agent-results**): challenge the result across the six dimensions, verify with a NEW sub-agent of the same type, accept when all challenges AGREE, or re-investigate with another NEW same-type sub-agent when any DISAGREE/UNCERTAIN. Loop until all agree or the 3-round cap; escalate to the user at the cap. The original sub-agent instance is never reused.
+Every sub-agent result — investigation findings, ADR decisions, and dispatched findings/solution-doc compilations — is questioned via the `question-everything` skill before acceptance (**verify-sub-agent-results**): challenge the result across the six dimensions, verify with a NEW sub-agent of the same type, accept when all challenges AGREE, or re-investigate with another NEW same-type sub-agent when any DISAGREE/UNCERTAIN. Loop until all agree or the 3-round cap; escalate to the user at the cap. The original sub-agent instance is never reused. Dispatched findings/solution-doc compilations synthesize already-verified material, so verification focuses on fidelity to that material rather than a fresh fact-check.
 
 ## Evidence Map in Sub-Agent Briefs
 
@@ -39,9 +42,9 @@ The evidence map (embedded in findings docs) is the input/output contract betwee
 
 ## When NOT to Dispatch
 
-- **Phases 1 (define scope), 3 (evaluate solutions), and 5 (compile solution doc)**: these involve user interaction or cross-area synthesis that must stay in the orchestrating agent.
+- **Phases 1 (define scope) and 3 (evaluate solutions)**: these involve user interaction and decision-making that must stay in the orchestrating agent.
 - **No suitable sub-agent available**: fall back to direct execution within the orchestrating agent.
-- **Single-task spikes are NOT exempt**: a single area or single ADR is still dispatched when a sub-agent is available — context preservation is the goal, not parallelism.
+- **Single-task spikes are NOT exempt**: a single area, single ADR, or single document is still dispatched when a sub-agent is available — context preservation is the goal, not parallelism.
 
 ## Platform Detection
 
