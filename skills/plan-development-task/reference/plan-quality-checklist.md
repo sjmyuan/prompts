@@ -42,3 +42,4 @@ Before presenting a development plan to the user, verify all items below.
 - [ ] Each step description is actionable and unambiguous
 - [ ] File paths and class names are specified where known
 - [ ] Validation criteria are explicit (e.g., "all tests pass", "no lint errors", "p99 latency < 500 ms")
+- [ ] Prose follows concise writing (see **concise-writing**): one objective per step sentence, one claim per scope-boundary bullet, no banned phrases

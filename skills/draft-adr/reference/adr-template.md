@@ -1,6 +1,6 @@
 # ADR Template
 
-When producing the final ADR document, use the exact structure below. Wrap placeholders in `{{ }}` and fill them in based on the discussion with the user.
+When producing the final ADR document, use the exact structure below. Wrap placeholders in `{{ }}` and fill them in based on the discussion with the user. Apply the concise writing rules in **reference/writing-style.md** — BLUF takeaway under every heading, caps, no banned phrases.
 
 ````markdown
 # YYYY-MM-DD-{{TITLE}}
@@ -11,41 +11,40 @@ When producing the final ADR document, use the exact structure below. Wrap place
 
 ## Context and Problem Statement
 
-[ Describe the context and problem statement, e.g. in free form using two to three sentences. You may want to articulate the problem in form of a question. ]
+[ ≤3 sentences, SCQA: Situation → Complication → Question → Answer. Lead with the question this ADR answers. ]
 
 ![Context diagram: system(s) in scope, actors, and external dependencies]({{DIAGRAM:context}})
 [ Embed the C4 context diagram drawn during define-problem, plus any flowchart or sequence diagram used to zoom into the context. For architecture diagrams use C4 Models see https://c4model.com ]
 
 ## Decision Outcome
 
-Chosen option: "[ option 1 ]", because [ justification e.g. only option which meets k.o. criterion of decision driver 1 | which resolves issue | comes out best (see below) | ... ].
+**Chosen:** "[ option 1 ]" — [ 1-sentence justification tied to a specific driver, e.g. "meets KO driver #1 (ACID); best on cost & team expertise" ].
 
 ![C4/flowchart: target state with the chosen option integrated into the context]({{DIAGRAM:solution}})
 [ Embed the target-state C4/flowchart view drawn during compile-adr. ]
 
 ## Consequences
 
-[ Describe a summary of the consequences of the decision chosen, e.g. in free form using two to three sentences. ] <!-- optional -->
+[ 1-line trade-off takeaway, e.g. "**Trade-off:** self-managed ops for lower cost." ]
 
 ### Positive Consequences <!-- optional -->
 
-* [ improvement of quality attribute satisfaction | follow-up decisions required | strengths | impact | ... ]
+* [ one claim per bullet, ≤10 words, no justification ]
 * ...
 
 ### Risks <!-- optional -->
 
-* [ what should be considered during implementation | risk mitigation | weaknesses | impact | ... ]
+* [ one claim per bullet, ≤10 words ]
 * ...
 
 ### Security
 
-* [ what should be considered during implementation | Impact on Authorization, Authentication, Audit, Assurance, Availability, Asset Protection, Risk profile, Security controls ]
+* [ one claim per bullet, ≤10 words ]
 * ...
 
 ## Decision Drivers <!-- optional -->
 
-* [ driver 1 e.g. a force, facing concern, ... ]
-* [ driver 2 e.g. a force, facing concern, ... ]
+* [ one driver per bullet — a fact, not a sentence ]
 * ...
 
 ## Considered Options
@@ -61,7 +60,9 @@ Chosen option: "[ option 1 ]", because [ justification e.g. only option which me
 
 ### [ option 1 ]
 
-[ example | description | pointer to more information | scenario | strengths | impact | ... ] <!-- required -->
+**Verdict:** [ 1 line: recommended / dropped + which driver decides — ≤15 words ]
+
+[ ≤3 short sentences: what it is, key strengths, key risks ] <!-- required -->
 
 #### Tech Details <!-- optional: include when tech details were provided from a spike's code investigation -->
 
@@ -83,19 +84,19 @@ diff --git a/<file> b/<file>
 
 #### Pros
 
-* [ key point 1 ]
-* [ key point 2 ]
+* [ one claim per bullet — no justification ]
 * ...
 
 #### Cons
 
-* [ key point 3 ]
-* [ key point 4 ]
+* [ one claim per bullet — no justification ]
 * ...
 
 ### [ option 2 ]
 
-[ example | description | pointer to more information | scenario | strengths | impact | ... ] <!-- required -->
+**Verdict:** [ 1 line: recommended / dropped + which driver decides — ≤15 words ]
+
+[ ≤3 short sentences: what it is, key strengths, key risks ] <!-- required -->
 #### Tech Details <!-- optional: include when tech details were provided from a spike's code investigation -->
 
 [ Target-state diagram(s) for this option: C4 view + sequence diagram(s) showing the flow this option changes. ]
@@ -116,14 +117,12 @@ diff --git a/<file> b/<file>
 
 #### Pros
 
-* [ key point 1 ]
-* [ key point 2 ]
+* [ one claim per bullet — no justification ]
 * ...
 
 #### Cons
 
-* [ key point 3 ]
-* [ key point 4 ]
+* [ one claim per bullet — no justification ]
 * ...
 
 ## References <!-- optional -->

@@ -101,6 +101,7 @@ Load only the examples directly relevant to the current change type to minimize 
 | Feature: simple config properties or flags | Full workflow example | [examples/feature-simple-configuration.md](examples/feature-simple-configuration.md) |
 | Refactor: splitting large classes (SRP) | Full workflow example | [examples/refactor-service-splitting.md](examples/refactor-service-splitting.md) |
 | Refactor: interface extraction for testability | Full workflow example | [examples/refactor-interface-implementation.md](examples/refactor-interface-implementation.md) |
+| Writing or reviewing plan.md / context.md prose | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets | [reference/writing-style.md](reference/writing-style.md) |
 </context-loading-guide>
 
 <skill-boundary>
@@ -171,7 +172,8 @@ Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its
 4. Determine the repo name when the plan belongs to a specific repo (an **orchestrate-feature-delivery** cell); use the **repo-first** layout `{location}/{repo}/{feature-name}/` — the delivery folder already exists, write into it; fall back to `{location}/{feature-name}/` when no repo applies so all plans for one repo live together.
 5. Write `plan.md` — start with the ratified `## Scope Boundary` block (see **scope-boundary**), then the complete numbered step list with objectives. When appending a rework plan (per **rework-plan-convention**), append a `## Rework <date>` section (with its own boundary) to the existing `plan.md` instead of overwriting it.
 6. Write `context.md` — capture all background: the user's original request, the classified change type, root cause or requirement summary, TDD approach rationale, the scope boundary rationale (see **scope-boundary**), the target branch name and base branch (see **plan-prerequisites**), constraints, assumptions, and any codebase references gathered. For an **orchestrate-feature-delivery** cell, also record the spike references from the agent brief (change-summary items, ADR files, solution-doc sections) so execution/resume agents can load full context on demand.
-7. Inform the user of the saved location so they can invoke **execute-plan** to carry it out.
+7. Validate conciseness (see **concise-writing**): each step states one objective in one sentence, scope-boundary bullets are one claim each, context.md prose ≤3 sentences per paragraph, no banned phrases.
+8. Inform the user of the saved location so they can invoke **execute-plan** to carry it out.
 </export-plan>
 
 </capabilities>

@@ -101,6 +101,10 @@ The assistant supports both English and Chinese (中文) output:
 - Technical terms (API, RAID, RACI, C4, Mermaid) remain in English unless the user explicitly requests translation.
 </bilingual-support>
 
+<concise-writing>
+All solution-doc prose follows BLUF (conclusion first), hard caps, atomic bullets, and tables-over-prose. Every heading's first line is a bolded one-line takeaway; no banned phrases; every sentence passes the "so what?" test. Load **reference/writing-style.md** for the full rules (caps table, banned-phrase list, sentence surgery).
+</concise-writing>
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -113,6 +117,7 @@ The assistant supports both English and Chinese (中文) output:
 | Designing API/event contracts | REST, gRPC, and async event schema conventions | [reference/api-design-standards.md](reference/api-design-standards.md) |
 | Performing RAID analysis | RAID framework definition and item schema | [reference/raid-framework.md](reference/raid-framework.md) |
 | Building a RACI matrix | RACI framework definition and table format | [reference/raci-framework.md](reference/raci-framework.md) |
+| Writing or reviewing any solution-doc prose | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets | [reference/writing-style.md](reference/writing-style.md) |
 | User corrects content or new findings emerge mid-session and diagrams need to stay current | Walkthrough of **sync-diagrams** updating affected diagrams and adding new ones | [examples/diagram-sync.md](examples/diagram-sync.md) |
 
 </context-loading-guide>
@@ -230,47 +235,50 @@ The assistant supports both English and Chinese (中文) output:
 </list-raci>
 
 <structure-solution-doc>
-1. Compile all confirmed sections into a single, well-organized Markdown document following this structure:
+1. Compile all confirmed sections into a single, well-organized Markdown document following this structure (apply **concise-writing** throughout):
 
 ```
 # Solution Document: [Solution Name]
 
 ## 1. Business Context & Solution Background
-[Context and background summary]
+**Takeaway:** [ 1 line: problem + why this solution ]
 
 ## 2. System Topology (C4 Model)
 ### 2.1 C2 — Container Diagram
-[Mermaid diagram + explanation]
+[Mermaid diagram — caption is the 1-line takeaway]
 ### 2.2 C3 — Component Diagram(s)
-[Mermaid diagram(s) + explanation]
+[Mermaid diagram(s) — caption is the 1-line takeaway]
 
 ## 3. Interaction Details
-[One subsection per critical flow with Mermaid diagram(s) + explanation. Use sequence diagrams for runtime message flows, flowcharts for process logic/decision branches, or both when needed.]
+**Takeaway:** [ 1 line per flow ]
+[One subsection per critical flow: diagram + 1-line caption. Use sequence diagrams for runtime message flows, flowcharts for process logic/decision branches, or both when needed.]
 
 ## 4. API / Event Schema
-[Structured schema definitions]
+[Tables / code blocks — no prose walkthrough]
 
 ## 5. Related Documents
-[Table of related documents]
+[Table]
 
 ## 6. External Dependencies
-[Table of external dependencies with teams and contacts]
+[Table with teams and contacts]
 
 ## 7. Maintainers
-[Table of components with maintainer teams and contacts]
+[Table with maintainer teams and contacts]
 
 ## 8. RAID Analysis
-[RAID table with Risks, Assumptions, Issues, Dependencies]
+[Table — one row per item]
 
 ## 9. RACI Matrix
-[RACI matrix table]
+[Matrix table]
 ```
 
-2. Use clear heading hierarchy, tables for structured data, and fenced code blocks for Mermaid diagrams and JSON/YAML schemas.
-3. For any section that was explicitly skipped, mark it as `[Skipped]`.
-4. Ensure all Mermaid diagrams use correct syntax and are renderable.
-5. Match the user's language preference (English or Chinese) for explanatory text.
-6. Present the final document and offer to refine any section.
+2. Under every heading, the first line is a bolded one-line takeaway (≤15 words). Tables and diagrams carry the detail; prose only summarizes in one line.
+3. Use tables for structured data and fenced code blocks for Mermaid diagrams and JSON/YAML schemas. Never restate what a table or diagram shows.
+4. For any section that was explicitly skipped, mark it as `[Skipped]`.
+5. Ensure all Mermaid diagrams use correct syntax and are renderable.
+6. Match the user's language preference (English or Chinese) for explanatory text.
+7. Run the concise check (see **concise-writing**): no sentence >20 words, no banned phrases, every bullet is one claim, every heading has a takeaway line.
+8. Present the final document and offer to refine any section.
 </structure-solution-doc>
 
 <sync-diagrams>

@@ -78,6 +78,10 @@ Never leave a stale diagram: after each change, every diagram either reflects th
 Tech details make each option's implementation concrete in the ADR: **target-state diagrams** (C4 + sequence, option-specific) and a **code change profile** (per change: `file:line` location, current code, git-style diff block, how-to, confidence). Produced per option by **detail-options-tech** and rendered as a `#### Tech Details` subsection in each option's evaluation section (omit when absent). **Grounding contract**: tech details must trace to code investigation evidence — findings from the `conduct-spike` pipeline (their embedded evidence map), or an on-demand evidence map built via `investigate-code`. Without evidence they stay architectural-level and unverified, and a spike is recommended before relying on them. See **reference/option-tech-details-guide.md**.
 </option-tech-details>
 
+<concise-writing>
+All ADR prose follows BLUF (conclusion first), hard caps, atomic bullets, and tables-over-prose. Every heading's first line is a bolded one-line takeaway; no banned phrases; every sentence passes the "so what?" test. Load **reference/writing-style.md** for the full rules (caps table, banned-phrase list, sentence surgery).
+</concise-writing>
+
 <context-loading-guide>
 
 | Load when | Provides | File |
@@ -89,6 +93,7 @@ Tech details make each option's implementation concrete in the ADR: **target-sta
 | User corrects content or new findings emerge mid-session and diagrams need to stay current | Walkthrough of **sync-diagrams** updating affected diagrams and adding new ones | [examples/diagram-sync.md](examples/diagram-sync.md) |
 | Detailing each option's technical implementation (diagrams + code changes) during evaluation, or rendering tech details in the ADR | Per-option tech details format, grounding contract, and code-access handling | [reference/option-tech-details-guide.md](reference/option-tech-details-guide.md) |
 | Seeing per-option tech details with C4/sequence diagrams and code diffs grounded in a code reference | Worked example of detailing two options for one area, and how they render in the ADR | [examples/option-tech-details-example.md](examples/option-tech-details-example.md) |
+| Writing or reviewing any ADR prose | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets | [reference/writing-style.md](reference/writing-style.md) |
 
 </context-loading-guide>
 
@@ -158,6 +163,9 @@ Tech details make each option's implementation concrete in the ADR: **target-sta
    - [ ] Consequences section addresses risks and positive impacts
    - [ ] Context and solution are visualized with diagrams (context diagram + target-state C4/flowchart view)
    - [ ] Metadata (title, owners, status) is populated
+   - [ ] Every section opens with a bolded one-line takeaway (BLUF)
+   - [ ] No sentence exceeds 20 words; no banned phrases (see **concise-writing**)
+   - [ ] Pros/cons and consequences are one-claim bullets, no justification
 7. Present the completed ADR to the user for final review and ask: "Would you like to adjust any section before saving?"
 </compile-adr>
 

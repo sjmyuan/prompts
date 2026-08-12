@@ -66,6 +66,9 @@ Detailed presentation format: [reference/confidence-and-coverage-guide.md](refer
 <spike-integration>
 When invoked from the `conduct-spike` skill for a spike investigation, scope the investigation to the spike's area and read its existing evidence before re-scanning: load the spike folder's findings doc (`docs/findings-<area>.md`), then update its evidence map — `file:line` entry points, sequence diagrams for call chains, evidence ledger (claim → verdict → confidence), and searched-negatives — so the spike can cite code evidence without re-scanning. Do not load when no spike area has been defined yet.
 </spike-integration>
+<concise-writing>
+All investigation prose and reports follow BLUF (conclusion first), hard caps, atomic bullets, and tables-over-prose. Every section opens with a bolded one-line takeaway; no banned phrases; every sentence passes the "so what?" test. Load **reference/writing-style.md** for the full rules (caps table, banned-phrase list, sentence surgery).
+</concise-writing>
 <context-loading-guide>
 | Load when | Provides | File |
 |---|---|---|
@@ -81,6 +84,7 @@ When invoked from the `conduct-spike` skill for a spike investigation, scope the
 | Finding similar features or flagging inconsistent patterns | End-to-end pattern discovery with inconsistency detection | [examples/pattern-discovery.md](examples/pattern-discovery.md) |
 | Presenting findings with confidence tags, gaps, and inconsistencies | 5-category presentation format with phrasing examples | [reference/confidence-and-coverage-guide.md](reference/confidence-and-coverage-guide.md) |
 | Reporting a standalone confidence & coverage profile | Standalone example with all five categories | [examples/confidence-and-coverage.md](examples/confidence-and-coverage.md) |
+| Writing or reviewing any investigation prose or report | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets | [reference/writing-style.md](reference/writing-style.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -94,7 +98,7 @@ When invoked from the `conduct-spike` skill for a spike investigation, scope the
 4. **Analyze dependencies**: List external libraries, internal module dependencies, service integrations, and configuration dependencies.
 5. **Extract structural fingerprint**: Note the feature's layer chain (e.g., Controller → Orchestrator → Service → Adapter), stereotypes, and external interactions. This feeds into discover-implementation-patterns.
 6. **Synthesize findings**: Present a coherent narrative — direct answer first, then supporting evidence with file:line references, key design decisions, and areas needing deeper investigation. Then apply present-findings-with-confidence to tag each finding as verified/inferred/assumed, report gaps, and raise inconsistencies.
-7. **Validate**: Verify that all file:line references are accurate by checking the workspace, that the narrative answers the original question directly, and that every finding carries a confidence tag with no gap silently omitted.
+7. **Validate**: Verify that all file:line references are accurate by checking the workspace, that the narrative answers the original question directly, that every finding carries a confidence tag with no gap silently omitted, and that prose follows **concise-writing** (answer first, ≤20-word sentences, no banned phrases).
 </investigate-codebase>
 
 <analyze-cross-repo-dependencies>
@@ -149,7 +153,7 @@ When invoked from the `conduct-spike` skill for a spike investigation, scope the
 2. **Load example**: Load [examples/markdown-report.md](examples/markdown-report.md) for structure reference.
 3. **Assemble sections**: System overview (C2 + dependency matrix) → Component internals (C3 per container) → Interaction flows (sequence diagrams) → Method details (call stacks) → Key decisions → Edge cases → Confidence & Coverage (verified/inferred/assumptions/gaps/inconsistencies) → Next steps.
 4. **Embed diagrams**: Mermaid source blocks with brief text descriptions.
-5. **Validate**: Ensure all file paths and line numbers are accurate, every investigation level is represented, and the Confidence & Coverage section lists verified/inferred/assumed findings, gaps, and inconsistencies.
+5. **Validate**: Ensure all file paths and line numbers are accurate, every investigation level is represented, the Confidence & Coverage section lists verified/inferred/assumed findings, gaps, and inconsistencies, and prose follows **concise-writing** (1-line takeaway per section, ≤3 sentences per paragraph, no banned phrases).
 </compile-markdown-report>
 
 <present-findings-with-confidence>
@@ -157,7 +161,7 @@ When invoked from the `conduct-spike` skill for a spike investigation, scope the
 2. **Report gaps**: List searched negatives (searched but not found), untraced paths, and coverage limits (e.g., "searched by suffix match only — differently-named features may be missed").
 3. **Raise inconsistencies**: Surface every contradiction found — code vs code, code vs docs, code vs config — with locations of both sides. Classify severity per [reference/pattern-discovery-strategies.md](reference/pattern-discovery-strategies.md).
 4. **Summarize**: Close with a compact "Confidence & Coverage" block listing ✅ Verified / 🔶 Inferred / 💭 Assumptions / ❓ Gaps / ⚠️ Inconsistencies. Offer to close any gap on request.
-5. **Validate**: Check that verified/inferred/assumed are clearly separated, every gap is stated (not silently omitted), and every inconsistency has both sides located.
+5. **Validate**: Check that verified/inferred/assumed are clearly separated, every gap is stated (not silently omitted), every inconsistency has both sides located, and the Confidence & Coverage block stays compact — one claim per line, ≤20 words.
 </present-findings-with-confidence>
 
 </capabilities>
