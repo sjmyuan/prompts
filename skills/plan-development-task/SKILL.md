@@ -10,6 +10,7 @@ description: Classify, clarify, and generate TDD-based step-by-step plans for bu
 - User asks to investigate and fix a problem in existing code
 - User submits a requirement to add new functionality or features
 - User asks to implement a new feature, enhancement, or behavior
+- User wants a POC to prove which option of an ADR is better — a standalone feature (not a snippet) that demonstrates one option
 - User describes desired functionality that does not currently exist in the codebase
 - User asks an exploratory question about whether a feature is possible (e.g., "is it possible to...", "can we add...", "would it be feasible to...")
 - User requests refactoring of existing code or functionality
@@ -37,6 +38,7 @@ Classify the user's request into one of three types:
 | "bug", "broken", "error", "exception", "not working", "incorrect", "wrong output", "failing", "regression" | **Bug Fix** | Something is producing incorrect or unexpected results |
 | "new", "add", "implement", "create", "support", "enhance", "extend", "feature", "capability" | **Feature** | New observable behavior is being introduced |
 | "refactor", "clean up", "restructure", "extract", "organize", "improve quality", "reduce debt", "split", "consolidate" | **Refactor** | Internal structure changes without behavior change |
+| "poc", "proof of concept", "prove which option", "compare approaches", "validate option" | **POC** | An uncertain ADR option needs evidence — build a standalone feature that demonstrates it (see **poc-plan**) |
 
 When unsure, ask the user: "Is the goal to fix something that's broken (bug), add new behavior (feature), or restructure without changing behavior (refactor)?"
 </change-type-classification>
@@ -70,6 +72,9 @@ Every plan carries an explicit **Scope Boundary** that the executor checks durin
 
 Derive the boundary from the classified change type, the confirmed scope, and (for orchestrator cells) the governing ADR decision. Present it to the user for ratification during plan confirmation, then persist it via **export-plan**. Rework sections inherit the original boundary and tighten it to the governing ADR.
 </scope-boundary>
+<poc-plan>
+A POC plan (from **orchestrate-feature-delivery**'s **poc-definition**) builds a **standalone feature** — a full, coherent slice demonstrating one ADR option, never a snippet. It carries `type: poc`, the option's **success criteria** (measurable evidence for the decision gate), and a final **evaluation step** that collects that evidence. The **Scope Boundary** covers the option's target area; other options and ADRs stay **Out of scope**.
+</poc-plan>
 
 <rework-plan-convention>
 When the plan is a **rework append** for an already-implemented feature (triggered by **orchestrate-feature-delivery**'s **handle-post-implementation-issue**), the feature folder already exists with an implemented `plan.md`:
@@ -101,6 +106,9 @@ Load only the examples directly relevant to the current change type to minimize 
 | Feature: simple config properties or flags | Full workflow example | [examples/feature-simple-configuration.md](examples/feature-simple-configuration.md) |
 | Refactor: splitting large classes (SRP) | Full workflow example | [examples/refactor-service-splitting.md](examples/refactor-service-splitting.md) |
 | Refactor: interface extraction for testability | Full workflow example | [examples/refactor-interface-implementation.md](examples/refactor-interface-implementation.md) |
+| Planning a POC (standalone feature proving one ADR option) | POC plan steps, success criteria, evaluation step | [reference/plan-poc.md](reference/plan-poc.md) |
+| Full POC plan walkthrough | plan-poc end-to-end output | [examples/plan-adr-option-poc.md](examples/plan-adr-option-poc.md) |
+| POC round from dispatch to decision gate (shared with the orchestrator) | End-to-end POC walkthrough | [../orchestrate-feature-delivery/examples/adr-option-poc.md](../orchestrate-feature-delivery/examples/adr-option-poc.md) |
 | Writing or reviewing plan.md / context.md prose | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets | [reference/writing-style.md](reference/writing-style.md) |
 </context-loading-guide>
 
@@ -121,6 +129,7 @@ This skill produces a **plan** but does not execute changes. After the plan is c
    - **Bug Fix** → apply **define-bug-scope**, then **plan-bug-fix**
    - **Feature** → apply **define-feature-scope**, then **plan-feature-implementation**
    - **Refactor** → apply **define-refactor-scope**, then **plan-refactor**
+   - **POC** → apply **plan-poc**
 </classify-change-type>
 
 <define-bug-scope>
@@ -156,6 +165,13 @@ Load **[reference/plan-feature-implementation.md](reference/plan-feature-impleme
 <plan-refactor>
 Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its steps.
 </plan-refactor>
+<plan-poc>
+1. Load the ADR and the option's **tech details** (from **draft-adr**'s **detail-options-tech** — target-state diagrams + code change profile); for an **orchestrate-feature-delivery** cell use the agent brief's spike references.
+2. Clarify with the user: which option, the **success criteria** (measurable — latency, complexity, migration cost), and the standalone feature slice that demonstrates it end-to-end.
+3. Apply **define-scope-boundary** — the option's target area is **In scope**; other options and ADRs are **Out of scope**.
+4. Produce a feature plan per **reference/plan-poc.md** — build the full slice TDD-style, then a final **evaluation step** that measures/collects evidence against each success criterion.
+5. Mark the plan `type: poc`; record success criteria + evaluation method in `context.md` via **export-plan**.
+</plan-poc>
 
 <define-scope-boundary>
 1. Derive the boundary from the classified change type, the confirmed scope, and (for **orchestrate-feature-delivery** cells) the governing ADR decision.
@@ -184,6 +200,7 @@ Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its
 <rule> If the classified type is **Bug Fix**: apply **define-bug-scope** to identify the root cause, then apply **plan-bug-fix** to generate the fix plan. </rule>
 <rule> If the classified type is **Feature**: apply **define-feature-scope** to clarify the requirement, then apply **plan-feature-implementation** to generate the implementation plan. </rule>
 <rule> If the classified type is **Refactor**: apply **define-refactor-scope** to clarify the scope and constraints, then apply **plan-refactor** to generate the refactoring plan. </rule>
+<rule> If the classified type is **POC**: apply **plan-poc** to generate the proof-of-concept plan. </rule>
 <rule> When both restructuring and new behavior are needed: apply **plan-refactor** first to stabilize the structure, then apply **plan-feature-implementation** for the new behavior. </rule>
 <rule> After the plan is confirmed by the user: optionally apply **export-plan** to persist the plan to files for later execution by execute-plan. </rule>
 <rule> When generating any plan (bug fix, feature, or refactor): always include the **Prepare Environment** prerequisites step first per **plan-prerequisites**; if any check is not ready, raise it to the user instead of starting execution. </rule>

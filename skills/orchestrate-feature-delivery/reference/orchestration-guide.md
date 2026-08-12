@@ -54,6 +54,17 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 | **blocked** | waiting on an unmerged dependency or a user decision (record blocker) | do not dispatch until the blocker clears |
 | **in-progress** | agent was interrupted mid-execution | resume from the last completed step in `plan.md` |
 
+## POC cells
+
+A POC proves one option of one ADR as a standalone feature (see **poc-definition**). It is planned and executed like any cell, then stops at a **decision gate** instead of merging.
+
+- **Dispatch**: plan → **coding-assistant** (plan-development-task, POC mode); execute → **coding-assistant** (execute-plan, POC mode). Include `type: poc` + success criteria in the brief.
+- **Compare POCs**: sibling POC cells (one per option) run in parallel in an early wave.
+- **Decision gate**: at **poc-ready**, present the evaluation report vs success criteria to the user — the user/team decides adopt/reject, never auto-decide.
+- **Adopt**: dispatch **adr-writer** (draft-adr) to record the validated option; **POC-as-implementation** — ask before pushing/PR, merge the branch, mark the `replaces` cell **superseded**; **POC-as-decision-input** — close the POC, dispatch the **poc-gated** feature with the decided option.
+- **Reject**: dispatch **adr-writer** to record the outcome; close the cell **rejected**; archive or discard the branch (ask the user); delivery proceeds on the other option.
+- **Sequencing**: never dispatch a **poc-gated** feature before its POC's decision.
+
 ## Rework after implementation
 
 Two modes, chosen by the cell's status (see **rework-modes** in the SKILL.md knowledge).

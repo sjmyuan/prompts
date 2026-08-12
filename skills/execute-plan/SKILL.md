@@ -10,6 +10,7 @@ description: Execute structured development plans step-by-step with progress tra
 - All plan steps are complete and a post-execution review with the review-code skill is needed
 - A step has failed or is blocked and needs error recovery before proceeding
 - A delivery index from orchestrate-feature-delivery points to planned feature × repo cells ready for execution
+- You need to execute a POC plan (a standalone feature proving one ADR option) and stop at an evaluation report for the decision gate
 - You need to execute a plan containing an appended `## Rework <date>` section (a rework triggered by orchestrate-feature-delivery) — run only the rework steps, never re-run the completed original steps
 - Do NOT load when no plan has been generated yet — if the user describes a problem without referencing an existing plan, let plan-development-task handle it first
 </when-to-use-this-skill>
@@ -93,6 +94,9 @@ When the plan file contains an appended `## Rework <date>` section (a rework tri
 - **verify-prerequisites** still applies — the rework runs on its own branch per the repo's branch convention (the original branch/PR may already be merged).
 - Commit conventions, **request-push-approval**, and **review-post-execution** apply exactly as for a normal plan.
 </rework-plan-execution>
+<poc-execution-mode>
+A POC plan (from **plan-development-task**'s **plan-poc** / an **orchestrate-feature-delivery** POC cell) executes like a normal feature on a **POC branch** — track, small-step commits, validation — but stops before merging: after the final **evaluation step**, produce the evaluation report (see **produce-poc-report**) and **STOP**. Pushing a POC branch is for review/evidence only (ask the user); merging happens only after the orchestrator's decision gate adopts it. Completion routes to the decision gate — never to plain **done**.
+</poc-execution-mode>
 
 <scope-boundary-check>
 The plan file's `## Scope Boundary` block (written by **export-plan** in plan-development-task) defines what execution may change. If the plan has no boundary block, treat the plan's listed steps and files as the boundary.
@@ -114,6 +118,8 @@ Load only the example most relevant to the current execution scenario to minimiz
 | A step is ambiguous, requires user input, or cannot proceed due to a missing dependency or external blocker | Output model: pausing execution at a blocked step, informing the user, and resuming after input | [examples/handling-failed-steps.md](examples/handling-failed-steps.md) |
 | Executing a plan with prerequisite checks, one commit per step, and push approval at the end | Output model: verify-prerequisites, commit-step, and request-push-approval in action | [examples/small-step-commits.md](examples/small-step-commits.md) |
 | Executing a plan with an appended `## Rework` section (run only the rework steps) | Rework execution walkthrough (shared with the orchestrator) | [../orchestrate-feature-delivery/examples/post-implementation-rework.md](../orchestrate-feature-delivery/examples/post-implementation-rework.md) |
+| Executing a POC plan (stop at evaluation report, no merge) | POC execution mode + evaluation report walkthrough | [examples/execute-adr-option-poc.md](examples/execute-adr-option-poc.md) |
+| POC round from dispatch to decision gate (shared with the orchestrator) | End-to-end POC walkthrough | [../orchestrate-feature-delivery/examples/adr-option-poc.md](../orchestrate-feature-delivery/examples/adr-option-poc.md) |
 | A step, recovery fix, or review fix risks exceeding the plan's scope boundary | Output model: refusal + decision options | [examples/refusing-out-of-scope-rework.md](examples/refusing-out-of-scope-rework.md) |
 </context-loading-guide>
 
@@ -204,8 +210,14 @@ Load only the example most relevant to the current execution scenario to minimiz
 6. If the step produced no code change (e.g., documentation-only), note that no commit is needed.
 </commit-step>
 
+<produce-poc-report>
+1. After the plan's final evaluation step, collect the measured evidence for each **success criterion** (benchmarks, complexity diff, integration results).
+2. Write an **Evaluation Report** into the feature folder (`evaluation-report.md`): per-criterion evidence, a verdict line (meets / misses), and any caveats.
+3. Do NOT push or merge — the report feeds the decision gate; ask the user before pushing for review.
+</produce-poc-report>
+
 <request-push-approval>
-1. When all steps are ✅ complete — or the user asks to sync — summarize the local state: branch name, commits created, and how many commits are ahead of the remote base.
+1. When all steps are ✅ complete — or the user asks to sync — summarize the local state: branch name, commits created, and how many commits are ahead of the remote base. For a **POC branch** (see **poc-execution-mode**), pushing is review/evidence only — merging waits for the orchestrator's decision gate.
 2. Ask the user explicitly: "Push branch [branch name] to remote?" Wait for a decision.
 3. Push only after the user confirms; report success or any errors.
 4. If the user declines or defers, leave the branch local and tell them the commits are ready to push whenever they choose.
@@ -236,6 +248,8 @@ Load only the example most relevant to the current execution scenario to minimiz
 <rule> **After Each ✅ Step**: Apply **commit-step** to record the change as one small commit. </rule>
 <rule> **Before Any Push**: Apply **request-push-approval** — never push to remote without the user's confirmation. </rule>
 <rule> **When the Plan Contains a Rework Section**: Apply **rework-plan-execution** — run only the appended `## Rework` steps and never modify the completed original steps. </rule>
+<rule> **When the Plan is a POC** (type: poc): Apply **poc-execution-mode** — run like a feature but stop at the evaluation report; never merge before the decision gate. </rule>
+<rule> **After the Final Evaluation Step of a POC**: Apply **produce-poc-report** and route to the orchestrator's decision gate. </rule>
 <rule> **When a Step, Recovery Fix, or Review Fix Exceeds the Boundary**: Apply **check-scope-boundary** — refuse and ask the user with options, never adapt silently. </rule>
 <rule> **When Deviating from the Plan**: Apply **check-scope-boundary** before adapting. </rule>
 

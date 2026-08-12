@@ -26,6 +26,9 @@ A feature is a coherent, independently valuable deliverable spanning one or more
 - Small shared-library changes stay inside the **first consuming feature**; only large or widely-shared changes become leading features.
 - IDs: `F1`, `F2`, … with kebab-case names and one-line descriptions.
 </feature-definition>
+<poc-definition>
+A POC proves one option of one ADR with a **standalone feature** (a full, coherent slice — never a snippet). POC cells carry: `adr` (governing ADR) · `option` (which option is proven) · `success-criteria` (measurable evidence for the gate) · `replaces` (optional — existing feature/implementation it may supersede on adoption) · `compare` (optional — sibling POC cells for other options, run in parallel to prove which way is better). Two adoption models: **POC-as-implementation** (on adopt, the POC branch merges and becomes the shipped feature) and **POC-as-decision-input** (the POC only informs the choice; a `poc-gated` feature implements the decided option afterwards).
+</poc-definition>
 <delivery-layout>
 All delivery artifacts for an epic live under one top-level folder — one folder per epic (no `docs/` prefix), named after the spiked epic:
 ```
@@ -40,11 +43,11 @@ deliveries/<epic-name>/               # one folder per epic (epic-name = spike n
 - **context.md** carries the distilled spike context; **plan.md** is written by **plan-development-task** and executed by **execute-plan** (rework per **rework-modes** — always appends `## Rework <date>`, implemented steps never modified).
 </delivery-layout>
 <dependency-edge-types>
-Classify each feature pair: **merge-blocked** (hard — develop after A's contract is known, merge only after A merges) · **contract-first** (soft — develop in parallel, merge after A) · **conflict** (same files/repo — serialize or split) · **independent** (parallel, any order).
+Classify each feature pair: **merge-blocked** (hard — develop after A's contract is known, merge only after A merges) · **contract-first** (soft — develop in parallel, merge after A) · **poc-gated** (implement only after the POC cell's decision — see **poc-definition**) · **conflict** (same files/repo — serialize or split) · **independent** (parallel, any order).
 Wave computation and intra-feature merge order: **reference/dependency-ordering-guide.md**.
 </dependency-edge-types>
 <delivery-state-machine>
-Each cell follows: **unplanned → planned → in-progress → done**, with **failed** and **blocked** as recoverable side states; **in-progress** also covers implemented-but-not-yet-merged cells awaiting push approval. Gating splits development from merging: a cell is **develop-ready** when its dependency cells are **planned** (contracts agreed — contract-first and independent cells develop in parallel); a cell is **merge-ready** only when its dependencies are **done** (merged). Full transitions: **reference/orchestration-guide.md**; issue-after-implementation rework: **rework-modes**.
+Each cell follows: **unplanned → planned → in-progress → done**, with **failed** and **blocked** as recoverable side states; **in-progress** also covers implemented-but-not-yet-merged cells awaiting push approval. POC cells fork after implementation: **in-progress → poc-ready** (evaluation report written, awaiting the decision gate) → **adopted** (promote → merge → **done**) or **rejected** (closed, branch archived/discarded); a replaced feature cell is marked **superseded**. Gating splits development from merging: a cell is **develop-ready** when its dependency cells are **planned** (contracts agreed — contract-first and independent cells develop in parallel); a cell is **merge-ready** only when its dependencies are **done** (merged). Full transitions: **reference/orchestration-guide.md**; issue-after-implementation rework: **rework-modes**; POC decision gate: **evaluate-poc-results**.
 </delivery-state-machine>
 <agent-dispatch>
 Every delivery task is delegated — the orchestrator never performs it (task → agent → skill): spike → **spike-conductor** (**conduct-spike**); plan / execute → **coding-assistant** (**plan-development-task** / **execute-plan**); solution-doc → **solution-doc-writer** (**write-solution-doc**); ADR → **adr-writer** (**draft-adr**).
@@ -71,6 +74,8 @@ Rework after implementation is **always append-only** — implemented steps are 
 | Running one orchestration round with parallel agents | Dispatch + status-update walkthrough | [examples/orchestration-round.md](examples/orchestration-round.md) |
 | Continuing an interrupted epic | Resume walkthrough with mixed statuses | [examples/resume-after-interruption.md](examples/resume-after-interruption.md) |
 | Distinguishing parallel vs merge-blocked features | Dependency-ordering-focused example | [examples/parallel-vs-sequential-waves.md](examples/parallel-vs-sequential-waves.md) |
+| Marking, sequencing, or gating POC cells, or running the decision gate | POC definition, lifecycle, adoption models | [reference/poc-lifecycle.md](reference/poc-lifecycle.md) |
+| Running a full POC round (compare POCs → decision gate → adopt/reject) | End-to-end POC walkthrough | [examples/adr-option-poc.md](examples/adr-option-poc.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -135,6 +140,19 @@ Rework after implementation is **always append-only** — implemented steps are 
 3. Apply **update-delivery-index** — post-merge adds a new rework feature (e.g. `F2-r1`) in a new wave; pre-merge keeps the rework on the same cell (no new feature/wave).
 4. Ask the user before pushing or opening a PR (per **branch-and-push-conventions**).
 </handle-post-implementation-issue>
+<define-poc-scope>
+1. During **decompose-change-into-features**, when an ADR option needs proof before a decision, flag the mapped cell `type: poc`.
+2. Fill the POC metadata per **poc-definition**: `adr`, `option`, `success-criteria`, `replaces` (if it may supersede an existing implementation), `compare` (sibling POC cells for other options).
+3. Sequence POC cells **early** (Wave 0) — run `compare` siblings in parallel; add a **poc-gated** edge from the implementing feature to its POC cell.
+4. Present the POC cells and success criteria to the user and confirm before recording them in the index.
+</define-poc-scope>
+<evaluate-poc-results>
+1. When a POC cell reaches **poc-ready**, read its evaluation report and **success-criteria** from the index.
+2. Present the evidence vs each criterion to the user — the user/team decides, never the orchestrator.
+3. On **adopt**: dispatch **adr-writer** (draft-adr) to record the validated option; then per the model — **POC-as-implementation**: promote the branch (ask before pushing/PR per **branch-and-push-conventions**), mark the `replaces` cell **superseded** when one exists; **POC-as-decision-input**: close the POC and dispatch the **poc-gated** feature with the decided option.
+4. On **reject**: dispatch **adr-writer** to record the outcome; close the cell **rejected** (archive or discard the branch — ask the user); delivery proceeds on the other option.
+5. Apply **update-delivery-index** after the decision.
+</evaluate-poc-results>
 
 </capabilities>
 
@@ -145,5 +163,7 @@ Rework after implementation is **always append-only** — implemented steps are 
 <rule> When dispatching any delivery task (plan, execute, solution-doc update, or ADR update), always dispatch the owning agent per **agent-dispatch** — never perform the task directly. </rule>
 <rule> When the user asks about a single cell's plan or status, read the delivery index and route the cell to **plan-development-task** or **execute-plan** — do not re-run the whole orchestration. </rule>
 <rule> When an issue surfaces after a feature was implemented (a cell is **done** or **in-progress** — implemented but not merged/committed/pushed), apply **handle-post-implementation-issue** — never re-run **decompose-change-into-features** on the whole epic. </rule>
+<rule> When decomposing change items and an ADR option needs proof before a decision, apply **define-poc-scope** to flag and sequence POC cells. </rule>
+<rule> When a POC cell reaches **poc-ready** (evaluation report written), apply **evaluate-poc-results** — the user decides adopt/reject, never the orchestrator. </rule>
 
 </rules>
