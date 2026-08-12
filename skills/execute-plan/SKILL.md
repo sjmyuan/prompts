@@ -1,6 +1,6 @@
 ---
 name: execute-plan
-description: Execute structured development plans step-by-step with progress tracking, validation checkpoints, and error recovery. Use when executing / carrying out / resuming / reviewing a plan from plan-development-task, or a delivery cell / rework from orchestrate-feature-delivery.
+description: Execute structured development plans with progress tracking, validation checkpoints, and error recovery. Use when executing / carrying out / resuming / reviewing a plan from plan-development-task, or a delivery cell / rework from orchestrate-feature-delivery.
 ---
 
 <when-to-use-this-skill>
@@ -91,6 +91,21 @@ Small-step commit rules applied throughout execution:
 Generated code must match the repo's existing comment style: detect it first, then follow it. Comment the **why** (non-obvious intent, workarounds, invariants, edge cases), never restate the **what**; never narrate the change (no plan-step references, "added/generated" markers, section banners, or AI mentions); match the repo's density — a sparse repo gets sparse comments, docstrings only where the repo already uses them (public API only); keep line comments ≤ 15 words. Detect the repo's convention during **verify-prerequisites** and enforce it in **commit-step**. Full rubric: **reference/code-comment-style.md**.
 </code-comment-conventions>
 
+<test-placement>
+Before writing any test code for a step, decide where tests belong — check existing coverage first, then extend existing tests when possible; create a new file only when no natural home exists.
+
+| Situation | Action |
+|---|---|
+| Behavior already covered by an existing test | Run it; add nothing unless an assertion is wrong or missing |
+| Changed class/module has an existing test file | Add new test methods there (extend) |
+| New behavior is a variant/edge case of an existing scenario | Add a method or parameterized case to the covering test |
+| New class/component with no existing test home | Create a new test file mirroring the class (e.g., `XTest` for `X`) |
+| New test is a different level than the natural existing file (unit vs integration) | Create a file at the right level |
+| Existing test file is unfocused or bloated (mixed concerns) | Create a new focused test file |
+
+Reuse the existing test's fixtures and mocks instead of duplicating setup. Extending an existing test file is a test-only change for this plan's own tests — within the **Scope Boundary**'s Minor exceptions. Record the placement decision in the plan file's step notes.
+</test-placement>
+
 <rework-plan-execution>
 When the plan file contains an appended `## Rework <date>` section (a rework triggered by **orchestrate-feature-delivery**'s **handle-post-implementation-issue**):
 - Execute **only** the rework section — the original steps are all ✅ and are never re-run or modified.
@@ -115,6 +130,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 | Load when | Provides | File |
 |---|---|---|
 | Executing any step that writes or modifies code | Code comment doctrine: why-not-what, banned patterns, density matching, pre-commit self-check | [reference/code-comment-style.md](reference/code-comment-style.md) |
+| A step writes or modifies tests for new logic | Output model: locating existing tests and extending them instead of creating a new file | [examples/extend-existing-tests.md](examples/extend-existing-tests.md) |
 | Generating code that needs to match the repo's comment style before committing | Output model: convention detection + pre-commit comment scan in action | [examples/comment-hygiene.md](examples/comment-hygiene.md) |
 | Executing a small, focused plan (single component or focused task) | Output model: detailed progress updates for a simple focused execution | [examples/single-component-refactor.md](examples/single-component-refactor.md) |
 | Executing a plan that spans multiple files and architectural layers | Output model: execution tracking across multiple files and layers | [examples/multi-file-implementation.md](examples/multi-file-implementation.md) |
@@ -147,10 +163,11 @@ Load only the example most relevant to the current execution scenario to minimiz
 <execute-step>
 1. Before starting a step, mark it as 🔄 in-progress in the plan file and briefly explain your approach. Apply **check-scope-boundary** — if the step's required changes exceed the plan's scope boundary, refuse and ask instead of adapting.
 2. Execute the step fully — no partial implementations.
-3. After completing the step, validate the outcome meets the step's objectives.
-4. Mark the step as ✅ completed; document files changed, implementation details, and validation results in the plan file.
-5. Confirm the prerequisite step is fully ✅ completed before starting a step that depends on it.
-6. Display the full updated step list with current statuses after each completion.
+3. If the step writes or modifies tests, apply **place-tests** before writing any test code — locate existing tests and prefer extending them over creating new files.
+4. After completing the step, validate the outcome meets the step's objectives.
+5. Mark the step as ✅ completed; document files changed, implementation details, and validation results in the plan file.
+6. Confirm the prerequisite step is fully ✅ completed before starting a step that depends on it.
+7. Display the full updated step list with current statuses after each completion.
 </execute-step>
 
 <handle-errors>
@@ -178,6 +195,14 @@ Load only the example most relevant to the current execution scenario to minimiz
 3. For build-dependent projects, verify the build succeeds at key milestones.
 4. Validate incrementally — do not wait until the end of the plan.
 </run-validation-checkpoints>
+
+<place-tests>
+1. When a step writes or modifies tests, locate existing test files for the changed production code first — same class/module and same level (unit vs integration), per the repo's test layout.
+2. Assess existing coverage by reading the relevant tests: is the new behavior already covered, partially covered, or uncovered?
+3. Decide placement per **test-placement**: already covered → run the existing tests and add nothing (tighten a wrong assertion only); natural home exists → extend that file with new methods or parameterized cases, reusing its fixtures and mocks; no natural home → create a new test file mirroring the class and level.
+4. Write the tests following the repo's test conventions (framework, naming, assertion style).
+5. Record the placement decision and rationale in the plan file's step notes, then run the affected tests to confirm they pass.
+</place-tests>
 
 <review-post-execution>
 1. After ALL plan steps are marked ✅ completed, apply the **review-code** skill on all files changed or created during execution.
@@ -241,13 +266,14 @@ Load only the example most relevant to the current execution scenario to minimiz
 <rule> **Throughout Execution**: Apply **track-plan** — keep the step list current and show the full list with statuses after every step. </rule>
 <rule> **When a Step Fails**: Apply **handle-errors** immediately. </rule>
 <rule> **At Validation Points**: Apply **run-validation-checkpoints** after code changes and at major milestones. Validate incrementally, not just at the end. </rule>
+<rule> **When a Step Writes or Modifies Tests**: Apply **place-tests** before writing any test code — locate existing tests and prefer extending them over creating new files. </rule>
 <rule> **When Facing Ambiguity or Blockers**: Apply **manage-user-interaction** — pause and ask rather than assuming. </rule>
 <rule> **After All Steps Complete**: Apply **review-post-execution**. </rule>
 <rule> **Before Starting the First Step**: Apply **verify-prerequisites** — if the branch or environment is not ready, raise it to the user and wait. </rule>
 <rule> **After Each ✅ Step**: Apply **commit-step** to record the change as one small commit. </rule>
 <rule> **Before Any Push**: Apply **request-push-approval** — never push to remote without the user's confirmation. </rule>
-<rule> **When the Plan Contains a Rework Section**: Apply **rework-plan-execution** — run only the appended `## Rework` steps and never modify the completed original steps. </rule>
-<rule> **When the Plan is a POC** (type: poc): Apply **poc-execution-mode** — run like a feature but stop at the evaluation report; never merge before the decision gate. </rule>
+<rule> **When the Plan Contains a Rework Section**: Execute per **rework-plan-execution** — apply **track-plan** and **execute-step** to the appended `## Rework` steps only; never modify the completed original steps. </rule>
+<rule> **When the Plan is a POC** (type: poc): Execute per **poc-execution-mode** — apply **track-plan** and **execute-step**; never merge before the decision gate. </rule>
 <rule> **After the Final Evaluation Step of a POC**: Apply **produce-poc-report** and route to the orchestrator's decision gate. </rule>
 <rule> **When a Step, Recovery Fix, or Review Fix Exceeds the Boundary**: Apply **check-scope-boundary** — refuse and ask the user with options, never adapt silently. </rule>
 <rule> **When Deviating from the Plan**: Apply **check-scope-boundary** before adapting. </rule>

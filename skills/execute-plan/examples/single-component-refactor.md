@@ -144,7 +144,6 @@ public class DataImportedHandler {
         this.dataTransformer = dataTransformer;
         this.eventPublisher = eventPublisher;
     }
-    }
     
     // ... rest of the class
 }
