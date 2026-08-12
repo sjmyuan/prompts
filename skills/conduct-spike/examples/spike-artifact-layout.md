@@ -36,5 +36,5 @@ spikes/payment-migration/
 > "Saved all 4 findings docs to `spikes/payment-migration/docs/`, the 4 ADRs to `adrs/`, the solution doc to `solution.md`, and the change summary to `change-summary.md`. Cross-references between artifacts now use relative paths inside the spike folder."
 
 **Notes**:
-- The delivery index for this epic is written at the same spike folder root by **orchestrate-feature-delivery**.
+- The delivery index for this epic is written by **orchestrate-feature-delivery** at `deliveries/<epic-name>/index.md` — a separate top-level `deliveries/` folder, not the spike folder.
 - Modularized solution sub-docs (if the solution doc is split per **solution-doc-modularity**) would land in `solution-doc/` next to the hub.

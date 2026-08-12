@@ -11,6 +11,7 @@ description: Investigate codebases to answer questions about functionality, arch
 - User wants to visualize architecture with C4 diagrams, sequence diagrams, or call stack traces
 - User wants to discover implementation patterns or detect inconsistencies across the codebase
 - User is conducting a spike investigation (via the `conduct-spike` skill) and needs current-state investigation of an area
+- User is drafting an ADR via the `draft-adr` skill and needs an evidence map (entry points, `file:line` locations, call chains) to ground per-option tech details
 </when-to-use-this-skill>
 
 <knowledge>

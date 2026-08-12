@@ -58,22 +58,6 @@ Use diagrams proactively whenever explaining context or a solution — never wai
 Zoom in level by level: C4 context → container → component for structure, then a flowchart or sequence diagram for a specific flow or interaction. The solution architecture is simply a C4/flowchart view of the target state — no separate diagram type is required. Draw C4 diagrams with Mermaid's native C4 types — `C4Context` (context), `C4Container` (container), `C4Component` (component) — with C4-PlantUML-compatible syntax (`Person`, `System`, `System_Ext`, `Container`, `ContainerDb`, `Component`, `Rel`, `System_Boundary`, `Container_Boundary`). Keep each diagram to a single message. Load **reference/diagram-guide.md** for the notation and snippets.
 </diagram-selection>
 
-<diagram-sync>
-Diagrams are living artifacts of the ADR session: every new finding or correction may invalidate an existing diagram or reveal context that needs a new one. After any confirmed change, sync the diagrams before proceeding so the visual record always matches the latest confirmed state.
-
-Update an existing diagram when:
-- The element it depicts changed — a system, container, component, actor, option, driver, or relationship was added, removed, or renamed
-- The flow or interaction it shows was corrected — a step, branch, or message order is different
-- The decision it visualizes changed — the chosen option, or the drivers it satisfies, is different
-
-Add a new diagram when:
-- New context is discussed that no existing diagram covers — a new flow, boundary, edge case, or failure path
-- The discussion zooms into a level not yet drawn (context → container → component → flow)
-- A correction introduces a distinct scenario worth its own view
-
-Never leave a stale diagram: after each change, every diagram either reflects the latest confirmed state or is replaced by a new one that does.
-</diagram-sync>
-
 <option-tech-details>
 Tech details make each option's implementation concrete in the ADR: **target-state diagrams** (C4 + sequence, option-specific) and a **code change profile** (per change: `file:line` location, current code, git-style diff block, how-to, confidence). Produced per option by **detail-options-tech** and rendered as a `#### Tech Details` subsection in each option's evaluation section (omit when absent). **Grounding contract**: tech details must trace to code investigation evidence — findings from the `conduct-spike` pipeline (their embedded evidence map), or an on-demand evidence map built via `investigate-code`. Without evidence they stay architectural-level and unverified, and a spike is recommended before relying on them. See **reference/option-tech-details-guide.md**.
 </option-tech-details>

@@ -93,15 +93,7 @@ After each spike round, suggest 3 go-deeper and 3 go-broader candidate questions
 </spike-direction-suggestions>
 
 <adr-uncertainty-signals>
-During ADR discussion (drafting, reviewing, or adjusting a decision), suggest a spike when the decision hinges on something reasoning alone cannot settle:
-- **Unverified assumption**: the chosen option assumes a fact no one has checked
-- **Unknown feasibility**: whether the option can work in this codebase or organization is unknown
-- **Missing measurement**: the decision depends on cost, latency, capacity, or effort data not yet collected
-- **Undecidable comparison**: two options stay close and the tiebreaker requires evidence, not opinion
-- **Uninvestigated dependency**: success depends on a system whose behavior is unknown
-- **Reviewer disagreement**: reviewers can't converge and need data rather than debate
-
-This is the "Untested assumption in ADR" go-deeper heuristic from **reference/spike-direction-suggestions-guide.md**, applied during ADR discussion rather than only after an investigation round.
+During ADR discussion (drafting, reviewing, or adjusting a decision), suggest a spike when the decision hinges on something reasoning alone cannot settle: **unverified assumption** (chosen option assumes an unchecked fact), **unknown feasibility** (whether the option works here is unknown), **missing measurement** (decision needs cost/latency/capacity/effort data not collected), **undecidable comparison** (tiebreaker requires evidence, not opinion), **uninvestigated dependency** (success depends on an unknown system), or **reviewer disagreement** (reviewers need data rather than debate). This is the "Untested assumption in ADR" go-deeper heuristic from **reference/spike-direction-suggestions-guide.md**, applied during ADR discussion rather than only after an investigation round.
 </adr-uncertainty-signals>
 
 <professional-doc-authoring>
@@ -109,9 +101,7 @@ ADRs and the solution document are always written by their owning skills — nev
 </professional-doc-authoring>
 
 <latest-state-doctrine>
-ADRs and the solution document are **single-source-of-truth documents maintained at the latest state**: rewrite changed sections **in place** so they read as if the current decision was always the decision; superseded content is **deleted**, not marked; git is the document's only history.
-
-This permits **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously" language and no in-document changelogs. Where notes are legitimately allowed (change summary, findings docs, conversation), see **reference/clean-artifact-principle.md** — which defines the rewrite-in-place procedure and the **no-note scan** gate.
+ADRs and the solution document are **single-source-of-truth documents maintained at the latest state**: rewrite changed sections **in place** so they read as if the current decision was always the decision; superseded content is **deleted**, not marked; git is the document's only history — **no** "Note:", "Updated", "Changed", "v2", "As of", "Previously" language and no in-document changelogs. Where notes are legitimately allowed (change summary, findings docs, conversation), see **reference/clean-artifact-principle.md** — which defines the rewrite-in-place procedure and the **no-note scan** gate.
 </latest-state-doctrine>
 
 <artifact-sync-doctrine>

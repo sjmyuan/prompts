@@ -1,6 +1,6 @@
 ---
 name: write-solution-doc
-description: Produce comprehensive solution documentation with C4 diagrams, sequence/flowchart diagrams, API contracts, RAID analysis, and RACI matrices. Use when documenting, writing, creating, or authoring a finalized solution decision, solution architecture, or technical solution document; producing C4/sequence/flowchart diagrams for a solution; defining API/event schemas; performing RAID analysis; creating RACI matrices; or compiling a complete multi-section solution document.
+description: Produce solution documentation with C4 diagrams, sequence/flowchart diagrams, API contracts, RAID analysis, and RACI matrices. Use when documenting, writing, or authoring a solution decision, architecture, or technical document; producing C4/sequence/flowchart diagrams; defining API/event schemas; performing RAID analysis; creating RACI matrices; or compiling a multi-section solution document.
 ---
 
 <when-to-use-this-skill>
@@ -17,16 +17,7 @@ description: Produce comprehensive solution documentation with C4 diagrams, sequ
 <knowledge>
 
 <solution-doc-structure>
-A complete solution document consists of the following sections, produced in order:
-1. **Business Context & Solution Background** — Why this solution exists, what problem it solves, and the decision rationale.
-2. **System Topology (C4 Model)** — C2 (Container) and C3 (Component) diagrams showing the system landscape.
-3. **Interaction Details** — Sequence diagrams (for runtime message flows between components) and/or flowcharts (for process logic, decision branches, and business workflows). Choose the appropriate diagram type per scenario or combine both when needed.
-4. **API / Event Schema** — Contract definitions between components (REST APIs, async events, gRPC, etc.).
-5. **Related Documents** — References to design docs, RFCs, ADRs, or external specifications.
-6. **External Dependencies** — External systems/services, their owning teams, and contact persons.
-7. **Maintainers** — Owning team and contact person for each component in the solution.
-8. **RAID Analysis** — Risks, Assumptions, Issues, and Dependencies.
-9. **RACI Matrix** — Responsible, Accountable, Consulted, and Informed parties.
+A complete solution document has 9 sections, produced in order: Business Context & Solution Background, System Topology (C2/C3), Interaction Details, API / Event Schema, Related Documents, External Dependencies, Maintainers, RAID Analysis, RACI Matrix. See **reference/solution-doc-structure.md** for the full section-by-section description and the Markdown template.
 </solution-doc-structure>
 
 <c4-model>
@@ -38,59 +29,23 @@ Draw all diagrams with Mermaid. Use Mermaid's native C4 diagram types for archit
 </c4-model>
 
 <diagram-selection-guide>
-Use the following decision matrix to choose the right diagram type for each interaction scenario:
-
-| Scenario | Recommended Diagram | Rationale |
-|---|---|---|
-| Runtime message passing between services/components (e.g., API calls, event publishing, request-response chains) | **Sequence Diagram** | Shows participants, message ordering, activation bars, and lifelines — best for temporal interaction flows |
-| Business process with decision branches and conditional paths (e.g., order approval workflow, refund eligibility logic, state transitions) | **Flowchart** | Shows decision diamonds, branching paths, and process steps — best for logic and control flow |
-| Data pipeline with transformation stages and branching (e.g., ETL steps, data routing rules, enrichment logic) | **Flowchart** | Pipeline stages are process steps; routing rules are decision nodes — naturally fits flowchart syntax |
-| Multi-participant orchestration with both runtime calls AND decision logic (e.g., saga orchestration with compensating actions, complex checkout flow) | **Both** — sequence diagram for the happy-path call chain + flowchart for the decision/compensation logic | Use sequence to show who-calls-whom, flowchart to show what-decisions-are-made |
-| State machine transitions (e.g., order status lifecycle, user onboarding states) | **Flowchart** (state diagram style) — use Mermaid `stateDiagram-v2` if the focus is on states and transitions; use `flowchart` if decision logic is the emphasis | States as nodes, transitions as arrows with conditions — choose syntax based on whether states or decisions dominate |
-| Pure state/status lifecycle with no decision branching (e.g., entity status flow, deployment states) | **State Diagram** (Mermaid `stateDiagram-v2`) | Cleaner than flowchart for state-centric views — use when the primary question is "what states exist and what triggers transitions?" |
-| Algorithm or processing logic within a single component (e.g., rate limiting algorithm, caching strategy) | **Flowchart** | No cross-component participants — purely internal logic flow |
-
-<diagram-interop>
-When receiving existing diagrams (from prior investigation, other tools, or user-provided sources) that use different conventions:
-- **C4 diagrams**: Accept Mermaid C4 diagrams regardless of element or boundary style; normalize to the native `C4Context` / `C4Container` / `C4Component` syntax in **mermaid-standards** when embedding in the final document.
-- **Sequence diagrams**: Accept both numbered and unnumbered message styles. Preserve existing numbering when present (useful for traceability); add a brief note explaining the numbering scheme.
-- **Flowcharts**: Accept Mermaid `flowchart` syntax. Normalize labels and shapes to the **mermaid-standards** conventions when embedding.
-- **State diagrams**: Accept Mermaid `stateDiagram-v2` syntax.
-</diagram-interop>
-
-**Decision rule**: If the primary question is "who talks to whom and in what order?" → use a sequence diagram. If the primary question is "what decisions are made and what paths exist?" → use a flowchart. When both questions matter, produce both diagrams.
+Choose the diagram type by scenario: runtime message passing → **sequence diagram**; business process / decision branches / data pipeline → **flowchart**; orchestration with both calls AND decisions → **both**; pure state lifecycle → **state diagram** (`stateDiagram-v2`). If the question is "who talks to whom, in what order?" → sequence; "what decisions and paths exist?" → flowchart. Accept and normalize existing diagrams from other sources. See **reference/diagram-selection-guide.md** for the full decision matrix and interop rules.
 </diagram-selection-guide>
-
-<diagram-sync>
-Diagrams are living artifacts of the solution document: every new finding or correction may invalidate an existing diagram or reveal context that needs a new one. After any confirmed change, sync the affected diagrams before continuing so the visual record always matches the latest confirmed state.
-
-Update an existing diagram when:
-- The element it depicts changed — a container, component, system, actor, or relationship was added, removed, or renamed
-- The interaction or process it shows was corrected — a message, call order, branch, or step is different
-- A confirmed section changed and the diagram is the visual for that section
-
-Add a new diagram when:
-- New context is discussed that no existing diagram covers — a new flow, boundary, zoom level, error path, or edge case
-- The discussion zooms into a level not yet drawn (C2 → C3 → sequence/flowchart)
-- A correction introduces a distinct scenario worth its own view
-
-Never leave a stale diagram: after each change, every diagram either reflects the latest confirmed state or is replaced by a new one that does.
-</diagram-sync>
 
 <mermaid-standards>
 Mermaid diagram conventions and formatting rules for all diagram types (C4, sequence, flowchart, state diagram). Load **reference/mermaid-standards.md** for the full standards.
 </mermaid-standards>
 
 <api-design-standards>
-API and event schema design conventions. Load **reference/api-design-standards.md** for the full standards.
+API and event schema design should include: **endpoint/topic name** + HTTP method (or channel/queue); **request/response or event payload schema** (JSON, Protobuf, or Avro); **authentication & authorization** (OAuth2, API Key, mTLS); **error handling** conventions (status codes, error body); **rate limiting, pagination, idempotency** where relevant; for async events: schema versioning, DLQ handling, ordering guarantees.
 </api-design-standards>
 
 <raid-framework>
-RAID analysis framework. Load **reference/raid-framework.md** for the full framework.
+RAID = **Risks** (future events that could negatively impact the solution), **Assumptions** (believed true, not yet validated), **Issues** (current problems or blockers), **Dependencies** (external factors or teams the solution relies on). Each item: ID, Category, Description, Impact (H/M/L), Probability (H/M/L, Risks only), Mitigation/Resolution, Owner. Present as a structured table.
 </raid-framework>
 
 <raci-framework>
-RACI responsibility assignment matrix. Load **reference/raci-framework.md** for the full framework.
+RACI = **R**esponsible (does the work), **A**ccountable (ultimately answerable — only ONE per task), **C**onsulted (two-way input), **I**nformed (kept up-to-date, one-way). Present as a matrix table: tasks as rows, teams/roles as columns, R/A/C/I in cells.
 </raci-framework>
 
 <bilingual-support>
@@ -114,9 +69,8 @@ All solution-doc prose follows BLUF (conclusion first), hard caps, atomic bullet
 | User needs API/event contract definitions | Detailed API schema and event schema design output | [examples/api-contracts.md](examples/api-contracts.md) |
 | User needs to list related documents, external deps, and maintainers | Document-listing and dependency-tracking workflow | [examples/dependencies-and-maintainers.md](examples/dependencies-and-maintainers.md) |
 | Writing Mermaid diagrams (C4, sequence, flowchart) | Diagram syntax, formatting rules, and conventions for all diagram types | [reference/mermaid-standards.md](reference/mermaid-standards.md) |
-| Designing API/event contracts | REST, gRPC, and async event schema conventions | [reference/api-design-standards.md](reference/api-design-standards.md) |
-| Performing RAID analysis | RAID framework definition and item schema | [reference/raid-framework.md](reference/raid-framework.md) |
-| Building a RACI matrix | RACI framework definition and table format | [reference/raci-framework.md](reference/raci-framework.md) |
+| Choosing the right diagram type for an interaction, or normalizing existing diagrams | Full decision matrix, interop rules, and decision rule | [reference/diagram-selection-guide.md](reference/diagram-selection-guide.md) |
+| Compiling the final document or recalling section order | 9-section description and Markdown template | [reference/solution-doc-structure.md](reference/solution-doc-structure.md) |
 | Writing or reviewing any solution-doc prose | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets | [reference/writing-style.md](reference/writing-style.md) |
 | User corrects content or new findings emerge mid-session and diagrams need to stay current | Walkthrough of **sync-diagrams** updating affected diagrams and adding new ones | [examples/diagram-sync.md](examples/diagram-sync.md) |
 
@@ -235,43 +189,7 @@ All solution-doc prose follows BLUF (conclusion first), hard caps, atomic bullet
 </list-raci>
 
 <structure-solution-doc>
-1. Compile all confirmed sections into a single, well-organized Markdown document following this structure (apply **concise-writing** throughout):
-
-```
-# Solution Document: [Solution Name]
-
-## 1. Business Context & Solution Background
-**Takeaway:** [ 1 line: problem + why this solution ]
-
-## 2. System Topology (C4 Model)
-### 2.1 C2 — Container Diagram
-[Mermaid diagram — caption is the 1-line takeaway]
-### 2.2 C3 — Component Diagram(s)
-[Mermaid diagram(s) — caption is the 1-line takeaway]
-
-## 3. Interaction Details
-**Takeaway:** [ 1 line per flow ]
-[One subsection per critical flow: diagram + 1-line caption. Use sequence diagrams for runtime message flows, flowcharts for process logic/decision branches, or both when needed.]
-
-## 4. API / Event Schema
-[Tables / code blocks — no prose walkthrough]
-
-## 5. Related Documents
-[Table]
-
-## 6. External Dependencies
-[Table with teams and contacts]
-
-## 7. Maintainers
-[Table with maintainer teams and contacts]
-
-## 8. RAID Analysis
-[Table — one row per item]
-
-## 9. RACI Matrix
-[Matrix table]
-```
-
+1. Load **reference/solution-doc-structure.md** and compile all confirmed sections into a single, well-organized Markdown document following its template (apply **concise-writing** throughout).
 2. Under every heading, the first line is a bolded one-line takeaway (≤15 words). Tables and diagrams carry the detail; prose only summarizes in one line.
 3. Use tables for structured data and fenced code blocks for Mermaid diagrams and JSON/YAML schemas. Never restate what a table or diagram shows.
 4. For any section that was explicitly skipped, mark it as `[Skipped]`.
@@ -297,9 +215,7 @@ All solution-doc prose follows BLUF (conclusion first), hard caps, atomic bullet
 
 <rule>Follow the documentation sequence strictly unless the user explicitly requests a different order or asks to skip a section. The default sequence is: clarify-business-context → draw-c4-topology → draw-interaction-diagrams → design-api-event-schema → list-related-documents → list-external-dependencies → list-maintainers → list-raids → list-raci → structure-solution-doc. **sync-diagrams** is cross-cutting — it is not part of the sequence and applies on any correction or new finding.</rule>
 
-<rule>Always ask questions one at a time and wait for the user's response before proceeding to the next question or capability. Never batch multiple questions together unless the user explicitly requests it.</rule>
-
-<rule>After each capability's output, pause and ask the user to confirm before proceeding to the next capability. On receiving feedback, refine the current output — and if the feedback changes any confirmed content, apply **sync-diagrams** to keep the diagrams current — until the user confirms satisfaction.</rule>
+<rule>When feedback on a capability's output changes any confirmed content → apply **sync-diagrams** to keep the diagrams current before continuing the sequence.</rule>
 
 <rule>When the user provides existing diagrams or documented architecture → incorporate them directly into the relevant capability instead of redrawing. Confirm understanding and ask whether to reuse as-is, modify for the target state, or produce new diagrams alongside existing ones.</rule>
 
@@ -316,8 +232,6 @@ All solution-doc prose follows BLUF (conclusion first), hard caps, atomic bullet
 <rule>When the user says "draft all" or "generate full document", skip the iterative confirmation loop and produce all sections at once as a draft using structure-solution-doc, then offer to refine any section.</rule>
 
 <rule>If the user provides pre-existing content for any section, incorporate it directly into the relevant capability instead of re-gathering that information. Confirm understanding of the provided content before proceeding.</rule>
-
-<rule>For Mermaid diagrams, always provide the complete, renderable Mermaid code inside a fenced code block with `mermaid` language tag. Include both the diagram code and a written explanation.</rule>
 
 <rule>When the user switches language mid-session (e.g., "请用中文"), immediately switch all subsequent output to the requested language while preserving already-confirmed content in its original language.</rule>
 </rules>

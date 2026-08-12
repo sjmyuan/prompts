@@ -53,7 +53,7 @@ Applies `<present-findings-with-confidence>`.
 ### Confidence & Coverage
 - ✅ Verified: entry point, routing, orchestration, publishing calls (file:line above)
 - 🔶 Inferred: `DataTransformer` is the only transformer — no other implementor confirmed
-- � Inferred: Clean Architecture layering inferred from package names
+- 🔶 Inferred: Clean Architecture layering inferred from package names
 - ❓ Gaps: error-handling path (`DataImportedHandler` retry/DLQ) not traced; outbound topic consumer not examined
 - ⚠️ Inconsistencies: none found
 ```
