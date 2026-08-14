@@ -214,7 +214,7 @@ Expected output: Current deployment architecture, constraints, migration feasibi
 
 ## Phase 3: Evaluate Solutions Per Area
 
-*(Evaluation proceeds as in `examples/end-to-end-spike.md` — same options and decision drivers. See that example for the full evaluation dialog.)*
+*(Evaluation proceeds as in `examples/end-to-end-spike.md` — same options and decision drivers. See that example for the full evaluation dialog; here it is dispatched in parallel to ADR-writer sub-agents, one per area, per **evaluate-solutions-per-area**.)*
 
 **Assumed Solutions Summary**:
 

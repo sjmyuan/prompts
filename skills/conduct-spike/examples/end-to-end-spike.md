@@ -140,6 +140,8 @@
 
 ## Phase 3: Evaluate Solutions Per Area
 
+*(Evaluation dispatched to an ADR-writer sub-agent per **evaluate-solutions-per-area** — the `draft-adr` evaluate chain below ran interactively with the user inside the sub-agent session.)*
+
 ### Area 1: Service Decomposition Boundaries
 
 | Option | Description | Pros | Cons |

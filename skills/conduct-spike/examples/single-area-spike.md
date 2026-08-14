@@ -101,6 +101,8 @@
 ---
 ## Phase 3: Evaluate Solutions Per Area
 
+*(Evaluation dispatched to an ADR-writer sub-agent per **evaluate-solutions-per-area** — even a single area; the `draft-adr` evaluate chain below ran interactively with the user inside the sub-agent session.)*
+
 ### Area 1: Database Selection
 
 | Option | Pros | Cons |

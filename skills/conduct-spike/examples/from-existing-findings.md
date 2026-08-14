@@ -70,7 +70,7 @@
 
 ## Phase 3: Evaluate Solutions Per Area
 
-*[Based on user's notes, the assistant helps structure and complete the evaluation]*
+*[Evaluation dispatched to an ADR-writer sub-agent per **evaluate-solutions-per-area**; based on the user's notes, the sub-agent helps structure and complete the evaluation interactively]*
 
 ### Area 1: Cache Topology
 

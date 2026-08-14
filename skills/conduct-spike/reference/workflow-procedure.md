@@ -14,13 +14,17 @@ Announce: "Investigating area: [area name]". Load the `investigate-code` skill's
 
 ## Evaluate solutions per area (evaluate-solutions-per-area)
 
-Per area: apply the `draft-adr` skill's evaluation capabilities — **define-decision-drivers** → **define-considered-options** → **evaluate-options** — seeded with the area's findings doc (its embedded evidence map). This produces the drivers, the option set (brainstorming included), pros/cons tied to drivers, and per-option tech details (its **evaluate-options** applies **detail-options-tech** whenever findings are available). Present per option so the user can compare technical feasibility; skip tech details only if the user declines or an option has no code impact.
+### Sub-agent dispatch — per-area brief template
 
-After evaluation, ask: "Which option do you recommend as the assumed solution for [area name]?" If unsure, help compare top contenders against the decision drivers and their tech details. Record the **assumed solution** — provisional, may change after ADR review.
+Each brief carries: area name and description, spike goal, the area's findings doc (evidence sections), and instructions to load `draft-adr` and apply its evaluate chain — **define-decision-drivers** → **define-considered-options** → **evaluate-options** — running the interactive dialog with the user inside the sub-agent session and returning the area's assumed solution. Dispatch concurrently for multiple areas, individually for a single area. Announce: "Dispatching evaluation of [N] area(s) to a sub-agent." After collection, review each returned assumed solution for fidelity to the findings doc and cross-area consistency; definitive verification lands with the ADR drafted in Phase 4.
+
+### Direct evaluation (fallback — no sub-agent available)
+
+Per area: load the `draft-adr` skill and apply its evaluate chain — **define-decision-drivers** → **define-considered-options** → **evaluate-options** — seeded with the area's findings doc (its embedded evidence map); its **evaluate-options** applies **detail-options-tech** whenever findings are available. Record the **assumed solution** — provisional, may change after ADR review.
 
 **Check for findings gaps**: if any option revealed a constraint, risk, or fact not captured in the findings document, update the affected sections and note the correction when presenting the evaluation summary.
 
-Repeat for each investigation area. **Validation**: at least 2 options considered; pros/cons relate to decision drivers; each option's tech details are grounded in the findings doc's evidence map (no invented code); the assumed solution follows logically from the comparison. Present a summary table of all areas with their assumed solutions and any findings corrections.
+Repeat for each investigation area. **Spike-specific validation** (generic checks — 2+ options, pros/cons tied to drivers — belong to `draft-adr`'s **compile-adr** checklist): each option's tech details are grounded in the findings doc's evidence map (no invented code); the assumed solution follows logically from the comparison; findings-gap corrections captured. Present a summary table of all areas with their assumed solutions and any findings corrections.
 
 ## Draft area ADRs (draft-area-adrs)
 
