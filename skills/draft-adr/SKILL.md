@@ -10,7 +10,7 @@ description: Guide users through drafting well-structured ADRs, proactively visu
 - User wants to evaluate each option by its technical implementation — target-state diagrams and concrete code changes with locations
 - User needs help structuring unstructured thoughts or notes into an ADR format
 - User wants to compile a polished ADR document from raw discussion points
-- User is conducting a spike investigation (via the `conduct-spike` skill) and needs an ADR drafted per decision area
+- User is conducting a spike investigation (via the `conduct-spike` skill) and needs options evaluated or an ADR drafted per decision area
 </when-to-use-this-skill>
 
 <knowledge>
@@ -40,6 +40,8 @@ When the user has only one option, prompt them to consider alternatives from the
 - **Open-source alternatives**: Are there OSS tools that address this?
 - **Build vs. buy**: Should we build it ourselves or purchase a solution?
 - **Incremental vs. big-bang**: Can we phase the change, or does it need to be all at once?
+- **Greenfield rewrite**: Would starting fresh produce a better outcome than modifying?
+- **Hybrid / phased**: Can we combine approaches or phase the transition?
 </option-brainstorming-prompts>
 
 <diagram-selection>

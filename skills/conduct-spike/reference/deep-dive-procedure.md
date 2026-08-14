@@ -39,7 +39,7 @@ Ask the user to share the context from the previous spike. This may include:
 ## Step 5: Evaluate solutions (per selected area)
 
 - Present the deepened investigation findings (now reflected in the updated findings document).
-- Apply the evaluate-solutions-per-area capability for each deep-dived area, leveraging the brainstorm prompts in `reference/solution-brainstorming-prompts.md`.
+- Apply the evaluate-solutions-per-area capability for each deep-dived area (option brainstorming is delegated to `draft-adr`'s **option-brainstorming-prompts**).
 - If options were already considered in the previous spike, bring them forward — ask if any should be re-evaluated in light of new findings or if new options have emerged.
 - Confirm the assumed solution for each area.
 

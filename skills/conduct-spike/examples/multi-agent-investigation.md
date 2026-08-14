@@ -198,7 +198,7 @@ Expected output: Current deployment architecture, constraints, migration feasibi
 | Are all internal calls in-process? | Yes | `service/PaymentOrchestrator.java:88` calls services directly; no internal HTTP client found | Verified |
 | Does `transactions` hold all payment types? | Yes | `db/schema.sql:201` — no payment-type discriminator at table level | Verified |
 | Can Kong split traffic? | Unknown | `kong/kong.yml:34` — single upstream, no weighted upstreams | Inferred |
-| Team has async messaging experience? | N/A | from user conversation, not code | Unverified |
+| Team has async messaging experience? | N/A | from user conversation, not code | Gap |
 
 **Searched-Negatives**
 

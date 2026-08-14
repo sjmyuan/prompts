@@ -20,6 +20,10 @@ description: Produce solution documentation with C4 diagrams, sequence/flowchart
 A complete solution document has 9 sections, produced in order: Business Context & Solution Background, System Topology (C2/C3), Interaction Details, API / Event Schema, Related Documents, External Dependencies, Maintainers, RAID Analysis, RACI Matrix. See **reference/solution-doc-structure.md** for the full section-by-section description and the Markdown template.
 </solution-doc-structure>
 
+<current-state-mode>
+The same 9-section format also documents the **current state** (as-is findings docs) and supports compiling a **target-state** document from a current-state baseline. Load **reference/current-state-mode.md** when producing a current-state document or evolving a baseline as-is → to-be.
+</current-state-mode>
+
 <c4-model>
 The C4 model provides a hierarchical approach to software architecture diagrams:
 - **C2 (Container Diagram)**: Shows the high-level technical building blocks — applications, data stores, microservices, etc. — and how they interact. Think "docker-compose" level.
@@ -71,6 +75,7 @@ All solution-doc prose follows BLUF (conclusion first), hard caps, atomic bullet
 | Writing Mermaid diagrams (C4, sequence, flowchart) | Diagram syntax, formatting rules, and conventions for all diagram types | [reference/mermaid-standards.md](reference/mermaid-standards.md) |
 | Choosing the right diagram type for an interaction, or normalizing existing diagrams | Full decision matrix, interop rules, and decision rule | [reference/diagram-selection-guide.md](reference/diagram-selection-guide.md) |
 | Compiling the final document or recalling section order | 9-section description and Markdown template | [reference/solution-doc-structure.md](reference/solution-doc-structure.md) |
+| Producing a current-state (as-is) document, or evolving a current-state baseline into a target-state (to-be) document | Current-state mode and baseline-input rules — diagram labeling, RAID/RACI substitution, as-is → to-be evolution | [reference/current-state-mode.md](reference/current-state-mode.md) |
 | Writing or reviewing any solution-doc prose | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets | [reference/writing-style.md](reference/writing-style.md) |
 | User corrects content or new findings emerge mid-session and diagrams need to stay current | Walkthrough of **sync-diagrams** updating affected diagrams and adding new ones | [examples/diagram-sync.md](examples/diagram-sync.md) |
 

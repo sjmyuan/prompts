@@ -19,7 +19,7 @@ Either approach is valid:
 
 ## Document format
 
-Findings documents are produced by the `write-solution-doc` skill, applied to the **current state** instead of the target state. Load that skill to access its full document structure, diagramming, and formatting capabilities. The key difference: label all diagrams as "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings.
+Findings documents are produced by the `write-solution-doc` skill in **current-state mode** — same structure, diagramming, and formatting as a solution doc, applied to the **current state** instead of the target state. Load `write-solution-doc`'s **reference/current-state-mode.md** for the full adaptation rules.
 
 ## Embedded evidence map (the spike's code evidence)
 
@@ -33,7 +33,7 @@ The findings doc is the spike's **evidence home** — the single place where cod
 
 | Claim / Question | Verdict | Evidence (file:line) | Confidence |
 
-Claims are the spike's questions ("Is there a circuit breaker?"); the verdict is the answer; evidence is the exact location; confidence is **verified** / **inferred** / **unverified**. Never present inference as evidence — an unverified claim is a gap, not evidence.
+Claims are the spike's questions ("Is there a circuit breaker?"); the verdict is the answer; evidence is the exact location. Confidence uses the `investigate-code` 5-tag model: **Verified** (directly read, `file:line` confirmed), **Inferred** (reasoned from evidence), **Assumption** (taken for granted), **Inconsistency** (contradiction — code vs code, docs, or config, both sides located), **Gap** (searched but not found, or not investigated). Never present inference as evidence — Inferred/Assumption claims are not Verified; Gap claims also go in searched-negatives.
 
 **Searched-negatives**
 
@@ -46,6 +46,6 @@ Dead-end searches recorded so later sub-agents don't repeat them; open questions
 ## Relationship to other artifacts
 
 - **ADRs** reference findings docs for evidence: "The current C2 topology (Findings Doc §2) shows all payment types sharing a single database..."
-- **The solution document** is produced by loading the findings doc(s), then evolving each section from current-state → target-state using `write-solution-doc`. Diagrams are updated in-place; new API contracts are added; RAID replaces constraints & pain points.
+- **The solution document** is produced by loading the findings doc(s) and applying `write-solution-doc` in **baseline-input mode** — evolving each section as-is → to-be (see `write-solution-doc`'s **reference/current-state-mode.md**).
 - When findings change (e.g., after a deep-dive), update the affected findings doc and any ADRs that reference it.
 - **ADRs and the solution document stay clean**: investigation detail and raw data live only in this findings document. ADRs and the solution doc carry the decision and the target-state architecture, citing the findings doc for evidence rather than embedding it.

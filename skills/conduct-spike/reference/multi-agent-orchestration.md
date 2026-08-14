@@ -34,7 +34,7 @@ Every sub-agent result — investigation findings, ADR decisions, and dispatched
 
 The evidence map (embedded in findings docs) is the input/output contract between the orchestrator and sub-agents:
 
-- **Input**: every brief carries the area's findings doc (or its evidence sections). Sub-agents start from entry points, follow existing call chains, and treat the evidence ledger's **verified** claims as settled — they verify only `inferred`/`unverified` claims or marked gaps.
+- **Input**: every brief carries the area's findings doc (or its evidence sections). Sub-agents start from entry points, follow existing call chains, and treat the evidence ledger's **Verified** claims as settled — they verify only **Inferred**/**Assumption** claims or marked **Gap**s/**Inconsistencies**.
 - **Output**: every investigation brief returns a per-area evidence map so the orchestrator can embed it in the area's findings doc (see **compile-findings-doc**).
 - **Searched-negatives travel with the findings doc**: a documented "not found" tells the next sub-agent not to repeat the scan.
 - **ADR-drafting briefs** include the area's findings doc (evidence sections) so ADRs can cite evidence locations without re-reading code.

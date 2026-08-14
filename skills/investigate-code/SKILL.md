@@ -65,7 +65,7 @@ Every finding must carry an epistemic status tag so the user can judge completen
 Detailed presentation format: [reference/confidence-and-coverage-guide.md](reference/confidence-and-coverage-guide.md)
 </finding-confidence-model>
 <spike-integration>
-When invoked from the `conduct-spike` skill for a spike investigation, scope the investigation to the spike's area and read its existing evidence before re-scanning: load the spike folder's findings doc (`docs/findings-<area>.md`), then update its evidence map — `file:line` entry points, sequence diagrams for call chains, evidence ledger (claim → verdict → confidence), and searched-negatives — so the spike can cite code evidence without re-scanning. Do not load when no spike area has been defined yet.
+When invoked from the `conduct-spike` skill for a spike investigation, scope the investigation to the spike's area and read its existing evidence before re-scanning: load the spike folder's findings doc (`docs/findings-<area>.md`), then update its embedded evidence map per `conduct-spike`'s **reference/findings-document-guide.md** (entry points `file:line`, sequence diagrams for call chains, evidence ledger with the 5-tag confidence model, searched-negatives). Do not load when no spike area has been defined yet.
 </spike-integration>
 <concise-writing>
 All investigation prose and reports follow BLUF (conclusion first), hard caps, atomic bullets, and tables-over-prose. Every section opens with a bolded one-line takeaway; no banned phrases; every sentence passes the "so what?" test. Load **reference/writing-style.md** for the full rules (caps table, banned-phrase list, sentence surgery).

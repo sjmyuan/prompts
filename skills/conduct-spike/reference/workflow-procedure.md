@@ -10,15 +10,13 @@ Each brief carries: area name and description, spike goal, brownfield/greenfield
 
 ### Direct investigation (fallback — no sub-agent available)
 
-Announce: "Investigating area: [area name]". Load the `investigate-code` skill's SKILL.md and apply its capabilities. Record the area's evidence map as you investigate (entry points, key locations with `file:line`, call chains, evidence verdicts, searched-negatives). Compile findings into a structured summary: **current state** (what exists today), **constraints & pain points** (what's limiting or broken), and **relevant diagrams** (C4/sequence showing current architecture).
+Announce: "Investigating area: [area name]". Load the `investigate-code` skill's SKILL.md and apply its capabilities — its **spike-integration** scopes the investigation to the area and updates the evidence map per **findings-document-guide.md**. Compile findings into a structured summary: **current state** (what exists today), **constraints & pain points** (what's limiting or broken), and **relevant diagrams** (C4/sequence showing current architecture).
 
 ## Evaluate solutions per area (evaluate-solutions-per-area)
 
-Per area: ask what options the user sees; use **solution-brainstorming-prompts** if only one option is offered; capture each option's description, pros/cons, and feasibility; identify the decision drivers and relate pros/cons to them.
+Per area: apply the `draft-adr` skill's evaluation capabilities — **define-decision-drivers** → **define-considered-options** → **evaluate-options** — seeded with the area's findings doc (its embedded evidence map). This produces the drivers, the option set (brainstorming included), pros/cons tied to drivers, and per-option tech details (its **evaluate-options** applies **detail-options-tech** whenever findings are available). Present per option so the user can compare technical feasibility; skip tech details only if the user declines or an option has no code impact.
 
-Per option: load the `draft-adr` skill and apply its **detail-options-tech** capability to produce the option's tech details — target-state diagrams and a code change profile (location, diff, how-to) — seeding it with the area's findings doc (its embedded evidence map). Present them per option so the user can compare technical feasibility. Skip only if the user declines or the option has no code impact.
-
-After all options are evaluated and tech-detailed, ask: "Which option do you recommend as the assumed solution for [area name]?" If unsure, help compare top contenders against the decision drivers and their tech details. Record the **assumed solution** — provisional, may change after ADR review.
+After evaluation, ask: "Which option do you recommend as the assumed solution for [area name]?" If unsure, help compare top contenders against the decision drivers and their tech details. Record the **assumed solution** — provisional, may change after ADR review.
 
 **Check for findings gaps**: if any option revealed a constraint, risk, or fact not captured in the findings document, update the affected sections and note the correction when presenting the evaluation summary.
 
@@ -28,17 +26,17 @@ Repeat for each investigation area. **Validation**: at least 2 options considere
 
 ### Sub-agent dispatch — per-area brief template
 
-Each brief carries: area name and description, evaluation results (decision drivers, options with pros/cons, **tech details per option**, assumed solution), the area's findings doc (evidence sections), and instructions to load `draft-adr`. Dispatch concurrently for multiple ADRs, individually for a single ADR. Announce: "Dispatching ADR drafting for [N] area(s) to a sub-agent." After collection, review each ADR.
+Each brief carries: area name and description, evaluation results (decision drivers, options with pros/cons, **tech details per option**, assumed solution), the area's findings doc (evidence sections), and instructions to load `draft-adr` and apply **compile-adr** seeded with the evaluation results. Dispatch concurrently for multiple ADRs, individually for a single ADR. Announce: "Dispatching ADR drafting for [N] area(s) to a sub-agent." After collection, review each ADR.
 
 ### Direct drafting or revising (fallback — no sub-agent available)
 
-Load the `draft-adr` skill's SKILL.md and apply its capabilities: define-problem → define-decision-drivers → define-considered-options → evaluate-options → compile-adr. Seed each capability with the evaluation results: problem from the area scope, drivers/options/assumed solution, and each option's tech details (already produced via `draft-adr` during evaluation).
+Load the `draft-adr` skill's SKILL.md and apply **compile-adr**, seeding it with the evaluation results: problem from the area scope, drivers/options/assumed solution, and each option's tech details (already produced via `draft-adr` during evaluation). Run the full chain (define-problem → define-decision-drivers → define-considered-options → evaluate-options → compile-adr) only if evaluation was skipped or is incomplete.
 
-Revising is the same procedure: re-load `draft-adr` and re-apply its capabilities, seeding with the existing ADR plus the changed decision. Never hand-edit an ADR — every write goes through `draft-adr` (see **professional-doc-authoring**).
+Revising is the same procedure: re-load `draft-adr` and re-apply **compile-adr**, seeding with the existing ADR plus the changed decision. Never hand-edit an ADR — every write goes through `draft-adr` (see **professional-doc-authoring**).
 
 ### ADR validation checklist
 
-Confirm: the chosen option follows logically from the decision drivers; all evaluated options are fairly represented; each option's provided tech details are carried into its evaluation section; consequences include both positive and negative impacts; the ADR can be understood without reading other ADRs. Then run the **no-note scan** from **clean-artifact-principle** — scan for banned process language ("Note:", "Updated", "Changed", "v2", "As of", "Previously", status parentheticals, in-document changelogs) and rewrite in place until none remain.
+Apply `draft-adr`'s **compile-adr** step 6 quality checklist. Spike-specific additions: each option's tech details are carried into its evaluation section; the ADR stands alone without reading other ADRs; it cites the findings doc for evidence. Then run the **no-note scan** from **clean-artifact-principle** — scan for banned process language ("Note:", "Updated", "Changed", "v2", "As of", "Previously", status parentheticals, in-document changelogs) and rewrite in place until none remain.
 
 ## Compile findings doc (compile-findings-doc)
 
@@ -47,15 +45,15 @@ Confirm: the chosen option follows logically from the decision drivers; all eval
 
 ### Sub-agent dispatch — brief template
 
-Each brief carries: document strategy, Phase 2 results (investigation summaries **and their evidence maps**), and instructions to load `write-solution-doc` and produce a **current-state document** — diagrams labeled "current state," RAID/RACI replaced with **constraints & pain points** and **raw data & metrics**, evidence maps embedded per **findings-document-guide.md**. Announce: "Dispatching findings-doc compilation to a sub-agent." After collection, review for evidence-map fidelity and cross-area consistency.
+Each brief carries: document strategy, Phase 2 results (investigation summaries **and their evidence maps**), and instructions to load `write-solution-doc` and produce a **current-state document** in **current-state mode** (see `write-solution-doc`'s **reference/current-state-mode.md**), with evidence maps embedded per **findings-document-guide.md**. Announce: "Dispatching findings-doc compilation to a sub-agent." After collection, review for evidence-map fidelity and cross-area consistency.
 
 ### Direct compilation (fallback — no sub-agent available)
 
-Load the `write-solution-doc` skill's SKILL.md and apply its capabilities to produce a **current-state document**: label all diagrams "current state," replace RAID/RACI sections with **constraints & pain points** and **raw data & metrics** from the investigation findings. Seed with Phase 2 results (investigation summaries and their evidence maps) rather than gathering context from scratch.
+Load the `write-solution-doc` skill's SKILL.md and apply its capabilities in **current-state mode** (see `write-solution-doc`'s **reference/current-state-mode.md**). Seed with Phase 2 results (investigation summaries and their evidence maps) rather than gathering context from scratch.
 
 ### Evidence-map embedding and validation (both paths)
 
-**Embed each area's evidence map inline** per **reference/findings-document-guide.md**: annotate entry points and key locations with `file:line` beside the sections that use them, express call chains as sequence diagrams, and add an **Evidence & Verification** section per area — evidence ledger (claim → verdict → evidence `file:line` → confidence **verified**/**inferred**/**unverified**) and searched-negatives. Preserve `file:line` precision — never vague references like "the service layer"; never present inference as evidence. Cross-reference between findings docs (if per-area): note where one area's current state creates constraints for another. Present each findings document and ask: "Does this accurately capture the current state? Anything to add, correct, or remove?" Then save it to `<spike-folder>/docs/findings-<area>.md` (apply **save-artifacts**). Findings docs are the **current-state baseline and evidence home**: evaluation compares options against them, ADRs cite them as evidence, sub-agent briefs carry their evidence sections, and the solution doc evolves their diagrams as-is → to-be. Update the embedded evidence map the moment new evidence is found — no round/version tracking.
+**Embed each area's evidence map inline** per **reference/findings-document-guide.md**: annotate entry points and key locations with `file:line` beside the sections that use them, express call chains as sequence diagrams, and add an **Evidence & Verification** section per area — evidence ledger (claim → verdict → evidence `file:line` → confidence per the `investigate-code` 5-tag model) and searched-negatives. Preserve `file:line` precision — never vague references like "the service layer"; never present inference as evidence. Cross-reference between findings docs (if per-area): note where one area's current state creates constraints for another. Present each findings document and ask: "Does this accurately capture the current state? Anything to add, correct, or remove?" Then save it to `<spike-folder>/docs/findings-<area>.md` (apply **save-artifacts**). Findings docs are the **current-state baseline and evidence home**: evaluation compares options against them, ADRs cite them as evidence, sub-agent briefs carry their evidence sections, and the solution doc evolves their diagrams as-is → to-be. Update the embedded evidence map the moment new evidence is found — no round/version tracking.
 
 ## Compile solution doc (compile-solution-doc)
 
@@ -63,11 +61,11 @@ Load the `write-solution-doc` skill's SKILL.md and apply its capabilities to pro
 
 ### Sub-agent dispatch — brief template
 
-Each brief carries: business context (spike goal), current-state baseline (findings docs — evolve diagrams as-is → to-be), assumed solutions (chosen option from each ADR), and instructions to load `write-solution-doc` and produce a **target-state** document (C4 diagrams show the target architecture, not current state). Announce: "Dispatching solution-doc compilation to a sub-agent." After collection, review for completeness and consistency with the ADRs.
+Each brief carries: business context (spike goal), current-state baseline (findings docs), assumed solutions (chosen option from each ADR), and instructions to load `write-solution-doc` and produce a **target-state** document in **baseline-input mode** (see `write-solution-doc`'s **reference/current-state-mode.md**). Announce: "Dispatching solution-doc compilation to a sub-agent." After collection, review for completeness and consistency with the ADRs.
 
 ### Direct compilation (fallback — no sub-agent available)
 
-Load the `write-solution-doc` skill's SKILL.md and apply its capabilities — for compiling AND revising. Seed with: business context (spike goal), current-state baseline (findings docs — evolve diagrams as-is → to-be), and assumed solutions (chosen option from each ADR). C4 diagrams show the **target architecture**, not current state. Revising is the same procedure seeded with the existing doc plus the changed decisions (see **professional-doc-authoring**).
+Load the `write-solution-doc` skill's SKILL.md and apply its capabilities in **baseline-input mode** (see `write-solution-doc`'s **reference/current-state-mode.md**) — for compiling AND revising. Seed with: business context (spike goal), current-state baseline (findings docs), and assumed solutions (chosen option from each ADR). Revising is the same procedure seeded with the existing doc plus the changed decisions (see **professional-doc-authoring**).
 
 ### Modularity, validation, presentation (both paths)
 
