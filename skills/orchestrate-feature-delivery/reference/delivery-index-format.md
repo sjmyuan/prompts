@@ -92,7 +92,7 @@ Each cell carries a brief that seeds **plan-development-task**:
 | **unplanned** | No plan files yet | Dispatch a planning agent (plan-development-task) |
 | **planned** | `plan.md` + `context.md` exist | Dispatch an execution agent (execute-plan) |
 | **in-progress** | Execution running — incl. implemented-but-not-yet-merged cells awaiting push approval | Resume from the last completed step; pre-merge rework appends like post-merge |
-| **poc-ready** | POC implemented + evaluation report written | Run the decision gate (**evaluate-poc-results**); user decides |
+| **poc-ready** | POC implemented + evaluation report written | Wait for the user to record **adopted**/**rejected** in the index |
 | **adopted** | POC proved the option | Promote (merge → done) or feed the **poc-gated** feature |
 | **rejected** | POC failed the criteria | Close the cell; delivery proceeds on the other option |
 | **superseded** | Existing implementation replaced by an adopted POC | Skip; keep as history |
@@ -105,7 +105,7 @@ Each cell carries a brief that seeds **plan-development-task**:
 A POC proves one option of one ADR as a **standalone feature** (see **poc-definition** in the SKILL.md knowledge). Record it in the index with `Type: poc` + the metadata above, and track statuses per the lifecycle above.
 
 - **Compare POCs**: sibling POC cells (one per option) run in parallel in an early wave; the implementing feature depends on its POC via a **poc-gated** edge and is never dispatched before the decision.
-- **Decision gate**: at **poc-ready**, the orchestrator presents the evaluation report vs success criteria — the user/team decides adopt/reject (**evaluate-poc-results**); the ADR records the outcome.
+- **Decision gate**: at **poc-ready**, the user reads the evaluation report vs success criteria and records **adopted**/**rejected** directly in the index — the orchestrator never evaluates or decides; the ADR records the outcome.
 - **Adopt**: **POC-as-implementation** — promote the branch (merge → done; mark `replaces` **superseded**); **POC-as-decision-input** — close the POC, dispatch the **poc-gated** feature with the decided option.
 - **Reject**: close the cell (branch archived or discarded); delivery proceeds on the other option.
 

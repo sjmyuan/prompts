@@ -2,7 +2,7 @@
 
 **Scenario**: ADR-002 (`adr-002-cache.md`) weighs two cache options — **Redis** vs **in-process**. The team can't decide on drivers alone; the user says: "Run a POC for each option to prove which is better — then pick."
 
-**Applies**: **define-poc-scope** → **orchestrate-delivery** → **evaluate-poc-results** → **update-delivery-index**
+**Applies**: **define-poc-scope** → **orchestrate-delivery** → **update-delivery-index**
 
 ## 1. Flag + sequence POC cells
 
@@ -19,16 +19,16 @@ Decomposition marks two POC cells (Wave 0, parallel) and one **poc-gated** imple
 - **Agent A** (coding-assistant) → plan + execute `F5a` (**plan-development-task** `plan-poc` / **execute-plan** POC mode) — brief carries `type: poc`, ADR-002, option Redis, success criteria.
 - **Agent B** (coding-assistant) → plan + execute `F5b` (in-process) in parallel — same repo ⇒ serialize execution waves or split to different repos when possible.
 
-## 3. Decision gate
+## 3. Decision gate (user-recorded)
 
-Both cells reach **poc-ready** with evaluation reports. Evidence presented vs criteria:
+Both cells reach **poc-ready**. The orchestrator waits — the user reads the evaluation reports vs success criteria and records the decision directly in the index:
 
 | Criterion | F5a (Redis) | F5b (in-process) |
 |---|---|---|
 | p99 < 50ms @ 2k rps | 34ms ✅ | 41ms ✅ |
 | New ops deps | 1 (redis client) | 0 ✅ |
 
-User decides: **adopt Redis**.
+User records: F5a **adopted** (Redis), F5b **rejected**.
 
 ## 4. Adopt + reject
 

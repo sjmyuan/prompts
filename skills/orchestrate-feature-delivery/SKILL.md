@@ -47,7 +47,7 @@ Classify each feature pair: **merge-blocked** (hard — develop after A's contra
 Wave computation and intra-feature merge order: **reference/dependency-ordering-guide.md**.
 </dependency-edge-types>
 <delivery-state-machine>
-Each cell follows: **unplanned → planned → in-progress → done**, with **failed** and **blocked** as recoverable side states; **in-progress** also covers implemented-but-not-yet-merged cells awaiting push approval. POC cells fork after implementation: **in-progress → poc-ready** (evaluation report written, awaiting the decision gate) → **adopted** (promote → merge → **done**) or **rejected** (closed, branch archived/discarded); a replaced feature cell is marked **superseded**. Gating splits development from merging: a cell is **develop-ready** when its dependency cells are **planned** (contracts agreed — contract-first and independent cells develop in parallel); a cell is **merge-ready** only when its dependencies are **done** (merged). Full transitions: **reference/orchestration-guide.md**; issue-after-implementation rework: **rework-modes**; POC decision gate: **evaluate-poc-results**.
+Each cell follows: **unplanned → planned → in-progress → done**, with **failed** and **blocked** as recoverable side states; **in-progress** also covers implemented-but-not-yet-merged cells awaiting push approval. POC cells fork after implementation: **in-progress → poc-ready** (evaluation report written, awaiting the user's recorded decision) → **adopted** (promote → merge → **done**) or **rejected** (closed, branch archived/discarded); a replaced feature cell is marked **superseded**. Gating splits development from merging: a cell is **develop-ready** when its dependency cells are **planned** (contracts agreed — contract-first and independent cells develop in parallel); a cell is **merge-ready** only when its dependencies are **done** (merged). Full transitions: **reference/orchestration-guide.md**; issue-after-implementation rework: **rework-modes**; POC decision: the user records **adopted**/**rejected** directly in the index — the orchestrator never evaluates or decides (see **reference/poc-lifecycle.md**).
 </delivery-state-machine>
 <agent-dispatch>
 Every delivery task is delegated — the orchestrator never performs it (task → agent → skill): spike → **spike-conductor** (**conduct-spike**); plan / execute → **coding-assistant** (**plan-development-task** / **execute-plan**); solution-doc → **solution-doc-writer** (**write-solution-doc**); ADR → **adr-writer** (**draft-adr**).
@@ -74,8 +74,8 @@ Rework after implementation is **always append-only** — implemented steps are 
 | Running one orchestration round with parallel agents | Dispatch + status-update walkthrough | [examples/orchestration-round.md](examples/orchestration-round.md) |
 | Continuing an interrupted epic | Resume walkthrough with mixed statuses | [examples/resume-after-interruption.md](examples/resume-after-interruption.md) |
 | Distinguishing parallel vs merge-blocked features | Dependency-ordering-focused example | [examples/parallel-vs-sequential-waves.md](examples/parallel-vs-sequential-waves.md) |
-| Marking, sequencing, or gating POC cells, or running the decision gate | POC definition, lifecycle, adoption models | [reference/poc-lifecycle.md](reference/poc-lifecycle.md) |
-| Running a full POC round (compare POCs → decision gate → adopt/reject) | End-to-end POC walkthrough | [examples/adr-option-poc.md](examples/adr-option-poc.md) |
+| Marking, sequencing, or gating POC cells, or handling a user-recorded POC decision | POC definition, lifecycle, adoption models | [reference/poc-lifecycle.md](reference/poc-lifecycle.md) |
+| Running a full POC round (compare POCs → user-recorded decision → adopt/reject) | End-to-end POC walkthrough | [examples/adr-option-poc.md](examples/adr-option-poc.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -110,10 +110,11 @@ Rework after implementation is **always append-only** — implemented steps are 
 </produce-delivery-index>
 <update-delivery-index>
 1. After every agent result, update the cell's status per the **delivery-state-machine**: unplanned → planned (plan written), planned → in-progress (execution started), in-progress → done (PR merged or code verified), plus failed or blocked with the reason.
-2. When a cell's PR merges, re-check downstream cells — any now develop-ready (dependencies planned) or merge-ready (dependencies done) become dispatchable.
-3. Record the agent assignment, plan location, and branch name for each cell (per **branch-and-push-conventions**).
-4. Keep the index as the single source of truth; never leave status changes only in conversation.
-5. Verify the updated index against **reference/delivery-index-format.md** — status values, readiness, recorded branches — before the next dispatch round.
+2. When the user records a POC decision (**poc-ready → adopted/rejected**) in the index, record it and dispatch the follow-ups per **reference/poc-lifecycle.md**: **adr-writer** records the outcome in the ADR; on **adopted** — **POC-as-implementation**: ask before promoting/merging the branch and mark the `replaces` cell **superseded**; **POC-as-decision-input**: dispatch the **poc-gated** feature with the decided option; on **rejected** — close the cell (archive or discard the branch — ask the user).
+3. When a cell's PR merges, re-check downstream cells — any now develop-ready (dependencies planned) or merge-ready (dependencies done) become dispatchable.
+4. Record the agent assignment, plan location, and branch name for each cell (per **branch-and-push-conventions**).
+5. Keep the index as the single source of truth; never leave status changes only in conversation.
+6. Verify the updated index against **reference/delivery-index-format.md** — status values, readiness, recorded branches — before the next dispatch round.
 </update-delivery-index>
 <orchestrate-delivery>
 1. Load the delivery index — or create it first via **decompose-change-into-features** → **map-features-to-repos** → **order-feature-delivery** → **produce-delivery-index** if it does not exist.
@@ -146,13 +147,6 @@ Rework after implementation is **always append-only** — implemented steps are 
 3. Sequence POC cells **early** (Wave 0) — run `compare` siblings in parallel; add a **poc-gated** edge from the implementing feature to its POC cell.
 4. Present the POC cells and success criteria to the user and confirm before recording them in the index.
 </define-poc-scope>
-<evaluate-poc-results>
-1. When a POC cell reaches **poc-ready**, read its evaluation report and **success-criteria** from the index.
-2. Present the evidence vs each criterion to the user — the user/team decides, never the orchestrator.
-3. On **adopt**: dispatch **adr-writer** (draft-adr) to record the validated option; then per the model — **POC-as-implementation**: promote the branch (ask before pushing/PR per **branch-and-push-conventions**), mark the `replaces` cell **superseded** when one exists; **POC-as-decision-input**: close the POC and dispatch the **poc-gated** feature with the decided option.
-4. On **reject**: dispatch **adr-writer** to record the outcome; close the cell **rejected** (archive or discard the branch — ask the user); delivery proceeds on the other option.
-5. Apply **update-delivery-index** after the decision.
-</evaluate-poc-results>
 
 </capabilities>
 
@@ -164,6 +158,7 @@ Rework after implementation is **always append-only** — implemented steps are 
 <rule> When the user asks about a single cell's plan or status, read the delivery index and route the cell to **plan-development-task** or **execute-plan** — do not re-run the whole orchestration. </rule>
 <rule> When an issue surfaces after a feature was implemented (a cell is **done** or **in-progress** — implemented but not merged/committed/pushed), apply **handle-post-implementation-issue** — never re-run **decompose-change-into-features** on the whole epic. </rule>
 <rule> When decomposing change items and an ADR option needs proof before a decision, apply **define-poc-scope** to flag and sequence POC cells. </rule>
-<rule> When a POC cell reaches **poc-ready** (evaluation report written), apply **evaluate-poc-results** — the user decides adopt/reject, never the orchestrator. </rule>
+<rule> When a POC cell reaches **poc-ready**, do not evaluate or decide — wait for the user to record **adopted**/**rejected** directly in the index. </rule>
+<rule> When the user records a POC decision (**adopted**/**rejected**) in the index, apply **update-delivery-index** to record it and dispatch the follow-ups (ADR update, branch promotion, **poc-gated** feature). </rule>
 
 </rules>

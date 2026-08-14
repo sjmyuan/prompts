@@ -1,6 +1,6 @@
 # POC Lifecycle
 
-Rules for POC cells in `orchestrate-feature-delivery` (**define-poc-scope**, **evaluate-poc-results**).
+Rules for POC cells in `orchestrate-feature-delivery` (**define-poc-scope**).
 
 ## POC cell metadata
 
@@ -17,15 +17,18 @@ Rules for POC cells in `orchestrate-feature-delivery` (**define-poc-scope**, **e
 
 `unplanned → planned → in-progress → poc-ready → adopted | rejected` (plus `failed`/`blocked`). A replaced feature is marked **superseded**.
 
-- **poc-ready**: execution finished the evaluation report; no merge yet.
+- **poc-ready**: execution finished the evaluation report; no merge yet — awaits the user's recorded decision.
 - **adopted**: user/team chose the option → **POC-as-implementation** (promote → merge → done) or **POC-as-decision-input** (dispatch the **poc-gated** feature).
 - **rejected**: option not proven → close the cell, archive/discard the branch, proceed on the other option.
 
 ## Decision gate
 
-1. Read the evaluation report + success criteria from the index.
-2. Present evidence vs each criterion — the user/team decides; the orchestrator never auto-decides.
-3. Record the outcome in the ADR via **adr-writer** (draft-adr); update the index.
+The orchestrator never evaluates or decides. At **poc-ready**, the user reads the evaluation report vs **success-criteria** and records **adopted** or **rejected** directly in the index. Once recorded, the orchestrator reacts:
+
+1. Dispatch **adr-writer** (draft-adr) to record the outcome in the ADR.
+2. **Adopted** — apply the matching adoption model below.
+3. **Rejected** — close the cell (archive/discard the branch — ask the user); delivery proceeds on the other option.
+4. Apply **update-delivery-index**.
 
 ## Adoption models
 
