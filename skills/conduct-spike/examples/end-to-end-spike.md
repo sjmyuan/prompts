@@ -79,21 +79,21 @@
 
 ---
 
-## Phase 2a: Direction Suggestions After Investigation
+## Phase 2a: Completion Checkpoint
 
-*[suggest-spike-directions applied — presenting 3 go-deeper and 3 go-broader candidates grounded in investigation evidence; see `examples/spike-direction-suggestions.md` for the full candidate format]*
-
-### Assistant Output (condensed)
-
-> "Here's what we learned. Before we formalize findings, here are 6 direction candidates — e.g., **D1**: trace the `PaymentOrchestrator` call graph to decide whether extraction is straightforward; **B2**: plan monitoring/observability for the multi-service target. See `examples/spike-direction-suggestions.md` for the full go-deeper/go-broader table."
-
-### User Response
-
-> "D1 (orchestrator call graph) and B2 (monitoring) are worth investigating, but let's proceed with what we have for now — we can deep-dive those after the first round of ADRs."
+*[Investigation complete — the assistant confirms the result before formalizing findings]*
 
 ### Assistant
 
-> "Got it. Proceeding to compile findings document. We can return to D1 and B2 as deep-dive follow-ups after the ADRs are drafted."
+> "Investigation complete. Is this result sufficient, or should we investigate further before formalizing the findings?"
+
+### User Response
+
+> "It's sufficient for now — let's formalize. We can dig into the orchestrator call graph and monitoring after the first round of ADRs."
+
+### Assistant
+
+> "Got it. Proceeding to compile findings document."
 
 ---
 

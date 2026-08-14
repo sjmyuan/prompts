@@ -1,8 +1,8 @@
 # Example: Spike Direction Suggestions — 3 Deeper, 3 Broader
 
-**Scenario**: The user just completed a spike round investigating "how to reduce order API latency." The findings revealed the bottleneck is in `order-processing-worker`'s DB queries, not the REST layer. Now the skill suggests 6 concrete next-step candidates — 3 to go deeper on unresolved details, 3 to broaden to adjacent concerns.
+**Scenario**: The user just completed a spike round investigating "how to reduce order API latency" and asks what to investigate next. The findings revealed the bottleneck is in `order-processing-worker`'s DB queries, not the REST layer. The skill suggests 6 concrete next-step candidates — 3 to go deeper on unresolved details, 3 to broaden to adjacent concerns.
 
-**Applies**: `suggest-spike-directions` — invoked after `compile-findings-doc`
+**Applies**: `suggest-spike-directions` — run manually after a spike round completes (e.g., after `conduct-spike`'s investigation phase)
 
 **What makes this distinct**: The suggestions are all grounded in specific findings from the investigation. None are generic ("maybe look at caching?"). Each cites exactly what was found and why going deeper or broader matters.
 
@@ -58,7 +58,7 @@ Would you like to pursue any of these directions? Pick one (or more) and I'll st
 
 ### Assistant
 
-> "Got it. Starting a new spike round: 'Identify the specific DB query causing 1.8s latency in order-processing-worker and determine whether an index, query rewrite, or schema change is needed.' Let me define the scope..."
+> "Got it. Handing back to `conduct-spike` to start a new spike round: 'Identify the specific DB query causing 1.8s latency in order-processing-worker and determine whether an index, query rewrite, or schema change is needed.' Let me define the scope..."
 
 ---
 

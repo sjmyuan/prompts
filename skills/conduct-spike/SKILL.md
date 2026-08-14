@@ -1,6 +1,6 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations producing ADRs, findings, solution docs, and change summaries. Use when scoping, investigating, evaluating, discussing ADRs needing investigation, formalizing, continuing, deep-diving, modularizing, summarizing changes, syncing updates, suggesting direction.
+description: Conduct spike investigations producing ADRs, findings, solution docs, and change summaries. Use when scoping, investigating, evaluating, discussing ADRs needing investigation, formalizing, continuing, deep-diving, modularizing, summarizing changes, syncing updates.
 ---
 
 <when-to-use-this-skill>
@@ -11,7 +11,7 @@ description: Conduct spike investigations producing ADRs, findings, solution doc
 - User wants to break down a large technical problem into independently decidable investigation areas, or split a large solution document into modular sub-documents
 - User has pre-existing investigation findings and wants to formalize them into ADRs and a solution document
 - User wants to continue a previous spike by digging deeper into one or more specific investigation areas that were not fully resolved
-- User wants to summarize the concrete code changes required to implement the chosen solution (change summary) or get suggestions for the next steps in the spike (direction candidates)
+- User wants to summarize the concrete code changes required to implement the chosen solution (change summary)
 - User found new evidence or changed a decision and wants every artifact — findings doc, ADR, solution doc, change summary — updated together and kept consistent
 - Do NOT load for plain ADR drafting, solution-doc writing, or code investigation — `draft-adr`, `write-solution-doc`, and `investigate-code` handle those directly; load only when a decision needs investigation first
 </when-to-use-this-skill>
@@ -88,12 +88,8 @@ When breaking down a spike problem into investigation areas, target 2–5 areas.
 When helping the user brainstorm solution options, prompt them to consider: status quo, incremental improvement, industry-standard approaches, build-vs-buy-vs-adopt, greenfield rewrite, and hybrid/phased strategies. See the full prompt set in **reference/solution-brainstorming-prompts.md**.
 </solution-brainstorming-prompts>
 
-<spike-direction-suggestions>
-After each spike round, suggest 3 go-deeper and 3 go-broader candidate questions grounded in investigation evidence — never guesswork. For candidate-generation heuristics, go-deeper vs. go-broader patterns, and output format, see **reference/spike-direction-suggestions-guide.md**.
-</spike-direction-suggestions>
-
 <adr-uncertainty-signals>
-During ADR discussion (drafting, reviewing, or adjusting a decision), suggest a spike when the decision hinges on something reasoning alone cannot settle: **unverified assumption** (chosen option assumes an unchecked fact), **unknown feasibility** (whether the option works here is unknown), **missing measurement** (decision needs cost/latency/capacity/effort data not collected), **undecidable comparison** (tiebreaker requires evidence, not opinion), **uninvestigated dependency** (success depends on an unknown system), or **reviewer disagreement** (reviewers need data rather than debate). This is the "Untested assumption in ADR" go-deeper heuristic from **reference/spike-direction-suggestions-guide.md**, applied during ADR discussion rather than only after an investigation round.
+During ADR discussion (drafting, reviewing, or adjusting a decision), suggest a spike when the decision hinges on something reasoning alone cannot settle: **unverified assumption** (chosen option assumes an unchecked fact), **unknown feasibility** (whether the option works here is unknown), **missing measurement** (decision needs cost/latency/capacity/effort data not collected), **undecidable comparison** (tiebreaker requires evidence, not opinion), **uninvestigated dependency** (success depends on an unknown system), or **reviewer disagreement** (reviewers need data rather than debate). This is the "Untested assumption in ADR" go-deeper heuristic, applied during ADR discussion rather than only after an investigation round.
 </adr-uncertainty-signals>
 
 <professional-doc-authoring>
@@ -138,8 +134,6 @@ Propagation stops at the first artifact a change does not affect. The change sum
 | Generating a change summary (code-level changes required to implement the solution) | Format, categories, and code-access guidance | [reference/change-summary-guide.md](reference/change-summary-guide.md) |
 | Assessing and splitting a large solution document into modular, AI-friendly pieces | Splitting heuristics, patterns, and validation checklist | [reference/solution-doc-modularity-guide.md](reference/solution-doc-modularity-guide.md) |
 | Producing a concrete change summary with code access, demonstrating all change categories | End-to-end change summary with code-verified scope estimates | [examples/change-summary-example.md](examples/change-summary-example.md) |
-| Suggesting candidate questions to narrow or broaden a spike after a round completes | Candidate-generation heuristics, go-deeper vs go-broader patterns, and the direction-menu template | [reference/spike-direction-suggestions-guide.md](reference/spike-direction-suggestions-guide.md) |
-| Seeing a worked example of direction suggestions — 3 go-deeper and 3 go-broader candidates grounded in investigation evidence | Walkthrough of generating direction candidates after a spike round, with rationale for each | [examples/spike-direction-suggestions.md](examples/spike-direction-suggestions.md) |
 | Revising an existing ADR or solution doc after a deep-dive or decision change — seeing how rewrite-in-place replaces the old decision cleanly | Before → after walkthrough of an ADR rewritten in place, with the banned-language absent list | [examples/update-artifact-in-place.md](examples/update-artifact-in-place.md) |
 | Suggesting a spike when ADR discussion reveals a decision hinges on unverified assumptions or unknown facts | Worked example of detecting ADR uncertainty and offering a focused spike before finalizing the ADR | [examples/adr-uncertainty-spike-suggestion.md](examples/adr-uncertainty-spike-suggestion.md) |
 | Synchronizing artifacts after a fact or decision change (new evidence, ADR revision, deep-dive) | Propagation matrix, sync procedure, and consistency checklist | [reference/artifact-sync-guide.md](reference/artifact-sync-guide.md) |
@@ -154,7 +148,7 @@ Propagation stops at the first artifact a change does not affect. The change sum
 
 <run-spike-workflow>
 1. Apply **define-spike-scope** to establish the spike goal and decompose the problem into investigation areas. Do not proceed until the scope is confirmed.
-2. Apply **investigate-per-area**, dispatching to a sub-agent whenever one is available (even single-area — see **multi-agent-orchestration**); always record **evidence maps**, never narrative only; verify results with **verify-sub-agent-results** before proceeding; then offer direction suggestions (3 go-deeper, 3 go-broader). A selected direction loops back to step 1 as the new goal; a confirmed-complete investigation proceeds to step 3.
+2. Apply **investigate-per-area**, dispatching to a sub-agent whenever one is available (even single-area — see **multi-agent-orchestration**); always record **evidence maps**, never narrative only; verify results with **verify-sub-agent-results** before proceeding; then confirm whether the investigation is complete or should continue in a new direction. A selected direction loops back to step 1 as the new goal; a confirmed-complete investigation proceeds to step 3.
 3. Apply **compile-findings-doc** to formalize the results into a structured findings document embedding each area's evidence map inline — dispatching to a sub-agent whenever one is available.
 4. After findings are confirmed, apply **evaluate-solutions-per-area** to brainstorm, compare, and select an assumed solution per area.
 5. Apply **draft-area-adrs** to produce one formal ADR per area, verifying each with **verify-sub-agent-results** before it is saved.
@@ -174,7 +168,7 @@ Propagation stops at the first artifact a change does not affect. The change sum
 2. **Sub-agent dispatch (preferred)**: announce "Dispatching investigation of [N] area(s) to a sub-agent," prepare per-area briefs (area, spike goal, brownfield/greenfield, the area's existing findings doc / evidence map, expected output including a per-area evidence map), dispatch concurrently for multiple areas, then collect and synthesize — resolving cross-area inconsistencies. Full brief template: **reference/workflow-procedure.md**.
 3. **Direct investigation (fallback)**: load the `investigate-code` skill and apply its capabilities; record the area's evidence map as you investigate (entry points, `file:line` key locations, call chains, evidence verdicts, searched-negatives); compile current state, constraints & pain points, and relevant diagrams. See **reference/findings-document-guide.md**.
 4. Apply **verify-sub-agent-results** to question and re-verify the collected results, then present a consolidated investigation summary, flagging facts that contradict or refine prior assumptions.
-5. Apply **suggest-spike-directions** (3 go-deeper, 3 go-broader candidates grounded in the evidence), then ask: "Would you like to pursue any of these directions, or is the investigation complete?" A selected direction loops back to scope definition; confirmation proceeds to step 6.
+5. Ask: "Is the investigation complete, or would you like to continue in a new direction?" A selected direction loops back to scope definition; confirmation proceeds to step 6.
 6. Hand off to **compile-findings-doc**, which embeds the recorded evidence maps inline.
 </investigate-per-area>
 
@@ -256,16 +250,8 @@ Propagation stops at the first artifact a change does not affect. The change sum
 2. **Deep-dive per selected area**: dispatch to a code-exploration sub-agent whenever one is available (even single-area — see **multi-agent-orchestration**), seeding it with the area's findings doc (evidence map) so covered code is not re-scanned; collect, verify with **verify-sub-agent-results**, and synthesize → update the findings doc's evidence map and any new facts/corrections → evaluate solutions → apply **draft-area-adrs** to update or produce ADRs.
 3. **Sync downstream artifacts** — apply **sync-update-artifacts**: refresh the solution doc via **compile-solution-doc** if ADR changes affect the system-level view, and the change summary if one exists.
 4. **Present results** — ADRs and the solution doc are **rewritten in place** to the latest state (delete superseded text, never annotate; see **latest-state-doctrine** and **reference/clean-artifact-principle.md**); run the **no-note scan** on each updated artifact; narrate the delta in conversation, never inside the document.
-5. After presenting, apply **suggest-spike-directions** for the next round. Full step-by-step procedure with prompts and validation checks: **reference/deep-dive-procedure.md**.
+5. After presenting, ask whether to continue with another deep-dive round or conclude; if continuing, treat the user's direction as the new scope. Full step-by-step procedure with prompts and validation checks: **reference/deep-dive-procedure.md**.
 </deep-dive-specific-areas>
-
-<suggest-spike-directions>
-1. **Review what was learned this round**: from the investigation summary (or findings doc / solution doc), extract key discoveries — systems identified, constraints measured, surprises, open questions.
-2. **Generate 3 go-deeper candidates**: concrete, answerable questions narrowing the spike into a specific unresolved detail. Each must reference a specific finding ("We found X, but didn't explore Y"), be investigable (codebase or prototype can answer it), and include a 1-sentence rationale.
-3. **Generate 3 go-broader candidates**: concrete questions expanding the spike to an adjacent concern the user may have missed. Each must reference something the scope excluded or touched, be a genuine decision, and include a 1-sentence rationale.
-4. **Present as a direction menu** using the template in **reference/spike-direction-suggestions-guide.md** (Go Deeper + Go Broader tables: candidate question, evidence anchor, rationale).
-5. Ask: "Would you like to pursue any of these directions? Pick one (or more) and I'll start a new spike round. Or if you're satisfied with the current results, we can stop here." A selected direction becomes a new spike scope — apply **define-spike-scope** with it as the goal.
-</suggest-spike-directions>
 
 <suggest-spike-on-adr-uncertainty>
 1. Detect uncertainty signals in the ADR discussion using **adr-uncertainty-signals** — unverified assumption, unknown feasibility, missing measurement, undecidable comparison, uninvestigated dependency, or reviewer disagreement.

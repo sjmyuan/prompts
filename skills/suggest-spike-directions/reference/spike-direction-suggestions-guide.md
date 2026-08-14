@@ -82,7 +82,7 @@ Use this template, grouped into "Go Deeper" and "Go Broader" sections. Each row:
 
 Ask: "Would you like to pursue any of these directions? Pick one (or more) and I'll start a new spike round. Or if you're satisfied with the current results, we can stop here."
 
-If the user selects a direction, treat it as a new spike scope and restart the workflow from `define-spike-scope`.
+If the user selects a direction, treat it as a new spike scope and hand it back to `conduct-spike`, which restarts from its `define-spike-scope`.
 
 ---
 

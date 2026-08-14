@@ -4,7 +4,7 @@
 
 **Applies**: `suggest-spike-on-adr-uncertainty` — invoked when ADR discussion reveals the decision depends on facts that haven't been established
 
-**What makes this distinct**: Unlike `suggest-spike-directions` (which fires after an investigation round to offer 3 go-deeper / 3 go-broader candidates), this fires *during* ADR discussion, detects a single uncertainty signal, and offers one focused spike to resolve it before the ADR is finalized.
+**What makes this distinct**: This fires *during* ADR discussion, detects a single uncertainty signal, and offers one focused spike to resolve it before the ADR is finalized — rather than broad next-step candidates after an investigation round.
 
 ---
 
@@ -48,4 +48,4 @@
 1. **One uncertainty signal, one focused spike**: The capability doesn't generate 6 candidates — it names the single unresolved fact and offers a spike scoped to resolve exactly that.
 2. **The ADR stays provisional**: The spike is a gate before finalizing the ADR, not a parallel side quest. The example shows the ADR is updated with evidence afterward.
 3. **Decline is respected**: The user is offered the alternative of recording the assumption as a risk in the ADR's consequences and moving on — no spike is forced.
-4. **Distinct from `suggest-spike-directions`**: The post-round suggestions example offers 3 go-deeper + 3 go-broader candidates; this capability fires during ADR discussion and proposes a focused investigation before the decision is recorded.
+4. **Focused, not broad**: This capability fires during ADR discussion and proposes a single focused investigation before the decision is recorded — not a broad set of next-step candidates.

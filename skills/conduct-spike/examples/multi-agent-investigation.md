@@ -142,21 +142,21 @@ Expected output: Current deployment architecture, constraints, migration feasibi
 
 ---
 
-## Phase 2a: Direction Suggestions After Investigation
+## Phase 2a: Completion Checkpoint
 
-*[suggest-spike-directions applied — presenting 3 go-deeper and 3 go-broader candidates grounded in the multi-agent investigation evidence; see `examples/spike-direction-suggestions.md` for the full candidate format]*
-
-### Orchestrator Output (condensed)
-
-> "All 4 sub-agents have returned. Before we formalize, here are 6 direction candidates grounded in the cross-agent findings — e.g., **D2**: prototype Kafka + API Gateway routing to validate the hybrid + strangler strategy end-to-end; **B3**: map team ownership to service boundaries (Conway's Law). See `examples/spike-direction-suggestions.md` for the full go-deeper/go-broader table."
-
-### User Response
-
-> "D2 (async + routing prototype) is a great idea — it addresses the two biggest infrastructure unknowns. But let's proceed with the findings first and circle back to D2 as a follow-up spike. B3 (team ownership) is a conversation I need to have with the engineering manager, not a technical spike."
+*[Investigation complete — the orchestrator confirms the result before formalizing findings]*
 
 ### Orchestrator
 
-> "Makes sense. I'll note D2 as a recommended follow-up spike. Proceeding to compile findings document from the 4 sub-agent outputs."
+> "All 4 sub-agents have returned and their findings are verified. Is this result sufficient, or should we investigate further before formalizing the findings?"
+
+### User Response
+
+> "It's sufficient — let's formalize. We can prototype the async + routing approach as a follow-up spike later."
+
+### Orchestrator
+
+> "Makes sense. Proceeding to compile findings document from the 4 sub-agent outputs."
 
 ---
 

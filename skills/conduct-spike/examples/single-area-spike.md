@@ -49,17 +49,17 @@
 
 ---
 
-## Phase 2a: Direction Suggestions After Investigation
+## Phase 2a: Completion Checkpoint
 
-*[suggest-spike-directions applied — presenting 3 go-deeper and 3 go-broader candidates grounded in investigation evidence; see `examples/spike-direction-suggestions.md` for the full candidate format]*
+*[Investigation complete — the assistant confirms the result before formalizing findings]*
 
-### Assistant Output (condensed)
+### Assistant
 
-> "Here's what we learned. Before we formalize findings, here are 6 direction candidates — e.g., **D1**: benchmark ClickHouse Cloud at 50K events/sec before committing; **B3**: define operational ownership for the database. See `examples/spike-direction-suggestions.md` for the full go-deeper/go-broader table."
+> "Investigation complete. Is this result sufficient, or should we investigate further before formalizing the findings?"
 
 ### User Response
 
-> "D1 (benchmarking) is a good call — but let's proceed with the assumption that 50K/sec is achievable and note it as a risk in the ADR. We can benchmark before final approval. B3 (operational ownership) is something I need to discuss with the team."
+> "It's sufficient — but let's proceed with the assumption that 50K events/sec is achievable and note it as a risk in the ADR."
 
 ### Assistant
 

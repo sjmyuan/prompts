@@ -2,7 +2,7 @@
 
 **Scenario**: The user previously conducted a spike on migrating a payment monolith to microservices. Four ADRs were drafted, but the database decomposition area was left unresolved — the team couldn't decide between "one DB per service" and "shared DB with views". Now the user wants to dig deeper into just this area to reach a conclusion.
 
-**Applies**: `deep-dive-specific-areas` → `suggest-spike-directions` — loads existing spike context, targets one unresolved area with deeper investigation, evaluates with new depth, updates the ADR, and suggests next-step directions grounded in the deep-dive findings.
+**Applies**: `deep-dive-specific-areas` — loads existing spike context, targets one unresolved area with deeper investigation, evaluates with new depth, and updates the ADR.
 
 **What makes this distinct**: This is not a full spike (scope is already defined, other ADRs exist), not a "from existing findings" case (the area needs new investigation, not just formalization), and not a simple ADR revision (the area was never resolved). It demonstrates the focused deep-dive workflow where only one area is revisited.
 
@@ -204,20 +204,20 @@
 
 ---
 
-## Step 8: Direction Suggestions After Deep-Dive
+## Step 8: Wrap-Up and Next Round
 
-*[suggest-spike-directions applied — presenting direction candidates for the next spike round, grounded in the deep-dive findings; see `examples/spike-direction-suggestions.md` for the full candidate format]*
-
-### Assistant Output (condensed)
-
-> "ADR-003 is now resolved. Before we wrap up, here are 6 direction candidates — e.g., **D1**: design the Kafka topic schema and partitioning for settlement events (ordering correctness); **B1**: define settlement service resilience requirements. See `examples/spike-direction-suggestions.md` for the full go-deeper/go-broader table."
-
-### User Response
-
-> "D1 (Kafka topic design) is critical — we need event ordering right before any implementation starts. And B1 (settlement resilience) is something I hadn't considered. Let's note both as follow-up spikes. For now, I'm satisfied with ADR-003 as-is."
+*[Deep-dive complete — the assistant confirms whether to continue or conclude]*
 
 ### Assistant
 
-> "Noted. D1 and B1 are queued as follow-up spikes. ADR-003 is finalized.
+> "ADR-003 is now resolved. Would you like to continue with another deep-dive round, or is this sufficient?"
+
+### User Response
+
+> "I'm satisfied with ADR-003 as-is. I'll decide on any follow-ups separately."
+
+### Assistant
+
+> "Understood. ADR-003 is finalized.
 >
 > As always: ADRs are formal decision records — review and approve with the team. The solution document and ADRs are version-controlled together in the spike folder — ADRs in `adrs/`, solution doc at the root (see `examples/spike-artifact-layout.md`)."
