@@ -36,13 +36,19 @@ Criteria for description trigger clarity and `<when-to-use-this-skill>` consiste
 
 </severity-levels>
 
-<skill-size-limit>
-The SKILL.md under review should not exceed **150 lines** to keep context size manageable during review. Flag the file size as:
+<size-limits>
+Sizes are measured by **character count** (≈ tokens × 4) — the real context cost — not just lines. Reformatting cannot change char count, so the char budget cannot be gamed; line count is only a secondary readability signal.
 
-- **≤150 lines** — No flag (acceptable).
-- **151–300 lines** — 🟡 Minor (excessive length; consider extracting more content to `reference/` files).
-- **>300 lines** — 🔴 Major (must be refactored before a meaningful review; extract large rubrics and examples to `reference/` files).
-</skill-size-limit>
+| File | Char budget | Line budget | Over-budget severity |
+|---|---|---|---|
+| SKILL.md | 12,000 | 150 | ≤2× 🟡 Minor · >2× 🔴 Major |
+| Each `reference/` file | 12,000 | 150 | 🟡 Minor (on-demand; consider splitting) |
+| Each `examples/` file | 9,000 | 150 | 🟡 Minor (on-demand; trim) |
+
+- **Max line length**: any line > 120 chars → 🟢 Nit (prefer wrapping to one idea per line); any line > 200 chars → 🟡 Minor (multi-item stuffing). Exceptions: frontmatter `description`, long URLs, Mermaid blocks, wide table cells.
+- **One line = one idea**: a line bundling 2+ logical items (list items joined by `;`/`and`, multiple short facts) is line-stuffing → 🟡 Minor even when short.
+- **Gaming detection**: when the line budget passes but the char budget is exceeded, flag the char-budget severity AND note that the line count is misleading — content was reformatted (line-merging), not reduced.
+</size-limits>
 
 <evaluation-process>
 A well-structured skill should define an evaluation process to assess the quality of its own output. Look for:
@@ -122,10 +128,11 @@ Apply these checks when the skill's description, when-to-use, or skill-boundary 
 | You detect noun-named capabilities or inline-embedded examples | Output model for naming and inline-content findings | [examples/noun-capabilities-and-inline-examples.md](examples/noun-capabilities-and-inline-examples.md) |
 | The skill appears mostly well-structured (few or no major findings) | Output model for a near-passing review | [examples/clean-skill-review.md](examples/clean-skill-review.md) |
 | Trigger-correctness failures are the primary or dominant finding | Output model for a review focused on description/when-to-use mismatches | [examples/trigger-correctness-violation.md](examples/trigger-correctness-violation.md) |
+| Size/density findings are the primary or dominant finding (char budget, line-stuffing, suspected line-merging) | Output model for size-budget and gaming findings | [examples/size-and-line-stuffing-review.md](examples/size-and-line-stuffing-review.md) |
 | Executing step 10 (example coverage assessment) | Coverage gap criteria and severity table | [reference/example-coverage-criteria.md](reference/example-coverage-criteria.md) |
 | Executing step 11 (individual example file review) | Quality criteria checklist for example files | [reference/example-quality-criteria.md](reference/example-quality-criteria.md) |
 | Checking naming conventions for skill name and capability names (step 8) | Action-verb naming convention rules for skill name, capability names, and knowledge subsection names | See `<action-verb-naming-convention>` in `<knowledge>` |
-| Checking file size and line count (step 1c) | Size limit thresholds (150/300 lines) and severity guidance | See `<skill-size-limit>` in `<knowledge>` |
+| Checking file size (steps 1c, 5, 11f) | Char/line budgets, max-line-length guard, and gaming-detection rule for SKILL.md, reference, and example files | See `<size-limits>` in `<knowledge>` |
 | Checking for output evaluation process (step 4) | Evaluation process patterns, common checklist patterns, and severity guidance | See `<evaluation-process>` in `<knowledge>` |
 | Checking conciseness across all files (step 5) | Unnecessary-content patterns per file type and severity guidance | [reference/conciseness-check.md](reference/conciseness-check.md) |
 | Checking cross-skill pipeline integration (step 16) | 4-point pipeline integration checklist with severity guidance | See `<pipeline-integration-review>` in `<knowledge>` |
@@ -145,7 +152,7 @@ Apply these checks when the skill's description, when-to-use, or skill-boundary 
 1. Read the full skill file to understand its domain and all sections.
    a. Verify all expected top-level sections are present: frontmatter YAML, `<when-to-use-this-skill>`, `<knowledge>`, and `<capabilities>`; flag any missing required section as 🔴 Major.
    b. Verify sections appear in the correct order: frontmatter → `<when-to-use-this-skill>` → `<knowledge>` → `<capabilities>` → `<rules>` (if present); flag out-of-order sections as 🟡 Minor.
-   c. Count the total lines of the SKILL.md file. If it exceeds 150 lines, flag as 🟡 Minor (excessive length consumes context during review — consider extracting content to `reference/` files). If it exceeds 300 lines, flag as 🔴 Major (file must be refactored before meaningful review).
+   c. Measure the file's size — count total lines AND estimate total characters (sum line lengths while reading). Apply `<size-limits>`: flag char-budget overruns per the table; count lines > 120 chars and > 200 chars and flag each as a single aggregated finding (🟢 Nit / 🟡 Minor); flag bundling of 2+ logical items in one line as 🟡 Minor; and when the line budget passes but the char budget is exceeded, note the mismatch as suspected line-merging (severity follows the char budget).
 2. **Check description quality and trigger consistency** — load **reference/trigger-correctness.md** first:
    a. Verify the frontmatter `description` follows the two-part template (domain summary + trigger phrase) — load **reference/description-template.md**; flag a missing trigger phrase as 🔴 Major.
    b. Score the description using the five-dimension quality metric — load **reference/description-scoring.md**; report the score (x/10) and flag a score ≤5 as 🔴 Major; flag a score of 6–8 as 🟡 Minor.
@@ -158,6 +165,7 @@ Apply these checks when the skill's description, when-to-use, or skill-boundary 
     - 🟢 Nit for a single verbose file.
     - 🟡 Minor for systematic verbosity across multiple files.
     - 🔴 Major if the skill could be cut by >30% without losing meaning.
+   Apply the `<size-limits>` budgets and max-line-length guard to each `reference/` file.
 6. For each rule, verify it answers "when scenario X → use capability Y" — flag any rule that re-states content already in a capability (duplication). If the skill has only one capability and no `<rules>` section, do not flag its absence.
 7. Check that a `<knowledge>` section exists and contains all reference material (tables, layouts, API signatures, platform constraints) that capabilities currently cite inline. Also check that large reference rubrics are not embedded directly in SKILL.md — they should be in `reference/` files loaded on demand; flag inline rubrics as 🔴 Major.
 8. **Check naming conventions** — load `<action-verb-naming-convention>` in `<knowledge>` for the full rubric:
@@ -172,6 +180,7 @@ Apply these checks when the skill's description, when-to-use, or skill-boundary 
     c. Check the scenario is realistic and non-trivial relative to the capability's complexity — flag toy/hello-world inputs for complex capabilities as 🟡 Minor.
     d. Check the example does not contradict any rule or knowledge entry in the parent skill — flag contradictions as 🔴 Major.
     e. Check that the example references the current capability name; flag stale names that no longer match the skill as 🟢 Nit.
+    f. Apply the `<size-limits>` example budget (≤ 9,000 chars / 150 lines) and max-line-length guard; flag overruns as 🟡 Minor.
     Load **reference/example-quality-criteria.md** for the full rubric.
 12. Surface inconsistencies: mixed styles within a section type, two conflicting patterns, or differing levels of procedural detail across capabilities of the same kind. Present both variants with file/line references and ask the user which should be canonical — do not silently pick one.
 13. Include a **Positive Highlights** section that acknowledges at least one well-structured aspect of the skill.
