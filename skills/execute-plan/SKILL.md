@@ -30,15 +30,15 @@ Status emojis used to track each step:
 </step-status-definitions>
 
 <step-tracking-format>
-Record each step in the plan file using this format:
+Record each step in the plan file using this format (each line one fact, see **concise-writing**):
 
 ```
 ### Step N: [Step Title] [Status Emoji]
-**Objective**: [What this step achieves]
+**Objective**: [What this step achieves — 1 sentence]
 **Files**: [Files created, modified, or deleted]
-**Implementation**: [Key changes or actions taken]
-**Validation**: [Test results or verification outcomes]
-**Status**: [Status emoji] [Status description]
+**Implementation**: [Key changes — 1 line]
+**Validation**: [Test results / verification — 1 line]
+**Status**: [Status emoji] [Status description — 1 line]
 ```
 </step-tracking-format>
 
@@ -123,6 +123,9 @@ The plan file's `## Scope Boundary` block (written by **export-plan** in plan-de
 - Beyond **In scope** (touching an **Out of scope** file, behavior, or ADR decision) → STOP, refuse, and ask the user with options: (a) extend the boundary, (b) record as a follow-up and stay in scope, (c) proceed anyway with a recorded deviation note.
 - Never adapt silently to out-of-scope changes.
 </scope-boundary-check>
+<concise-writing>
+All prose written into `plan.md` / `context.md` follows **reference/writing-style.md** — BLUF takeaways, hard caps (step objective 1 sentence, step note 1 line, bullet 1 claim, paragraph ≤ 3 sentences, sentence ≤ 20 words), atomic bullets, tables over prose, no banned phrases or process narration, So-what test.
+</concise-writing>
 
 <context-loading-guide>
 Load only the example most relevant to the current execution scenario to minimize context size.
@@ -143,6 +146,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 | Executing a POC plan (stop at evaluation report, no merge) | POC execution mode + evaluation report walkthrough | [examples/execute-adr-option-poc.md](examples/execute-adr-option-poc.md) |
 | POC round from dispatch to decision gate (shared with the orchestrator) | End-to-end POC walkthrough | [../orchestrate-feature-delivery/examples/adr-option-poc.md](../orchestrate-feature-delivery/examples/adr-option-poc.md) |
 | A step, recovery fix, or review fix risks exceeding the plan's scope boundary | Output model: refusal + decision options | [examples/refusing-out-of-scope-rework.md](examples/refusing-out-of-scope-rework.md) |
+| Writing or updating plan.md / context.md prose | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets | [reference/writing-style.md](reference/writing-style.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -153,9 +157,9 @@ Load only the example most relevant to the current execution scenario to minimiz
 1. Locate or create the feature folder and its two files (`plan.md` + `context.md`) per **feature-folder-structure**; for an **orchestrate-feature-delivery** cell use the existing `deliveries/<epic-name>/{repo}/{feature-name}/`, otherwise ask the user or default to `docs/feature-implementations/`.
 2. Derive a short kebab-case feature name from the plan's objective (e.g., `add-auth-system`, `fix-null-pointer-in-transformer`) per **feature-folder-structure**.
 3. Before creating a new plan, check if the feature folder already exists with a plan file. If it contains an appended `## Rework <date>` section, execute only the rework steps (see **rework-plan-execution**) — never re-run or modify the completed original steps. If a plan file has steps with ❌ failed or 🚫 blocked status, ask the user whether to **resume** from the last known state or **start fresh** (create a new folder/overwrite).
-4. Materialize the plan into `plan.md` per **plan-input-schema**: list each step with its number, title, objective, and initial status ⏳ pending, using the **step-tracking-format**.
-5. Populate `context.md` with all relevant background: requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, and any other material that informed the plan.
-6. Update step status in the plan file immediately after each state change (⏳ → 🔄 → ✅, or ❌/🚫 on failure). Refer to **step-status-definitions** for emoji meanings.
+4. Materialize the plan into `plan.md` per **plan-input-schema**: list each step with its number, title, objective (one sentence each, see **concise-writing**), and initial status ⏳ pending, using the **step-tracking-format**.
+5. Populate `context.md` concisely (see **concise-writing**): one bolded takeaway per section, tables for requirements/constraints, compact bullet lists for references — requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, decisions.
+6. Update step status in the plan file immediately after each state change (⏳ → 🔄 → ✅, or ❌/🚫 on failure); keep each note to one line per fact. Refer to **step-status-definitions** for emoji meanings.
 7. Never modify plan structure, objectives, steps, or the **Scope Boundary** block except to update statuses or add clarifying notes.
 8. Report progress: at plan start show all steps with ⏳ pending; after each step completion show the full list with current statuses and per-step details (files, implementation, validation); never summarize multiple steps together; at plan end show the final all-✅ list with a summary of accomplishments.
 </track-plan>

@@ -62,6 +62,9 @@ Execution agents commit locally and small-step; pushing or opening PRs happens o
 <rework-modes>
 Rework after implementation is **always append-only** — implemented steps are never changed, for **done** and **in-progress** cells alike; always scoped to **that cell only** (usually its governing ADR), never the whole epic. In both modes: append a `## Rework <date>` section at the end of the existing `plan.md` (sibling `rework-plan.md` only if very long); implemented steps stay byte-for-byte unchanged; new steps reference the triggering issue and the reworked ADR decision; execution runs **only** the appended steps; the index records the appended plan location and ADR focus. **Post-merge** (cell **done** — merged/verified): history is shipped, so run a focused spike via **spike-conductor** (**conduct-spike**) with ADR / solution-doc updates via **adr-writer** (**draft-adr**) / **solution-doc-writer** (**write-solution-doc**), and track the rework as a new feature (e.g. `F2-r1`) in a new wave. **Pre-merge** (cell **in-progress** — implemented but not merged/committed/pushed): nothing is merged yet, so spike + ADR / solution-doc updates only if the issue challenges the governing ADR decision, and the rework stays on the **same cell** (no new feature/wave) — appended steps merge together with the original work.
 </rework-modes>
+<concise-writing>
+All prose in the delivery index follows **reference/writing-style.md** — table-first, one-line Summary, atomic bullets, one-sentence feature descriptions, no process narration, So-what test.
+</concise-writing>
 <context-loading-guide>
 | Load when | Provides | File |
 |---|---|---|
@@ -76,6 +79,7 @@ Rework after implementation is **always append-only** — implemented steps are 
 | Distinguishing parallel vs merge-blocked features | Dependency-ordering-focused example | [examples/parallel-vs-sequential-waves.md](examples/parallel-vs-sequential-waves.md) |
 | Marking, sequencing, or gating POC cells, or handling a user-recorded POC decision | POC definition, lifecycle, adoption models | [reference/poc-lifecycle.md](reference/poc-lifecycle.md) |
 | Running a full POC round (compare POCs → user-recorded decision → adopt/reject) | End-to-end POC walkthrough | [examples/adr-option-poc.md](examples/adr-option-poc.md) |
+| Writing or updating the delivery index prose | BLUF rules, one-line Summary, atomic bullets, banned-phrase list | [reference/writing-style.md](reference/writing-style.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -105,7 +109,7 @@ Rework after implementation is **always append-only** — implemented steps are 
 1. Write the **delivery index** at `deliveries/<epic-name>/index.md` (one folder per epic, no `docs/` prefix — see **delivery-layout**; `<epic-name>` is the spiked epic's name) per **reference/delivery-index-format.md** — include the **Spike References** block (change summary file, ADR files, solution-doc sections).
 2. Create per-repo plan folders in the **repo-first** layout: `deliveries/<epic-name>/{repo}/{feature-name}/plan.md` + `context.md` (see **delivery-layout**).
 3. Mark each cell's initial status **unplanned** and its plan location.
-4. Verify the index against **reference/delivery-index-format.md** — structure, status values, develop/merge readiness — before confirming.
+4. Verify the index against **reference/delivery-index-format.md** — structure, status values, develop/merge readiness, concise prose (see **concise-writing**) — before confirming.
 5. Confirm the index location with the user — from here the epic is driven by **orchestrate-delivery**.
 </produce-delivery-index>
 <update-delivery-index>
@@ -114,7 +118,7 @@ Rework after implementation is **always append-only** — implemented steps are 
 3. When a cell's PR merges, re-check downstream cells — any now develop-ready (dependencies planned) or merge-ready (dependencies done) become dispatchable.
 4. Record the agent assignment, plan location, and branch name for each cell (per **branch-and-push-conventions**).
 5. Keep the index as the single source of truth; never leave status changes only in conversation.
-6. Verify the updated index against **reference/delivery-index-format.md** — status values, readiness, recorded branches — before the next dispatch round.
+6. Verify the updated index against **reference/delivery-index-format.md** — status values, readiness, recorded branches, concise prose (see **concise-writing**) — before the next dispatch round.
 </update-delivery-index>
 <orchestrate-delivery>
 1. Load the delivery index — or create it first via **decompose-change-into-features** → **map-features-to-repos** → **order-feature-delivery** → **produce-delivery-index** if it does not exist.

@@ -1,6 +1,6 @@
 # Concise Writing Style
 
-Applies to all prose in investigation reports and development plans. Tables and diagrams carry the detail; prose states takeaways.
+Applies to all prose in investigation reports and development plans, including their `plan.md` / `context.md` files. Tables carry the detail; prose states takeaways.
 
 ## Core rule: BLUF (Bottom Line Up Front)
 - Open every section with the conclusion in one line, then the why.
@@ -18,6 +18,11 @@ Applies to all prose in investigation reports and development plans. Tables and 
 | Bullet | 1 claim, no justification |
 | Paragraph | ≤3 sentences |
 | Sentence | ≤20 words, one clause |
+
+## Plan files (plan.md / context.md)
+- **plan.md**: `## Scope Boundary` bullets = one claim each; each step = one 1-sentence objective; step notes = one line per fact.
+- **context.md**: bolded one-line takeaway under each heading; requirements/constraints as tables; references as compact bullet lists.
+- No narrative paragraphs, no process narration, no meta-commentary.
 
 ## Atomic bullets
 - Each bullet = one claim (fact or verdict), not a sentence with reasoning.

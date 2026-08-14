@@ -2,6 +2,15 @@
 
 The delivery index is written at **`deliveries/<epic-name>/index.md`** — one folder per epic (no `docs/` prefix), named after the spiked epic (`<epic-name>` = spike name). The spike's own artifacts stay untouched in the spike folder (`spikes/<spike-name>/`; ADRs in `adrs/`, solution + change summary at the root, findings in `docs/`) and are referenced from the index via **Spike References**. The index is the epic's **single source of truth for state** — the orchestrator reads it to decide next actions, updates it as agents report, and uses its **Spike References** so every agent brief can point agents at the full spike output.
 
+## Concise writing
+
+The index is table-first; prose states takeaways only (see **reference/writing-style.md**).
+
+- **Summary**: one line — `N features · M repos · W waves · critical path: F_x → F_y`.
+- **Feature description**: one sentence; dependencies/statuses live in tables.
+- **Spike References**: one bullet per artifact (path — what it provides).
+- No narrative paragraphs, no process narration ("I dispatched…"), no meta-commentary.
+
 ## Delivery layout
 
 ```

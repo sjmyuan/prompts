@@ -84,7 +84,7 @@ When the plan is a **rework append** for an already-implemented feature (trigger
 </rework-plan-convention>
 
 <concise-writing>
-All prose in plans and context files follows **reference/writing-style.md** — BLUF takeaways, hard caps (step objective 1 sentence, bullet 1 claim, paragraph ≤ 3 sentences, sentence ≤ 20 words), atomic bullets, no banned phrases, So-what test.
+All prose in `plan.md` / `context.md` follows **reference/writing-style.md** — BLUF takeaways, hard caps (step objective 1 sentence, bullet 1 claim, paragraph ≤ 3 sentences, sentence ≤ 20 words), atomic bullets, no banned phrases, So-what test. Plan files are table-first; context files are takeaway-first.
 </concise-writing>
 
 <context-loading-guide>
@@ -174,7 +174,7 @@ Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its
 3. Derive a short kebab-case feature name from the plan's objective (e.g., `fix-null-pointer-in-transformer`).
 4. Determine the repo name when the plan belongs to a specific repo (an **orchestrate-feature-delivery** cell); use the **repo-first** layout `{location}/{repo}/{feature-name}/` — the delivery folder already exists, write into it; fall back to `{location}/{feature-name}/` when no repo applies so all plans for one repo live together.
 5. Write `plan.md` — start with the ratified `## Scope Boundary` block (see **scope-boundary**), then the complete numbered step list with objectives. When appending a rework plan (per **rework-plan-convention**), append a `## Rework <date>` section (with its own boundary) to the existing `plan.md` instead of overwriting it.
-6. Write `context.md` — capture all background: the user's original request, the classified change type, root cause or requirement summary, TDD approach rationale, the scope boundary rationale (see **scope-boundary**), the target branch name and base branch (see **plan-prerequisites**), constraints, assumptions, and any codebase references gathered. For an **orchestrate-feature-delivery** cell, also record the spike references from the agent brief (change-summary items, ADR files, solution-doc sections) so execution/resume agents can load full context on demand.
+6. Write `context.md` concisely (see **concise-writing**): one bolded takeaway per section, tables for requirements/constraints, compact bullet lists for references — original request, change type, root cause/requirement summary, TDD rationale, boundary rationale (see **scope-boundary**), branch + base (see **plan-prerequisites**), constraints, assumptions, codebase references; for an **orchestrate-feature-delivery** cell add the agent brief's spike references (change-summary items, ADR files, solution-doc sections).
 7. Validate conciseness (see **concise-writing**): each step states one objective in one sentence, scope-boundary bullets are one claim each, context.md prose ≤3 sentences per paragraph, no banned phrases.
 8. Inform the user of the saved location so they can invoke **execute-plan** to carry it out.
 </export-plan>
