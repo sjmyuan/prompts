@@ -168,10 +168,10 @@ Propagation stops at the first artifact a change does not affect. The change sum
 </investigate-per-area>
 
 <evaluate-solutions-per-area>
-1. Per area, apply the `draft-adr` skill's evaluation capabilities — **define-decision-drivers** → **define-considered-options** → **evaluate-options** — seeded with the area's findings doc (its embedded evidence map). This produces the drivers, the option set (brainstorming included), pros/cons tied to drivers, and per-option tech details (its **evaluate-options** applies **detail-options-tech** whenever findings are available). Present per option for feasibility comparison; skip tech details only if the user declines or an option has no code impact.
+1. Per area, delegate evaluation to `draft-adr` — apply **define-decision-drivers** → **define-considered-options** → **evaluate-options**, seeded with the area's findings doc (evidence map embedded). Present options per area for feasibility comparison; tech details come from `draft-adr`'s **detail-options-tech** (auto-applied by **evaluate-options** when findings exist) — skip only if the user declines or the option has no code impact.
 2. Ask: "Which option do you recommend as the assumed solution for [area name]?" If unsure, compare top contenders against drivers and tech details. Record the **assumed solution** — provisional until ADR review.
-3. **Check for findings gaps**: if any option revealed a constraint, risk, or fact not captured in the findings doc, update the affected sections and note the correction.
-4. Repeat per area, then validate each evaluation — at least 2 options, pros/cons relate to drivers, tech details grounded in the evidence map (no invented code), assumed solution follows logically. Present a summary table of all areas with assumed solutions and any findings corrections.
+3. **Check for findings gaps**: if any option revealed a constraint, risk, or fact not captured in the findings doc, update the affected sections — the correction flows into **draft-area-adrs** and downstream artifacts.
+4. Repeat per area, then validate each evaluation with spike-specific checks only — tech details grounded in the evidence map (no invented code), assumed solution follows logically, findings-gap corrections captured (generic checks like 2+ options or pros/cons tied to drivers are `draft-adr`'s **compile-adr** job). Present the summary table of all areas with assumed solutions and corrections — the handoff to **draft-area-adrs**.
 </evaluate-solutions-per-area>
 
 <draft-area-adrs>
