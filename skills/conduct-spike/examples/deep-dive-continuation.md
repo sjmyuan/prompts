@@ -68,22 +68,10 @@
 
 **What's NEW in this investigation** (things not covered in the original spike):
 
-- **Stored procedure dependency graph**: Traced all 12 stored procedures to identify which ones span multiple payment types.
-  - 8 of 12 procedures are payment-type-specific (can be isolated).
-  - 4 procedures span types: `settle_cross_type()`, `reconcile_daily()`, `calculate_fees()`, `audit_trail()` — these join `transactions` across all payment types.
-- **Table-level access analysis**: Mapped which payment types read/write to which tables:
-  - `credit_card_auths` table: only CreditCardPayment service touches it → safe to isolate.
-  - `bank_transfer_refs` table: only BankTransferPayment service → safe to isolate.
-  - `transactions` table: ALL payment types read and write → the core conflict point.
-  - `accounts` table: ALL payment types read; only settlement batch writes.
-- **Settlement batch profiling**: Profiled the nightly settlement batch process:
-  - Currently runs as a single stored procedure call with 4 dependent sub-procedures.
-  - Processes ~500K transactions/night, takes 45 minutes.
-  - The cross-type procedures are the bottleneck — they do full-table scans on `transactions`.
-- **Prototype assessment**: Evaluated feasibility of extracting settlement into its own service:
-  - Cross-type stored procedures could be rewritten as a standalone settlement service.
-  - The settlement service would own the `transactions` and `accounts` tables.
-  - Payment-type services would write to the settlement service via async events (aligns with ADR-002's Kafka decision).
+- **Stored procedure dependency graph**: 12 procedures traced — 8 are payment-type-specific (isolable); 4 span types (`settle_cross_type()`, `reconcile_daily()`, `calculate_fees()`, `audit_trail()`) joining `transactions` across all types.
+- **Table-level access analysis**: `credit_card_auths` and `bank_transfer_refs` are single-type → safe to isolate; `transactions` is read/written by ALL types (core conflict point); `accounts` read by all, written only by settlement batch.
+- **Settlement batch profiling**: nightly batch runs as a single stored procedure call with 4 dependent sub-procedures, ~500K transactions in 45 minutes; the cross-type procedures are the bottleneck (full-table scans on `transactions`).
+- **Prototype assessment**: cross-type procedures could be rewritten as a standalone settlement service owning `transactions` and `accounts`, with payment-type services writing via async events (aligns with ADR-002's Kafka decision).
 
 **What was ALREADY KNOWN** (from previous spike, not re-investigated):
 - Single PostgreSQL, ~80 tables, 2000+ lines of stored procedures.
@@ -104,10 +92,10 @@
 
 | Option | Description | Pros | Cons |
 |---|---|---|---|
-| **A: One DB per service (full split)** | Each payment-type service gets its own database. `transactions` table duplicated or split. | Maximum independence; each service can choose its own DB; aligns with microservices ideal | Settlement logic must be completely rewritten; cross-type queries become distributed; data consistency challenges |
-| **B: Shared DB with materialized views** | Keep single PostgreSQL. Each service accesses only its own tables + materialized views for cross-type data. | Lowest migration effort; stored procedures mostly untouched; team stays in comfort zone | Still a monolithic DB underneath; materialized view refresh lag; scaling bottleneck remains; doesn't enforce domain boundaries |
-| **C: Shared DB + settlement extraction** (NEW) | Payment-type services own their type-specific tables. Settlement extracted as its own service that owns `transactions` and `accounts`. Payment services publish events; settlement service consumes and processes. | Gradual decomposition; settlement bottleneck gets its own scaling; aligns with ADR-002 (Kafka already decided); stored procedures rewritten incrementally | Settlement service becomes a critical dependency; eventual consistency between payment write and settlement processing; more complex than Option B initially |
-| **D: Event sourcing + CQRS** | All payment events stored as immutable event stream. Each service projects its own read model. | Full audit trail built-in; services truly independent; replay capability for debugging | Massive paradigm shift; team has zero event sourcing experience; 2000+ lines of stored procedure logic must be rethought; overengineered for the problem |
+| **A: One DB per service** | Each service gets its own DB; `transactions` duplicated or split. | Maximum independence; per-service DB choice; microservices ideal | Settlement logic rewritten; distributed cross-type queries; consistency challenges |
+| **B: Shared DB + materialized views** | Keep single PostgreSQL; each service accesses its tables + views for cross-type data. | Lowest migration effort; stored procedures mostly untouched; team comfort zone | Still a monolithic DB; view refresh lag; scaling bottleneck remains; no domain boundaries |
+| **C: Shared DB + settlement extraction** (NEW) | Payment-type services own type-specific tables; settlement extracted as its own service owning `transactions` + `accounts`; payment services publish events, settlement consumes. | Gradual decomposition; settlement scales independently; aligns with ADR-002 (Kafka already decided); incremental stored-procedure rewrite | Settlement becomes a critical dependency; eventual consistency between write and settlement; initially more complex than B |
+| **D: Event sourcing + CQRS** | All payment events stored as an immutable stream; each service projects its own read model. | Built-in audit trail; fully independent services; replay capability | Massive paradigm shift; zero team experience; 2000+ lines of procedure logic rethought; overengineered |
 
 **Decision Drivers** (unchanged from original spike):
 - Hard: Must not break nightly settlement batch (45-min SLAs); Must maintain transactional consistency for payment capture

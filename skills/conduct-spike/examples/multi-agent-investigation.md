@@ -29,39 +29,14 @@
 
 ### Orchestrator: Prepare Briefs
 
-The orchestrator prepares 4 self-contained briefs, one per investigation area. Each brief includes the area description, the overall spike goal, and the expected output format — and **requires the sub-agent to return a per-area evidence map** (entry points, key code locations with file:line, call chains, evidence verdicts, searched-negatives). No findings doc exists yet, so this first round seeds the evidence map (see `reference/findings-document-guide.md`).
+The orchestrator prepares 4 self-contained briefs, one per investigation area. Each includes the area description, the overall spike goal, the expected output format — and **requires the sub-agent to return a per-area evidence map** (entry points, key locations with file:line, call chains, evidence verdicts, searched-negatives). No findings doc exists yet, so this first round seeds the evidence map (see `reference/findings-document-guide.md`).
 
-**Brief 1 — Service Decomposition Boundaries**:
-```
-Investigate: How should the payment monolith be split into services?
-Context: Single Spring Boot app, ~200K LOC. Payment types: CreditCard, BankTransfer, Wallet.
-Scope: Identify bounded contexts, current package dependencies, team ownership boundaries.
-Expected output: Current state of code organization, domain coupling points, constraints & pain points + per-area evidence map.
-```
-
-**Brief 2 — Inter-service Communication**:
-```
-Investigate: What communication patterns exist and what will the new services need?
-Context: Currently all in-process calls. External integrations use REST, gRPC, and SOAP.
-Scope: Map current integration points, assess team familiarity with async patterns.
-Expected output: Current communication landscape, constraints, existing infrastructure (message brokers, gateways) + per-area evidence map.
-```
-
-**Brief 3 — Database Decomposition Strategy**:
-```
-Investigate: How is the monolithic database structured and how can it be decomposed?
-Context: Single PostgreSQL, ~80 tables. Shared tables across payment types.
-Scope: Analyze table ownership, stored procedures, data access patterns.
-Expected output: Current database topology, cross-domain table dependencies, constraints & pain points + per-area evidence map.
-```
-
-**Brief 4 — Migration Strategy**:
-```
-Investigate: What deployment infrastructure exists and what migration patterns are feasible?
-Context: Kubernetes on AWS, Kong API Gateway, GitHub Actions CI/CD.
-Scope: Assess current deployment pipeline, traffic routing capability, feature flag infrastructure.
-Expected output: Current deployment architecture, constraints, migration feasibility assessment + per-area evidence map.
-```
+| Brief | Investigate | Scope | Expected output |
+|---|---|---|---|
+| 1 — Service decomposition | How should the monolith be split into services? | Bounded contexts, package dependencies, team ownership | Current code organization, coupling points, constraints + evidence map |
+| 2 — Inter-service communication | What patterns exist / are needed? | Current integration points, team familiarity with async | Communication landscape, constraints, existing infra + evidence map |
+| 3 — Database decomposition | How is the DB structured / decomposable? | Table ownership, stored procedures, access patterns | DB topology, cross-domain dependencies, constraints + evidence map |
+| 4 — Migration strategy | What deployment infra / patterns are feasible? | Deployment pipeline, traffic routing, feature flags | Deployment architecture, constraints, feasibility + evidence map |
 
 ### Orchestrator: Dispatch
 
@@ -73,90 +48,37 @@ Expected output: Current deployment architecture, constraints, migration feasibi
 
 *Each sub-agent works independently, exploring the codebase for its assigned area. The sub-agents do not communicate with each other.*
 
-| Sub-agent | Area | Exploration scope | Duration |
-|---|---|---|---|
-| Agent A | Service decomposition | Package structure, domain imports, class dependencies | Independent |
-| Agent B | Inter-service communication | External API calls, circuit breakers, message patterns | Independent |
-| Agent C | Database decomposition | Table schemas, stored procedures, cross-table queries | Independent |
-| Agent D | Migration strategy | K8s configs, CI/CD pipelines, API gateway routes | Independent |
-
 ### Sub-Agent A Returns — Service Decomposition
 
-**Current State**:
-- Single Spring Boot app with package-by-layer: `controller/`, `service/`, `repository/`, `domain/`
-- Three business domains: CreditCardPayment (40%), BankTransferPayment (30%), WalletPayment (25%), Shared (5%)
-- `PaymentOrchestrator` (1200 lines) coordinates all payment types centrally
-- Credit card service directly imports bank transfer domain objects (tight coupling)
-
-**Constraints & Pain Points**:
-- Full redeploy for any payment type change
-- Cannot scale wallet payments independently
-- 3 teams step on each other's code
+**Current State**: package-by-layer (`controller/`, `service/`, `repository/`, `domain/`); three domains — CreditCard (40%), BankTransfer (30%), Wallet (25%), Shared (5%); `PaymentOrchestrator` (1200 lines) coordinates all types; credit card service imports bank transfer domain objects.
+**Constraints**: full redeploy for any payment-type change; wallet cannot scale independently; 3 teams step on each other's code.
 
 ### Sub-Agent B Returns — Inter-service Communication
 
-**Current State**:
-- All internal communication is in-process method calls
-- External: REST (bank APIs), gRPC (wallet provider), SOAP (legacy acquirer)
-- No message broker in ecosystem; no Kafka/RabbitMQ experience on team
-- No circuit breaker pattern; external failures propagate to users
-
-**Constraints & Pain Points**:
-- Team has no async messaging experience
-- SOAP legacy integration must be maintained
+**Current State**: all internal communication in-process; external REST (bank APIs), gRPC (wallet provider), SOAP (legacy acquirer); no message broker, no Kafka/RabbitMQ experience; no circuit breaker — external failures propagate to users.
+**Constraints**: no async messaging experience; SOAP legacy must be maintained.
 
 ### Sub-Agent C Returns — Database Decomposition
 
-**Current State**:
-- Single PostgreSQL, ~80 tables
-- `transactions`, `accounts`, `audit_log` shared across all payment types
-- 12 stored procedures for settlement (2000+ lines)
-- No per-payment-type access control
-
-**Constraints & Pain Points**:
-- Stored procedures are a migration blocker (heavy logic in DB)
-- Cross-payment-type queries in `transactions` table
+**Current State**: single PostgreSQL, ~80 tables; `transactions`, `accounts`, `audit_log` shared across all payment types; 12 stored procedures for settlement (2000+ lines); no per-payment-type access control.
+**Constraints**: stored procedures are a migration blocker; cross-payment-type queries in `transactions`.
 
 ### Sub-Agent D Returns — Migration Strategy
 
-**Current State**:
-- Deployed on Kubernetes (EKS), 3 replicas
-- Kong API Gateway routes `/api/payments/*` to monolith
-- GitHub Actions CI/CD with canary deployment support
-- No feature flags or traffic splitting infrastructure
-
-**Constraints & Pain Points**:
-- No traffic splitting at API gateway level
-- Canary deployments exist but not tested for routing-based migration
+**Current State**: Kubernetes (EKS), 3 replicas; Kong API Gateway routes `/api/payments/*` to monolith; GitHub Actions CI/CD with canary support; no feature flags or traffic splitting.
+**Constraints**: no traffic splitting at the gateway; canaries not tested for routing-based migration.
 
 ### Orchestrator: Synthesize
 
-> *All 4 sub-agents have returned. The orchestrator reviews findings for cross-area consistency:*
-> - Agent A and Agent C both identified tight coupling — consistent
-> - Agent B and Agent D both noted lack of infrastructure for gradual migration — aligned
-> - No contradictions found across sub-agent outputs
->
-> *The orchestrator compiles the synthesized investigation summary and presents it to the user.*
->
-> *It embeds each returned per-area evidence map into the consolidated findings doc below — `file:line` entry points and key locations annotated inline, plus the Evidence & Verification section (ledger + searched-negatives). See `reference/findings-document-guide.md` for the embedding format.*
+> *All 4 sub-agents returned. Cross-area consistency: Agent A + C both flagged tight coupling; Agent B + D both noted missing migration infrastructure; no contradictions. The orchestrator embeds each returned per-area evidence map into the consolidated findings doc below — `file:line` entry points annotated inline plus the Evidence & Verification section (see `reference/findings-document-guide.md`).*
 
 ---
 
 ## Phase 2a: Completion Checkpoint
 
-*[Investigation complete — the orchestrator confirms the result before formalizing findings]*
-
-### Orchestrator
-
-> "All 4 sub-agents have returned and their findings are verified. Is this result sufficient, or should we investigate further before formalizing the findings?"
-
-### User Response
-
-> "It's sufficient — let's formalize. We can prototype the async + routing approach as a follow-up spike later."
-
-### Orchestrator
-
-> "Makes sense. Proceeding to compile findings document from the 4 sub-agent outputs."
+> Orchestrator: "All 4 sub-agents have returned and their findings are verified. Is this sufficient, or should we investigate further before formalizing?"
+> User: "It's sufficient — let's formalize. We can prototype the async + routing approach as a follow-up spike later."
+> Orchestrator: "Proceeding to compile the findings document from the 4 sub-agent outputs."
 
 ---
 
@@ -236,13 +158,10 @@ The orchestrator prepares 4 briefs, each containing one area's evaluation result
 **Brief 1 — ADR for Service Decomposition**:
 ```
 Produce ADR for: Service Decomposition Boundaries
-Decision drivers: Must maintain 99.9% SLA; Must not lose data; Prefer alignment with existing teams
-Options:
-  A: Payment-type services — Pros: clear ownership, independent scaling. Cons: shared lib coupling
-  B: Domain-driven services — Pros: cleaner dependencies. Cons: team restructuring
-  C: Strangler extraction — Pros: lowest risk. Cons: temporary hybrid complexity
+Decision drivers: 99.9% SLA; no data loss; align with existing teams
+Options: A) Payment-type services — clear ownership, independent scaling; shared-lib coupling. B) Domain-driven services — cleaner dependencies; team restructuring. C) Strangler extraction — lowest risk; temporary hybrid complexity.
 Assumed solution: Option A (Payment-type services)
-Findings doc: findings-payment-migration.md — Evidence & Verification section (key locations, ledger, coupling) — cite evidence without re-scanning
+Findings doc: findings-payment-migration.md — Evidence & Verification section (key locations, ledger, coupling); cite evidence without re-scanning
 Load draft-adr skill and produce a complete ADR.
 ```
 

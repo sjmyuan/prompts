@@ -34,48 +34,18 @@
 
 *[investigate-code skill applied]*
 
-**Current State**:
-- Single Spring Boot app with package-by-layer structure: `controller/`, `service/`, `repository/`, `domain/`
-- Three main business domains identifiable in code: CreditCardPayment (40% of code), BankTransferPayment (30%), WalletPayment (25%), Shared utilities (5%)
-- Domain packages are intermingled — credit card service directly imports bank transfer domain objects
-- `PaymentOrchestrator` class (1200 lines) coordinates all payment types in one place
+**Current State**: package-by-layer (`controller/`, `service/`, `repository/`, `domain/`); three intermingled domains — CreditCardPayment (40%), BankTransferPayment (30%), WalletPayment (25%), Shared (5%); `PaymentOrchestrator` (1200 lines) coordinates all payment types; credit card service imports bank-transfer domain objects.
+**Constraints & Pain Points**: whole-app redeploy on any payment-type change; wallet cannot scale independently; 3 teams step on each other's code.
 
-**Constraints & Pain Points**:
-- Deployment: whole app redeploys when any payment type changes
-- Scaling: cannot scale wallet payments independently during peak hours
-- Team ownership: 3 teams work on different payment types but step on each other's code
+### Areas 2–4 (same pattern, abbreviated)
 
-### Area 2: Inter-service Communication
+*[investigate-code skill applied per area]*
 
-*(Areas 2–4 follow the same investigation pattern as Area 1 — abbreviated here for conciseness.)*
-
-*[investigate-code skill applied]*
-
-**Current State**:
-- All communication is in-process method calls; no service boundaries exist yet
-- External integrations use: REST (to bank APIs), gRPC (to wallet provider), SOAP (legacy acquirer)
-- No message broker in the current ecosystem; team has no Kafka/RabbitMQ experience
-- Circuit breaker pattern not used; external call failures propagate directly to users
-
-### Area 3: Database Decomposition Strategy
-
-*[investigate-code skill applied]*
-
-**Current State**:
-- Single PostgreSQL database, ~80 tables
-- Payment types share `transactions`, `accounts`, and `audit_log` tables
-- Stored procedures for settlement logic (2000+ lines across 12 procedures)
-- No database-level access control per payment type; any service can query any table
-
-### Area 4: Migration Strategy
-
-*[investigate-code skill applied]*
-
-**Current State**:
-- Monolith deployed on Kubernetes with 3 replicas
-- API Gateway (Kong) already routes `/api/payments/*` to the monolith
-- CI/CD pipeline in GitHub Actions; canary deployments supported
-- No feature flags or traffic splitting infrastructure currently in place
+| Area | Current State | Key Constraint |
+|---|---|---|
+| 2. Inter-service communication | All in-process calls; external REST/gRPC/SOAP; no broker; no circuit breaker | No async experience; SOAP must be maintained |
+| 3. Database decomposition | Single PostgreSQL ~80 tables; `transactions`/`accounts`/`audit_log` shared; 12 settlement stored procedures (2000+ lines) | No per-type access control |
+| 4. Migration strategy | K8s (3 replicas); Kong routes `/api/payments/*`; GitHub Actions canary CI/CD | No feature flags or traffic splitting |
 
 ---
 
@@ -107,32 +77,11 @@
 
 **C2 Container Diagram (Current State)**: Single Spring Boot monolith → PostgreSQL database, with all payment types sharing the same app and DB.
 
-**Current Architecture Summary**:
-- Monolithic Spring Boot app (~200K LOC) with package-by-layer structure
-- Three business domains intermingled: CreditCardPayment, BankTransferPayment, WalletPayment
-- `PaymentOrchestrator` (1200 lines) centrally coordinates all payment types
-- All communication is in-process method calls; no service boundaries
-- Single PostgreSQL database (~80 tables) shared across all payment types
-- `transactions`, `accounts`, `audit_log` tables are cross-domain hotspots
-- 12 stored procedures (2000+ lines) for settlement logic
-- Deployed on Kubernetes (3 replicas) behind Kong API Gateway
-- No message broker, feature flags, or traffic splitting infrastructure
+**Current Architecture Summary**: monolithic Spring Boot app (~200K LOC), package-by-layer, three intermingled domains coordinated by `PaymentOrchestrator` (1200 lines); all communication in-process; single PostgreSQL (~80 tables) with `transactions`/`accounts`/`audit_log` as cross-domain hotspots; 12 settlement stored procedures (2000+ lines); deployed on Kubernetes (3 replicas) behind Kong API Gateway; no message broker, feature flags, or traffic splitting.
 
-**Constraints & Pain Points**:
-- Full redeploy required for any payment type change
-- Cannot scale wallet payments independently during peak hours
-- Three teams working on different payment types step on each other's code
-- No circuit breaker pattern; external call failures propagate to users
-- Team has no async messaging (Kafka/RabbitMQ) experience
-- SOAP legacy acquirer integration must be maintained
-- Canary deployments supported in CI/CD but not tested for routing-based migration
+**Constraints & Pain Points**: full redeploy for any payment-type change; wallet cannot scale independently; three teams contend on the same code; no circuit breaker; no async experience; SOAP legacy must be maintained; canaries untested for routing migration.
 
-**Raw Data & Metrics**:
-- ~200K LOC in monolith
-- ~80 database tables
-- 12 stored procedures, 2000+ lines
-- 3 Kubernetes replicas
-- 3 external integration protocols: REST, gRPC, SOAP
+**Raw Data & Metrics**: ~200K LOC · ~80 tables · 12 stored procedures · 3 replicas · 3 protocols (REST, gRPC, SOAP).
 
 > *The findings document now serves as the current-state baseline. Evaluation will compare solution options against this baseline. ADRs will cite specific sections for evidence. The solution document will evolve these diagrams from as-is → to-be.*
 
@@ -146,9 +95,9 @@
 
 | Option | Description | Pros | Cons |
 |---|---|---|---|
-| **A: Payment-type services** | One service per payment type + shared lib | Clear ownership per team; independent scaling | Shared lib coupling; cross-cutting concerns duplicated |
-| **B: Domain-driven services** | Payment Initiation, Payment Processing, Settlement, Reconciliation | Aligned with business process; cleaner dependencies | More services; team restructuring needed |
-| **C: Strangler extraction** | Extract one payment type at a time, leaving rest in monolith | Lowest risk; incremental | Temporary hybrid complexity |
+| **A: Payment-type services** | One service per payment type + shared lib | Clear ownership; independent scaling | Shared-lib coupling; duplicated cross-cutting concerns |
+| **B: Domain-driven services** | Payment Initiation, Processing, Settlement, Reconciliation | Aligned with business process; cleaner deps | More services; team restructuring |
+| **C: Strangler extraction** | Extract one payment type at a time | Lowest risk; incremental | Temporary hybrid complexity |
 
 **Assumed Solution**: Option A (Payment-type services) — aligns with existing team structure, minimizes organizational change, and allows independent scaling.
 
@@ -157,8 +106,8 @@
 | Option | Description | Pros | Cons |
 |---|---|---|---|
 | **A: Synchronous REST** | Services call each other via REST APIs | Simple; team familiar | Tight coupling; cascading failures |
-| **B: Async events (Kafka)** | Services communicate via event streams | Loose coupling; resilience | Team learning curve; eventual consistency complexity |
-| **C: Hybrid** | REST for queries, events for commands | Best of both worlds | More infrastructure; two patterns to maintain |
+| **B: Async events (Kafka)** | Services communicate via event streams | Loose coupling; resilience | Team learning curve; eventual consistency |
+| **C: Hybrid** | REST for queries, events for commands | Best of both worlds | More infra; two patterns to maintain |
 
 **Assumed Solution**: Option C (Hybrid) — synchronous REST for real-time payment status queries, async Kafka events for payment processing commands and settlement.
 
@@ -166,8 +115,8 @@
 
 | Option | Description | Pros | Cons |
 |---|---|---|---|
-| **A: Database per service** | Each service owns its own database | True decoupling; independent scaling | Complex data migration; cross-service queries hard |
-| **B: Shared DB + views** | One physical DB, schema-level separation with views | Simpler migration; existing SQL preserved | Not true decoupling; schema coupling remains |
+| **A: Database per service** | Each service owns its own database | True decoupling; independent scaling | Complex migration; hard cross-service queries |
+| **B: Shared DB + views** | One physical DB, schema-level separation via views | Simpler migration; existing SQL preserved | Not true decoupling; schema coupling remains |
 | **C: Event-driven sync** | DB per service, synchronized via CDC events | Eventual consistency with audit trail | Complex to operate; eventual consistency |
 
 **Assumed Solution**: Option A (Database per service) — phased implementation starting with the least-coupled payment type (Wallet), using the Strangler Fig pattern.
@@ -177,8 +126,8 @@
 | Option | Description | Pros | Cons |
 |---|---|---|---|
 | **A: Strangler Fig** | Incrementally replace monolith parts with new services | Low risk; reversible; incremental value | Takes longer; routing complexity during transition |
-| **B: Parallel run** | Run old and new systems side by side, compare results | Highest confidence in correctness | Double operational cost; comparison logic complex |
-| **C: Big-bang cutover** | Build everything, switch in one go | Clean cut; no transitional complexity | High risk; no rollback if something fails |
+| **B: Parallel run** | Run old and new systems side by side, compare results | Highest confidence in correctness | Double operational cost; complex comparison |
+| **C: Big-bang cutover** | Build everything, switch in one go | Clean cut; no transitional complexity | High risk; no rollback on failure |
 
 **Assumed Solution**: Option A (Strangler Fig) — extract Wallet payments first (simplest domain), then Bank Transfer, then Credit Card. Use API Gateway for traffic routing.
 

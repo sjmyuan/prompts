@@ -45,8 +45,6 @@
 - Retention: raw events for 30 days, aggregated data for 2 years
 - Team size: 4 backend engineers, no dedicated DBA
 
-**Relevant patterns from org**: All existing services use PostgreSQL via JPA/Hibernate. DevOps team manages infrastructure via Terraform.
-
 ---
 
 ## Phase 2a: Completion Checkpoint
@@ -63,7 +61,7 @@
 
 ### Assistant
 
-> "Understood. I'll note the 50K/sec assumption as a key risk in the ADR. Proceeding to compile findings document."
+> "Understood — noting 50K/sec as a key ADR risk. Proceeding to compile findings."
 
 ---
 
@@ -94,9 +92,8 @@
 **Relevant Industry Patterns** (greenfield adaptation):
 - ClickHouse widely adopted for clickstream analytics (CloudFlare, GitLab)
 - Amazon Timestream used by AWS-native teams for time-series
-- Common pattern: managed OLAP + PostgreSQL for service metadata
 
-> *This findings document serves as the constraints baseline. Since this is greenfield, it captures organizational and operational constraints rather than existing code architecture. Evaluation will compare options against these constraints.*
+> *Since this is greenfield, the findings document captures organizational and operational constraints rather than existing code architecture — the baseline evaluation compares options against.*
 
 ---
 ## Phase 3: Evaluate Solutions Per Area
