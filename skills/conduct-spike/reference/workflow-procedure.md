@@ -71,14 +71,12 @@ Each brief carries: business context (spike goal), current-state baseline (findi
 
 Load the `write-solution-doc` skill's SKILL.md and apply its capabilities in **baseline-input mode** (see `write-solution-doc`'s **reference/current-state-mode.md**) — for compiling AND revising. Seed with: business context (spike goal), current-state baseline (findings docs), and assumed solutions (chosen option from each ADR). Revising is the same procedure seeded with the existing doc plus the changed decisions (see **professional-doc-authoring**).
 
-### Modularity, validation, presentation (both paths)
+### Validation, presentation (both paths)
 
-2. **Assess size and modularity** per **solution-doc-modularity**: if the doc exceeds ~3000 words, has 5+ major sections, or has independently useful sections, identify candidates for extraction.
-3. **Extract independent sections**: for each candidate, create a standalone doc with standalone context and back-reference, replace it in the hub with a 2–4 sentence summary and cross-reference link. Skip extraction for small, single-service solutions.
-4. Compile the output bundle — findings docs, N ADRs, 1 solution doc (hub), modular sub-docs (if extracted) — and save per **spike-artifact-layout**: findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`.
-5. Keep the solution doc at the latest state per **artifact-maintenance-doctrine** (see **reference/artifact-maintenance-guide.md**): only target-state architecture, no process notes; on refresh route through `write-solution-doc` and rewrite affected sections in place — delete superseded text, never annotate.
-6. Validate the bundle: every ADR's chosen solution is reflected, cross-references between all artifacts are consistent, diagrams match assumed solutions, extracted sub-docs have correct back-references. Run the **no-note scan** on the solution doc and rewrite until none remain.
-7. Present the bundle and remind the user: findings docs are the current-state record (keep even if decisions change); ADRs are formal decision records (review and approve with the team); the solution doc is the target-state architecture; version-control all artifacts together in the spike folder.
+2. Compile the output bundle — findings docs, N ADRs, 1 solution doc — and save per **spike-artifact-layout**: findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`.
+3. Keep the solution doc at the latest state per **artifact-maintenance-doctrine** (see **reference/artifact-maintenance-guide.md**): only target-state architecture, no process notes; on refresh route through `write-solution-doc` and rewrite affected sections in place — delete superseded text, never annotate.
+4. Validate the bundle: every ADR's chosen solution is reflected, cross-references between all artifacts are consistent, diagrams match assumed solutions. Run the **no-note scan** on the solution doc and rewrite until none remain.
+5. Present the bundle and remind the user: findings docs are the current-state record (keep even if decisions change); ADRs are formal decision records (review and approve with the team); the solution doc is the target-state architecture; version-control all artifacts together in the spike folder.
 
 ## Continue prior spike (continue-prior-spike)
 

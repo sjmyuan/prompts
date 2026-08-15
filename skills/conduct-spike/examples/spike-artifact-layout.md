@@ -35,4 +35,3 @@ spikes/payment-migration/
 
 **Notes**:
 - The delivery index for this epic is written by **orchestrate-feature-delivery** at `deliveries/<epic-name>/index.md` — a separate top-level `deliveries/` folder, not the spike folder.
-- Modularized solution sub-docs (if the solution doc is split per **solution-doc-modularity**) would land in `solution-doc/` next to the hub.

@@ -70,3 +70,7 @@ The change summary is consumed by **orchestrate-feature-delivery** (decomposed i
 </compile-change-summary>
 
 </capabilities>
+
+<rules>
+<rule> When user requests a change summary, apply the **compile-change-summary** to the input artifacts. </rule>
+</rules>

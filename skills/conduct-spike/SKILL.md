@@ -1,6 +1,6 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations producing ADRs, findings, and solution docs. Use when scoping, investigating decisions, evaluating options, discussing undecided ADRs, formalizing findings, continuing spikes, modularizing, syncing updates.
+description: Conduct spike investigations producing ADRs, findings, and solution docs. Use when scoping, investigating decisions, evaluating options, discussing undecided ADRs, formalizing findings, continuing spikes, syncing updates.
 ---
 
 <when-to-use-this-skill>
@@ -8,7 +8,7 @@ description: Conduct spike investigations producing ADRs, findings, and solution
 - Produce ADRs for each decision area alongside a consolidated solution document
 - Discuss an ADR (drafting, reviewing, or adjusting) whose outcome depends on unverified assumptions, unknown feasibility, or missing evidence
 - Understand current implementation as an investigation area within a spike before a decision is made
-- Break a large technical problem into independently decidable areas, or split a large solution document into modular sub-documents
+- Break a large technical problem into independently decidable areas
 - Formalize pre-existing investigation findings into ADRs and a solution document
 - Continue a previous spike, digging deeper into specific areas not fully resolved
 - Sync every artifact — findings doc, ADR, solution doc — after new evidence or a changed decision
@@ -31,7 +31,7 @@ spikes/<spike-name>/
 └── docs/                   # findings documents — findings-<area>.md each
 ```
 
-Modularized solution sub-docs (see **solution-doc-modularity**) live in `solution-doc/` next to the hub. Artifacts cross-reference each other with relative paths inside the spike folder.
+Artifacts cross-reference each other with relative paths inside the spike folder.
 
 Every producing capability saves its output per this layout: determine the spike folder path (ask the user or detect an existing `spikes/<spike-name>/`), create `adrs/` and `docs/` as needed, then confirm the layout after saving.
 </spike-artifact-layout>
@@ -47,10 +47,6 @@ Captures **current-state architecture** (via `write-solution-doc` **current-stat
 <option-tech-details>
 ADR option tech details (target-state diagrams + code change profiles) come from `draft-adr` **detail-options-tech**, grounded in the findings doc's evidence map — delegate to `draft-adr` during evaluation and ADR drafting (see **professional-doc-authoring**).
 </option-tech-details>
-
-<solution-doc-modularity>
-When a solution doc exceeds ~3000 words or 5+ major sections, split standalone sections into docs: hub keeps 2–4 sentence summaries + cross-refs; each extracted doc stands alone and back-references the hub. Details: **reference/solution-doc-modularity-guide.md**.
-</solution-doc-modularity>
 
 <continuation-mode>
 Continuing a spike = **another round of the same workflow**, seeded with prior artifacts: confirm which areas to revisit (unselected stay as-is), run capabilities in **revise-in-place** mode; **sync-update-artifacts** propagates downstream. See **examples/continue-prior-spike.md**.
@@ -108,7 +104,6 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 | Worked verification loop (accept/contradict) | Verification examples | [examples/confirming-result.md](examples/confirming-result.md), [examples/contradicting-result.md](examples/contradicting-result.md) |
 | Producing/understanding findings docs | Format, evidence-map rules | [reference/findings-document-guide.md](reference/findings-document-guide.md) |
 | Syncing artifacts after a fact/decision change | Rewrite-in-place protocol, propagation | [reference/artifact-maintenance-guide.md](reference/artifact-maintenance-guide.md) |
-| Splitting a large solution doc | Splitting heuristics, checklist | [reference/solution-doc-modularity-guide.md](reference/solution-doc-modularity-guide.md) |
 | ADR discussion hinging on unverified assumptions | Uncertainty-spike suggestion example | [examples/adr-uncertainty-spike-suggestion.md](examples/adr-uncertainty-spike-suggestion.md) |
 | Fact/decision change propagated through artifacts | Sync walkthrough | [examples/sync-update-across-artifacts.md](examples/sync-update-across-artifacts.md) |
 | Placing artifacts into the spike folder | Layout example | [examples/spike-artifact-layout.md](examples/spike-artifact-layout.md) |
@@ -172,10 +167,9 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 1. Dispatch to a sub-agent when available; direct is the fallback (see **multi-agent-orchestration**).
 2. **Dispatch**: announce "Dispatching solution-doc compilation"; brief (spike goal, findings docs, assumed solutions; load `write-solution-doc`, produce a **target-state** doc in **baseline-input mode**); collect and review. Full brief: **reference/workflow-procedure.md**.
 3. **Direct (fallback)**: load `write-solution-doc` in **baseline-input mode** (evolve findings-doc sections as-is → to-be; C4 shows the **target architecture**) — for compiling AND revising. Seed with spike goal, findings docs, assumed solutions.
-4. **Assess modularity** per **solution-doc-modularity**: if >~3000 words or 5+ major sections, extract sections into standalone docs with back-references; replace each in the hub with a 2–4 sentence summary + link.
-5. Save per **spike-artifact-layout** (findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`); keep at the latest state (see **artifact-maintenance-doctrine**).
-6. Validate: every ADR's chosen solution reflected, cross-references consistent, diagrams match, sub-docs back-reference; run the **no-note scan** until clean.
-7. Present the bundle: findings = current-state record; ADRs = decision records (review/approve); solution doc = target-state architecture; version-control together.
+4. Save per **spike-artifact-layout** (findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`); keep at the latest state (see **artifact-maintenance-doctrine**).
+5. Validate: every ADR's chosen solution reflected, cross-references consistent, diagrams match; run the **no-note scan** until clean.
+6. Present the bundle: findings = current-state record; ADRs = decision records (review/approve); solution doc = target-state architecture; version-control together.
 </compile-solution-doc>
 
 <compile-findings-doc>
@@ -220,5 +214,4 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 <rules>
 <rule>When the user initiates a spike investigation from scratch, apply **run-spike-workflow** to orchestrate all phases from scope definition through solution compilation.</rule>
 <rule>When the user starts from existing material instead of a blank slate, apply **continue-prior-spike** to continue the previous spike.</rule>
-<rule>After the solution doc is compiled, if the doc is large, apply the modularity steps in **compile-solution-doc**.</rule>
 </rules>
