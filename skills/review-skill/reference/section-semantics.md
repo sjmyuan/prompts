@@ -9,7 +9,7 @@ A well-formed copilot skill file uses these sections with distinct, non-overlapp
 | `<knowledge>` | Facts the agent recalls | Reference tables, directory layouts, API signatures, platform constraints, banned practices, selection guides; large rubrics extracted to `reference/` files and loaded on demand |
 | `<capabilities>` | Procedures the agent executes | Ordered step-by-step instructions for *how* to accomplish a task; named with an action verb |
 | `<rules>` | Internal routing triggers | "When [scenario] → use [capability]"; must not repeat what the capability already says; **may be omitted in single-capability skills** |
-| `<context-loading-guide>` in `<knowledge>` | On-demand context router | Condition-first table (`Load when` \| `Provides` \| `File`) that states the exact condition under which each file (examples, references, rubrics) should be loaded; loaded on demand |
+| `<context-loading-guide>` in `<knowledge>` | On-demand context router | Condition-first table (`Load when` \| `Provides` \| `File`) that routes on-demand files whose load condition is not fixed by a capability step — examples, plus step-independent references. References tied to a specific step are routed inline from that step; each knowledge subsection links its own reference file |
 
 **Common structural violations**:
 - Knowledge embedded in capabilities (lookup tables, API lists, constraint bullets inside a capability section)
@@ -17,7 +17,8 @@ A well-formed copilot skill file uses these sections with distinct, non-overlapp
 - Capabilities written as bullet-point fact lists instead of ordered procedural steps
 - Capabilities named as nouns (`<storage-management>`) instead of action verbs (`<manage-storage>`)
 - Skill name (frontmatter `name:`) is a noun phrase (`svg-editor`) instead of an action verb (`edit-svg`)
-- A bare `<examples>` section used instead of a `<context-loading-guide>` entry inside `<knowledge>` (the preferred pattern consolidates all on-demand context — examples, references, rubrics — in one place)
+- A bare `<examples>` section used instead of a `<context-loading-guide>` entry inside `<knowledge>` (the guide consolidates on-demand context — examples and step-independent references — in one place)
+- On-demand files (references, examples) with no load route — not linked from a knowledge subsection, a capability step, or a context-loading-guide row
 - `<context-loading-guide>` written as a bullet list, or as a two-column **Scenario | Reference** table — the first column must be a decision condition ("Load when…"), not a content description
 - `<context-loading-guide>` first column describes *what the file contains* instead of *when to load it* — forces the agent to infer the loading condition, leading to missed or wrong loads
 - `<examples>` content embedded inline rather than referenced by file path for on-demand loading

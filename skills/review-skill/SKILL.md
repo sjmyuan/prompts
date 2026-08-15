@@ -16,73 +16,69 @@ description: Review SKILL.md files for correct structure, section-purpose compli
 
 <skill-file-section-semantics>
 Section-purpose table and common structural violations.
+Details: [reference/section-semantics.md](reference/section-semantics.md)
 </skill-file-section-semantics>
 
 <trigger-correctness>
 Criteria for description trigger clarity and `<when-to-use-this-skill>` consistency.
+Details: [reference/trigger-correctness.md](reference/trigger-correctness.md)
 </trigger-correctness>
 
 <severity-levels>
 Severity definitions and Blocker-vs-Major guidance.
+Details: [reference/severity-levels.md](reference/severity-levels.md)
 </severity-levels>
 
 <size-limits>
 Char/line budgets per file type, max-line-length guard, gaming detection, and the measurement script.
+Details: [reference/size-limits.md](reference/size-limits.md)
 </size-limits>
 
 <size-remediation>
 Ordered remediation for over-budget files — redistribute, reduce, escalate — plus anti-patterns to never suggest.
+Details: [reference/size-remediation.md](reference/size-remediation.md)
 </size-remediation>
 
 <evaluation-process>
 Patterns for a skill-defined output-evaluation process, plus severity when absent.
+Details: [reference/evaluation-process.md](reference/evaluation-process.md)
 </evaluation-process>
 
 <action-verb-naming-convention>
 Naming rules for the skill name, capability names, and knowledge subsection names.
+Details: [reference/naming-conventions.md](reference/naming-conventions.md)
 </action-verb-naming-convention>
 
 <conciseness-check>
 Criteria for identifying unnecessary content across SKILL.md, references, and examples.
+Details: [reference/conciseness-check.md](reference/conciseness-check.md)
 </conciseness-check>
 
 <writing-style>
 Prose-quality rules — directive voice, BLUF, hard caps, banned phrases, no narration.
+Details: [reference/writing-style.md](reference/writing-style.md)
 </writing-style>
 
 <platform-agnostic-writing>
 Portability rules — no platform tool names, no concrete context paths, detect-don't-assume.
+Details: [reference/platform-agnostic-writing.md](reference/platform-agnostic-writing.md)
 </platform-agnostic-writing>
 
 <pipeline-integration-review>
 4-point checklist for producer→consumer skill pipelines — handoff, shared schema, awareness, guard clauses.
+Details: [reference/pipeline-integration.md](reference/pipeline-integration.md)
 </pipeline-integration-review>
 
 <context-loading-guide>
 
 | Load when | Provides | File |
 |---|---|---|
-| Section structure, naming, context placement (steps 1, 3–8) | Section semantics | [reference/section-semantics.md](reference/section-semantics.md) |
-| Trigger clarity and coverage (step 2) | Trigger criteria | [reference/trigger-correctness.md](reference/trigger-correctness.md) |
-| `description` template (step 2a) | Description template | [reference/description-template.md](reference/description-template.md) |
-| Description scoring (step 2b) | Scoring rubric | [reference/description-scoring.md](reference/description-scoring.md) |
 | Before writing output — load first, every review | Output format | [examples/skill-file-review.md](examples/skill-file-review.md) |
 | Noun-named capabilities or inline examples detected | Naming/inline model | [examples/noun-capabilities-and-inline-examples.md](examples/noun-capabilities-and-inline-examples.md) |
 | Mostly well-structured skill (few or no major findings) | Near-passing model | [examples/clean-skill-review.md](examples/clean-skill-review.md) |
 | Trigger failures dominant | Trigger-failure model | [examples/trigger-correctness-violation.md](examples/trigger-correctness-violation.md) |
 | Size/density findings dominant | Size/gaming model | [examples/size-and-line-stuffing-review.md](examples/size-and-line-stuffing-review.md) |
-| Step 10 (example coverage) | Coverage criteria | [reference/example-coverage-criteria.md](reference/example-coverage-criteria.md) |
-| Step 11 (example review) | Quality checklist | [reference/example-quality-criteria.md](reference/example-quality-criteria.md) |
-| Naming conventions (step 8) | Naming rules | [reference/naming-conventions.md](reference/naming-conventions.md) |
-| File size (steps 1c, 5, 11f) | Size budgets | [reference/size-limits.md](reference/size-limits.md) |
-| Severity assignment (all steps) | Severity table | [reference/severity-levels.md](reference/severity-levels.md) |
-| Size-overrun fixes | Remediation menu | [reference/size-remediation.md](reference/size-remediation.md) |
-| Output evaluation (step 4) | Evaluation patterns | [reference/evaluation-process.md](reference/evaluation-process.md) |
-| Conciseness (step 5) | Conciseness patterns | [reference/conciseness-check.md](reference/conciseness-check.md) |
-| Writing style (step 5a) | Style rubric | [reference/writing-style.md](reference/writing-style.md) |
 | Writing-style findings dominant | Style model | [examples/writing-style-review.md](examples/writing-style-review.md) |
-| Pipeline integration (step 16) | Pipeline checklist | [reference/pipeline-integration.md](reference/pipeline-integration.md) |
-| Platform portability | Portability rules | [reference/platform-agnostic-writing.md](reference/platform-agnostic-writing.md) |
 
 </context-loading-guide>
 
@@ -96,7 +92,7 @@ Portability rules — no platform tool names, no concrete context paths, detect-
 **Note**: Do not modify the skill file during review; suggest changes as descriptions or patch snippets.
 
 **Steps**:
-1. Read the full skill file to understand its domain and all sections.
+1. Read the full skill file to understand its domain and all sections — apply **reference/section-semantics.md** for the section-purpose table and violation list.
    a. Verify all expected top-level sections are present: frontmatter YAML, `<when-to-use-this-skill>`, `<knowledge>`, `<capabilities>`; flag any missing as 🔴 Major.
    b. Verify section order: frontmatter → `<when-to-use-this-skill>` → `<knowledge>` → `<capabilities>` → `<rules>` (if present); flag out-of-order as 🟡 Minor.
    c. Measure the file's size — run `scripts/measure_sizes.py` on the skill folder when available, else count lines and estimate chars.
@@ -114,6 +110,7 @@ Portability rules — no platform tool names, no concrete context paths, detect-
 5. **Check conciseness and writing style** — Review SKILL.md, references, and examples for verbose content.
    Load **reference/conciseness-check.md** for severity flags; apply **reference/size-limits.md** budgets to each `reference/` file, and **reference/size-remediation.md** when over budget.
    a. **Check writing style** — Load **reference/writing-style.md**. Verify directive voice, BLUF, hard caps, no banned phrases, no narration. Flag per its severity table.
+   b. **Check platform-agnostic writing** — Load **reference/platform-agnostic-writing.md**. Flag platform tool names or concrete context paths in the skill's own prose as 🟡 Minor.
 6. For each rule, verify it answers "when scenario X → use capability Y" — flag rules re-stating capability content. If the skill has one capability and no `<rules>` section, do not flag its absence.
 7. Check a `<knowledge>` section exists and holds reference material (tables, layouts, APIs, constraints). Flag rubrics embedded in SKILL.md instead of `reference/` files as 🔴 Major.
 8. **Check naming conventions** — load **reference/naming-conventions.md** for the full rubric:
