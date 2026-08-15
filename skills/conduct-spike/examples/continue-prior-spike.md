@@ -112,22 +112,20 @@
 
 *[sync-update-artifacts — ADR-003's decision changes the system-level view]*
 
-> "ADR-003 now recommends settlement extraction. The C2 diagram needs a Settlement Service container and the nightly-batch sequence diagram needs updating. I'll refresh the solution document and change summary."
+> "ADR-003 now recommends settlement extraction. The C2 diagram needs a Settlement Service container and the nightly-batch sequence diagram needs updating. I'll refresh the solution document."
 
 **Solution doc** (via `write-solution-doc`, rewritten in place):
 - C2: Settlement Service container — inbound events from Kafka, owns `transactions` + `accounts`.
 - Sequence (nightly settlement): Payment Services → Kafka → Settlement Service → PostgreSQL.
 - RAID: Risk — Settlement Service is a critical dependency; Assumption — Kafka topic partitioning aligns with payment types.
 
-**Change summary**: ADR-003 cluster recomputed — New: settlement service, Kafka topics; Modified: payment services publish events; retired items removed. Cross-cutting: settlement monitoring added.
-
-**Consistency check**: [x] ADR cites updated findings [x] solution doc mirrors Option C [x] change summary traces to ADR-003 [x] no-note scan passes.
+**Consistency check**: [x] ADR cites updated findings [x] solution doc mirrors Option C [x] no-note scan passes.
 
 ---
 
 ## Step 7: Present Results + Next Round
 
-**Revised**: ADR-003 (resolved — Option C); solution doc + change summary refreshed in place. **Unchanged**: ADR-001, ADR-002, ADR-004 — decisions stand.
+**Revised**: ADR-003 (resolved — Option C); solution doc refreshed in place. **Unchanged**: ADR-001, ADR-002, ADR-004 — decisions stand.
 
 > "ADR-003 is resolved: shared DB + settlement extraction, phased. Would you like to continue with another round, or is this sufficient?"
 

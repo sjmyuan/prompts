@@ -2,7 +2,7 @@
 
 **Scenario**: The user has completed a spike on migrating the payment monolith to microservices and wants to understand the concrete code changes required.
 
-**Applies**: `summarize-required-changes`
+**Applies**: `compile-change-summary`
 
 **What makes this distinct**: Demonstrates the change summary with code access — the current codebase is available, so estimates are concrete and code-path-verified.
 
@@ -14,7 +14,7 @@
 
 ## Assistant Output
 
-*[summarize-required-changes applied — with code access confirmed]*
+*[compile-change-summary applied — with code access confirmed]*
 
 # Change Summary: Payment Service Microservice Migration
 

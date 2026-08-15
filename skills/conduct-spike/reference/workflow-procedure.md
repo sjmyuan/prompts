@@ -84,10 +84,6 @@ Load the `write-solution-doc` skill's SKILL.md and apply its capabilities in **b
 
 Follow **continue-prior-spike** in SKILL.md. Distinct dispatch detail: seed sub-agents with the area's existing findings doc / evidence map so covered code is not re-scanned; scope strictly to answering the open questions; revise existing ADRs in place.
 
-## Summarize required changes (summarize-required-changes)
-
-Follow **summarize-required-changes** in SKILL.md. Distinct detail: determine code access first — with access, trace code paths and mark estimates code-verified; without access, generate at architectural level and mark estimates unverified.
-
 ## Sync update artifacts (sync-update-artifacts)
 
 Follow **sync-update-artifacts** in SKILL.md. Distinct detail: the findings doc carries the evidence map, so its owning-skill update flows through `write-solution-doc` (see **professional-doc-authoring**).

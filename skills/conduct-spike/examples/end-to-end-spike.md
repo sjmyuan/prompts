@@ -176,4 +176,4 @@ Similar structured ADRs produced for communication strategy (ADR-002: Hybrid syn
 
 ### Wrap-Up (conversation level — not written into any artifact)
 
-> All four assumed solutions are adopted into the solution doc. If an ADR decision changes during review, the corresponding section is rewritten in place. Artifacts version together in `spikes/payment-migration/` — ADRs in `adrs/`, solution doc and change summary at the root, findings in `docs/` (see `examples/spike-artifact-layout.md`).
+> All four assumed solutions are adopted into the solution doc. If an ADR decision changes during review, the corresponding section is rewritten in place. Artifacts version together in `spikes/payment-migration/` — ADRs in `adrs/`, solution doc at the root, findings in `docs/` (see `examples/spike-artifact-layout.md`).

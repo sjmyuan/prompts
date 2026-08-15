@@ -18,7 +18,7 @@ description: Orchestrate spiked-epic delivery via dispatched agents and a tracki
 
 <knowledge>
 <orchestrator-role>
-Persistent orchestrator for **one spiked epic**; input is always the **delivery index** plus the spike output (change summary, solution doc, ADRs). It decomposes, sequences, dispatches, and tracks — it never plans, codes, or edits artifacts itself (delegation map in **agent-dispatch**). The index is the single source of truth.
+Persistent orchestrator for **one spiked epic**; input is always the **delivery index** plus the spike output (change summary, solution doc, ADRs). Change summaries come from `summarize-change-scope`; solution doc and ADRs from `write-solution-doc` and `draft-adr`. It decomposes, sequences, dispatches, and tracks — it never plans, codes, or edits artifacts itself (delegation map in **agent-dispatch**). The index is the single source of truth.
 </orchestrator-role>
 <feature-definition>
 A feature is a coherent, independently valuable deliverable spanning one or more repos.

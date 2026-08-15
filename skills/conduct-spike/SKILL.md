@@ -1,6 +1,6 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations producing ADRs, findings, solution docs, and change summaries. Use when scoping, investigating decisions, evaluating options, discussing undecided ADRs, formalizing findings, continuing spikes, modularizing, summarizing changes, syncing updates.
+description: Conduct spike investigations producing ADRs, findings, and solution docs. Use when scoping, investigating decisions, evaluating options, discussing undecided ADRs, formalizing findings, continuing spikes, modularizing, syncing updates.
 ---
 
 <when-to-use-this-skill>
@@ -11,15 +11,14 @@ description: Conduct spike investigations producing ADRs, findings, solution doc
 - Break a large technical problem into independently decidable areas, or split a large solution document into modular sub-documents
 - Formalize pre-existing investigation findings into ADRs and a solution document
 - Continue a previous spike, digging deeper into specific areas not fully resolved
-- Summarize the concrete code changes required to implement the chosen solution (change summary)
-- Sync every artifact — findings doc, ADR, solution doc, change summary — after new evidence or a changed decision
+- Sync every artifact — findings doc, ADR, solution doc — after new evidence or a changed decision
 - Do NOT load for plain ADR drafting, solution-doc writing, or code investigation — `draft-adr`, `write-solution-doc`, `investigate-code` handle those; load only when a decision needs investigation first
 </when-to-use-this-skill>
 
 <knowledge>
 
 <spike-definition>
-A spike reduces uncertainty via research and prototyping; its output is documented decisions, not production code. It produces: **Findings Documents** (current-state baseline, each embedding its area's evidence map — `file:line` entry points, call chains, evidence ledger, searched-negatives), **N ADRs** (one per area), **1 Solution Document** (target-state architecture with C4, API contracts, RAID, RACI — decision-only), and optionally **1 Change Summary** (code-level changes traceable to ADRs).
+A spike reduces uncertainty via research and prototyping; its output is documented decisions, not production code. It produces: **Findings Documents** (current-state baseline, each embedding its area's evidence map — `file:line` entry points, call chains, evidence ledger, searched-negatives), **N ADRs** (one per area), and **1 Solution Document** (target-state architecture with C4, API contracts, RAID, RACI — decision-only).
 </spike-definition>
 
 <spike-artifact-layout>
@@ -29,7 +28,6 @@ All spike artifacts version together in **one folder per spike**:
 spikes/<spike-name>/
 ├── adrs/                   # one file per ADR — ADR-001-<kebab-name>.md, …
 ├── solution.md             # the solution document (hub)
-├── change-summary.md       # only when requested
 └── docs/                   # findings documents — findings-<area>.md each
 ```
 
@@ -43,12 +41,8 @@ Do NOT use for: quick answers without formal documentation, already-decided prob
 </inappropriate-scenarios>
 
 <findings-document>
-Captures **current-state architecture** (via `write-solution-doc` **current-state mode**, directly transformable to the solution doc) and is the spike's **evidence home**: embeds each area's evidence map — `file:line` annotations, sequence diagrams for call chains, evidence ledger (claim → verdict → confidence, 5-tag model), searched-negatives. ADRs, change summaries, sub-agents cite it without re-scanning. Details: **reference/findings-document-guide.md**.
+Captures **current-state architecture** (via `write-solution-doc` **current-state mode**, directly transformable to the solution doc) and is the spike's **evidence home**: embeds each area's evidence map — `file:line` annotations, sequence diagrams for call chains, evidence ledger (claim → verdict → confidence, 5-tag model), searched-negatives. ADRs and sub-agents cite it without re-scanning. Details: **reference/findings-document-guide.md**.
 </findings-document>
-
-<change-summary>
-Translates findings→solution-doc delta into change items by category — New, Modified, Retired, Configuration, Data, Dependency, Test — traceable to ADRs. Quality depends on code access; state which mode. Consumed by **orchestrate-feature-delivery**. Details: **reference/change-summary-guide.md**.
-</change-summary>
 
 <option-tech-details>
 ADR option tech details (target-state diagrams + code change profiles) come from `draft-adr` **detail-options-tech**, grounded in the findings doc's evidence map — delegate to `draft-adr` during evaluation and ADR drafting (see **professional-doc-authoring**).
@@ -87,15 +81,14 @@ ADRs and the solution document are always written by their owning skills — nev
 </professional-doc-authoring>
 
 <artifact-maintenance-doctrine>
-Artifacts form a dependency chain — **Findings Docs → ADRs → Solution Doc → Change Summary** — kept **at the latest state**: rewrite changed sections **in place**, **delete** superseded content (git is history) — no "Note:", "Updated", "Changed", "v2", "As of", "Previously", no changelogs. Notes allowed only in change summary, findings docs, conversation.
+Artifacts form a dependency chain — **Findings Docs → ADRs → Solution Doc** — kept **at the latest state**: rewrite changed sections **in place**, **delete** superseded content (git is history) — no "Note:", "Updated", "Changed", "v2", "As of", "Previously", no changelogs. Notes allowed only in findings docs, conversation.
 
 | Change origin | Propagate to |
 |---|---|
-| Findings doc (new evidence/correction) | ADR → solution doc → change summary |
-| ADR decision change | Solution doc → change summary |
-| Solution doc change | Change summary |
+| Findings doc (new evidence/correction) | ADR → solution doc |
+| ADR decision change | Solution doc |
 
-Propagation stops at the first artifact a change does not affect. The change summary is **never final** — recompute whenever baseline or target changes. Full protocol: **reference/artifact-maintenance-guide.md**.
+Propagation stops at the first artifact a change does not affect. Full protocol: **reference/artifact-maintenance-guide.md**.
 </artifact-maintenance-doctrine>
 
 <context-loading-guide>
@@ -115,9 +108,7 @@ Propagation stops at the first artifact a change does not affect. The change sum
 | Worked verification loop (accept/contradict) | Verification examples | [examples/confirming-result.md](examples/confirming-result.md), [examples/contradicting-result.md](examples/contradicting-result.md) |
 | Producing/understanding findings docs | Format, evidence-map rules | [reference/findings-document-guide.md](reference/findings-document-guide.md) |
 | Syncing artifacts after a fact/decision change | Rewrite-in-place protocol, propagation | [reference/artifact-maintenance-guide.md](reference/artifact-maintenance-guide.md) |
-| Generating a change summary | Format, categories, code access | [reference/change-summary-guide.md](reference/change-summary-guide.md) |
 | Splitting a large solution doc | Splitting heuristics, checklist | [reference/solution-doc-modularity-guide.md](reference/solution-doc-modularity-guide.md) |
-| Change summary with code access | End-to-end example | [examples/change-summary-example.md](examples/change-summary-example.md) |
 | ADR discussion hinging on unverified assumptions | Uncertainty-spike suggestion example | [examples/adr-uncertainty-spike-suggestion.md](examples/adr-uncertainty-spike-suggestion.md) |
 | Fact/decision change propagated through artifacts | Sync walkthrough | [examples/sync-update-across-artifacts.md](examples/sync-update-across-artifacts.md) |
 | Placing artifacts into the spike folder | Layout example | [examples/spike-artifact-layout.md](examples/spike-artifact-layout.md) |
@@ -198,27 +189,18 @@ Propagation stops at the first artifact a change does not affect. The change sum
 8. Findings docs are the **current-state baseline and evidence home**; update the evidence map on new evidence — no round/version tracking.
 </compile-findings-doc>
 
-<summarize-required-changes>
-1. Confirm findings + solution doc finalized; ask: "Would you like me to generate a summary of the concrete code changes required to implement this solution?" Optional — never produce unless requested.
-2. Determine code access: **with access**, trace code paths and estimate scope (file counts, LOC ranges, classes to modify), mark code-verified; **without access**, generate at architectural level, mark estimates as unverified.
-3. Per area/ADR, map the delta using **change-summary-guide** categories (New, Modified, Retired, Configuration, Data, Dependency, Test); group by area/service with ADR references; identify cross-cutting concerns.
-4. Compile per **change-summary-guide** with a notes section; save to `<spike-folder>/change-summary.md` per **spike-artifact-layout**.
-5. Present and ask: "Does this change scope look accurate? Anything missing, overestimated, or underestimated?"
-6. The change summary is **never final** — if findings or the solution doc change, apply **sync-update-artifacts**.
-</summarize-required-changes>
-
 <sync-update-artifacts>
 1. Identify the change and its origin artifact: new evidence/correction (findings doc), changed decision (ADR), or target-state change (solution doc).
 2. Trace the propagation path with **artifact-maintenance-doctrine**.
 3. Apply the change at the origin through its owning skill — `draft-adr` for ADRs, `write-solution-doc` for findings/solution docs (see **professional-doc-authoring**) — rewriting affected sections **in place** per the latest-state protocol.
 4. Run the **no-note scan** on each touched ADR and solution doc (see **reference/artifact-maintenance-guide.md**); rewrite until clean.
-5. Propagate downstream in order, re-running the owning capability seeded with the current artifact plus the delta; recompute the change summary's affected clusters.
-6. Validate consistency — every artifact reflects the latest facts; ADRs cite only current findings; the solution doc mirrors every ADR; the change summary traces to current ADRs.
+5. Propagate downstream in order, re-running the owning capability seeded with the current artifact plus the delta.
+6. Validate consistency — every artifact reflects the latest facts; ADRs cite only current findings; the solution doc mirrors every ADR.
 7. Present the delta in conversation, never inside the artifacts (see **artifact-maintenance-doctrine**).
 </sync-update-artifacts>
 
 <continue-prior-spike>
-1. Load the prior spike's artifacts — scope summary, findings docs, ADRs, solution doc, change summary (if any). If unavailable, ask the user to share or summarize them.
+1. Load the prior spike's artifacts — scope summary, findings docs, ADRs, solution doc. If unavailable, ask the user to share or summarize them.
 2. Confirm the continuation scope: which areas to revisit, the open question for each, and which areas stand as-is.
 3. Validate: selected areas independently decidable; unselected areas' decisions preserved.
 4. Run the standard workflow in revise-in-place mode per **continuation-mode**: **investigate-per-area** (seed sub-agents with existing evidence maps; target only what answers the open questions), then **compile-findings-doc** → **evaluate-solutions-per-area** → **draft-area-adrs**.
@@ -238,5 +220,5 @@ Propagation stops at the first artifact a change does not affect. The change sum
 <rules>
 <rule>When the user initiates a spike investigation from scratch, apply **run-spike-workflow** to orchestrate all phases from scope definition through solution compilation.</rule>
 <rule>When the user starts from existing material instead of a blank slate, apply **continue-prior-spike** to continue the previous spike.</rule>
-<rule>After the solution doc is compiled: if the user wants implementation scope, apply **summarize-required-changes**; if the doc is large, apply the modularity steps in **compile-solution-doc**.</rule>
+<rule>After the solution doc is compiled, if the doc is large, apply the modularity steps in **compile-solution-doc**.</rule>
 </rules>

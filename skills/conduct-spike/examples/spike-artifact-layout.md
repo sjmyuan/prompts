@@ -1,6 +1,6 @@
 # Example: Saving Spike Artifacts into One Per-Spike Folder
 
-**Scenario**: A payment-migration spike (4 areas) has produced its findings docs, 4 ADRs, a solution doc, and a change summary. The user asks: "Keep all spike artifacts in one folder so we can version them together." The assistant places every artifact in the spike's folder per **spike-artifact-layout**.
+**Scenario**: A payment-migration spike (4 areas) has produced its findings docs, 4 ADRs, and a solution doc. The user asks: "Keep all spike artifacts in one folder so we can version them together." The assistant places every artifact in the spike's folder per **spike-artifact-layout**.
 
 **What makes this distinct**: Every other example focuses on *producing* an artifact; this one shows *where* each artifact lands once produced — the per-spike folder that downstream consumers (**orchestrate-feature-delivery**, sub-agents, reviewers) read paths from.
 
@@ -11,7 +11,6 @@
 - Findings docs (per-area): service-boundaries, communication, database, migration-strategy
 - ADRs: ADR-001 (decomposition), ADR-002 (communication), ADR-003 (database), ADR-004 (migration)
 - Solution doc (hub)
-- Change summary
 
 ## Resulting spike folder
 
@@ -23,7 +22,6 @@ spikes/payment-migration/
 │   ├── adr-003-database-decomposition.md
 │   └── adr-004-migration-strategy.md
 ├── solution.md
-├── change-summary.md
 └── docs/
     ├── findings-service-boundaries.md
     ├── findings-communication.md
@@ -33,7 +31,7 @@ spikes/payment-migration/
 
 ## Assistant confirmation (conversation level — not written into any artifact)
 
-> "Saved all 4 findings docs to `spikes/payment-migration/docs/`, the 4 ADRs to `adrs/`, the solution doc to `solution.md`, and the change summary to `change-summary.md`. Cross-references between artifacts now use relative paths inside the spike folder."
+> "Saved all 4 findings docs to `spikes/payment-migration/docs/`, the 4 ADRs to `adrs/`, and the solution doc to `solution.md`. Cross-references between artifacts now use relative paths inside the spike folder."
 
 **Notes**:
 - The delivery index for this epic is written by **orchestrate-feature-delivery** at `deliveries/<epic-name>/index.md` — a separate top-level `deliveries/` folder, not the spike folder.
