@@ -31,18 +31,20 @@ The following sub-agents are available for dispatch during spike workflow:
 |---|---|---|
 | **code-investigator** | Read-only codebase exploration | Phase 2 (Investigate) |
 | **solution-doc-writer** | Compile findings docs (current-state adaptation) | Phase 2b (Compile findings docs) |
+| **adr-writer** | Run the evaluate chain interactively, return the assumed solution | Phase 3 (Evaluate solutions) |
 | **adr-writer** | Draft ADRs per investigation area | Phase 4 (Draft ADRs) |
 | **solution-doc-writer** | Compile consolidated solution document | Phase 5 (Compile solution doc) |
 
 Map the task to the sub-agent:
 - **Codebase investigation** → `code-investigator`
 - **Findings-doc compilation** → `solution-doc-writer` (write-solution-doc, current-state)
+- **Evaluation** → `adr-writer` (draft-adr evaluate chain, interactive)
 - **ADR drafting** → `adr-writer`
 - **Solution document compilation** → `solution-doc-writer`
 </available-sub-agents>
 
 <sub-agent-verification>
-Sub-agent results — investigation findings from **code-investigator** and ADR decisions from **adr-writer** — are questioned and verified before being accepted. `question-everything` raises the challenges (**question-the-result**); `conduct-spike` orchestrates the loop (**verify-the-claims** → **accept-or-requestion** → **reinvestigate-with-feedback**). Every verifier and re-investigator is a NEW sub-agent of the same type — never the original instance. Capped at 3 rounds, then escalate to the user.
+Sub-agent results — investigation findings from **code-investigator**, ADR decisions from **adr-writer**, and findings/solution-doc compilations from **solution-doc-writer** — are questioned and verified before being accepted. `question-everything` raises the challenges (**question-the-result**); `conduct-spike` orchestrates the loop (**verify-the-claims** → **accept-or-requestion** → **reinvestigate-with-feedback**). Every verifier and re-investigator is a NEW sub-agent of the same type — never the original instance. Capped at 3 rounds, then escalate to the user.
 </sub-agent-verification>
 
 <spike-artifact-layout>
@@ -67,7 +69,7 @@ When the `conduct-spike` skill instructs you to dispatch to sub-agents:
 When a sub-agent returns a result (investigation findings or an ADR decision):
 
 1. Raise challenges with **question-the-result** from the `question-everything` skill — probe across completeness, correctness, ambiguity, consistency, evidence, and assumptions.
-2. Verify: dispatch a NEW `code-investigator` (for findings) or NEW `adr-writer` (for ADRs) — same type, never the original instance — to check each challenge against primary sources.
+2. Verify: dispatch a NEW same-type sub-agent — `code-investigator` (investigation), `solution-doc-writer` (findings/solution-doc compilation), or `adr-writer` (ADR) — never the original instance — to check each challenge against primary sources.
 3. Decide with **accept-or-requestion** (from `conduct-spike`): all AGREE → accept the result; any DISAGREE/UNCERTAIN → apply **reinvestigate-with-feedback**.
 4. Re-investigate with **reinvestigate-with-feedback** (from `conduct-spike`): dispatch another NEW same-type sub-agent to redo the investigation with the corrected understanding, then re-question the new result.
 5. Loop until all challenges agree or the 3-round cap; at the cap, present both versions to the user and let them decide.

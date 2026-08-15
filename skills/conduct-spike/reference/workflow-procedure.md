@@ -1,22 +1,14 @@
 # Workflow Procedures
 
-Full step-by-step procedures for spike workflow capabilities, loaded on demand per phase: dispatch briefs, direct-execution steps, validation checklists.
+Direct-execution procedures and validation checklists for spike workflow capabilities, loaded on demand when a phase runs without a sub-agent. Dispatch briefs live in **reference/dispatch-briefs.md**; dispatch-vs-direct rules live in **reference/multi-agent-orchestration.md**.
 
 ## Investigate per area (investigate-per-area)
-
-### Sub-agent dispatch — per-area brief template
-
-Each brief carries: area name and description, spike goal, brownfield/greenfield, the area's existing findings doc / evidence map (if one exists), and expected output including a per-area evidence map (entry points, key locations with `file:line`, call chains, evidence verdicts, searched-negatives). Dispatch concurrently for multiple areas, individually for a single area. Announce: "Dispatching investigation of [N] area(s) to a sub-agent." After collection, synthesize the results, resolving cross-area inconsistencies for the findings doc.
 
 ### Direct investigation (fallback — no sub-agent available)
 
 Announce: "Investigating area: [area name]". Load the `investigate-code` skill and apply its capabilities — its **spike-integration** scopes the investigation to the area and updates the evidence map per **findings-document-guide.md**. Compile the area summary: **current state**, **constraints & pain points**, **relevant diagrams** (C4/sequence).
 
 ## Evaluate solutions per area (evaluate-solutions-per-area)
-
-### Sub-agent dispatch — per-area brief template
-
-Each brief carries: area name and description, spike goal, the area's findings doc (evidence sections), and instructions to load `draft-adr` and apply its evaluate chain — **define-decision-drivers** → **define-considered-options** → **evaluate-options** — running the interactive dialog with the user inside the sub-agent session and returning the area's assumed solution. Dispatch concurrently for multiple areas, individually for a single area. Announce: "Dispatching evaluation of [N] area(s) to a sub-agent." After collection, review each assumed solution for fidelity to the findings doc and cross-area consistency; definitive verification lands at the Phase 4 ADR.
 
 ### Direct evaluation (fallback — no sub-agent available)
 
@@ -27,10 +19,6 @@ Per area: load the `draft-adr` skill and apply its evaluate chain — **define-d
 Repeat per area. **Spike-specific validation** (generic checks — 2+ options, pros/cons tied to drivers — belong to `draft-adr`'s **compile-adr** checklist): tech details grounded in the evidence map (no invented code); assumed solution follows logically; findings-gap corrections captured. Present a summary table of areas with assumed solutions and corrections.
 
 ## Draft area ADRs (draft-area-adrs)
-
-### Sub-agent dispatch — per-area brief template
-
-Each brief carries: area name and description, evaluation results (decision drivers, options with pros/cons, **tech details per option**, assumed solution), the area's findings doc (evidence sections), and instructions to load `draft-adr` and apply **compile-adr** seeded with the evaluation results. Dispatch concurrently for multiple ADRs, individually for a single ADR. Announce: "Dispatching ADR drafting for [N] area(s) to a sub-agent." After collection, review each ADR.
 
 ### Direct drafting or revising (fallback — no sub-agent available)
 
@@ -44,13 +32,6 @@ Apply `draft-adr`'s **compile-adr** checklist. Spike-specific additions: each op
 
 ## Compile findings doc (compile-findings-doc)
 
-1. Determine document strategy: **per-area** (2+ loosely-coupled areas) or **one consolidated doc** (tightly-coupled or single-area). Ask the user.
-2. Dispatch to a sub-agent whenever one is available; fall back to direct compilation only when none exists (see **multi-agent-orchestration.md**).
-
-### Sub-agent dispatch — brief template
-
-Each brief carries: document strategy, Phase 2 results (investigation summaries **and their evidence maps**), and instructions to load `write-solution-doc` and produce a **current-state document** in **current-state mode** (see `write-solution-doc`'s **reference/current-state-mode.md**), with evidence maps embedded per **findings-document-guide.md**. Announce: "Dispatching findings-doc compilation to a sub-agent." After collection, review for evidence-map fidelity and cross-area consistency.
-
 ### Direct compilation (fallback — no sub-agent available)
 
 Load the `write-solution-doc` skill's SKILL.md and apply its capabilities in **current-state mode** (see `write-solution-doc`'s **reference/current-state-mode.md**). Seed with Phase 2 results (investigation summaries and their evidence maps) rather than gathering context from scratch.
@@ -61,22 +42,13 @@ Load the `write-solution-doc` skill's SKILL.md and apply its capabilities in **c
 
 ## Compile solution doc (compile-solution-doc)
 
-1. Dispatch to a sub-agent whenever one is available; fall back to direct compilation only when none exists (see **multi-agent-orchestration.md**).
-
-### Sub-agent dispatch — brief template
-
-Each brief carries: business context (spike goal), current-state baseline (findings docs), assumed solutions (chosen option from each ADR), and instructions to load `write-solution-doc` and produce a **target-state** document in **baseline-input mode**. Announce: "Dispatching solution-doc compilation to a sub-agent." After collection, review for completeness and consistency with the ADRs.
-
 ### Direct compilation (fallback — no sub-agent available)
 
 Load the `write-solution-doc` skill's SKILL.md and apply its capabilities in **baseline-input mode** (see `write-solution-doc`'s **reference/current-state-mode.md**) — for compiling AND revising. Seed with: business context (spike goal), current-state baseline (findings docs), and assumed solutions (chosen option from each ADR). Revising is the same procedure seeded with the existing doc plus the changed decisions (see **professional-doc-authoring**).
 
 ### Validation, presentation (both paths)
 
-2. Compile the output bundle — findings docs, N ADRs, 1 solution doc — and save per **spike-artifact-layout**: findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`.
-3. Keep the solution doc at the latest state per **artifact-maintenance-doctrine** (see **reference/artifact-maintenance-guide.md**): only target-state architecture, no process notes; on refresh route through `write-solution-doc` and rewrite affected sections in place — delete superseded text, never annotate.
-4. Validate the bundle: every ADR's chosen solution is reflected, cross-references between all artifacts are consistent, diagrams match assumed solutions. Run the **no-note scan** on the solution doc and rewrite until none remain.
-5. Present the bundle and remind the user: findings docs are the current-state record (keep even if decisions change); ADRs are formal decision records (review and approve with the team); the solution doc is the target-state architecture; version-control all artifacts together in the spike folder.
+Compile the output bundle — findings docs, N ADRs, 1 solution doc — and save per **spike-artifact-layout**: findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`. Keep the solution doc at the latest state per **artifact-maintenance-doctrine** (see **reference/artifact-maintenance-guide.md**): only target-state architecture, no process notes; on refresh route through `write-solution-doc` and rewrite affected sections in place — delete superseded text, never annotate. Validate the bundle: every ADR's chosen solution is reflected, cross-references between all artifacts are consistent, diagrams match assumed solutions. Run the **no-note scan** on the solution doc and rewrite until none remain. Present the bundle and remind the user: findings docs are the current-state record (keep even if decisions change); ADRs are formal decision records (review and approve with the team); the solution doc is the target-state architecture; version-control all artifacts together in the spike folder.
 
 ## Continue prior spike (continue-prior-spike)
 
