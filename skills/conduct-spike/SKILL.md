@@ -124,6 +124,15 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 7. Pause for user confirmation after each phase; skip only if the user requests it.
 </run-spike-workflow>
 
+<continue-prior-spike>
+1. Load the prior spike's artifacts — scope summary, findings docs, ADRs, solution doc. If unavailable, ask the user to share or summarize them.
+2. Confirm the continuation scope: which areas to revisit, the open question for each, and which areas stand as-is.
+3. Validate: selected areas independently decidable; unselected areas' decisions preserved.
+4. Run the standard workflow in revise-in-place mode per **continuation-mode**: **investigate-per-area** (seed sub-agents with existing evidence maps; target only what answers the open questions), then **compile-findings-doc** → **evaluate-solutions-per-area** → **draft-area-adrs**.
+5. Apply **sync-update-artifacts** to propagate changes downstream.
+6. Ask whether to continue with another round or conclude; a continuation becomes the new scope via **define-spike-scope**.
+</continue-prior-spike>
+
 <define-spike-scope>
 1. Ask: "What technical problem or feature do you want to spike? Describe it in 2–4 sentences." Then clarify the goal — what question(s) to answer, what uncertainty to reduce?
 2. Decompose into **investigation areas** per **problem-decomposition-guide** (target 2–5): propose a breakdown with one-line descriptions; confirm split/merge/add/remove.
@@ -192,15 +201,6 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 6. Validate consistency — every artifact reflects the latest facts; ADRs cite only current findings; the solution doc mirrors every ADR.
 7. Present the delta in conversation, never inside the artifacts (see **artifact-maintenance-doctrine**).
 </sync-update-artifacts>
-
-<continue-prior-spike>
-1. Load the prior spike's artifacts — scope summary, findings docs, ADRs, solution doc. If unavailable, ask the user to share or summarize them.
-2. Confirm the continuation scope: which areas to revisit, the open question for each, and which areas stand as-is.
-3. Validate: selected areas independently decidable; unselected areas' decisions preserved.
-4. Run the standard workflow in revise-in-place mode per **continuation-mode**: **investigate-per-area** (seed sub-agents with existing evidence maps; target only what answers the open questions), then **compile-findings-doc** → **evaluate-solutions-per-area** → **draft-area-adrs**.
-5. Apply **sync-update-artifacts** to propagate changes downstream.
-6. Ask whether to continue with another round or conclude; a continuation becomes the new scope via **define-spike-scope**.
-</continue-prior-spike>
 
 <suggest-spike-on-adr-uncertainty>
 1. Detect uncertainty signals via **adr-uncertainty-signals**.
