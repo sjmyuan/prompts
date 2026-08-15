@@ -65,7 +65,7 @@ Details: [reference/platform-agnostic-writing.md](reference/platform-agnostic-wr
 </platform-agnostic-writing>
 
 <pipeline-integration-review>
-4-point checklist for producer→consumer skill pipelines — handoff, shared schema, awareness, guard clauses.
+Integration checklist for skill↔skill pipelines (handoff, shared schema, awareness, guard clauses) and skill↔sub-agent integration (dispatch briefs, output contracts, verification, fallback).
 Details: [reference/pipeline-integration.md](reference/pipeline-integration.md)
 </pipeline-integration-review>
 
@@ -79,6 +79,8 @@ Details: [reference/pipeline-integration.md](reference/pipeline-integration.md)
 | Trigger failures dominant | Trigger-failure model | [examples/trigger-correctness-violation.md](examples/trigger-correctness-violation.md) |
 | Size/density findings dominant | Size/gaming model | [examples/size-and-line-stuffing-review.md](examples/size-and-line-stuffing-review.md) |
 | Writing-style findings dominant | Style model | [examples/writing-style-review.md](examples/writing-style-review.md) |
+| Skill references another skill, or dispatches / is loaded by sub-agents | Integration checklist (skill-skill + skill-agent) | [reference/pipeline-integration.md](reference/pipeline-integration.md) |
+| Sub-agent dispatch or embedded-execution findings dominant | Agent-integration model | [examples/agent-integration-review.md](examples/agent-integration-review.md) |
 
 </context-loading-guide>
 
@@ -133,7 +135,7 @@ Details: [reference/pipeline-integration.md](reference/pipeline-integration.md)
 13. Include a **Positive Highlights** section that acknowledges at least one well-structured aspect of the skill.
 14. Include a **Risks & Assumptions** section that states any assumptions made about the intended skill format (e.g., four-section semantics) and notes that no runtime evaluation was performed.
 15. Format findings with severity levels (see **reference/severity-levels.md**) and load **examples/skill-file-review.md** for output structure guidance.
-16. **Check pipeline integration**: If the skill references another skill, load **reference/pipeline-integration.md** and verify all 4 points. Flag gaps; skip if none referenced.
+16. **Check integration**: If the skill references another skill or dispatches (or is loaded by) sub-agents, load **reference/pipeline-integration.md** and verify the applicable axes and points. Flag gaps; skip if neither applies.
 17. Verify output completeness: every finding has a severity label, **Positive Highlights** and **Risks & Assumptions** sections are present, and all recommendations are actionable (not vague).
 </review-skill-file>
 
