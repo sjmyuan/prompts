@@ -90,6 +90,10 @@ Both the **skill name** and its **capability names** in the skill under review m
 Criteria for identifying unnecessary content across SKILL.md, reference files, and example files. Load **reference/conciseness-check.md** for the full rubric.
 </conciseness-check>
 
+<writing-style>
+Prose-quality rules for skill files — directive voice, BLUF, hard caps, banned phrases, no narration. Load **reference/writing-style.md** for the full rubric.
+</writing-style>
+
 <platform-agnostic-writing>
 Skills should be portable across AI platforms. Avoid platform-specific references:
 
@@ -135,6 +139,8 @@ Apply these checks when the skill's description, when-to-use, or skill-boundary 
 | Checking file size (steps 1c, 5, 11f) | Char/line budgets, max-line-length guard, and gaming-detection rule for SKILL.md, reference, and example files | See `<size-limits>` in `<knowledge>` |
 | Checking for output evaluation process (step 4) | Evaluation process patterns, common checklist patterns, and severity guidance | See `<evaluation-process>` in `<knowledge>` |
 | Checking conciseness across all files (step 5) | Unnecessary-content patterns per file type and severity guidance | [reference/conciseness-check.md](reference/conciseness-check.md) |
+| Checking writing style — voice, BLUF, banned phrases, narration (step 5a) | Writing-style rubric for skill files: directive voice, hard caps, atomic bullets, per-file rules, severity | [reference/writing-style.md](reference/writing-style.md) |
+| Writing-style findings are the primary or dominant finding | Output model for a voice/narration-focused review | [examples/writing-style-review.md](examples/writing-style-review.md) |
 | Checking cross-skill pipeline integration (step 16) | 4-point pipeline integration checklist with severity guidance | See `<pipeline-integration-review>` in `<knowledge>` |
 
 </context-loading-guide>
@@ -161,11 +167,12 @@ Apply these checks when the skill's description, when-to-use, or skill-boundary 
    e. Flag any direct contradiction between the scope described in `description` and the bullets in `<when-to-use-this-skill>` as 🔴 Major.
 3. For each capability section, verify it describes *how to do something* as ordered steps — flag any that are fact lists, reference tables, or constraint bullets (those belong in `<knowledge>`).
 4. **Check for output evaluation process** — For each capability, verify it includes a validation or checklist step that evaluates the quality of the skill's output. Load `<evaluation-process>` in `<knowledge>` for guidance. If no capability contains any form of output evaluation, flag as 🟡 Minor. If the skill also lacks examples demonstrating output validation, flag as 🔴 Major.
-5. **Check conciseness across all files** — Review SKILL.md, all reference files, and all example files for unnecessary or verbose content. Load `<conciseness-check>` in `<knowledge>` for guidance. Flag violations as:
+5. **Check conciseness and writing style across all files** — Review SKILL.md, all reference files, and all example files for unnecessary or verbose content. Load `<conciseness-check>` in `<knowledge>` for guidance. Flag violations as:
     - 🟢 Nit for a single verbose file.
     - 🟡 Minor for systematic verbosity across multiple files.
     - 🔴 Major if the skill could be cut by >30% without losing meaning.
    Apply the `<size-limits>` budgets and max-line-length guard to each `reference/` file.
+   a. **Check writing style** — Load **reference/writing-style.md**. Verify directive voice in capability steps, BLUF openings, hard caps (≤20-word sentences, ≤3-sentence paragraphs, 1-claim bullets), absence of banned phrases, and no meta-commentary or process narration in any file. Flag per the reference's severity table.
 6. For each rule, verify it answers "when scenario X → use capability Y" — flag any rule that re-states content already in a capability (duplication). If the skill has only one capability and no `<rules>` section, do not flag its absence.
 7. Check that a `<knowledge>` section exists and contains all reference material (tables, layouts, API signatures, platform constraints) that capabilities currently cite inline. Also check that large reference rubrics are not embedded directly in SKILL.md — they should be in `reference/` files loaded on demand; flag inline rubrics as 🔴 Major.
 8. **Check naming conventions** — load `<action-verb-naming-convention>` in `<knowledge>` for the full rubric:
