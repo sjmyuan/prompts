@@ -15,7 +15,7 @@ description: Produce change summaries translating a decided solution's delta int
 <knowledge>
 
 <change-summary-schema>
-A change summary translates the delta between **findings** (current state) and **solution doc** (target state) into change items grouped by category, each cluster traceable to its ADR:
+A change summary translates the delta between **findings** (current state) and **solution doc** (target state) into change items grouped by category, each cluster traceable to its ADR — one ADR per decision problem, grouped under its area:
 
 | Category | Meaning |
 |---|---|
@@ -63,7 +63,7 @@ The change summary is consumed by **orchestrate-feature-delivery** (decomposed i
 <compile-change-summary>
 1. Load the input artifacts: findings doc (current state), solution doc (target state), ADRs (for tracing). If any is missing, ask the user to share it — do not compile from guesswork.
 2. Determine code access: ask "Can I access the current codebase to verify the scope of changes?" Record **code-verified** or **unverified** per **code-access-modes**.
-3. Map the delta per area/ADR using **change-summary-schema** categories; group by area/service, label each cluster with its ADR reference; identify cross-cutting concerns.
+3. Map the delta per area → per ADR (an area can hold multiple ADRs — one per decision problem) using **change-summary-schema** categories; group by area, label each cluster with its ADR reference; identify cross-cutting concerns.
 4. Compile per **reference/change-summary-guide.md** with a notes section; save to `<spike-folder>/change-summary.md`.
 5. Present and ask: "Does this change scope look accurate? Anything missing, overestimated, or underestimated?"
 6. The change summary is **never final** — to regenerate after findings or the solution doc change, rerun these steps seeded with the updated artifacts (as `conduct-spike`'s **sync-update-artifacts** does).

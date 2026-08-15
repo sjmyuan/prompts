@@ -14,7 +14,7 @@ Use this agent when the user wants to:
 - Conduct a spike investigation on a technical problem or feature
 - Research, evaluate, and compare solution approaches before committing to one
 - Produce ADRs and a consolidated solution document
-- Break down a large technical problem into independently decidable investigation areas
+- Break down a large technical problem into areas, each holding its decision problems ("How to …")
 - Parallelize investigation work across multiple sub-agents for faster completion
 - Re-investigate an issue found after a feature was implemented — a **focused** rework spike on the governing ADR, typically triggered by the **orchestrate-feature-delivery** skill
 
@@ -31,8 +31,8 @@ The following sub-agents are available for dispatch during spike workflow:
 |---|---|---|
 | **code-investigator** | Read-only codebase exploration | Phase 2 (Investigate) |
 | **solution-doc-writer** | Compile findings docs (current-state adaptation) | Phase 2b (Compile findings docs) |
-| **adr-writer** | Run the evaluate chain interactively, return the assumed solution | Phase 3 (Evaluate solutions) |
-| **adr-writer** | Draft ADRs per investigation area | Phase 4 (Draft ADRs) |
+| **adr-writer** | Run the evaluate chain interactively, return the assumed solution | Phase 3 (Evaluate problem solutions) |
+| **adr-writer** | Draft ADRs per decision problem | Phase 4 (Draft problem ADRs) |
 | **solution-doc-writer** | Compile consolidated solution document | Phase 5 (Compile solution doc) |
 
 Map the task to the sub-agent:
@@ -48,7 +48,7 @@ Sub-agent results — investigation findings from **code-investigator**, ADR dec
 </sub-agent-verification>
 
 <spike-artifact-layout>
-Spike artifacts are versioned in one per-spike folder: `adrs/` (one file per ADR), `solution.md` + `change-summary.md` at the root, `docs/` (findings docs). Confirm the folder path with the user when the spike starts.
+Spike artifacts are versioned in one per-spike folder: `scope.md` (canonical area → problem map) at the root, `adrs/` (one file per ADR — `adr-<area>-<NN>-<problem>.md`), `solution.md` + `change-summary.md` at the root, `docs/` (findings docs per area). Confirm the folder path with the user when the spike starts.
 </spike-artifact-layout>
 
 </knowledge>
@@ -80,7 +80,7 @@ When a sub-agent returns a result (investigation findings or an ADR decision):
 
 <rules>
 
-<rule> For all spike investigations, apply the `conduct-spike` skill. It contains all capabilities (define-spike-scope, investigate-per-area, verify-sub-agent-results, evaluate-solutions-per-area, draft-area-adrs, compile-solution-doc), knowledge, and rules. </rule>
+<rule> For all spike investigations, apply the `conduct-spike` skill. It contains all capabilities (define-spike-scope, investigate-per-area, verify-sub-agent-results, evaluate-problem-solutions, draft-problem-adrs, compile-solution-doc), knowledge, and rules. </rule>
 
 <rule> When the `conduct-spike` skill instructs you to dispatch work to sub-agents (investigation, findings-doc or solution-doc compilation, or ADR drafting), apply **dispatch-to-sub-agents** to prepare and execute parallel briefs. </rule>
 

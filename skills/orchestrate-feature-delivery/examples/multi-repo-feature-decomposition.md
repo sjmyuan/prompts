@@ -49,7 +49,7 @@ Written to `deliveries/payment-migration/index.md` (see **delivery-layout**); pl
 ## Spike References
 - **Change summary**: spikes/payment-migration/change-summary.md
 - **Solution doc**: spikes/payment-migration/solution.md
-- **ADRs**: spikes/payment-migration/adrs/adr-001-wallet.md · adr-002-cutover.md
+- **ADRs**: spikes/payment-migration/adrs/adr-wallet-01-payment-failure-handling.md · adr-cutover-01-service-cutover.md
 
 ## Cell plan status
 | Cell | Status | Agent | Plan location |

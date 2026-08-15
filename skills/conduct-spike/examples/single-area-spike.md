@@ -2,7 +2,7 @@
 
 **Scenario**: The user wants to spike the choice of database for a new analytics service. Since this is a greenfield service with a single clear decision, it's a single-area spike.
 
-**Applies**: All capabilities — `define-spike-scope` → `investigate-per-area` → `compile-findings-doc` → `evaluate-solutions-per-area` → `draft-area-adrs` → `compile-solution-doc`
+**Applies**: All capabilities — `define-spike-scope` → `investigate-per-area` → `compile-findings-doc` → `evaluate-problem-solutions` → `draft-problem-adrs` → `compile-solution-doc`
 
 **What makes this distinct**: Single investigation area with greenfield context (no existing implementation to investigate). Demonstrates the workflow still applies in full but with a lighter touch — and that even a **single** task is dispatched to a sub-agent to keep the orchestrating agent's context small (see `reference/multi-agent-orchestration.md`).
 
@@ -17,11 +17,11 @@
 
 **Spike Goal**: Select the optimal database for a clickstream analytics service supporting high-throughput writes and real-time dashboard queries.
 
-**Investigation Areas**:
+**Area and problem** (recorded in `scope.md`):
 
-| # | Area | Description |
+| # | Area | Problem ("How to …?") |
 |---|---|---|
-| 1 | Database selection | Which database (or combination) best supports the write throughput, query patterns, and operational constraints of the analytics service? |
+| 1 | Database selection | How to pick the database (or combination) that best supports the write throughput, query patterns, and operational constraints of the analytics service? |
 
 ---
 
@@ -96,9 +96,9 @@
 > *Since this is greenfield, the findings document captures organizational and operational constraints rather than existing code architecture — the baseline evaluation compares options against.*
 
 ---
-## Phase 3: Evaluate Solutions Per Area
+## Phase 3: Evaluate Problem Solutions
 
-*(Evaluation dispatched to an ADR-writer sub-agent per **evaluate-solutions-per-area** — even a single area; the `draft-adr` evaluate chain below ran interactively with the user inside the sub-agent session.)*
+*(Evaluation dispatched to an ADR-writer sub-agent per **evaluate-problem-solutions** — even a single problem; the `draft-adr` evaluate chain below ran interactively with the user inside the sub-agent session.)*
 
 ### Area 1: Database Selection
 
@@ -118,15 +118,15 @@
 
 ---
 
-## Phase 4: Draft ADR — SINGLE-TASK DISPATCH
+## Phase 4: Draft Problem ADR — SINGLE-TASK DISPATCH
 
-### ADR-001: Database Selection for Analytics Service
+### ADR: Database selection — pick the database
 
-*[Single task — dispatched to a sub-agent that loads `draft-adr` and produces the ADR; the orchestrator reviews the result.]*
+*[Single task — dispatched to a sub-agent that loads `draft-adr` and produces the ADR; the orchestrator reviews the result. Saved as `adr-database-selection-01-pick-database.md`, tagged `Area: Database selection`.]*
 
-> "Dispatching ADR drafting for 1 area to a sub-agent."
+> "Dispatching ADR drafting for 1 problem to a sub-agent."
 
-**Title**: ADR-001: Select ClickHouse Cloud as the Database for the Analytics Service
+**Title**: Select ClickHouse Cloud as the Database for the Analytics Service
 
 **Status**: Draft
 
@@ -164,9 +164,9 @@
 - API Contracts: ingestion endpoint (POST /events), query endpoint (GET /analytics)
 - RAID Analysis: risk around ClickHouse learning curve, assumption about 50K/sec estimate, dependency on ClickHouse Cloud SLA
 
-**ADR**:
-- ADR-001: Database Selection for Analytics Service (ClickHouse Cloud)
+**ADR** (one problem, area-prefixed in `adrs/`):
+- `adr-database-selection-01-pick-database.md` — ClickHouse Cloud
 
 ### Closing Notes
 
-> This is a single-area spike. The solution document is simpler than a multi-area spike but still provides C4 diagrams, API contracts, and RAID analysis for the new service. If additional decisions arise during implementation (e.g., schema design, partitioning strategy), they can be addressed in follow-up ADRs.
+> This is a single-area, single-problem spike — one ADR. The solution document is simpler than a multi-area spike but still provides C4 diagrams, API contracts, and RAID analysis for the new service. If additional decisions arise during implementation (e.g., schema design, partitioning strategy), they become new problems under the same area and are addressed in follow-up ADRs.

@@ -8,21 +8,21 @@ Direct-execution procedures and validation checklists for spike workflow capabil
 
 Announce: "Investigating area: [area name]". Load the `investigate-code` skill and apply its capabilities — its **spike-integration** scopes the investigation to the area and updates the evidence map per **findings-document-guide.md**. Compile the area summary: **current state**, **constraints & pain points**, **relevant diagrams** (C4/sequence).
 
-## Evaluate solutions per area (evaluate-solutions-per-area)
+## Evaluate problem solutions (evaluate-problem-solutions)
 
 ### Direct evaluation (fallback — no sub-agent available)
 
-Per area: load the `draft-adr` skill and apply its evaluate chain — **define-decision-drivers** → **define-considered-options** → **evaluate-options** — seeded with the area's findings doc (its embedded evidence map); its **evaluate-options** applies **detail-options-tech** whenever findings are available. Record the **assumed solution** — provisional, may change after ADR review.
+Per problem (batch a whole area's problems in one pass when they share its evidence): load the `draft-adr` skill and apply its evaluate chain — **define-decision-drivers** → **define-considered-options** → **evaluate-options** — seeded with the area's findings doc (its embedded evidence map); its **evaluate-options** applies **detail-options-tech** whenever findings are available. Record the **assumed solution** — provisional, may change after ADR review.
 
 **Check for findings gaps**: if any option revealed a constraint, risk, or fact not captured in the findings document, update the affected sections and note the correction when presenting the evaluation summary.
 
-Repeat per area. **Spike-specific validation** (generic checks — 2+ options, pros/cons tied to drivers — belong to `draft-adr`'s **compile-adr** checklist): tech details grounded in the evidence map (no invented code); assumed solution follows logically; findings-gap corrections captured. Present a summary table of areas with assumed solutions and corrections.
+Repeat per problem within each area. **Spike-specific validation** (generic checks — 2+ options, pros/cons tied to drivers — belong to `draft-adr`'s **compile-adr** checklist): tech details grounded in the evidence map (no invented code); assumed solution follows logically; findings-gap corrections captured. Present a summary table of areas → problems with assumed solutions and corrections.
 
-## Draft area ADRs (draft-area-adrs)
+## Draft problem ADRs (draft-problem-adrs)
 
 ### Direct drafting or revising (fallback — no sub-agent available)
 
-Load `draft-adr` and apply **compile-adr**, seeding with the evaluation results: problem from the area scope, drivers/options/assumed solution, and each option's tech details (already produced via `draft-adr` during evaluation). Run the full chain only if evaluation was skipped or is incomplete.
+Per problem: load `draft-adr` and apply **compile-adr**, seeding with the evaluation results: problem from the scope map, drivers/options/assumed solution, and each option's tech details (already produced via `draft-adr` during evaluation); tag the ADR with its `Area:`. Run the full chain only if evaluation was skipped or is incomplete.
 
 Revising = same procedure seeded with the existing ADR plus the changed decision; never hand-edit (see **professional-doc-authoring**).
 
@@ -48,11 +48,11 @@ Load the `write-solution-doc` skill's SKILL.md and apply its capabilities in **b
 
 ### Validation, presentation (both paths)
 
-Compile the output bundle — findings docs, N ADRs, 1 solution doc — and save per **spike-artifact-layout**: findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`. Keep the solution doc at the latest state per **artifact-maintenance-doctrine** (see **reference/artifact-maintenance-guide.md**): only target-state architecture, no process notes; on refresh route through `write-solution-doc` and rewrite affected sections in place — delete superseded text, never annotate. Validate the bundle: every ADR's chosen solution is reflected, cross-references between all artifacts are consistent, diagrams match assumed solutions. Run the **no-note scan** on the solution doc and rewrite until none remain. Present the bundle and remind the user: findings docs are the current-state record (keep even if decisions change); ADRs are formal decision records (review and approve with the team); the solution doc is the target-state architecture; version-control all artifacts together in the spike folder.
+Compile the output bundle — scope map, findings docs, ADRs, 1 solution doc — and save per **spike-artifact-layout**: scope map → `scope.md`, findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`. Keep the solution doc at the latest state per **artifact-maintenance-doctrine** (see **reference/artifact-maintenance-guide.md**): only target-state architecture, no process notes; on refresh route through `write-solution-doc` and rewrite affected sections in place — delete superseded text, never annotate. Validate the bundle: the solution doc mirrors every ADR's chosen solution **grouped by area** (per the scope map), cross-references between all artifacts are consistent, diagrams match assumed solutions. Run the **no-note scan** on the solution doc and rewrite until none remain. Present the bundle and remind the user: findings docs are the current-state record (keep even if decisions change); ADRs are formal decision records (review and approve with the team); the solution doc is the target-state architecture; version-control all artifacts together in the spike folder.
 
 ## Continue prior spike (continue-prior-spike)
 
-Follow **continue-prior-spike** in SKILL.md. Distinct dispatch detail: seed sub-agents with the area's existing findings doc / evidence map so covered code is not re-scanned; scope strictly to answering the open questions; revise existing ADRs in place.
+Follow **continue-prior-spike** in SKILL.md. Distinct dispatch detail: confirm the scope map (`scope.md`) and apply the confirmed deltas first; seed sub-agents with the area's existing findings doc / evidence map so covered code is not re-scanned; scope strictly to answering the open problems; revise existing ADRs in place.
 
 ## Sync update artifacts (sync-update-artifacts)
 

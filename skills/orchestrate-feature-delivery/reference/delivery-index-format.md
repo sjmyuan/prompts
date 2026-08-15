@@ -34,7 +34,7 @@ deliveries/<epic-name>/               # one folder per epic (no docs/ prefix)
 ## Spike References
 - **Change summary**: [path — the full change list]
 - **Solution doc**: [path — target-state section per feature]
-- **ADRs**: [paths — one per decision area]
+- **ADRs**: [paths — one per decision problem (area-prefixed)]
 
 ## Repos
 - repo-a — [what changes here]
@@ -43,9 +43,9 @@ deliveries/<epic-name>/               # one folder per epic (no docs/ prefix)
 ## Features
 ### F1: [kebab-case-name] — Wave [n]
 - **Description**: [one line]
-- **ADRs**: [ADR-00X ...]
+- **ADRs**: [adr-<area>-<NN>-<problem>.md ...]
 - **Change summary items**: [item ids]
-- **Type**: `poc` (optional) — **ADR**: ADR-00X · **Option**: [option] · **Success criteria**: [measurable] · **Replaces**: F2 (optional) · **Compare**: F5 (optional, sibling POC)
+- **Type**: `poc` (optional) — **ADR**: adr-<area>-<NN>-<problem>.md · **Option**: [option] · **Success criteria**: [measurable] · **Replaces**: F2 (optional) · **Compare**: F5 (optional, sibling POC)
 - **Repos**: repo-a (PR) · repo-c (PR)
 - **Intra-feature merge order**: repo-c → repo-a
 - **Dependencies**: blocked-by [F2] (merge-blocked) · blocks [F4]
@@ -124,7 +124,7 @@ Record rework according to the cell's status (see **rework-modes** in the SKILL.
 
 **Post-merge (cell done)** — record without erasing history:
 
-- Keep the original cell status **done** and append a **Rework** note, e.g. `Rework: F2-r1 · ADR-001 focused spike · appended plan deliveries/<epic-name>/order-service/wallet-service/plan.md (## Rework 2026-08-08)`.
+- Keep the original cell status **done** and append a **Rework** note, e.g. `Rework: F2-r1 · adr-wallet-01-payment-failure-handling.md focused spike · appended plan deliveries/<epic-name>/order-service/wallet-service/plan.md (## Rework 2026-08-08)`.
 - Add the rework as a new feature/cell (e.g., `F2-r1`) in a **new wave** after the original feature — it depends on the original cell's PR (already merged).
 - The appended plan lives at the end of the feature's existing `plan.md` (or a sibling `rework-plan.md`); implemented steps are never modified.
 

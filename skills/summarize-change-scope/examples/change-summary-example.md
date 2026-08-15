@@ -18,12 +18,13 @@
 
 # Change Summary: Payment Service Microservice Migration
 
-## Area: Service Decomposition Boundaries (ADR-001)
+## Area: Service Decomposition Boundaries
+### ADR: `adr-service-decomposition-01-split-monolith.md` — payment-type services
 
 ### New
 - **WalletPaymentService** (Spring Boot microservice): New service extracted from monolith. Handles wallet payment initiation, authorization, settlement, refunds.
   - Scope: ~15–20 Java files (controller, service, repository, domain), ~3K–5K LOC estimated
-  - Depends on: ADR-002 (communication), ADR-003 (database)
+  - Depends on: `adr-communication-01-service-communication.md`, `adr-database-01-break-up-database.md`
 - **BankTransferPaymentService** (Spring Boot): New service for bank transfer payments.
   - Scope: ~20–25 Java files, ~5K–8K LOC estimated
 - **CreditCardPaymentService** (Spring Boot): New service for credit card payments.
@@ -49,7 +50,8 @@
 
 ---
 
-## Area: Inter-service Communication (ADR-002)
+## Area: Inter-service Communication
+### ADR: `adr-communication-01-service-communication.md` — hybrid sync/async
 
 ### New
 - **Kafka topic definitions**: `payment.initiated`, `payment.authorized`, `payment.settled`, `payment.refunded`
@@ -68,7 +70,8 @@
 
 ---
 
-## Area: Database Decomposition (ADR-003)
+## Area: Database Decomposition
+### ADR: `adr-database-01-break-up-database.md` — database per service
 
 ### New
 - **Per-service databases**: `wallet_db`, `banktransfer_db`, `creditcard_db` — initially schemas within the same PostgreSQL instance, later separate instances.
@@ -88,9 +91,20 @@
 - **12 stored procedures** for settlement logic: Rewrite as application-level logic in each service.
   - Scope: ~2000 lines of PL/pgSQL to retire; ~1500 lines of Java to write
 
+### ADR: `adr-database-02-schema-migration.md` — expand-contract migrations
+
+### Data
+- **Expand-contract migration scripts**: additive columns → backfill → drop, shipped with each service as it extracts.
+  - Scope: ~3–4 migration scripts + backfill jobs
+
+### Modified
+- **Settlement stored procedures**: procedure rewrites follow the phased DB split (aligns with `adr-database-01-break-up-database.md`).
+  - Scope: ~2000 lines PL/pgSQL rewritten incrementally
+
 ---
 
-## Area: Migration Strategy (ADR-004)
+## Area: Migration Strategy
+### ADR: `adr-migration-01-zero-downtime-migration.md` — strangler fig
 
 ### Configuration
 - **Kong API Gateway**: Add routing rules with traffic splitting (canary). Route `wallet` traffic to new service progressively (10% → 50% → 100%).

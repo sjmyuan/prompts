@@ -10,7 +10,7 @@ description: Guide users through drafting well-structured ADRs, proactively visu
 - User wants to evaluate each option by its technical implementation — target-state diagrams and concrete code changes with locations
 - User needs help structuring unstructured thoughts or notes into an ADR format
 - User wants to compile a polished ADR document from raw discussion points
-- User is conducting a spike investigation (via the `conduct-spike` skill) and needs options evaluated or an ADR drafted per decision area
+- User is conducting a spike investigation (via the `conduct-spike` skill) and needs options evaluated or an ADR drafted per decision problem
 </when-to-use-this-skill>
 
 <knowledge>

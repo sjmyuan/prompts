@@ -1,8 +1,8 @@
 # Example: End-to-End Spike — Payment Service Migration
 
-**Scenario**: The user wants to spike migrating a legacy payment processing service from a monolithic architecture to microservices. The spike should produce ADRs for each key decision area and a consolidated solution document.
+**Scenario**: The user wants to spike migrating a legacy payment processing service from a monolithic architecture to microservices. The spike should produce ADRs for each key decision problem (grouped by area) and a consolidated solution document.
 
-**Applies**: All capabilities in sequence — `define-spike-scope` → `investigate-per-area` → `compile-findings-doc` → `evaluate-solutions-per-area` → `draft-area-adrs` → `compile-solution-doc`
+**Applies**: All capabilities in sequence — `define-spike-scope` → `investigate-per-area` → `compile-findings-doc` → `evaluate-problem-solutions` → `draft-problem-adrs` → `compile-solution-doc`
 
 **What makes this distinct**: Full multi-area brownfield spike demonstrating the complete 5-phase workflow end to end (see `examples/multi-agent-investigation.md` for the parallel-dispatch variant).
 
@@ -17,14 +17,14 @@
 
 **Spike Goal**: Determine the target architecture for decomposing the payment monolith into independently deployable services, selecting technologies, and defining a migration strategy.
 
-**Investigation Areas**:
+**Areas and problems** (each problem → one ADR, recorded in `scope.md`):
 
-| # | Area | Description |
+| # | Area | Problems ("How to …?") |
 |---|---|---|
-| 1 | Service decomposition boundaries | How should we split the monolith? What are the bounded contexts and service boundaries? |
-| 2 | Inter-service communication | How will the new services communicate (sync vs. async, protocol, message format)? |
-| 3 | Database decomposition strategy | How do we break up the monolithic database? One DB per service, shared DB with views, or event-driven? |
-| 4 | Migration strategy | How do we transition from monolith to microservices with zero downtime? Strangler fig, parallel run, or big-bang? |
+| 1 | Service decomposition boundaries | How to split the monolith? What are the bounded contexts and service boundaries? |
+| 2 | Inter-service communication | How to handle service-to-service communication (sync vs. async, protocol, message format)? |
+| 3 | Database decomposition strategy | How to break up the monolithic database? · How to migrate the schema safely? |
+| 4 | Migration strategy | How to transition from monolith to microservices with zero downtime? Strangler fig, parallel run, or big-bang? |
 
 ---
 
@@ -78,11 +78,11 @@
 
 ---
 
-## Phase 3: Evaluate Solutions Per Area
+## Phase 3: Evaluate Problem Solutions
 
-*(Evaluation dispatched to an ADR-writer sub-agent per **evaluate-solutions-per-area** — the `draft-adr` evaluate chain below ran interactively with the user inside the sub-agent session.)*
+*(Evaluation dispatched per problem to an ADR-writer sub-agent per **evaluate-problem-solutions** — a whole area's problems share one brief when evidence is shared; the `draft-adr` evaluate chain below ran interactively with the user inside the sub-agent session.)*
 
-### Area 1: Service Decomposition Boundaries
+### Area 1: Service Decomposition — problem: How to split the monolith?
 
 | Option | Description | Pros | Cons |
 |---|---|---|---|
@@ -112,6 +112,8 @@
 
 **Assumed Solution**: Option A (Database per service) — phased implementation starting with the least-coupled payment type (Wallet), using the Strangler Fig pattern.
 
+**Second problem — How to migrate the schema safely?** (→ `adr-database-02-schema-migration.md`): Options — (A) expand-contract migrations shipped with each service (**chosen**), (B) central schema-migration tool (single choke point), (C) shared DB with views during transition (deferred). **Assumed solution**: Option A.
+
 ### Area 4: Migration Strategy
 
 | Option | Description | Pros | Cons |
@@ -124,13 +126,13 @@
 
 ---
 
-## Phase 4: Draft ADRs
+## Phase 4: Draft Problem ADRs
 
-### ADR 001: Payment Service Decomposition
+### ADR: Service decomposition — split the monolith
 
-*[draft-adr skill applied — full ADR produced]*
+*[draft-adr skill applied — full ADR produced; saved as `adr-service-decomposition-01-split-monolith.md`, tagged `Area: Service decomposition`]*
 
-**Title**: ADR-001: Decompose Payment Monolith into Payment-Type Microservices
+**Title**: Decompose Payment Monolith into Payment-Type Microservices
 
 **Status**: Draft
 
@@ -148,12 +150,6 @@
 
 ---
 
-### ADR 002-004 (summarized)
-
-Similar structured ADRs produced for communication strategy (ADR-002: Hybrid sync/async), database decomposition (ADR-003: Database per service), and migration strategy (ADR-004: Strangler Fig).
-
----
-
 ## Phase 5: Compile Solution Doc
 
 *[write-solution-doc skill applied]*
@@ -168,12 +164,13 @@ Similar structured ADRs produced for communication strategy (ADR-002: Hybrid syn
 - RAID: risks (data consistency), assumptions (Kafka adoption), issues (SOAP legacy)
 - RACI: ownership per service and cross-cutting concerns
 
-**ADRs**:
-- ADR-001: Payment Service Decomposition (Payment-type services)
-- ADR-002: Inter-service Communication (Hybrid sync/async)
-- ADR-003: Database Decomposition (Database per service)
-- ADR-004: Migration Strategy (Strangler Fig)
+**ADRs** (one per problem, area-prefixed in `adrs/`):
+- `adr-service-decomposition-01-split-monolith.md` — Payment-type services
+- `adr-communication-01-service-communication.md` — Hybrid sync/async
+- `adr-database-01-break-up-database.md` — Database per service
+- `adr-database-02-schema-migration.md` — Expand-contract migrations
+- `adr-migration-01-zero-downtime-migration.md` — Strangler Fig
 
 ### Wrap-Up (conversation level — not written into any artifact)
 
-> All four assumed solutions are adopted into the solution doc. If an ADR decision changes during review, the corresponding section is rewritten in place. Artifacts version together in `spikes/payment-migration/` — ADRs in `adrs/`, solution doc at the root, findings in `docs/` (see `examples/spike-artifact-layout.md`).
+> All five assumed solutions are adopted into the solution doc, mirrored **grouped by area** per `scope.md`. If an ADR decision changes during review, the corresponding area section is rewritten in place. Artifacts version together in `spikes/payment-migration/` — scope map at the root, ADRs in `adrs/` (area-prefixed), solution doc at the root, findings in `docs/` (see `examples/spike-artifact-layout.md`).

@@ -2,7 +2,7 @@
 
 **Scenario**: The user has already done informal investigation on a caching strategy problem and has notes. They want to formalize the findings into ADRs and a solution document without re-doing the investigation.
 
-**Applies**: `define-spike-scope` → `compile-findings-doc` → `evaluate-solutions-per-area` → `draft-area-adrs` → `compile-solution-doc` (skipping `investigate-per-area`; compile-findings-doc formalizes the provided findings)
+**Applies**: `define-spike-scope` → `compile-findings-doc` → `evaluate-problem-solutions` → `draft-problem-adrs` → `compile-solution-doc` (skipping `investigate-per-area`; compile-findings-doc formalizes the provided findings)
 
 **What makes this distinct**: The investigation phase is skipped because the user already has findings. The spike starts from evaluation, demonstrating the "provide pre-existing findings" rule.
 
@@ -19,12 +19,12 @@
 
 **Spike Goal**: Define a caching strategy for the product catalog service to reduce database load and improve response times.
 
-**Investigation Areas** (derived from user's notes):
+**Areas and problems** (derived from the user's notes, recorded in `scope.md`):
 
-| # | Area | Description |
+| # | Area | Problem ("How to …?") |
 |---|---|---|
-| 1 | Cache topology | Where should caches sit in the architecture? (application-level, distributed, CDN) |
-| 2 | Cache invalidation strategy | How will cached data stay consistent with the source of truth? |
+| 1 | Cache topology | How to position caches in the architecture? (application-level, distributed, CDN) |
+| 2 | Cache invalidation strategy | How to keep cached data consistent with the source of truth? |
 
 ---
 
@@ -68,9 +68,9 @@
 
 ---
 
-## Phase 3: Evaluate Solutions Per Area
+## Phase 3: Evaluate Problem Solutions
 
-*[Evaluation dispatched to an ADR-writer sub-agent per **evaluate-solutions-per-area**; based on the user's notes, the sub-agent helps structure and complete the evaluation interactively]*
+*[Evaluation dispatched to an ADR-writer sub-agent per **evaluate-problem-solutions**; based on the user's notes, the sub-agent helps structure and complete the evaluation interactively]*
 
 ### Area 1: Cache Topology
 
@@ -94,13 +94,13 @@
 
 ---
 
-## Phase 4: Draft ADRs
+## Phase 4: Draft Problem ADRs
 
-### ADR-001: Cache Topology for Product Catalog
+### ADR: Cache topology — position caches
 
-*[draft-adr skill applied — full ADR produced]*
+*[draft-adr skill applied — full ADR produced; saved as `adr-cache-topology-01-position-caches.md`]*
 
-**Title**: ADR-001: Adopt Two-Tier Caching (In-Memory + Redis) for Product Catalog
+**Title**: Adopt Two-Tier Caching (In-Memory + Redis) for Product Catalog
 
 **Status**: Draft
 
@@ -112,11 +112,11 @@
 
 **Chosen Option**: Two-tier cache: application-level Caffeine (30s TTL) + Redis cluster (5min TTL)
 
-### ADR-002: Cache Invalidation via CDC
+### ADR: Cache invalidation — keep cached data consistent
 
-*[draft-adr skill applied — full ADR produced]*
+*[draft-adr skill applied — full ADR produced; saved as `adr-cache-invalidation-01-invalidate-cached-data.md`]*
 
-**Title**: ADR-002: Use CDC-Based Cache Invalidation for Product Catalog
+**Title**: Use CDC-Based Cache Invalidation for Product Catalog
 
 **Status**: Draft
 
@@ -136,9 +136,9 @@
 - API contracts unaffected (caching is transparent to callers)
 - RAID: risk of Redis outage, assumption about CDC pipeline reliability
 
-**ADRs**:
-- ADR-001: Cache Topology (Two-tier: Caffeine + Redis)
-- ADR-002: Cache Invalidation (CDC-based)
+**ADRs** (one per problem, area-prefixed in `adrs/`, mirrored grouped by area in `solution.md`):
+- `adr-cache-topology-01-position-caches.md` — Two-tier (Caffeine + Redis)
+- `adr-cache-invalidation-01-invalidate-cached-data.md` — CDC-based
 
 ### Wrap-Up (conversation level — not written into any artifact)
 

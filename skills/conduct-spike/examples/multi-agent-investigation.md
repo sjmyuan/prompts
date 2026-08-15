@@ -2,7 +2,7 @@
 
 **Scenario**: The user wants to conduct a heavy spike with 4 investigation areas on migrating a legacy payment service. The orchestrating agent dispatches investigation and ADR drafting to sub-agents in parallel to reduce wall-clock time.
 
-**Applies**: `define-spike-scope` → `investigate-per-area` (parallel dispatch) → `compile-findings-doc` → `evaluate-solutions-per-area` → `draft-area-adrs` (parallel dispatch) → `compile-solution-doc`
+**Applies**: `define-spike-scope` → `investigate-per-area` (parallel dispatch) → `compile-findings-doc` → `evaluate-problem-solutions` → `draft-problem-adrs` (parallel dispatch) → `compile-solution-doc`
 
 **What makes this distinct**: Demonstrates parallel sub-agent orchestration — the orchestrator delegates independent work units concurrently, then synthesizes. Dispatch is the default for **all** spikes (even single-area) to preserve the orchestrating agent's context; parallel speed is secondary (see `reference/multi-agent-orchestration.md`).
 
@@ -12,16 +12,16 @@
 
 *(Scope definition proceeds as in `examples/end-to-end-spike.md` — the same payment service migration problem with 4 investigation areas. See that example for the full scope-definition dialog.)*
 
-**Investigation Areas** (4 areas — qualifies for parallel dispatch):
+**Areas and problems** (4 areas — qualifies for parallel dispatch; each problem → one ADR):
 
-| # | Area | Description |
+| # | Area | Problem ("How to …?") |
 |---|---|---|
-| 1 | Service decomposition boundaries | How should we split the monolith? What are the bounded contexts and service boundaries? |
-| 2 | Inter-service communication | How will the new services communicate (sync vs. async, protocol, message format)? |
-| 3 | Database decomposition strategy | How do we break up the monolithic database? One DB per service, shared DB with views, or event-driven? |
-| 4 | Migration strategy | How do we transition from monolith to microservices with zero downtime? |
+| 1 | Service decomposition boundaries | How to split the monolith? What are the bounded contexts and service boundaries? |
+| 2 | Inter-service communication | How to handle service-to-service communication (sync vs. async, protocol, message format)? |
+| 3 | Database decomposition strategy | How to break up the monolithic database? One DB per service, shared DB with views, or event-driven? |
+| 4 | Migration strategy | How to transition from monolith to microservices with zero downtime? |
 
-> *User confirms the breakdown. The orchestrator notes: 4 areas → will use parallel dispatch for both Phase 2 (investigation) and Phase 4 (ADR drafting).*
+> *User confirms the breakdown. The orchestrator notes: 4 areas → parallel dispatch for Phase 2 (investigation, per area) and Phase 4 (ADR drafting, per problem).*
 
 ---
 
@@ -109,18 +109,18 @@ The orchestrator prepares 4 self-contained briefs, one per area — area descrip
 
 ---
 
-## Phase 3: Evaluate Solutions Per Area
+## Phase 3: Evaluate Problem Solutions
 
-*(Evaluation proceeds as in `examples/end-to-end-spike.md` — same options and decision drivers. See that example for the full evaluation dialog; here it is dispatched in parallel to ADR-writer sub-agents, one per area, per **evaluate-solutions-per-area**.)*
+*(Evaluation proceeds as in `examples/end-to-end-spike.md` — same options and decision drivers. See that example for the full evaluation dialog; here it is dispatched per problem to ADR-writer sub-agents, per **evaluate-problem-solutions** — a whole area's problems share one brief.)*
 
-**Assumed Solutions Summary**:
+**Assumed Solutions Summary** (per area → problem):
 
-| Area | Assumed Solution |
+| Area → Problem | Assumed Solution |
 |---|---|
-| Service decomposition | Payment-type services (Wallet, Bank Transfer, Credit Card) |
-| Inter-service communication | Hybrid: REST for queries, Kafka events for commands |
-| Database decomposition | Database per service, phased by payment type |
-| Migration strategy | Strangler Fig, starting with Wallet payments |
+| Service decomposition → split the monolith | Payment-type services (Wallet, Bank Transfer, Credit Card) |
+| Inter-service communication → service communication | Hybrid: REST for queries, Kafka events for commands |
+| Database decomposition → break up the database | Database per service, phased by payment type |
+| Migration strategy → zero-downtime migration | Strangler Fig, starting with Wallet payments |
 
 ---
 
@@ -128,19 +128,19 @@ The orchestrator prepares 4 self-contained briefs, one per area — area descrip
 
 ### Orchestrator: Prepare Briefs
 
-The orchestrator prepares 4 briefs, each containing one area's evaluation results:
+The orchestrator prepares 4 briefs — one per problem (the database area batches both problems into one brief since they share evidence):
 
-**Brief 1 — ADR for Service Decomposition**:
+**Brief 1 — ADR for Service Decomposition (problem: split the monolith)**:
 ```
-Produce ADR for: Service Decomposition Boundaries
+Produce ADR for problem: How to split the monolith? (Area: Service Decomposition)
 Decision drivers: 99.9% SLA; no data loss; align with existing teams
 Options: A) Payment-type services — clear ownership, independent scaling; shared-lib coupling. B) Domain-driven services — cleaner dependencies; team restructuring. C) Strangler extraction — lowest risk; temporary hybrid complexity.
 Assumed solution: Option A (Payment-type services)
 Findings doc: findings-payment-migration.md — Evidence & Verification section (key locations, ledger, coupling); cite evidence without re-scanning
-Load draft-adr skill and produce a complete ADR.
+Load draft-adr skill and produce a complete ADR tagged Area: Service Decomposition.
 ```
 
-*[Similar briefs prepared for areas 2-4 — each includes its area's findings doc (evidence sections).]*
+*[Similar briefs prepared for the other problems — each includes its area's findings doc (evidence sections).]*
 
 ### Orchestrator: Dispatch
 
@@ -154,14 +154,14 @@ Load draft-adr skill and produce a complete ADR.
 
 ### Sub-Agent Results
 
-**ADR-001**: Payment Service Decomposition (Payment-type services)
-**ADR-002**: Inter-service Communication (Hybrid sync/async)
-**ADR-003**: Database Decomposition (Database per service)
-**ADR-004**: Migration Strategy (Strangler Fig)
+**`adr-service-decomposition-01-split-monolith.md`**: Payment-type services
+**`adr-communication-01-service-communication.md`**: Hybrid sync/async
+**`adr-database-01-break-up-database.md`**: Database per service
+**`adr-migration-01-zero-downtime-migration.md`**: Strangler Fig
 
 ### Orchestrator: Synthesize
 
-> *All 4 ADRs reviewed for consistency: ADR-001 (payment-type services) + ADR-003 (DB per service) are consistent; ADR-002 (Kafka) + ADR-004 (Strangler + gateway routing) are complementary; ADR-004 cross-references ADR-001 correctly. No conflicts — presenting for review.*
+> *All 4 ADRs reviewed for consistency: service-decomposition (payment-type services) + database-decomposition (DB per service) are consistent; communication (Kafka) + migration (Strangler + gateway routing) are complementary; the migration ADR cross-references the decomposition ADR correctly. No conflicts — presenting for review.*
 
 ---
 
@@ -171,7 +171,7 @@ Load draft-adr skill and produce a complete ADR.
 
 > "Dispatching solution-doc compilation to a sub-agent."
 
-**Final Output Bundle**: `findings-payment-migration.md` (current-state + evidence maps) · `solution.md` (C4, API contracts, RAID, RACI — decision-only) · ADR-001 (Payment-type services) · ADR-002 (Hybrid sync/async) · ADR-003 (DB per service) · ADR-004 (Strangler Fig).
+**Final Output Bundle**: `scope.md` (area → problem map) · `findings-payment-migration.md` (current-state + evidence maps) · `solution.md` (C4, API contracts, RAID, RACI — decision-only, ADR decisions grouped by area) · the 4 area-prefixed ADRs in `adrs/`.
 
 ---
 

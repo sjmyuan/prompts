@@ -1,6 +1,6 @@
 # Example: Syncing All Artifacts After New Evidence Flips an ADR Decision
 
-**Scenario**: A spike produced findings, ADR-002 (REST), and a solution doc. A follow-up prototype measures a 3K orders/sec REST throttle — below the 10K peak. The user asks to update the ADR. The assistant propagates the change through every downstream artifact so the whole bundle stays consistent.
+**Scenario**: A spike produced findings, `adr-communication-01-service-communication.md` (REST), and a solution doc. A follow-up prototype measures a 3K orders/sec REST throttle — below the 10K peak. The user asks to update the ADR. The assistant propagates the change through every downstream artifact so the whole bundle stays consistent.
 
 **Applies**: `sync-update-artifacts`
 
@@ -13,8 +13,8 @@
 Artifacts after the original spike:
 
 - Findings doc: current state; peak load unmeasured (listed as an assumption)
-- ADR-002: "Synchronous REST" (chosen because it is the simplest option)
-- Solution doc: target architecture with REST request/response contracts
+- `adr-communication-01-service-communication.md`: "Synchronous REST" (chosen because it is the simplest option)
+- Solution doc: target architecture with REST request/response contracts (communication decisions under the `Inter-service communication` area)
 
 ## The change (user request)
 
@@ -24,12 +24,12 @@ Artifacts after the original spike:
 
 | Origin | Affected downstream |
 |---|---|
-| Findings doc (new evidence: 3K/sec measured limit) | ADR-002 → solution doc |
+| Findings doc (new evidence: 3K/sec measured limit) | `adr-communication-01-service-communication.md` → solution doc's communication area section |
 
 ## What the assistant does, artifact by artifact
 
 1. **Findings doc** (via `write-solution-doc`): replaces the "peak load unmeasured" assumption with the measured 3K/sec limit; records the REST throttle in the Evidence & Verification section with `file:line` and a **verified** confidence tag; adds it to constraints & pain points.
-2. **ADR-002** (via `draft-adr`): decision changes to "Event-driven Kafka" — chosen option, justification, and consequences rewritten in place.
+2. **`adr-communication-01-service-communication.md`** (via `draft-adr`): decision changes to "Event-driven Kafka" — chosen option, justification, and consequences rewritten in place.
 
    **Before** (as drafted):
    ```markdown
@@ -44,13 +44,13 @@ Artifacts after the original spike:
 
 ## Consistency check
 
-- [x] ADR-002 cites the measured 3K/sec fact from the findings doc
+- [x] The communication ADR cites the measured 3K/sec fact from the findings doc
 - [x] Solution doc mirrors Kafka as the chosen option
 - [x] No-note scan passes: no "changed from REST", "v2", or "Updated" in the ADR or solution doc
 
 ## What the assistant says (in conversation)
 
-> "The prototype measured 3K/sec — below the 10K peak. I updated the findings doc with the measurement, flipped ADR-002 to Kafka in place, and refreshed the solution doc's communication section and diagrams. All three artifacts now agree."
+> "The prototype measured 3K/sec — below the 10K peak. I updated the findings doc with the measurement, flipped the communication ADR to Kafka in place, and refreshed the solution doc's communication section and diagrams. All three artifacts now agree."
 
 ## What is deliberately absent from the artifacts
 

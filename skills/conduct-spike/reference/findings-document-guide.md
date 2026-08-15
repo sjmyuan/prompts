@@ -14,7 +14,7 @@ Most of the time, the current implementation *is* a solution — just the existi
 
 Either approach is valid:
 
-- **Per-area findings docs** (recommended for multi-area spikes): Each investigation area gets its own findings document. This keeps each doc focused and independently updatable. Best when areas are loosely coupled.
+- **Per-area findings docs** (recommended for multi-area spikes): Each investigation area gets its own findings document — one subsection per problem in the area, sharing the area's evidence map. This keeps each doc focused and independently updatable. Best when areas are loosely coupled.
 - **One consolidated findings doc**: All areas in a single document with per-area sections and cross-area observations. Best when areas are tightly coupled and cross-cutting concerns are significant.
 
 ## Document format

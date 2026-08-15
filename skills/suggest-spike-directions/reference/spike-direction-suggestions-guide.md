@@ -29,7 +29,7 @@ Heuristics for generating go-deeper candidates:
 | **Unexplored edge case** | The happy path works, but failure modes are unknown | "What happens when the payment gateway times out? Is there a retry strategy, dead-letter queue, or does the order silently fail?" |
 | **Pending sub-decision** | A high-level decision was made but details remain | "We chose Postgres as the database, but haven't decided: normalized schema vs. denormalized views for the dashboard queries?" |
 | **Unclear contract** | An integration point was identified but its API/SLA isn't documented | "The payment gateway's `/authorize` endpoint has a 500ms SLA — but what's the exact retry behavior? Idempotency guarantees? Error code taxonomy?" |
-| **Untested assumption in ADR** | An ADR option makes a claim that needs verification | "ADR-002 assumes EventBridge can handle 10K events/sec — has this been load-tested? What's the current throughput?" |
+| **Untested assumption in ADR** | An ADR option makes a claim that needs verification | "`adr-communication-01-service-communication.md` assumes EventBridge can handle 10K events/sec — has this been load-tested? What's the current throughput?" |
 
 **Format each candidate as**:
 - A concrete, answerable question (not "investigate performance" but "profile `order-processing-worker` to identify which function consumes 1.8s of the 2.3s p95 latency")

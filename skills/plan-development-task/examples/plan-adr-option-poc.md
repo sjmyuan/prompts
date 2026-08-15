@@ -1,6 +1,6 @@
 # Example: Planning a POC for One ADR Option
 
-**Scenario**: The payment-migration delivery can't pick a cache option from ADR-002. The user says: "Plan a POC that builds the Redis option as a standalone feature so we can measure whether it beats in-process."
+**Scenario**: The payment-migration delivery can't pick a cache option from `adr-caching-01-cache-option.md`. The user says: "Plan a POC that builds the Redis option as a standalone feature so we can measure whether it beats in-process."
 
 **Applies**: **plan-poc** → **export-plan**
 
@@ -13,11 +13,11 @@
 
 ```markdown
 ## Scope Boundary
-**In scope**: wallet-service read path + caching layer for the Redis option (ADR-002)
+**In scope**: wallet-service read path + caching layer for the Redis option (`adr-caching-01-cache-option.md`)
 **Out of scope**: the in-process option, other ADRs, unrelated modules
 **Rule**: no step may change anything beyond **In scope**
 
-1. Prepare Environment — POC branch `poc-adr-002-redis` per repo convention
+1. Prepare Environment — POC branch `poc-adr-caching-01-redis` per repo convention
 2. Write focused tests for cache get/set/evict (Redis)
 3. Confirm tests fail · implement minimal Redis client + cache facade
 4. Refactor + validate + cleanup + quality gate
@@ -26,4 +26,4 @@
 
 ## 3. Export
 
-- `plan.md` marked `type: poc`; `context.md` records success criteria, ADR-002 references, and the evaluation method. Routes to **execute-plan** (POC mode) and stops at the evaluation report for the orchestrator's decision gate.
+- `plan.md` marked `type: poc`; `context.md` records success criteria, `adr-caching-01-cache-option.md` references, and the evaluation method. Routes to **execute-plan** (POC mode) and stops at the evaluation report for the orchestrator's decision gate.

@@ -10,17 +10,17 @@ Dispatch multiple work units concurrently, a single unit on its own. Each brief 
 
 Brief per area: area name + description, spike goal, brownfield/greenfield. Carry the area's existing findings doc / evidence map when one exists; require a per-area evidence map back (see **Evidence map in every brief**). After collection, synthesize, resolving cross-area inconsistencies for the findings doc.
 
-## Evaluation — evaluate-solutions-per-area → `adr-writer`
+## Evaluation — evaluate-problem-solutions → `adr-writer`
 
-**Announce**: "Dispatching evaluation of [N] area(s) to a sub-agent."
+**Announce**: "Dispatching evaluation of [N] problem(s) to a sub-agent."
 
-Brief per area: area name + description, spike goal, the area's findings doc (evidence sections). Instructions: load `draft-adr` and run the interactive evaluate chain — **define-decision-drivers** → **define-considered-options** → **evaluate-options** — with the user dialog inside the sub-agent session. Expected output: the area's assumed solution. After collection, review each for fidelity to the findings doc and cross-area consistency; definitive verification lands on the Phase 4 ADR.
+Brief per problem (batch a whole area's problems in one brief when they share its subject/evidence): problem name ("How to …?"), its area + description, spike goal, the area's findings doc (evidence sections). Instructions: load `draft-adr` and run the interactive evaluate chain — **define-decision-drivers** → **define-considered-options** → **evaluate-options** — with the user dialog inside the sub-agent session. Expected output: the problem's assumed solution. After collection, review each for fidelity to the findings doc and cross-area consistency; definitive verification lands on the Phase 4 ADR.
 
-## ADR drafting — draft-area-adrs → `adr-writer`
+## ADR drafting — draft-problem-adrs → `adr-writer`
 
-**Announce**: "Dispatching ADR drafting for [N] area(s) to a sub-agent."
+**Announce**: "Dispatching ADR drafting for [N] problem(s) to a sub-agent."
 
-Brief per area: area name + description, evaluation results (decision drivers, options with pros/cons, **tech details per option**, assumed solution), the area's findings doc (evidence sections). Instructions: load `draft-adr` and apply **compile-adr** seeded with the evaluation results. After collection, review each ADR.
+Brief per problem (batch a whole area's problems in one brief when they share its evidence): problem name ("How to …?"), its area + description, evaluation results (decision drivers, options with pros/cons, **tech details per option**, assumed solution), the area's findings doc (evidence sections). Instructions: load `draft-adr` and apply **compile-adr** seeded with the evaluation results; tag the ADR with its `Area:`. After collection, review each ADR.
 
 ## Findings-doc compilation — compile-findings-doc → `solution-doc-writer`
 

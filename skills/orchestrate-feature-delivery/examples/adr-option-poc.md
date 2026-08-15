@@ -1,6 +1,6 @@
 # Example: Proving an ADR Option with Compare-POCs
 
-**Scenario**: ADR-002 (`adr-002-cache.md`) weighs two cache options — **Redis** vs **in-process**. The team can't decide on drivers alone; the user says: "Run a POC for each option to prove which is better — then pick."
+**Scenario**: `adr-caching-01-cache-option.md` weighs two cache options — **Redis** vs **in-process**. The team can't decide on drivers alone; the user says: "Run a POC for each option to prove which is better — then pick."
 
 **Applies**: **define-poc-scope** → **orchestrate-delivery** → **update-delivery-index**
 
@@ -10,13 +10,13 @@ Decomposition marks two POC cells (Wave 0, parallel) and one **poc-gated** imple
 
 | Cell | Type | ADR / Option | Success criteria | Status |
 |---|---|---|---|---|
-| order-service/F5a | poc | ADR-002 · Redis | p99 < 50ms @ 2k rps; ≤ 3 new ops deps | unplanned |
-| order-service/F5b | poc | ADR-002 · in-process | p99 < 50ms @ 2k rps; zero new deps | unplanned |
+| order-service/F5a | poc | adr-caching-01-cache-option.md · Redis | p99 < 50ms @ 2k rps; ≤ 3 new ops deps | unplanned |
+| order-service/F5b | poc | adr-caching-01-cache-option.md · in-process | p99 < 50ms @ 2k rps; zero new deps | unplanned |
 | order-service/F5 | feature | — (poc-gated on F5a/F5b decision) | — | unplanned |
 
 ## 2. Dispatch (POC mode, parallel)
 
-- **Agent A** (coding-assistant) → plan + execute `F5a` (**plan-development-task** `plan-poc` / **execute-plan** POC mode) — brief carries `type: poc`, ADR-002, option Redis, success criteria.
+- **Agent A** (coding-assistant) → plan + execute `F5a` (**plan-development-task** `plan-poc` / **execute-plan** POC mode) — brief carries `type: poc`, `adr-caching-01-cache-option.md`, option Redis, success criteria.
 - **Agent B** (coding-assistant) → plan + execute `F5b` (in-process) in parallel — same repo ⇒ serialize execution waves or split to different repos when possible.
 
 ## 3. Decision gate (user-recorded)
@@ -32,7 +32,7 @@ User records: F5a **adopted** (Redis), F5b **rejected**.
 
 ## 4. Adopt + reject
 
-- Dispatch **adr-writer** (draft-adr): ADR-002 records the Redis decision + POC evidence.
+- Dispatch **adr-writer** (draft-adr): `adr-caching-01-cache-option.md` records the Redis decision + POC evidence.
 - **F5a (POC-as-implementation)**: promote the branch — ask user, merge → **done**. No `replaces` target, so nothing is **superseded**.
 - **F5b**: close **rejected**, archive branch; update index.
 - **F5 (poc-gated)**: now dispatchable with the decided option — if the POC slice already ships the full feature, F5 may be dropped or reduced to the remaining scope.

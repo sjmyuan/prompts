@@ -14,8 +14,8 @@ Original boundary (from the existing `plan.md`):
 
 ```
 ## Scope Boundary
-**In scope**: wallet-service `application/` + `test/`; ADR-001 payment-failure decision
-**Out of scope**: `payment-gateway/` client code; ADR-002 cutover; other modules
+**In scope**: wallet-service `application/` + `test/`; `adr-wallet-01-payment-failure-handling.md` payment-failure decision
+**Out of scope**: `payment-gateway/` client code; `adr-cutover-01-service-cutover.md` cutover; other modules
 ```
 
 The rework request requires changing `payment-gateway/` credential retry logic — **Out of scope**.

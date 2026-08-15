@@ -13,7 +13,7 @@
 ## 2. Dispatch (round 1)
 
 - **Agent A** (coding-assistant) → plan `shared-contracts/F1` (plan-development-task)
-  - Brief: scope brief + spike references — change-summary items 1–3, ADR-001 (`spikes/payment-migration/adrs/adr-001-wallet.md`), solution-doc §Wallet. Agent loads them on demand for full context.
+  - Brief: scope brief + spike references — change-summary items 1–3, `adr-wallet-01-payment-failure-handling.md` (`spikes/payment-migration/adrs/`), solution-doc §Wallet. Agent loads them on demand for full context.
 
 > **Delegation rule in action**: when any agent's plan or execution surfaces a solution-doc or ADR change, the orchestrator dispatches a **solution-doc-writer** / **adr-writer** agent for the update — it never edits artifacts itself.
 

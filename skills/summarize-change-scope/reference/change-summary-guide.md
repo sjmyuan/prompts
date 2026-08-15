@@ -21,7 +21,7 @@ Produce the change summary after the solution document is finalized. It is an op
 | Artifact | Role in change summary |
 |---|---|
 | Findings documents | Define the baseline — what exists today. Changes are derived by diffing against this. |
-| ADRs | Each ADR's chosen option drives a cluster of changes. Cite the ADR number for each change cluster. |
+| ADRs | Each ADR's chosen option drives a cluster of changes — one ADR per decision problem, grouped under its area. Cite the ADR file for each cluster. |
 | Solution document | Defines the target state. The change summary lists what must happen to get there. |
 
 ## Change categories
@@ -43,7 +43,9 @@ Group each change into one of these categories for consistent structure:
 ```markdown
 # Change Summary: [Spike Goal]
 
-## Area: [Area Name] (ADR-00X)
+## Area: [Area Name]
+### ADR: adr-<area>-<NN>-<problem>.md — [decision]
+(down to one ADR per decision problem; an area can hold several)
 
 ### New
 - **[Service/Module Name]**: [Brief description of what to create and why.]
