@@ -11,3 +11,17 @@ Sizes use **character count** (≈ tokens × 4) — the real context cost. Refor
 - Line > 120 chars → 🟢 Nit; line > 200 chars → 🟡 Minor (multi-item stuffing). Exceptions: `description`, long URLs, Mermaid blocks, wide table cells.
 - One line = one idea: a line bundling 2+ logical items is line-stuffing → 🟡 Minor even when short.
 - Gaming: when the line budget passes but the char budget is exceeded, flag the char severity AND note the line count is misleading (line-merging).
+
+## How to measure
+
+Run the measurement script from the skill folder when available:
+`python3 scripts/measure_sizes.py <skill-dir-or-file>` — reports chars, bytes,
+lines, >120/>200 violations (excluding table rows, the frontmatter `description`,
+and mermaid blocks), and budget status per file type.
+
+Manual fallback (no script available):
+- **Character count** — use `wc -m` or python `len(open(f).read())`, NOT `wc -c`,
+  which counts **bytes**. Emoji/multi-byte chars inflate bytes (review-skill
+  SKILL.md: 11,708 bytes but 11,566 chars).
+- **Long-line scan** — exclude lines starting with `|` (table rows) and the
+  frontmatter `description`; both are exempt per the rules above.

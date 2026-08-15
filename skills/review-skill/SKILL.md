@@ -27,7 +27,7 @@ Severity definitions and Blocker-vs-Major guidance.
 </severity-levels>
 
 <size-limits>
-Char/line budgets per file type, max-line-length guard, and gaming detection.
+Char/line budgets per file type, max-line-length guard, gaming detection, and the measurement script.
 </size-limits>
 
 <size-remediation>
@@ -99,7 +99,7 @@ Portability rules — no platform tool names, no concrete context paths, detect-
 1. Read the full skill file to understand its domain and all sections.
    a. Verify all expected top-level sections are present: frontmatter YAML, `<when-to-use-this-skill>`, `<knowledge>`, `<capabilities>`; flag any missing as 🔴 Major.
    b. Verify section order: frontmatter → `<when-to-use-this-skill>` → `<knowledge>` → `<capabilities>` → `<rules>` (if present); flag out-of-order as 🟡 Minor.
-   c. Measure the file's size — count total lines AND estimate total characters.
+   c. Measure the file's size — run `scripts/measure_sizes.py` on the skill folder when available, else count lines and estimate chars.
    Apply **reference/size-limits.md** for budgets, line-length, line-stuffing, and gaming detection.
    When both budgets are exceeded, load **reference/size-remediation.md** and recommend fixes (redistribute → reduce → escalate); never suggest merging steps into one sentence (anti-pattern).
 2. **Check description quality and trigger consistency** — load **reference/trigger-correctness.md** first:
