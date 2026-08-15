@@ -1,6 +1,6 @@
 ---
 name: review-skill
-description: Review SKILL.md files for correct structure, section-purpose compliance, naming convention adherence, and absence of duplication. Evaluates whether knowledge, capabilities, rules, and examples sections each serve their intended purpose and whether names follow action-verb conventions. Use when users request feedback, a quality assessment, or want to improve, fix, or ensure a copilot skill file triggers correctly.
+description: Review SKILL.md files for correct structure, section-purpose compliance, naming conventions, and duplication. Use when reviewing, fixing, improving, or checking trigger correctness of a copilot skill file.
 ---
 
 <when-to-use-this-skill>
@@ -15,138 +15,74 @@ description: Review SKILL.md files for correct structure, section-purpose compli
 <knowledge>
 
 <skill-file-section-semantics>
-Section-purpose table and common structural violations. Load **reference/section-semantics.md** for the full rubric.
+Section-purpose table and common structural violations.
 </skill-file-section-semantics>
 
 <trigger-correctness>
-Criteria for description trigger clarity and `<when-to-use-this-skill>` consistency. Load **reference/trigger-correctness.md** for the full rubric.
+Criteria for description trigger clarity and `<when-to-use-this-skill>` consistency.
 </trigger-correctness>
 
 <severity-levels>
-
-| Level | Symbol | When to use |
-|---|---|---|
-| Blocker | 🚫 | The skill cannot be used in production as-is — it will fail to load, never activate, or produce incorrect output in all or most realistic scenarios |
-| Major | 🔴 | A structural violation or coverage gap that causes the agent to behave incorrectly for at least one realistic scenario |
-| Minor | 🟡 | A pattern deviation that reduces quality or maintainability but does not break the skill for the common case |
-| Nit | 🟢 | Cosmetic or trivial issue — naming consistency, minor wording, style alignment |
-| Inconsistency | ⚠️ | Two conflicting patterns that cannot be auto-resolved; present both variants and ask the user to decide |
-
-**Blocker vs. Major**: Use 🚫 Blocker when the agent cannot complete the task at all in the normal case (e.g., no capability defined, frontmatter missing entirely, `<when-to-use-this-skill>` absent so the skill never self-confirms activation). Use 🔴 Major for violations that break the skill only in specific — but realistic — scenarios.
-
+Severity definitions and Blocker-vs-Major guidance.
 </severity-levels>
 
 <size-limits>
-Sizes are measured by **character count** (≈ tokens × 4) — the real context cost — not just lines. Reformatting cannot change char count, so the char budget cannot be gamed; line count is only a secondary readability signal.
-
-| File | Char budget | Line budget | Over-budget severity |
-|---|---|---|---|
-| SKILL.md | 12,000 | 150 | ≤2× 🟡 Minor · >2× 🔴 Major |
-| Each `reference/` file | 12,000 | 150 | 🟡 Minor (on-demand; consider splitting) |
-| Each `examples/` file | 9,000 | 150 | 🟡 Minor (on-demand; trim) |
-
-- **Max line length**: any line > 120 chars → 🟢 Nit (prefer wrapping to one idea per line); any line > 200 chars → 🟡 Minor (multi-item stuffing). Exceptions: frontmatter `description`, long URLs, Mermaid blocks, wide table cells.
-- **One line = one idea**: a line bundling 2+ logical items (list items joined by `;`/`and`, multiple short facts) is line-stuffing → 🟡 Minor even when short.
-- **Gaming detection**: when the line budget passes but the char budget is exceeded, flag the char-budget severity AND note that the line count is misleading — content was reformatted (line-merging), not reduced.
+Char/line budgets per file type, max-line-length guard, and gaming detection.
 </size-limits>
 
 <size-remediation>
-Ordered remediation actions for files over budget — redistribute first, then reduce, then escalate — plus the anti-patterns to never suggest (merging steps into one sentence, line-merging, cutting structural sections). Load **reference/size-remediation.md** when recommending fixes for size overruns.
+Ordered remediation for over-budget files — redistribute, reduce, escalate — plus anti-patterns to never suggest.
 </size-remediation>
 
 <evaluation-process>
-A well-structured skill should define an evaluation process to assess the quality of its own output. Look for:
-
-- A dedicated validation or checklist step within a capability that lists criteria for verifying output correctness.
-- A separate capability focused on evaluating or self-reviewing the skill's output.
-- A reference file containing a quality checklist that the capability instructs the agent to load and apply.
-- Explicit success criteria or pass/fail checks defined in the capability steps.
-
-Common patterns:
-- "Verify that [output] meets [criteria]" as a step.
-- "Load **reference/quality-checklist.md** and apply each criterion".
-- A dedicated `<validate-output>` capability with ordered validation steps.
-
-Flag the absence of any evaluation mechanism as follows:
-- No evaluation step in any capability → 🟡 Minor (output reliability depends entirely on agent discretion).
-- No evaluation step AND no examples demonstrating output validation → 🔴 Major (no way to verify output correctness).
+Patterns for a skill-defined output-evaluation process, plus severity when absent.
 </evaluation-process>
 
 <action-verb-naming-convention>
-Both the **skill name** and its **capability names** in the skill under review must follow the action-verb naming convention:
-
-**Skill name** (frontmatter `name:` field, kebab-case):
-- Must start with an imperative action verb: `edit-svg`, `validate-data`, `generate-diagram`, `review-code`, `create-flowchart`
-- NOT noun phrases: `svg-editor`, `data-validator`, `diagram-generator`, `code-reviewer`, `flowchart-creator`
-- Example: a skill named `form-validator` should be named `validate-form`
-
-**Capability section names** (inside `<capabilities>`):
-- Must start with an imperative action verb: `<manage-storage>`, not `<storage-management>`; `<generate-report>`, not `<report-generation>`
-- Good patterns: `validate-`, `generate-`, `create-`, `analyze-`, `calculate-`, `collect-`, `transform-`, `review-`
-- Bad patterns: `validation`, `generation`, `creation`, `analysis`, `calculation`, `collection`, `transformation`, `review`
-
-**`<knowledge>` subsection names**:
-- Must use **descriptive noun phrases** (`<storage-patterns>`, not `<define-storage>`)
-- A subsection named with an action verb inside `<knowledge>` signals that procedural content has leaked into knowledge — this is a structural violation
+Naming rules for the skill name, capability names, and knowledge subsection names.
 </action-verb-naming-convention>
 
 <conciseness-check>
-Criteria for identifying unnecessary content across SKILL.md, reference files, and example files. Load **reference/conciseness-check.md** for the full rubric.
+Criteria for identifying unnecessary content across SKILL.md, references, and examples.
 </conciseness-check>
 
 <writing-style>
-Prose-quality rules for skill files — directive voice, BLUF, hard caps, banned phrases, no narration. Load **reference/writing-style.md** for the full rubric.
+Prose-quality rules — directive voice, BLUF, hard caps, banned phrases, no narration.
 </writing-style>
 
 <platform-agnostic-writing>
-Skills should be portable across AI platforms. Avoid platform-specific references:
-
-- **No platform-specific tool names**: Replace tool names like `vscode_askQuestions` or `run_in_terminal` with generic action descriptions — e.g., "ask the user for confirmation" or "run the command"
-- **No concrete context paths**: Describe persistent context targets by their type (personal persistent notes, project-level persistent notes, session-scoped context) rather than by concrete file paths like `/memories/` or `/memories/repo/`
-- **Detect, don't assume**: When a capability needs to interact with platform features (context stores, tools, file structures), first detect what the platform supports, then map accordingly
-
-Flag violations as:
-- 🟡 Minor — A single platform-specific reference that doesn't break the skill
-- 🔴 Major — Multiple platform-specific references that would prevent the skill from working on another platform
+Portability rules — no platform tool names, no concrete context paths, detect-don't-assume.
 </platform-agnostic-writing>
 
 <pipeline-integration-review>
-When a skill references or is referenced by another skill (forming a producer→consumer pipeline), review must verify 4 integration points beyond the individual file structure:
-
-1. **Handoff mechanism** — Is there a file-based export/import between the skills, or is the user the transport layer? A skill that produces plans should offer an export capability; a skill that consumes plans should define a plan-input-schema and support loading from files. If the handoff relies entirely on conversation text → 🟡 Minor (fragile — context resets lose the plan).
-
-2. **Shared schema** — Does the downstream skill define the format it expects? The downstream skill should document its input schema (minimum fields, accepted formats). If the upstream skill produces output in a format the downstream skill doesn't explicitly accept → 🟡 Minor.
-
-3. **Bidirectional awareness** — Do both skills reference each other? The upstream skill should mention the downstream skill in its description, skill-boundary, or rules. The downstream skill should mention the upstream skill in its description or when-to-use. Missing cross-references → 🟡 Minor.
-
-4. **Guard clauses** — Does the downstream skill prevent premature loading? Its when-to-use or description should include a loading constraint (e.g., "Do NOT load when no plan has been generated yet"). Absence → 🟡 Minor (both skills could load simultaneously).
-
-Apply these checks when the skill's description, when-to-use, or skill-boundary references another skill by name.
+4-point checklist for producer→consumer skill pipelines — handoff, shared schema, awareness, guard clauses.
 </pipeline-integration-review>
 
 <context-loading-guide>
 
 | Load when | Provides | File |
 |---|---|---|
-| Evaluating section structure, naming, or on-demand context placement (steps 1, 3–8) | Section-purpose table and common structural violations | [reference/section-semantics.md](reference/section-semantics.md) |
-| Checking trigger clarity and description-to-when-to-use coverage (step 2) | Trigger-correctness criteria, trigger phrase rules, and common violations | [reference/trigger-correctness.md](reference/trigger-correctness.md) |
-| Writing or evaluating the `description` field (step 2a) | Two-part description template with example | [reference/description-template.md](reference/description-template.md) |
-| Scoring description quality (step 2b) | Five-dimension scoring rubric with pass/fail thresholds | [reference/description-scoring.md](reference/description-scoring.md) |
-| Before writing review output — load first, every review | Canonical output format, severity label usage, multi-violation structure | [examples/skill-file-review.md](examples/skill-file-review.md) |
-| You detect noun-named capabilities or inline-embedded examples | Output model for naming and inline-content findings | [examples/noun-capabilities-and-inline-examples.md](examples/noun-capabilities-and-inline-examples.md) |
-| The skill appears mostly well-structured (few or no major findings) | Output model for a near-passing review | [examples/clean-skill-review.md](examples/clean-skill-review.md) |
-| Trigger-correctness failures are the primary or dominant finding | Output model for a review focused on description/when-to-use mismatches | [examples/trigger-correctness-violation.md](examples/trigger-correctness-violation.md) |
-| Size/density findings are the primary or dominant finding (char budget, line-stuffing, suspected line-merging) | Output model for size-budget and gaming findings | [examples/size-and-line-stuffing-review.md](examples/size-and-line-stuffing-review.md) |
-| Executing step 10 (example coverage assessment) | Coverage gap criteria and severity table | [reference/example-coverage-criteria.md](reference/example-coverage-criteria.md) |
-| Executing step 11 (individual example file review) | Quality criteria checklist for example files | [reference/example-quality-criteria.md](reference/example-quality-criteria.md) |
-| Checking naming conventions for skill name and capability names (step 8) | Action-verb naming convention rules for skill name, capability names, and knowledge subsection names | See `<action-verb-naming-convention>` in `<knowledge>` |
-| Checking file size (steps 1c, 5, 11f) | Char/line budgets, max-line-length guard, and gaming-detection rule for SKILL.md, reference, and example files | See `<size-limits>` in `<knowledge>` |
-| Recommending fixes for size overruns (both budgets exceeded, or char overrun) | Remediation action menu, priority order, and anti-patterns | [reference/size-remediation.md](reference/size-remediation.md) |
-| Checking for output evaluation process (step 4) | Evaluation process patterns, common checklist patterns, and severity guidance | See `<evaluation-process>` in `<knowledge>` |
-| Checking conciseness across all files (step 5) | Unnecessary-content patterns per file type and severity guidance | [reference/conciseness-check.md](reference/conciseness-check.md) |
-| Checking writing style — voice, BLUF, banned phrases, narration (step 5a) | Writing-style rubric for skill files: directive voice, hard caps, atomic bullets, per-file rules, severity | [reference/writing-style.md](reference/writing-style.md) |
-| Writing-style findings are the primary or dominant finding | Output model for a voice/narration-focused review | [examples/writing-style-review.md](examples/writing-style-review.md) |
-| Checking cross-skill pipeline integration (step 16) | 4-point pipeline integration checklist with severity guidance | See `<pipeline-integration-review>` in `<knowledge>` |
+| Section structure, naming, context placement (steps 1, 3–8) | Section semantics | [reference/section-semantics.md](reference/section-semantics.md) |
+| Trigger clarity and coverage (step 2) | Trigger criteria | [reference/trigger-correctness.md](reference/trigger-correctness.md) |
+| `description` template (step 2a) | Description template | [reference/description-template.md](reference/description-template.md) |
+| Description scoring (step 2b) | Scoring rubric | [reference/description-scoring.md](reference/description-scoring.md) |
+| Before writing output — load first, every review | Output format | [examples/skill-file-review.md](examples/skill-file-review.md) |
+| Noun-named capabilities or inline examples detected | Naming/inline model | [examples/noun-capabilities-and-inline-examples.md](examples/noun-capabilities-and-inline-examples.md) |
+| Mostly well-structured skill (few or no major findings) | Near-passing model | [examples/clean-skill-review.md](examples/clean-skill-review.md) |
+| Trigger failures dominant | Trigger-failure model | [examples/trigger-correctness-violation.md](examples/trigger-correctness-violation.md) |
+| Size/density findings dominant | Size/gaming model | [examples/size-and-line-stuffing-review.md](examples/size-and-line-stuffing-review.md) |
+| Step 10 (example coverage) | Coverage criteria | [reference/example-coverage-criteria.md](reference/example-coverage-criteria.md) |
+| Step 11 (example review) | Quality checklist | [reference/example-quality-criteria.md](reference/example-quality-criteria.md) |
+| Naming conventions (step 8) | Naming rules | [reference/naming-conventions.md](reference/naming-conventions.md) |
+| File size (steps 1c, 5, 11f) | Size budgets | [reference/size-limits.md](reference/size-limits.md) |
+| Severity assignment (all steps) | Severity table | [reference/severity-levels.md](reference/severity-levels.md) |
+| Size-overrun fixes | Remediation menu | [reference/size-remediation.md](reference/size-remediation.md) |
+| Output evaluation (step 4) | Evaluation patterns | [reference/evaluation-process.md](reference/evaluation-process.md) |
+| Conciseness (step 5) | Conciseness patterns | [reference/conciseness-check.md](reference/conciseness-check.md) |
+| Writing style (step 5a) | Style rubric | [reference/writing-style.md](reference/writing-style.md) |
+| Writing-style findings dominant | Style model | [examples/writing-style-review.md](examples/writing-style-review.md) |
+| Pipeline integration (step 16) | Pipeline checklist | [reference/pipeline-integration.md](reference/pipeline-integration.md) |
+| Platform portability | Portability rules | [reference/platform-agnostic-writing.md](reference/platform-agnostic-writing.md) |
 
 </context-loading-guide>
 
@@ -157,48 +93,50 @@ Apply these checks when the skill's description, when-to-use, or skill-boundary 
 <review-skill-file>
 **Objective**: Evaluate a SKILL.md file for correct section structure, separation of concerns, and absence of duplication.
 
-**Note**: Do not modify the skill file during review. Suggest changes with clear descriptions or patch-style snippets.
+**Note**: Do not modify the skill file during review; suggest changes as descriptions or patch snippets.
 
 **Steps**:
 1. Read the full skill file to understand its domain and all sections.
-   a. Verify all expected top-level sections are present: frontmatter YAML, `<when-to-use-this-skill>`, `<knowledge>`, and `<capabilities>`; flag any missing required section as 🔴 Major.
-   b. Verify sections appear in the correct order: frontmatter → `<when-to-use-this-skill>` → `<knowledge>` → `<capabilities>` → `<rules>` (if present); flag out-of-order sections as 🟡 Minor.
-   c. Measure the file's size — count total lines AND estimate total characters (sum line lengths while reading). Apply `<size-limits>`: flag char-budget overruns per the table; count lines > 120 chars and > 200 chars and flag each as a single aggregated finding (🟢 Nit / 🟡 Minor); flag bundling of 2+ logical items in one line as 🟡 Minor; and when the line budget passes but the char budget is exceeded, note the mismatch as suspected line-merging (severity follows the char budget). When BOTH budgets are exceeded, load **reference/size-remediation.md** and recommend fixes in priority order (redistribute → reduce → escalate); never suggest merging steps into one sentence (anti-pattern).
+   a. Verify all expected top-level sections are present: frontmatter YAML, `<when-to-use-this-skill>`, `<knowledge>`, `<capabilities>`; flag any missing as 🔴 Major.
+   b. Verify section order: frontmatter → `<when-to-use-this-skill>` → `<knowledge>` → `<capabilities>` → `<rules>` (if present); flag out-of-order as 🟡 Minor.
+   c. Measure the file's size — count total lines AND estimate total characters.
+   Apply **reference/size-limits.md** for budgets, line-length, line-stuffing, and gaming detection.
+   When both budgets are exceeded, load **reference/size-remediation.md** and recommend fixes (redistribute → reduce → escalate); never suggest merging steps into one sentence (anti-pattern).
 2. **Check description quality and trigger consistency** — load **reference/trigger-correctness.md** first:
    a. Verify the frontmatter `description` follows the two-part template (domain summary + trigger phrase) — load **reference/description-template.md**; flag a missing trigger phrase as 🔴 Major.
-   b. Score the description using the five-dimension quality metric — load **reference/description-scoring.md**; report the score (x/10) and flag a score ≤5 as 🔴 Major; flag a score of 6–8 as 🟡 Minor.
-   c. Check that the intent verbs and key scenarios in the trigger phrase match the bullets in `<when-to-use-this-skill>` (bidirectional): flag any `<when-to-use-this-skill>` scenario whose keyword or intent verb is absent from `description` as 🟡 Minor (under-coverage); flag any trigger scenario in `description` absent from `<when-to-use-this-skill>` as 🟡 Minor (over-triggering or undocumented scope).
-   d. If `<when-to-use-this-skill>` is missing entirely, flag as 🔴 Major.
-   e. Flag any direct contradiction between the scope described in `description` and the bullets in `<when-to-use-this-skill>` as 🔴 Major.
-3. For each capability section, verify it describes *how to do something* as ordered steps — flag any that are fact lists, reference tables, or constraint bullets (those belong in `<knowledge>`).
-4. **Check for output evaluation process** — For each capability, verify it includes a validation or checklist step that evaluates the quality of the skill's output. Load `<evaluation-process>` in `<knowledge>` for guidance. If no capability contains any form of output evaluation, flag as 🟡 Minor. If the skill also lacks examples demonstrating output validation, flag as 🔴 Major.
-5. **Check conciseness and writing style across all files** — Review SKILL.md, all reference files, and all example files for unnecessary or verbose content. Load `<conciseness-check>` in `<knowledge>` for guidance. Flag violations as:
-    - 🟢 Nit for a single verbose file.
-    - 🟡 Minor for systematic verbosity across multiple files.
-    - 🔴 Major if the skill could be cut by >30% without losing meaning.
-   Apply the `<size-limits>` budgets and max-line-length guard to each `reference/` file; when a reference file is over budget, recommend remediation per **reference/size-remediation.md**.
-   a. **Check writing style** — Load **reference/writing-style.md**. Verify directive voice in capability steps, BLUF openings, hard caps (≤20-word sentences, ≤3-sentence paragraphs, 1-claim bullets), absence of banned phrases, and no meta-commentary or process narration in any file. Flag per the reference's severity table.
-6. For each rule, verify it answers "when scenario X → use capability Y" — flag any rule that re-states content already in a capability (duplication). If the skill has only one capability and no `<rules>` section, do not flag its absence.
-7. Check that a `<knowledge>` section exists and contains all reference material (tables, layouts, API signatures, platform constraints) that capabilities currently cite inline. Also check that large reference rubrics are not embedded directly in SKILL.md — they should be in `reference/` files loaded on demand; flag inline rubrics as 🔴 Major.
-8. **Check naming conventions** — load `<action-verb-naming-convention>` in `<knowledge>` for the full rubric:
-   a. Check the skill's frontmatter `name:` field follows the action-verb naming convention (imperative verb + noun in kebab-case, e.g., `edit-svg`, `validate-data`); flag noun-phrase names (e.g., `svg-editor`, `data-validator`) as 🔴 Major.
+   b. Score the description using the five-dimension metric — load **reference/description-scoring.md**; report the score (x/10); flag ≤5 as 🔴 Major and 6–8 as 🟡 Minor.
+   c. Check the trigger phrase's verbs and scenarios match the `<when-to-use-this-skill>` bullets; flag any term in one absent from the other as 🟡 Minor (under- or over-coverage).
+   d. Flag a missing `<when-to-use-this-skill>` as 🔴 Major.
+   e. Flag any direct contradiction between `description` scope and `<when-to-use-this-skill>` bullets as 🔴 Major.
+3. For each capability, verify it describes *how to do something* as ordered steps — flag fact lists, reference tables, or constraint bullets (those belong in `<knowledge>`).
+4. **Check output evaluation process** — Verify each capability includes a validation or checklist step.
+   Load **reference/evaluation-process.md** for guidance. Flag no evaluation as 🟡 Minor; no evaluation AND no validation examples as 🔴 Major.
+5. **Check conciseness and writing style** — Review SKILL.md, references, and examples for verbose content.
+   Load **reference/conciseness-check.md** for severity flags; apply **reference/size-limits.md** budgets to each `reference/` file, and **reference/size-remediation.md** when over budget.
+   a. **Check writing style** — Load **reference/writing-style.md**. Verify directive voice, BLUF, hard caps, no banned phrases, no narration. Flag per its severity table.
+6. For each rule, verify it answers "when scenario X → use capability Y" — flag rules re-stating capability content. If the skill has one capability and no `<rules>` section, do not flag its absence.
+7. Check a `<knowledge>` section exists and holds reference material (tables, layouts, APIs, constraints). Flag rubrics embedded in SKILL.md instead of `reference/` files as 🔴 Major.
+8. **Check naming conventions** — load **reference/naming-conventions.md** for the full rubric:
+   a. Check the frontmatter `name:` follows the action-verb convention (e.g., `edit-svg`, not `svg-editor`); flag noun-phrase names as 🔴 Major.
    b. Check each capability section name uses an action verb; flag noun-named sections as 🔴 Major.
-   c. Verify that `<knowledge>` subsection names use descriptive noun phrases — a subsection named with an action verb (e.g., `<check-constraints>`) signals that procedural content has leaked into `<knowledge>`; flag as 🟡 Minor.
-9. Check that on-demand context (examples, reference rubrics) is exposed via a `<context-loading-guide>` entry inside `<knowledge>` (preferred) rather than a standalone `<examples>` section. If a bare `<examples>` section exists instead, flag it as 🟡 Minor. If a `<context-loading-guide>` exists but uses a description-first **Scenario | Reference** format instead of a condition-first **Load when | Provides | File** format, flag it as 🟡 Minor — the first column must state the decision condition, not describe the file's content. If the guide is written as a bullet list, flag it as 🟡 Minor. Either way, verify that all referenced content is linked by file path — not embedded inline — and flag inline content as 🔴 Major.
-10. Assess example coverage: cross-reference each named capability against the linked examples. Flag capabilities with no corresponding example as 🔴 Major; flag skills where examples cover only a subset of scenarios as 🟡 Minor. Load **reference/example-coverage-criteria.md** for the full rubric.
+   c. Verify `<knowledge>` subsection names use descriptive noun phrases — an action-verb name (e.g., `<check-constraints>`) signals procedural content leaked into `<knowledge>`; flag as 🟡 Minor.
+9. Check on-demand context (examples, rubrics) is exposed via a `<context-loading-guide>` inside `<knowledge>` (preferred), not a standalone `<examples>` section.
+   Flag a bare `<examples>` section, a **Scenario | Reference** guide (not condition-first **Load when | Provides | File**), or a bullet-list guide as 🟡 Minor.
+   Verify all referenced content is file-linked — not inline — and flag inline content as 🔴 Major.
+10. Assess coverage: cross-reference capabilities against linked examples. Flag no-example capabilities as 🔴 Major; subset-only coverage as 🟡 Minor. Load **reference/example-coverage-criteria.md**.
 11. Load and review each linked example file:
-    a. Verify the file has a clear scenario heading that names the trigger condition and the capability being demonstrated — flag missing or vague descriptions as 🟡 Minor.
+    a. Verify a clear scenario heading names the trigger condition and demonstrated capability — flag missing or vague as 🟡 Minor.
     b. Verify the example output structure matches what the capability's steps would produce — flag structural drift as 🔴 Major.
-    c. Check the scenario is realistic and non-trivial relative to the capability's complexity — flag toy/hello-world inputs for complex capabilities as 🟡 Minor.
+    c. Check the scenario is realistic and non-trivial — flag toy/hello-world inputs for complex capabilities as 🟡 Minor.
     d. Check the example does not contradict any rule or knowledge entry in the parent skill — flag contradictions as 🔴 Major.
-    e. Check that the example references the current capability name; flag stale names that no longer match the skill as 🟢 Nit.
-    f. Apply the `<size-limits>` example budget (≤ 9,000 chars / 150 lines) and max-line-length guard; flag overruns as 🟡 Minor and recommend remediation per **reference/size-remediation.md** when over budget.
+    e. Check the example references the current capability name; flag stale names as 🟢 Nit.
+    f. Apply the **reference/size-limits.md** example budget and max-line-length guard; flag overruns as 🟡 Minor and recommend remediation per **reference/size-remediation.md**.
     Load **reference/example-quality-criteria.md** for the full rubric.
-12. Surface inconsistencies: mixed styles within a section type, two conflicting patterns, or differing levels of procedural detail across capabilities of the same kind. Present both variants with file/line references and ask the user which should be canonical — do not silently pick one.
+12. Surface inconsistencies: mixed styles within a section type or differing procedural detail. Present both variants and ask the user which is canonical — do not silently pick one.
 13. Include a **Positive Highlights** section that acknowledges at least one well-structured aspect of the skill.
 14. Include a **Risks & Assumptions** section that states any assumptions made about the intended skill format (e.g., four-section semantics) and notes that no runtime evaluation was performed.
-15. Format findings with severity levels (🚫 Blocker, 🔴 Major, 🟡 Minor, 🟢 Nit, ⚠️ Inconsistency) and load **examples/skill-file-review.md** for output structure guidance.
-16. **Check cross-skill pipeline integration**: If the skill's description, when-to-use, or skill-boundary references another skill by name (indicating a producer→consumer pipeline), load `<pipeline-integration-review>` in `<knowledge>` and verify all 4 integration points. Flag gaps per the severity guidance in each point. If the skill does not reference any other skill, skip this step.
+15. Format findings with severity levels (see **reference/severity-levels.md**) and load **examples/skill-file-review.md** for output structure guidance.
+16. **Check pipeline integration**: If the skill references another skill, load **reference/pipeline-integration.md** and verify all 4 points. Flag gaps; skip if none referenced.
 17. Verify output completeness: every finding has a severity label, **Positive Highlights** and **Risks & Assumptions** sections are present, and all recommendations are actionable (not vague).
 </review-skill-file>
 
@@ -206,5 +144,5 @@ Apply these checks when the skill's description, when-to-use, or skill-boundary 
 
 <rules>
 <rule>When the user submits a SKILL.md file for review or asks to improve or fix a skill file, use **review-skill-file**.</rule>
-<rule>When the user asks whether a skill will trigger or activate correctly, or whether its description matches its scenarios, use **review-skill-file** and focus on step 2 (trigger correctness).</rule>
+<rule>When the user asks whether a skill will trigger or activate correctly, or whether its description matches its scenarios, use **review-skill-file** and focus on step 2.</rule>
 </rules>

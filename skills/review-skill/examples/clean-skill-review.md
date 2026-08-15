@@ -1,5 +1,5 @@
 ````markdown
-# Example: Skill File Review
+# Example: Clean Skill Review (Near-Passing)
 
 **Scenario**: Review of `skills/commit-message-writer/SKILL.md` — a copilot skill that guides an AI agent to produce consistent, well-formed git commit messages.
 
@@ -15,7 +15,7 @@
 
 ## Findings
 
-### � Minor Issues
+### 🟡 Minor Issues
 
 #### Examples exposed via standalone `<examples>` section instead of `<context-loading-guide>` inside `<knowledge>`
 - **File**: [SKILL.md](SKILL.md#L58-L64)
@@ -24,7 +24,7 @@
 
 ---
 
-### �🟢 Nits / Suggestions
+### 🟢 Nits / Suggestions
 
 #### `<knowledge>` entry for commit type prefixes could include a "when in doubt" fallback
 - **File**: [SKILL.md](SKILL.md#L12-L28)

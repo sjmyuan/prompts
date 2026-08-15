@@ -1,5 +1,5 @@
 ````markdown
-# Example: Skill File Review
+# Example: Noun-Named Capabilities and Inline Examples
 
 **Scenario**: Review of `skills/form-validator/SKILL.md` — a copilot skill that guides an AI agent through form validation for a React web app.
 
@@ -68,5 +68,5 @@
 ## Recommended Next Steps
 1. Rename all three capability sections to action-verb phrases. *(Resolves 🔴 naming)*
 2. Create `examples/async-validation.md` and link it from `<examples>`. *(Resolves 🔴 coverage gap)*
-3. Extract inline example content to separate files; replace with file-path references. *(Resolves � inline examples)*
+3. Extract inline example content to separate files; replace with file-path references. *(Resolves 🟡 inline examples)*
 ````

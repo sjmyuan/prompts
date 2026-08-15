@@ -1,5 +1,5 @@
 ````markdown
-# Example: Skill File Review
+# Example: Trigger-Correctness Violation
 
 **Scenario**: Review of `skills/sql-query-builder/SKILL.md` — a copilot skill that helps an AI agent build, review, and optimize SQL queries.
 

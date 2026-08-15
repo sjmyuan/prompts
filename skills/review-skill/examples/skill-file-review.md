@@ -1,5 +1,5 @@
 ````markdown
-# Example: Skill File Review
+# Example: Full Structural Review
 
 **Scenario**: Review of `skills/develop-miniprogram/SKILL.md` — a copilot skill that guides an AI agent on WeChat Miniprogram development.
 
@@ -43,9 +43,9 @@
 
 #### `<examples>` section is standalone instead of nested inside `<knowledge>`
 - **File**: [SKILL.md](SKILL.md#L162-L175)
-- **Issue**: The `<examples>` section exists at the top level of the skill file rather than as an `<example-selector>` entry inside `<knowledge>`. The preferred pattern places all lookup material inside `<knowledge>`.
+- **Issue**: The `<examples>` section exists at the top level of the skill file rather than as a `<context-loading-guide>` entry inside `<knowledge>`. The preferred pattern places all lookup material inside `<knowledge>`.
 - **Impact**: Minor structural inconsistency; examples are still reachable, but the skill deviates from the recommended pattern.
-- **Recommendation**: Move the examples list into an `<example-selector>` entry inside the `<knowledge>` section.
+- **Recommendation**: Move the examples list into a `<context-loading-guide>` entry inside the `<knowledge>` section.
 
 ### 🟢 Nits / Suggestions
 
