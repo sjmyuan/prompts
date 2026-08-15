@@ -11,4 +11,4 @@ Use when [intent-verb₁] / [intent-verb₂] / [intent-verb₃] [object/scope].
 - **Part 2 (trigger phrase)** — tells the AI *when to activate*; must list all intent verbs that match `<when-to-use-this-skill>` bullets
 
 **Example**:
-> Review SKILL.md files for correct structure, section-purpose compliance, and absence of duplication. Use when reviewing, improving, fixing, or diagnosing trigger failures in a copilot skill file.
+> Draft sprint plans from a product backlog and flag capacity risks. Use when planning, sizing, or rebalancing a sprint.

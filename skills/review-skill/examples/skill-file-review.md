@@ -4,6 +4,7 @@
 **Scenario**: Review of `skills/develop-miniprogram/SKILL.md` — a copilot skill that guides an AI agent on WeChat Miniprogram development.
 
 **Review Focus**: Skill structure correctness — whether `<knowledge>`, `<capabilities>`, `<rules>`, and `<examples>` sections each serve their intended purpose and are free of duplication.
+**Applies**: **review-skill-file**
 
 ## Code Review Summary
 
@@ -19,31 +20,44 @@
 
 #### Capabilities contain reference knowledge, not procedural steps
 - **File**: [SKILL.md](SKILL.md#L18-L130)
-- **Issue**: Several capability sections are reference tables or factual lists rather than descriptions of *how to do something*. `<navigation-and-data-flow>` embeds two lookup tables (navigation API and data-passing patterns); `<wechat-api-usage>` lists API signatures and banned practices; `<project-structure>` describes the directory layout. These are knowledge the agent needs to recall, not actions to perform.
+- **Issue**: Several capability sections are reference tables or factual lists rather than descriptions of *how to do something*.
+  `<navigation-and-data-flow>` embeds two lookup tables (navigation API and data-passing patterns);
+  `<wechat-api-usage>` lists API signatures and banned practices;
+  `<project-structure>` describes the directory layout.
+  These are knowledge the agent needs to recall, not actions to perform.
 - **Impact**: The agent cannot distinguish "what I know" from "what I should do", making it harder to apply the correct step sequence when acting.
-- **Recommendation**: Extract reference tables, directory layouts, API signatures, platform constraints, and banned-practice lists into a dedicated `<knowledge>` section. Keep capabilities as pure step-by-step procedures (e.g., "Steps to create and register a new page: 1. … 2. …").
+- **Recommendation**: Extract reference tables, directory layouts, API signatures, platform constraints, and banned-practice lists into a dedicated `<knowledge>` section.
+  Keep capabilities as pure step-by-step procedures (e.g., "Steps to create and register a new page: 1. … 2. …").
 
 #### Rules duplicate content already in capabilities
 - **File**: [SKILL.md](SKILL.md#L133-L160)
-- **Issue**: Most rules re-state implementation details already covered in capabilities. For example, the rule *"Canvas pages must set `"renderer": "webview"`"* repeats the same constraint already written inside `<canvas-operations>`. Similarly, the `try/catch` rule repeats `<storage-management>`, and the `wx.switchTab` rule repeats `<navigation-and-data-flow>`.
+- **Issue**: Most rules re-state implementation details already covered in capabilities.
+  For example, the rule *"Canvas pages must set `"renderer": "webview"`"* repeats the same constraint already written inside `<canvas-operations>`.
+  Similarly, the `try/catch` rule repeats `<storage-management>`, and the `wx.switchTab` rule repeats `<navigation-and-data-flow>`.
 - **Impact**: Every constraint is maintained in two places; they can drift apart. The agent also receives redundant signal, bloating the prompt without adding guidance value.
-- **Recommendation**: Rules should answer "**when** does this situation apply → **which capability** to use", not re-describe how the capability works. Example: *"When adding any new page, use **add-page**. Read `app.json` first — navigating to an unregistered page causes silent failures."*
+- **Recommendation**: Rules should answer "**when** does this situation apply → **which capability** to use",
+  not re-describe how the capability works.
+  Example: *"When adding any new page, use **add-page**. Read `app.json` first — navigating to an unregistered page causes silent failures."*
 
 ### 🟡 Minor Issues
 
 #### `<project-structure>` doubles as a capability and as knowledge
 - **File**: [SKILL.md](SKILL.md#L18-L40)
-- **Issue**: The section contains both a directory-layout reference (knowledge) and a new-page checklist (procedure). Mixing the two makes it unclear whether the agent should consult this section to recall a fact or to follow steps.
+- **Issue**: The section contains both a directory-layout reference (knowledge) and a new-page checklist (procedure).
+  Mixing the two makes it unclear whether the agent should consult this section to recall a fact or to follow steps.
 - **Recommendation**: Split into a `<project-structure>` knowledge entry (directory layout + package ownership rules) and an `<add-page>` capability (the checklist as ordered steps).
 
 #### `<typescript-patterns>` and `<styling-conventions>` read as bullet-point knowledge, not capabilities
 - **File**: [SKILL.md](SKILL.md#L95-L120)
-- **Issue**: Both sections list facts and constraints (`"strict": true`, `rpx` for sizing) rather than describing a procedure to follow. A capability should answer "how do I apply TypeScript/styling in this project?", not just enumerate settings.
-- **Recommendation**: Convert to step-by-step procedures ("How to type a develop-miniprogram codebase: 1. … 2. …") or, for purely factual entries (tsconfig flags, forbidden units), move them to `<knowledge>`.
+- **Issue**: Both sections list facts and constraints (`"strict": true`, `rpx` for sizing) rather than describing a procedure to follow.
+  A capability should answer "how do I apply TypeScript/styling in this project?", not just enumerate settings.
+- **Recommendation**: Convert to step-by-step procedures ("How to type a develop-miniprogram codebase: 1. … 2. …")
+  or, for purely factual entries (tsconfig flags, forbidden units), move them to `<knowledge>`.
 
 #### `<examples>` section is standalone instead of nested inside `<knowledge>`
 - **File**: [SKILL.md](SKILL.md#L162-L175)
-- **Issue**: The `<examples>` section exists at the top level of the skill file rather than as a `<context-loading-guide>` entry inside `<knowledge>`. The preferred pattern places all lookup material inside `<knowledge>`.
+- **Issue**: The `<examples>` section exists at the top level of the skill file rather than as a `<context-loading-guide>` entry inside `<knowledge>`.
+  The preferred pattern places all lookup material inside `<knowledge>`.
 - **Impact**: Minor structural inconsistency; examples are still reachable, but the skill deviates from the recommended pattern.
 - **Recommendation**: Move the examples list into a `<context-loading-guide>` entry inside the `<knowledge>` section.
 
@@ -54,14 +68,16 @@
 
 #### Example links are present but could align with capability names
 - **File**: [SKILL.md](SKILL.md#L162-L175)
-- The `<examples>` section links each example to a use-case description. After a rename from `<canvas-operations>` to `<canvas-setup-and-draw>`, the example description should use the same verb phrase for consistency.
+- The `<examples>` section links each example to a use-case description.
+  After a rename from `<canvas-operations>` to `<canvas-setup-and-draw>`, the example description should use the same verb phrase for consistency.
 
 ### ⚠️ Inconsistencies (Decision Required)
 
 #### Two styles of constraint expression inside capabilities
 - **Variant A**: Prose bullets — *"Centralise access in `utils/storage.ts`; use named constants for keys"* — used in `<storage-management>`, `<typescript-patterns>`, `<styling-conventions>`
 - **Variant B**: Imperative numbered steps — used in the new-page checklist inside `<project-structure>`
-- **Trade-offs**: Prose bullets are compact and easy to scan; numbered steps make sequencing explicit and are easier for the agent to follow procedurally. Mixed usage makes it unclear which format is authoritative for capabilities.
+- **Trade-offs**: Prose bullets are compact and easy to scan; numbered steps make sequencing explicit and are easier for the agent to follow procedurally.
+  Mixed usage makes it unclear which format is authoritative for capabilities.
 - **Decision needed**: Should capabilities always use numbered steps (procedural), or are bullet lists acceptable for non-sequential guidance?
 
 ---
@@ -75,7 +91,9 @@
 ---
 
 ## Risks & Assumptions
-- The review assumes the intended semantics are: `<knowledge>` = facts to recall, `<capabilities>` = procedures to execute, `<rules>` = when-to-use-which-capability triggers. If the skill format has a different intended design, some findings may not apply.
+- The review assumes the intended semantics are: `<knowledge>` = facts to recall, `<capabilities>` = procedures to execute,
+  `<rules>` = when-to-use-which-capability triggers.
+  If the skill format has a different intended design, some findings may not apply.
 - No runtime evaluation of whether the agent actually follows the skill more accurately after restructuring — that requires prompt testing.
 
 ---

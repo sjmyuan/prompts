@@ -8,6 +8,7 @@ problem.
 **Review Focus**: Writing style — directive voice, BLUF, hard caps, banned
 phrases, meta-commentary, and process narration in SKILL.md, its reference,
 and its example.
+**Applies**: **review-skill-file**
 
 ## Code Review Summary
 

@@ -6,6 +6,7 @@ file "fits the 150-line budget."
 
 **Review Focus**: File size and density — whether the line-count budget
 reflects the true context cost, and whether lines were merged to dodge it.
+**Applies**: **review-skill-file**
 
 ## Code Review Summary
 

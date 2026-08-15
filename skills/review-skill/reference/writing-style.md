@@ -1,6 +1,7 @@
 # Skill-File Writing Style
 
-Prose-quality rules for the skill under review: its SKILL.md, reference rubrics, and example files. Complements conciseness (reference/conciseness-check.md) and section semantics (reference/section-semantics.md) — style flags how prose is written, structure flags what is placed where.
+Prose-quality rules for the skill under review: its SKILL.md, reference rubrics, and example files.
+Complements conciseness (reference/conciseness-check.md) and section semantics (reference/section-semantics.md) — style flags how prose is written, structure flags what is placed where.
 
 ## Core rule: directive voice
 - SKILL.md is a procedure the agent executes — write commands, not descriptions.

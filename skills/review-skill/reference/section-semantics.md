@@ -17,10 +17,12 @@ A well-formed copilot skill file uses these sections with distinct, non-overlapp
 - Capabilities written as bullet-point fact lists instead of ordered procedural steps
 - Capabilities named as nouns (`<storage-management>`) instead of action verbs (`<manage-storage>`)
 - Skill name (frontmatter `name:`) is a noun phrase (`svg-editor`) instead of an action verb (`edit-svg`)
-- A bare `<examples>` section used instead of a `<context-loading-guide>` entry inside `<knowledge>` (the guide consolidates on-demand context — examples and step-independent references — in one place)
+- A bare `<examples>` section used instead of a `<context-loading-guide>` entry inside `<knowledge>`
+  (the guide consolidates on-demand context — examples and step-independent references — in one place)
 - On-demand files (references, examples) with no load route — not linked from a knowledge subsection, a capability step, or a context-loading-guide row
 - `<context-loading-guide>` written as a bullet list, or as a two-column **Scenario | Reference** table — the first column must be a decision condition ("Load when…"), not a content description
 - `<context-loading-guide>` first column describes *what the file contains* instead of *when to load it* — forces the agent to infer the loading condition, leading to missed or wrong loads
 - `<examples>` content embedded inline rather than referenced by file path for on-demand loading
 - Large reference rubrics embedded inline in SKILL.md instead of extracted to `reference/` files
-- Using `<knowledge>`, `<capabilities>`, or `<rules>` tag syntax to reference sections in prose (e.g., "put this in `<knowledge>`") — use plain names like "the knowledge section" instead; XML-like syntax may confuse the AI during parsing
+- Using `<knowledge>`, `<capabilities>`, or `<rules>` tag syntax to reference sections in prose (e.g., "put this in `<knowledge>`")
+  — use plain names like "the knowledge section" instead; XML-like syntax may confuse the AI during parsing

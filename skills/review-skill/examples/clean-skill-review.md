@@ -4,6 +4,7 @@
 **Scenario**: Review of `skills/commit-message-writer/SKILL.md` — a copilot skill that guides an AI agent to produce consistent, well-formed git commit messages.
 
 **Review Focus**: Full structural review — section semantics, capability naming, rules, and example coverage.
+**Applies**: **review-skill-file**
 
 ## Code Review Summary
 
@@ -19,8 +20,10 @@
 
 #### Examples exposed via standalone `<examples>` section instead of `<context-loading-guide>` inside `<knowledge>`
 - **File**: [SKILL.md](SKILL.md#L58-L64)
-- **Issue**: The skill uses a top-level `<examples>` section rather than a `<context-loading-guide>` entry nested inside `<knowledge>`. The preferred pattern consolidates all on-demand context — examples, references, rubrics — in one place so the agent always knows where to look.
-- **Recommendation**: Move the examples list into a `<context-loading-guide>` block inside the `<knowledge>` section. The file references can stay exactly as-is; only the placement and tag name change.
+- **Issue**: The skill uses a top-level `<examples>` section rather than a `<context-loading-guide>` entry nested inside `<knowledge>`.
+  The preferred pattern consolidates all on-demand context — examples, references, rubrics — in one place so the agent always knows where to look.
+- **Recommendation**: Move the examples list into a `<context-loading-guide>` block inside the `<knowledge>` section.
+  The file references can stay exactly as-is; only the placement and tag name change.
 
 ---
 
@@ -29,7 +32,8 @@
 #### `<knowledge>` entry for commit type prefixes could include a "when in doubt" fallback
 - **File**: [SKILL.md](SKILL.md#L12-L28)
 - **Issue**: The prefix reference table (feat, fix, chore, docs, refactor, test, ci) does not indicate what to use when a change spans multiple types.
-- **Recommendation**: Add a single note: *"When a commit spans multiple types, prefer the type with the highest user impact (feat > fix > refactor > chore)."* This prevents the agent from stalling on ambiguous inputs.
+- **Recommendation**: Add a single note: *"When a commit spans multiple types, prefer the type with the highest user impact (feat > fix > refactor > chore)."*
+  This prevents the agent from stalling on ambiguous inputs.
 
 #### Rule for breaking changes could link to the capability more explicitly
 - **File**: [SKILL.md](SKILL.md#L55-L57)
@@ -48,7 +52,8 @@
 ---
 
 ## Risks & Assumptions
-- Review assumes the four-section semantics (knowledge / capabilities / rules) with on-demand context exposed via `<context-loading-guide>` inside `<knowledge>`. If the intended skill format differs, findings may not apply.
+- Review assumes the four-section semantics (knowledge / capabilities / rules) with on-demand context exposed via `<context-loading-guide>` inside `<knowledge>`.
+  If the intended skill format differs, findings may not apply.
 
 ---
 
