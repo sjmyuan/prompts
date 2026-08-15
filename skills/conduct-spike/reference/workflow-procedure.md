@@ -82,29 +82,12 @@ Load the `write-solution-doc` skill's SKILL.md and apply its capabilities in **b
 
 ## Continue prior spike (continue-prior-spike)
 
-1. Load the prior spike's artifacts — scope summary, findings docs, ADRs, solution doc, change summary (if any). If unavailable, ask the user to share or summarize them.
-2. Confirm the continuation scope: which areas to revisit, the open question for each, which areas stand as-is.
-3. Validate: selected areas independently decidable; unselected areas' decisions preserved.
-4. Run the standard workflow in revise-in-place mode: **investigate-per-area** (dispatch briefs seed sub-agents with the area's existing findings doc / evidence map so covered code is not re-scanned; scope strictly to answering the open questions), then **compile-findings-doc** → **evaluate-solutions-per-area** → **draft-area-adrs** (revising existing ADRs in place).
-5. Apply **sync-update-artifacts** to propagate downstream.
-6. Ask whether to continue with another round or conclude; a continuation becomes the new scope via **define-spike-scope**.
+Follow **continue-prior-spike** in SKILL.md. Distinct dispatch detail: seed sub-agents with the area's existing findings doc / evidence map so covered code is not re-scanned; scope strictly to answering the open questions; revise existing ADRs in place.
 
 ## Summarize required changes (summarize-required-changes)
 
-1. Confirm prerequisites: findings docs and solution doc finalized. Ask: "Would you like me to generate a summary of the concrete code changes required to implement this solution?" Optional — do not produce unless requested.
-2. Determine code access: ask "Can I access the current codebase to verify the scope of changes?" **With access**: trace code paths and estimate scope concretely (file counts, LOC ranges, classes to modify), mark code-verified. **Without access**: generate at architectural level, mark estimates as unverified approximations.
-3. For each area/ADR, map the delta from current state to target state using the categories in **change-summary-guide** (New, Modified, Retired, Configuration, Data, Dependency, Test).
-4. Group changes by area/service, labeling each cluster with its ADR reference; identify cross-cutting concerns spanning multiple areas.
-5. Compile the change summary following **change-summary-guide**; include a notes section for caveats, assumptions, and open questions. Save to `<spike-folder>/change-summary.md` per **spike-artifact-layout**.
-6. Present and ask: "Does this change scope look accurate? Anything missing, overestimated, or underestimated?"
-7. The change summary is **never final** — if findings or the solution doc change, apply **sync-update-artifacts** to refresh it.
+Follow **summarize-required-changes** in SKILL.md. Distinct detail: determine code access first — with access, trace code paths and mark estimates code-verified; without access, generate at architectural level and mark estimates unverified.
 
 ## Sync update artifacts (sync-update-artifacts)
 
-1. Identify the change and its origin artifact: new evidence or corrected fact (findings doc), changed decision (ADR), or target-state change (solution doc).
-2. Trace the propagation path with **artifact-maintenance-doctrine** to determine which downstream artifacts the change affects.
-3. Apply the change at the origin through its owning skill — `draft-adr` for ADRs, `write-solution-doc` for findings/solution docs (the findings doc carries the evidence map — see **professional-doc-authoring**) — rewriting affected sections in place.
-4. Run the **no-note scan** on each touched ADR and solution doc per **reference/artifact-maintenance-guide.md**; rewrite until clean.
-5. Propagate downstream in order, re-running the owning capability seeded with the current artifact plus the delta; for the change summary, recompute the affected clusters against the updated baseline and target.
-6. Validate consistency: every artifact reflects the latest facts and decisions; ADRs cite only current findings; the solution doc mirrors every ADR; the change summary traces to current ADRs.
-7. Present the delta in conversation — what changed and how artifacts now agree; never inside the artifacts (see **artifact-maintenance-doctrine**).
+Follow **sync-update-artifacts** in SKILL.md. Distinct detail: the findings doc carries the evidence map, so its owning-skill update flows through `write-solution-doc` (see **professional-doc-authoring**).

@@ -4,7 +4,7 @@
 
 **Applies**: `define-spike-scope` → `investigate-per-area` (parallel dispatch) → `compile-findings-doc` → `evaluate-solutions-per-area` → `draft-area-adrs` (parallel dispatch) → `compile-solution-doc`
 
-**What makes this distinct**: This example demonstrates the multi-agent orchestration pattern where the orchestrating agent delegates independent work units to sub-agents that run concurrently, then synthesizes their results. Note that dispatch to sub-agents is the default for **all** spikes — including single-area/single-ADR ones — primarily to preserve the orchestrating agent's context; parallel speed is a secondary benefit (see `reference/multi-agent-orchestration.md`).
+**What makes this distinct**: Demonstrates parallel sub-agent orchestration — the orchestrator delegates independent work units concurrently, then synthesizes. Dispatch is the default for **all** spikes (even single-area) to preserve the orchestrating agent's context; parallel speed is secondary (see `reference/multi-agent-orchestration.md`).
 
 ---
 
@@ -29,14 +29,14 @@
 
 ### Orchestrator: Prepare Briefs
 
-The orchestrator prepares 4 self-contained briefs, one per investigation area. Each includes the area description, the overall spike goal, the expected output format — and **requires the sub-agent to return a per-area evidence map** (entry points, key locations with file:line, call chains, evidence verdicts, searched-negatives). No findings doc exists yet, so this first round seeds the evidence map (see `reference/findings-document-guide.md`).
+The orchestrator prepares 4 self-contained briefs, one per area — area description, spike goal, expected output — each **requiring a per-area evidence map** (entry points, `file:line` key locations, call chains, verdicts, searched-negatives). No findings doc exists yet, so this round seeds the evidence map (see `reference/findings-document-guide.md`).
 
 | Brief | Investigate | Scope | Expected output |
 |---|---|---|---|
-| 1 — Service decomposition | How should the monolith be split into services? | Bounded contexts, package dependencies, team ownership | Current code organization, coupling points, constraints + evidence map |
-| 2 — Inter-service communication | What patterns exist / are needed? | Current integration points, team familiarity with async | Communication landscape, constraints, existing infra + evidence map |
-| 3 — Database decomposition | How is the DB structured / decomposable? | Table ownership, stored procedures, access patterns | DB topology, cross-domain dependencies, constraints + evidence map |
-| 4 — Migration strategy | What deployment infra / patterns are feasible? | Deployment pipeline, traffic routing, feature flags | Deployment architecture, constraints, feasibility + evidence map |
+| 1 — Service decomposition | How to split the monolith? | Bounded contexts, package deps, ownership | Current org, coupling, constraints + evidence map |
+| 2 — Inter-service communication | What patterns exist / needed? | Integration points, async familiarity | Comm landscape, constraints, infra + evidence map |
+| 3 — Database decomposition | How is the DB structured / decomposable? | Table ownership, stored procs, access | DB topology, cross-domain deps + evidence map |
+| 4 — Migration strategy | What infra / patterns feasible? | Pipeline, traffic routing, feature flags | Deployment arch, constraints, feasibility + evidence map |
 
 ### Orchestrator: Dispatch
 
@@ -46,7 +46,7 @@ The orchestrator prepares 4 self-contained briefs, one per investigation area. E
 
 ### Sub-Agents Execute Concurrently
 
-*Each sub-agent works independently, exploring the codebase for its assigned area. The sub-agents do not communicate with each other.*
+*Each sub-agent works independently and does not communicate with the others.*
 
 ### Sub-Agent A Returns — Service Decomposition
 
@@ -74,21 +74,13 @@ The orchestrator prepares 4 self-contained briefs, one per investigation area. E
 
 ---
 
-## Phase 2a: Completion Checkpoint
-
-> Orchestrator: "All 4 sub-agents have returned and their findings are verified. Is this sufficient, or should we investigate further before formalizing?"
-> User: "It's sufficient — let's formalize. We can prototype the async + routing approach as a follow-up spike later."
-> Orchestrator: "Proceeding to compile the findings document from the 4 sub-agent outputs."
-
----
-
 ## Phase 2b: Compile Findings Documents
 
 *[Orchestrator applies compile-findings-doc — producing one consolidated findings document from the synthesized investigation results of all 4 sub-agents]*
 
 ### Findings Document: `findings-payment-migration.md`
 
-*[write-solution-doc skill applied to current state]*
+*[write-solution-doc skill applied to current state; evidence maps embedded inline per `reference/findings-document-guide.md`]*
 
 **C2 Container Diagram (Current State)**: Monolithic Spring Boot app on Kubernetes → single PostgreSQL, behind Kong API Gateway.
 
@@ -97,40 +89,23 @@ The orchestrator prepares 4 self-contained briefs, one per investigation area. E
 | Area | Current State | Key Constraint |
 |---|---|---|
 | Service decomposition | Single app, package-by-layer, 3 intermingled domains | `PaymentOrchestrator` (1200 lines) couples all types |
-| Inter-service communication | All in-process calls; external: REST/gRPC/SOAP | No async messaging experience on team |
-| Database decomposition | Single PostgreSQL, ~80 tables, shared `transactions`/`accounts` | 12 stored procedures (2000+ lines) are a migration blocker |
-| Migration strategy | K8s + Kong API Gateway + GitHub Actions CI/CD | No traffic splitting or feature flags in place |
+| Inter-service communication | In-process calls; external REST/gRPC/SOAP | No async messaging experience on team |
+| Database decomposition | Single PostgreSQL ~80 tables, shared `transactions`/`accounts` | 12 stored procedures (2000+ lines) block migration |
+| Migration strategy | K8s + Kong API Gateway + GitHub Actions CI/CD | No traffic splitting or feature flags |
 
-**Cross-Area Observations**:
-- Area 1 (service boundaries) and Area 3 (database): the shared `transactions` table couples payment-type services and database decomposition — both must be addressed together.
-- Area 2 (communication) and Area 4 (migration): lack of async messaging and traffic splitting means migration must start with synchronous patterns.
-
-**Raw Data & Metrics**:
-- ~200K LOC, ~80 tables, 3 K8s replicas
-- 3 external protocols (REST, gRPC, SOAP)
-- Team: 3 sub-teams, no Kafka experience
+**Cross-Area Observations**: Area 1 + 3 couple via the shared `transactions` table — both must be addressed together; Area 2 + 4 lack async/traffic-split infra — migration must start synchronous.
 
 **Evidence & Verification** (per-area evidence maps embedded inline):
 
-**Evidence Ledger**
-
-| Claim / Question | Verdict | Evidence (file:line) | Confidence |
+| Claim / Question | Verdict | Evidence (`file:line`) | Confidence |
 |---|---|---|---|
-| Is there a circuit breaker around external calls? | No | `grep "CircuitBreaker\|Resilience4j\|fallback"` across `payment-service` — no matches | Verified (negative) |
-| Are all internal calls in-process? | Yes | `service/PaymentOrchestrator.java:88` calls services directly; no internal HTTP client found | Verified |
-| Does `transactions` hold all payment types? | Yes | `db/schema.sql:201` — no payment-type discriminator at table level | Verified |
+| Circuit breaker around external calls? | No | `grep "CircuitBreaker\|Resilience4j\|fallback"` across `payment-service` — no matches | Verified (negative) |
+| All internal calls in-process? | Yes | `service/PaymentOrchestrator.java:88` — no internal HTTP client found | Verified |
 | Can Kong split traffic? | Unknown | `kong/kong.yml:34` — single upstream, no weighted upstreams | Inferred |
-| Team has async messaging experience? | N/A | from user conversation, not code | Gap |
 
-**Searched-Negatives**
+**Searched-Negatives**: `grep -ri "kafka\|rabbit\|mq"` in `payment-service` — no broker usage; `grep -ri "featureflag\|trafficsplit"` in `infra-configs` — none found.
 
-| Area | Search performed | Result | Next step |
-|---|---|---|---|
-| Communication | `grep -ri "kafka\|rabbit\|mq"` in `payment-service` | No message broker usage | Prototype async feasibility (direction D2) |
-| Migration | `grep -ri "featureflag\|trafficsplit"` in `infra-configs` | None found | Verify Kong weighted-upstream capability in docs |
-| Service decomposition | Search for `*Module` / bounded-context markers | None — package-by-layer only | Deep-dive into domain import graph (D1) |
-
-> *Entry points and key locations (`file:line`) also annotate the C2/sequence diagrams above. Findings consolidated from 4 parallel sub-agent investigations. Cross-area consistency verified — no contradictions found. This document is the current-state baseline and evidence home for evaluation.*
+> *Entry points (`file:line`) annotate the C2/sequence diagrams. Findings consolidated from 4 parallel sub-agents; cross-area consistency verified, no contradictions. This is the current-state baseline and evidence home.*
 
 ---
 
@@ -186,42 +161,26 @@ Load draft-adr skill and produce a complete ADR.
 
 ### Orchestrator: Synthesize
 
-> *The orchestrator reviews all 4 ADRs for consistency:*
-> - ADR-001 assumes payment-type services; ADR-003 assumes DB per service — consistent decomposition strategy
-> - ADR-002 assumes Kafka; ADR-004 assumes Strangler Fig with API Gateway routing — complementary, no conflict
-> - ADR-004 references ADR-001's service boundaries — cross-reference is correct
->
-> *All ADRs are consistent. Presenting to user for review.*
+> *All 4 ADRs reviewed for consistency: ADR-001 (payment-type services) + ADR-003 (DB per service) are consistent; ADR-002 (Kafka) + ADR-004 (Strangler + gateway routing) are complementary; ADR-004 cross-references ADR-001 correctly. No conflicts — presenting for review.*
 
 ---
 
 ## Phase 5: Compile Solution Doc — SINGLE-TASK DISPATCH
 
-*The solution document is a single unit (it synthesizes all ADRs into one cohesive document), so it is dispatched as one task — context preservation, not parallelism.*
-
-*[Orchestrator prepares a brief: business context, findings doc, and the 4 assumed solutions, with instructions to load `write-solution-doc` and produce the target-state document. Dispatched to a solution-doc sub-agent; the orchestrator reviews the result.]*
+*The solution doc is one unit synthesizing all ADRs, so it dispatches as a single task (context preservation, not parallelism). Brief: business context, findings doc, 4 assumed solutions; load `write-solution-doc`, produce the target-state doc.*
 
 > "Dispatching solution-doc compilation to a sub-agent."
 
-### Final Output Bundle
-
-- **Findings Document**: `findings-payment-migration.md` (current-state architecture + embedded per-area evidence map: `file:line` key locations, evidence ledger, searched-negatives)
-- **Solution Document**: `solution.md` (C4 diagrams, API contracts, RAID, RACI — decision-only, no code references)
-- **ADR-001**: Service Decomposition (Payment-type services)
-- **ADR-002**: Inter-service Communication (Hybrid sync/async)
-- **ADR-003**: Database Decomposition (Database per service)
-- **ADR-004**: Migration Strategy (Strangler Fig)
+**Final Output Bundle**: `findings-payment-migration.md` (current-state + evidence maps) · `solution.md` (C4, API contracts, RAID, RACI — decision-only) · ADR-001 (Payment-type services) · ADR-002 (Hybrid sync/async) · ADR-003 (DB per service) · ADR-004 (Strangler Fig).
 
 ---
 
 ## Key Takeaways: Direct vs. Sub-Agent Dispatch
 
-| Aspect | Direct Execution (fallback only) | Sub-Agent Dispatch (default) |
+| Aspect | Direct (fallback only) | Sub-Agent (default) |
 |---|---|---|
-| Orchestrator context usage | High — all reading/reasoning stays in the orchestrator's window | Low — work happens in isolated sub-agent contexts |
-| Investigation time | Sum of all areas (4x single-area time) | Max of any single area (~1x) when concurrent |
-| ADR drafting time | Sum of all ADRs (4x single-ADR time) | Max of any single ADR (~1x) when concurrent |
-| Coordination overhead | None | Brief preparation + synthesis |
-| Findings/solution-doc compilation | Done in the orchestrator — large writes crowd its context | Single dispatch per doc (one unit) — the write happens in the sub-agent |
-| When used | Only when no suitable sub-agent is available | Always — even single-area/single-ADR/single-document spikes |
-| Risk | Orchestrator context bloat degrades later synthesis | Sub-agents may need re-prompting if briefs are incomplete |
+| Orchestrator context | High — all reasoning stays in its window | Low — work happens in isolated contexts |
+| Time | Sum of all areas/ADRs | Max of any single one when concurrent |
+| Coordination | None | Brief prep + synthesis |
+| When used | Only when no suitable sub-agent exists | Always — even single-task spikes |
+| Risk | Orchestrator context bloat | Incomplete briefs need re-prompting |

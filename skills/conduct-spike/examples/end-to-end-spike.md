@@ -4,7 +4,7 @@
 
 **Applies**: All capabilities in sequence — `define-spike-scope` → `investigate-per-area` → `compile-findings-doc` → `evaluate-solutions-per-area` → `draft-area-adrs` → `compile-solution-doc`
 
-**What makes this distinct**: This is a full multi-area spike on a brownfield system with complex dependencies, demonstrating the complete 5-phase workflow. It runs investigation, ADR drafting, and findings/solution-doc compilation directly in the orchestrating agent to keep the walkthrough readable; in practice these steps dispatch to sub-agents whenever available — including for single tasks — to preserve the orchestrating agent's context (see `reference/multi-agent-orchestration.md` and `examples/multi-agent-investigation.md`).
+**What makes this distinct**: Full multi-area brownfield spike demonstrating the complete 5-phase workflow end to end (see `examples/multi-agent-investigation.md` for the parallel-dispatch variant).
 
 ---
 
@@ -53,17 +53,10 @@
 
 *[Investigation complete — the assistant confirms the result before formalizing findings]*
 
-### Assistant
+### Assistant → User
 
-> "Investigation complete. Is this result sufficient, or should we investigate further before formalizing the findings?"
-
-### User Response
-
-> "It's sufficient for now — let's formalize. We can dig into the orchestrator call graph and monitoring after the first round of ADRs."
-
-### Assistant
-
-> "Got it. Proceeding to compile findings document."
+> "Investigation complete — is this sufficient, or should we investigate further before formalizing?"
+> User: "It's sufficient — let's formalize. We can dig into the orchestrator call graph after the first round of ADRs."
 
 ---
 
@@ -79,11 +72,9 @@
 
 **Current Architecture Summary**: monolithic Spring Boot app (~200K LOC), package-by-layer, three intermingled domains coordinated by `PaymentOrchestrator` (1200 lines); all communication in-process; single PostgreSQL (~80 tables) with `transactions`/`accounts`/`audit_log` as cross-domain hotspots; 12 settlement stored procedures (2000+ lines); deployed on Kubernetes (3 replicas) behind Kong API Gateway; no message broker, feature flags, or traffic splitting.
 
-**Constraints & Pain Points**: full redeploy for any payment-type change; wallet cannot scale independently; three teams contend on the same code; no circuit breaker; no async experience; SOAP legacy must be maintained; canaries untested for routing migration.
+**Constraints & Raw Data**: full redeploy for any payment-type change; wallet cannot scale; three teams contend on the same code; no circuit breaker; no async experience; SOAP legacy must be maintained · ~200K LOC · ~80 tables · 12 stored procedures · 3 replicas · 3 protocols (REST, gRPC, SOAP).
 
-**Raw Data & Metrics**: ~200K LOC · ~80 tables · 12 stored procedures · 3 replicas · 3 protocols (REST, gRPC, SOAP).
-
-> *The findings document now serves as the current-state baseline. Evaluation will compare solution options against this baseline. ADRs will cite specific sections for evidence. The solution document will evolve these diagrams from as-is → to-be.*
+> *Findings = current-state baseline; evaluation compares options against it; ADRs cite its evidence; the solution doc evolves these diagrams as-is → to-be.*
 
 ---
 
@@ -95,8 +86,8 @@
 
 | Option | Description | Pros | Cons |
 |---|---|---|---|
-| **A: Payment-type services** | One service per payment type + shared lib | Clear ownership; independent scaling | Shared-lib coupling; duplicated cross-cutting concerns |
-| **B: Domain-driven services** | Payment Initiation, Processing, Settlement, Reconciliation | Aligned with business process; cleaner deps | More services; team restructuring |
+| **A: Payment-type services** | One per payment type + shared lib | Clear ownership; independent scaling | Shared-lib coupling; duplicated concerns |
+| **B: Domain-driven services** | Initiation, Processing, Settlement, Reconciliation | Aligned with business process | More services; team restructuring |
 | **C: Strangler extraction** | Extract one payment type at a time | Lowest risk; incremental | Temporary hybrid complexity |
 
 **Assumed Solution**: Option A (Payment-type services) — aligns with existing team structure, minimizes organizational change, and allows independent scaling.
@@ -105,9 +96,9 @@
 
 | Option | Description | Pros | Cons |
 |---|---|---|---|
-| **A: Synchronous REST** | Services call each other via REST APIs | Simple; team familiar | Tight coupling; cascading failures |
-| **B: Async events (Kafka)** | Services communicate via event streams | Loose coupling; resilience | Team learning curve; eventual consistency |
-| **C: Hybrid** | REST for queries, events for commands | Best of both worlds | More infra; two patterns to maintain |
+| **A: Synchronous REST** | Services call via REST | Simple; team familiar | Tight coupling; cascading failures |
+| **B: Async events (Kafka)** | Event streams | Loose coupling; resilience | Learning curve; eventual consistency |
+| **C: Hybrid** | REST for queries, events for commands | Best of both worlds | More infra; two patterns |
 
 **Assumed Solution**: Option C (Hybrid) — synchronous REST for real-time payment status queries, async Kafka events for payment processing commands and settlement.
 
@@ -115,9 +106,9 @@
 
 | Option | Description | Pros | Cons |
 |---|---|---|---|
-| **A: Database per service** | Each service owns its own database | True decoupling; independent scaling | Complex migration; hard cross-service queries |
-| **B: Shared DB + views** | One physical DB, schema-level separation via views | Simpler migration; existing SQL preserved | Not true decoupling; schema coupling remains |
-| **C: Event-driven sync** | DB per service, synchronized via CDC events | Eventual consistency with audit trail | Complex to operate; eventual consistency |
+| **A: Database per service** | Each service owns its DB | True decoupling; independent scaling | Complex migration; hard cross-service queries |
+| **B: Shared DB + views** | Schema-level separation via views | Simpler migration; SQL preserved | Not true decoupling |
+| **C: Event-driven sync** | DB per service, CDC events | Eventual consistency + audit trail | Complex to operate |
 
 **Assumed Solution**: Option A (Database per service) — phased implementation starting with the least-coupled payment type (Wallet), using the Strangler Fig pattern.
 
@@ -125,9 +116,9 @@
 
 | Option | Description | Pros | Cons |
 |---|---|---|---|
-| **A: Strangler Fig** | Incrementally replace monolith parts with new services | Low risk; reversible; incremental value | Takes longer; routing complexity during transition |
-| **B: Parallel run** | Run old and new systems side by side, compare results | Highest confidence in correctness | Double operational cost; complex comparison |
-| **C: Big-bang cutover** | Build everything, switch in one go | Clean cut; no transitional complexity | High risk; no rollback on failure |
+| **A: Strangler Fig** | Incrementally replace parts | Low risk; reversible; incremental value | Takes longer; routing complexity |
+| **B: Parallel run** | Run old and new side by side | Highest correctness confidence | Double operational cost |
+| **C: Big-bang cutover** | Build everything, switch at once | Clean cut; no transition complexity | High risk; no rollback |
 
 **Assumed Solution**: Option A (Strangler Fig) — extract Wallet payments first (simplest domain), then Bank Transfer, then Credit Card. Use API Gateway for traffic routing.
 
@@ -153,11 +144,7 @@
 
 **Chosen Option**: A — Payment-type services (Wallet, Bank Transfer, Credit Card) with a shared utility library
 
-**Consequences**:
-- (+) Each team independently deploys and scales their payment type
-- (+) Incremental extraction possible via Strangler Fig
-- (-) Shared lib creates coupling risk; must be versioned and treated as an API
-- (-) Cross-cutting concerns (auth, logging) may be duplicated across services
+**Consequences**: (+) independent deploy/scale per payment type; (+) incremental Strangler extraction; (−) shared lib coupling risk — version and treat as an API; (−) duplicated cross-cutting concerns (auth, logging).
 
 ---
 
@@ -175,12 +162,11 @@ Similar structured ADRs produced for communication strategy (ADR-002: Hybrid syn
 
 **Solution Document**: `solution.md`
 - Business context: migrate payment monolith to microservices
-- C2 Container Diagram: API Gateway → Wallet Service, Bank Transfer Service, Credit Card Service, each with own DB; Kafka event bus
-- C3 Component Diagrams: per service (e.g., Wallet Service: Controller → Service → Repository → Wallet DB)
-- Sequence Diagrams: payment initiation flow, settlement flow, migration toggle flow
+- C2 Container Diagram: API Gateway → Wallet, Bank Transfer, Credit Card services, each with own DB; Kafka event bus
+- C3 Component + Sequence Diagrams: per service (as-is → to-be), payment initiation/settlement/migration flows
 - API Contracts: REST endpoints for queries, Kafka topic schemas for events
-- RAID Analysis: risks around data consistency, assumptions about Kafka adoption, issues with SOAP legacy integration
-- RACI Matrix: ownership per service and cross-cutting concerns
+- RAID: risks (data consistency), assumptions (Kafka adoption), issues (SOAP legacy)
+- RACI: ownership per service and cross-cutting concerns
 
 **ADRs**:
 - ADR-001: Payment Service Decomposition (Payment-type services)
@@ -190,4 +176,4 @@ Similar structured ADRs produced for communication strategy (ADR-002: Hybrid syn
 
 ### Wrap-Up (conversation level — not written into any artifact)
 
-> The solution document adopts the assumed solutions from all four ADRs. If any ADR decision changes during team review, the corresponding section of the solution document is rewritten in place. All artifacts are version-controlled together in the spike folder — `spikes/payment-migration/` — with the ADRs in `adrs/`, the solution doc (`solution.md`) and change summary at the root, and findings docs in `docs/` (see `examples/spike-artifact-layout.md`).
+> All four assumed solutions are adopted into the solution doc. If an ADR decision changes during review, the corresponding section is rewritten in place. Artifacts version together in `spikes/payment-migration/` — ADRs in `adrs/`, solution doc and change summary at the root, findings in `docs/` (see `examples/spike-artifact-layout.md`).
