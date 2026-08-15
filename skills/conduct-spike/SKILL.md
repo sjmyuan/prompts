@@ -238,12 +238,6 @@ Propagation stops at the first artifact a change does not affect. The change sum
 
 <rules>
 <rule>When the user initiates a spike investigation from scratch, apply **run-spike-workflow** to orchestrate all phases from scope definition through solution compilation.</rule>
-<rule>When the user starts from existing material instead of a blank slate: pre-existing findings → skip **investigate-per-area** and start at **compile-findings-doc**, then **evaluate-solutions-per-area**; a prior spike's unresolved areas → apply **continue-prior-spike**, then the standard workflow; a mid-spike scope change (add an area) → re-apply **define-spike-scope**, then the remaining capabilities; a revised assumed solution → re-apply **draft-area-adrs**, then **compile-solution-doc**.</rule>
-<rule>If the spike has only one area, the workflow still applies in full. If the problem is greenfield, adapt **investigate-per-area** per **greenfield-scenarios**.</rule>
-<rule>When the user discusses, revises, or adjusts an ADR: if the decision hinges on an unverified assumption, unknown feasibility, missing evidence, or an unresolved comparison, apply **suggest-spike-on-adr-uncertainty** before finalizing; otherwise write or revise through `draft-adr` via **draft-area-adrs** — never hand-edit (see **professional-doc-authoring**).</rule>
-<rule>When a fact or decision changes — new evidence, findings correction, ADR revision, continuation round, or solution-doc refresh — apply **sync-update-artifacts** to propagate the change through every affected downstream artifact.</rule>
-<rule>If the user asks for a quick recommendation without formal documentation, decline (see **inappropriate-scenarios**).</rule>
-<rule>When dispatching to a sub-agent, include the area's findings doc (or its evidence sections) in the brief and instruct it to skip covered code.</rule>
+<rule>When the user starts from existing material instead of a blank slate, apply **continue-prior-spike** to continue the previous spike.</rule>
 <rule>After the solution doc is compiled: if the user wants implementation scope, apply **summarize-required-changes**; if the doc is large, apply the modularity steps in **compile-solution-doc**.</rule>
-<rule>When the user wants tech implementation detail per option (diagrams, code diffs, change locations), delegate to `draft-adr`'s **detail-options-tech** during **evaluate-solutions-per-area** (see **option-tech-details**).</rule>
 </rules>
