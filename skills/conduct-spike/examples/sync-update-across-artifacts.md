@@ -4,7 +4,7 @@
 
 **Applies**: `sync-update-artifacts`
 
-**What makes this distinct**: Unlike `examples/update-artifact-in-place.md` (one ADR rewritten in place), this example shows the full propagation — one change rippling through ADR → solution doc → change summary, with the consistency checks in between.
+**What makes this distinct**: Shows the full propagation — one change rippling through findings → ADR → solution doc → change summary — including the rewrite-in-place before/after shape (which the former `update-artifact-in-place.md` example showed in isolation).
 
 ---
 
@@ -30,7 +30,17 @@ Artifacts after the original spike:
 ## What the assistant does, artifact by artifact
 
 1. **Findings doc** (via `write-solution-doc`): replaces the "peak load unmeasured" assumption with the measured 3K/sec limit; records the REST throttle in the Evidence & Verification section with `file:line` and a **verified** confidence tag; adds it to constraints & pain points.
-2. **ADR-002** (via `draft-adr`): decision changes to "Event-driven Kafka" — chosen option, justification, and consequences rewritten in place (see `update-artifact-in-place.md` for the before/after shape).
+2. **ADR-002** (via `draft-adr`): decision changes to "Event-driven Kafka" — chosen option, justification, and consequences rewritten in place.
+
+   **Before** (as drafted):
+   ```markdown
+   Chosen option: "Synchronous REST", because the team is familiar with it and it is the simplest option.
+   ```
+
+   **After** (rewritten in place — old text deleted, not annotated):
+   ```markdown
+   Chosen option: "Event-driven Kafka", because the measured 10K orders/sec peak exceeds REST's throttling limits, and Kafka provides the replay and redelivery semantics the audit path requires.
+   ```
 3. **Solution doc** (via `write-solution-doc`): inter-service communication section evolves from REST contracts to Kafka topics; C4/sequence diagrams updated; no "changed from REST" language.
 4. **Change summary**: ADR-002 cluster updated — "Add Kafka client library" (Dependency), "Provision Kafka topics" (Configuration), "Refactor `PaymentOrchestrator` to publish events" (Modified); REST server/client items retired; cross-cutting "team Kafka training" added.
 

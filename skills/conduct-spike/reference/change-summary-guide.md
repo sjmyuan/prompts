@@ -92,4 +92,4 @@ Always be transparent with the user about whether scope estimates are code-verif
 
 ## Keeping it current
 
-The change summary is **never final**: it derives from the delta between findings (baseline) and the solution doc (target). Whenever either changes — new evidence, findings correction, ADR decision change, deep-dive — recompute the affected clusters via **sync-update-artifacts** (see `artifact-sync-guide.md`) so the summary always reflects the current artifacts.
+The change summary is **never final**: it derives from the delta between findings (baseline) and the solution doc (target). Whenever either changes — new evidence, findings correction, ADR decision change, continuation round — recompute the affected clusters via **sync-update-artifacts** (see **reference/artifact-maintenance-guide.md**) so the summary always reflects the current artifacts.

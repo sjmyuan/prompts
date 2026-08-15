@@ -56,9 +56,9 @@ Tech details (target-state diagrams + code change profiles) per ADR option are p
 When a solution doc exceeds ~3000 words or 5+ major sections, split independently understandable sections into standalone docs: the main doc becomes a hub with 2–4 sentence summaries and cross-references; each extracted doc must stand alone and back-reference the hub. See **reference/solution-doc-modularity-guide.md**.
 </solution-doc-modularity>
 
-<deep-dive-mode>
-When drilling deeper into specific unresolved areas from a previous spike, the skill operates in **deep-dive mode**; areas not selected stay as-is. See **reference/deep-dive-mode-guide.md**.
-</deep-dive-mode>
+<continuation-mode>
+Continuing a previous spike is **another round of the same workflow**, seeded with the prior spike's artifacts: confirm which areas to revisit (unselected areas stay as-is), then run the standard capabilities in **revise-in-place** mode — investigate-per-area already seeds sub-agents with existing evidence maps; compile-findings-doc, draft-area-adrs, and compile-solution-doc already support revising; sync-update-artifacts propagates downstream. See **examples/continue-prior-spike.md**.
+</continuation-mode>
 
 <greenfield-scenarios>
 Greenfield (no existing implementation): research industry approaches and similar systems, study operational constraints (cloud, team, compliance), build proof-of-concept prototypes instead of tracing code. Remaining phases proceed unchanged.
@@ -84,12 +84,8 @@ During ADR discussion (drafting, reviewing, or adjusting a decision), suggest a 
 ADRs and the solution document are always written by their owning skills — never hand-edited: every ADR write goes through `draft-adr`; every findings/solution-doc write through `write-solution-doc` (findings in current-state mode). Load the owning skill's SKILL.md and apply its capabilities, seeding with the existing document plus the change — inside the spike workflow or standalone. Bypassing the owning skill degrades the artifact.
 </professional-doc-authoring>
 
-<latest-state-doctrine>
-ADRs and the solution doc are **single-source-of-truth, kept at the latest state**: rewrite changed sections **in place**, **delete** superseded content (git is the only history) — no "Note:", "Updated", "Changed", "v2", "As of", "Previously", no changelogs. Notes allowed only in change summary, findings docs, conversation. See **reference/clean-artifact-principle.md** (rewrite-in-place procedure + **no-note scan** gate).
-</latest-state-doctrine>
-
-<artifact-sync-doctrine>
-Changes propagate down the artifact chain so the user always sees one consistent picture: **Findings Docs → ADRs → Solution Doc → Change Summary**.
+<artifact-maintenance-doctrine>
+Artifacts form a dependency chain — **Findings Docs → ADRs → Solution Doc → Change Summary** — and are kept **at the latest state**: rewrite changed sections **in place**, **delete** superseded content (git is the only history) — no "Note:", "Updated", "Changed", "v2", "As of", "Previously", no changelogs. Notes allowed only in change summary, findings docs, conversation.
 
 | Change origin | Propagate to |
 |---|---|
@@ -97,8 +93,8 @@ Changes propagate down the artifact chain so the user always sees one consistent
 | ADR decision change | Solution doc → change summary |
 | Solution doc change | Change summary |
 
-Propagation stops at the first artifact a change does not affect. The change summary is **never final** — recompute it whenever its baseline or target changes. See **reference/artifact-sync-guide.md**.
-</artifact-sync-doctrine>
+Propagation stops at the first artifact a change does not affect. The change summary is **never final** — recompute it whenever its baseline or target changes. Full protocol: **reference/artifact-maintenance-guide.md** (rewrite-in-place procedure, notes allowed/banned map, no-note scan, propagation matrix).
+</artifact-maintenance-doctrine>
 
 <context-loading-guide>
 
@@ -109,22 +105,19 @@ Propagation stops at the first artifact a change does not affect. The change sum
 | Working from pre-existing findings without re-investigating | Workflow starting from existing investigation results | [examples/from-existing-findings.md](examples/from-existing-findings.md) |
 | Decomposing a complex problem into areas | Decomposition rubric with examples and edge cases | [reference/decomposition-rubric.md](reference/decomposition-rubric.md) |
 | Heavy multi-area spike benefiting from parallel sub-agents | Multi-area parallel dispatch walkthrough with evidence maps embedded | [examples/multi-agent-investigation.md](examples/multi-agent-investigation.md) |
-| Continuing a previous spike by digging deeper into unresolved areas | Deep-dive walkthrough: load context, focus investigation, update ADRs | [examples/deep-dive-continuation.md](examples/deep-dive-continuation.md) |
+| Continuing a previous spike by digging deeper into unresolved areas | Continuation walkthrough: load prior artifacts, confirm subset, run the workflow in revise-in-place mode | [examples/continue-prior-spike.md](examples/continue-prior-spike.md) |
 | Dispatching investigation, findings-doc, evaluation, ADR, or solution-doc work to sub-agents | Dispatch pattern, context-preservation rationale, fallback rules | [reference/multi-agent-orchestration.md](reference/multi-agent-orchestration.md) |
 | Executing a workflow phase (investigate, evaluate, draft ADRs, compile, summarize, sync) | Full phase procedures — dispatch briefs, direct-execution steps, validation checklists | [reference/workflow-procedure.md](reference/workflow-procedure.md) |
 | Raising challenges on a sub-agent's returned result | Skeptic questioning dimensions and questions per dimension | `question-everything`: [reference/questioning-dimensions.md](../question-everything/reference/questioning-dimensions.md) |
 | Verifying challenges before acceptance | Verification brief, dispatch rules, comparison and loop-control rules | [reference/verification-protocol.md](reference/verification-protocol.md) |
 | Seeing a worked verification loop — accept vs. contradict → new round | Examples of the question → verify → accept/re-investigate loop | [examples/confirming-result.md](examples/confirming-result.md), [examples/contradicting-result.md](examples/contradicting-result.md) |
 | Producing or understanding findings docs (format, strategy, evidence map) | Findings doc format, strategy selection, evidence-map embedding rules | [reference/findings-document-guide.md](reference/findings-document-guide.md) |
-| Drafting, revising, or compiling ADRs and the solution doc — keeping them at the latest state | Latest-state rewrite-in-place protocol, allowed vs banned notes, no-note scan | [reference/clean-artifact-principle.md](reference/clean-artifact-principle.md) |
-| Entering or executing deep-dive mode | Mode comparison guide and deep-dive procedure | [reference/deep-dive-mode-guide.md](reference/deep-dive-mode-guide.md), [reference/deep-dive-procedure.md](reference/deep-dive-procedure.md) |
+| Rewriting or syncing artifacts after a fact/decision change — keeping them at the latest state | Rewrite-in-place protocol, notes allowed/banned map, no-note scan, propagation matrix, consistency checklist | [reference/artifact-maintenance-guide.md](reference/artifact-maintenance-guide.md) |
 | Generating a change summary | Format, categories, and code-access guidance | [reference/change-summary-guide.md](reference/change-summary-guide.md) |
 | Splitting a large solution doc into modular pieces | Splitting heuristics, patterns, and validation checklist | [reference/solution-doc-modularity-guide.md](reference/solution-doc-modularity-guide.md) |
 | Producing a change summary with code access, all categories | End-to-end change summary with code-verified scope estimates | [examples/change-summary-example.md](examples/change-summary-example.md) |
-| Revising an ADR or solution doc after a decision change — rewrite-in-place | Before → after walkthrough of an ADR rewritten in place | [examples/update-artifact-in-place.md](examples/update-artifact-in-place.md) |
 | Suggesting a spike when ADR discussion hinges on unverified assumptions | Worked example of detecting ADR uncertainty and offering a focused spike | [examples/adr-uncertainty-spike-suggestion.md](examples/adr-uncertainty-spike-suggestion.md) |
-| Synchronizing artifacts after a fact or decision change | Propagation matrix, sync procedure, consistency checklist | [reference/artifact-sync-guide.md](reference/artifact-sync-guide.md) |
-| Seeing a decision change propagated through ADR, solution doc, and change summary | Walkthrough of syncing all artifacts after new evidence flips an ADR decision | [examples/sync-update-across-artifacts.md](examples/sync-update-across-artifacts.md) |
+| Seeing a fact/decision change propagated through findings, ADR, solution doc, and change summary | Walkthrough of syncing all artifacts after new evidence flips an ADR decision, with the rewrite-in-place before/after | [examples/sync-update-across-artifacts.md](examples/sync-update-across-artifacts.md) |
 | Placing produced artifacts into the per-spike folder | Worked example of the spike folder layout with every artifact placed | [examples/spike-artifact-layout.md](examples/spike-artifact-layout.md) |
 
 </context-loading-guide>
@@ -171,7 +164,7 @@ Propagation stops at the first artifact a change does not affect. The change sum
 2. **Dispatch**: announce "Dispatching ADR drafting for [N] area(s) to a sub-agent"; brief per area (evaluation results — drivers, options with pros/cons, tech details per option, assumed solution, findings-doc evidence sections; load `draft-adr`, apply **compile-adr**); collect and review. Full brief: **reference/workflow-procedure.md**.
 3. **Direct drafting or revising (fallback)**: load `draft-adr` and apply **compile-adr** seeded with the evaluation results; run the full chain only if evaluation was skipped. Revising = same procedure seeded with the existing ADR plus the change; never hand-edit (see **professional-doc-authoring**).
 4. Apply **verify-sub-agent-results**; save each ADR to `<spike-folder>/adrs/ADR-00X-<kebab-name>.md` (see **save-artifacts**); ask: "Would you like to adjust any ADR before compiling the solution document?" On uncertainty, apply **suggest-spike-on-adr-uncertainty** first.
-5. Keep each ADR at the latest state (see **latest-state-doctrine**); validate via `draft-adr`'s **compile-adr** checklist + spike checks (tech details in each option's evaluation, standalone-readable, cites the findings doc); run the **no-note scan** until clean.
+5. Keep each ADR at the latest state (see **artifact-maintenance-doctrine**); validate via `draft-adr`'s **compile-adr** checklist + spike checks (tech details in each option's evaluation, standalone-readable, cites the findings doc); run the **no-note scan** until clean.
 </draft-area-adrs>
 
 <verify-sub-agent-results>
@@ -188,7 +181,7 @@ Propagation stops at the first artifact a change does not affect. The change sum
 3. **Direct (fallback)**: load `write-solution-doc` in **baseline-input mode** (evolve findings-doc sections as-is → to-be; C4 shows the **target architecture**) — for compiling AND revising. Seed with spike goal, findings docs, assumed solutions.
 4. **Assess modularity** per **solution-doc-modularity**: if >~3000 words or 5+ major sections, extract sections into standalone docs with back-references; replace each in the hub with a 2–4 sentence summary + link.
 5. Save per **spike-artifact-layout** (see **save-artifacts**): findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`.
-6. Keep the solution doc at the latest state (see **latest-state-doctrine**).
+6. Keep the solution doc at the latest state (see **artifact-maintenance-doctrine**).
 7. Validate: every ADR's chosen solution reflected, cross-references consistent, diagrams match, sub-docs back-reference; run the **no-note scan** until clean.
 8. Present the bundle: findings = current-state record; ADRs = decision records (review/approve); solution doc = target-state architecture; version-control together.
 </compile-solution-doc>
@@ -222,19 +215,22 @@ Propagation stops at the first artifact a change does not affect. The change sum
 
 <sync-update-artifacts>
 1. Identify the change and its origin artifact: new evidence/correction (findings doc), changed decision (ADR), or target-state change (solution doc).
-2. Trace the propagation path with **artifact-sync-doctrine**.
-3. Apply the change through its owning skill — `draft-adr` for ADRs, `write-solution-doc` for findings/solution docs (see **professional-doc-authoring**); propagate downstream, re-running the owning capability with the current artifact plus the delta; recompute the change summary's affected clusters.
-4. Validate consistency — every artifact reflects the latest facts; ADRs cite only current findings; the solution doc mirrors every ADR; the change summary traces to current ADRs — and run the **no-note scan** on each touched ADR and solution doc.
-5. Present the delta in conversation, never inside the artifacts (see **latest-state-doctrine**).
+2. Trace the propagation path with **artifact-maintenance-doctrine**.
+3. Apply the change at the origin through its owning skill — `draft-adr` for ADRs, `write-solution-doc` for findings/solution docs (see **professional-doc-authoring**) — rewriting affected sections **in place** per the latest-state protocol.
+4. Run the **no-note scan** on each touched ADR and solution doc (see **reference/artifact-maintenance-guide.md**); rewrite until clean.
+5. Propagate downstream in order, re-running the owning capability seeded with the current artifact plus the delta; recompute the change summary's affected clusters.
+6. Validate consistency — every artifact reflects the latest facts; ADRs cite only current findings; the solution doc mirrors every ADR; the change summary traces to current ADRs.
+7. Present the delta in conversation, never inside the artifacts (see **artifact-maintenance-doctrine**).
 </sync-update-artifacts>
 
-<deep-dive-specific-areas>
-1. Gather existing context and confirm the deep-dive scope — which areas to revisit, what questions remain, which stay as-is.
-2. **Deep-dive per selected area**: dispatch to a code-exploration sub-agent when one is available (even single-area), seeding it with the area's findings doc (evidence map) so covered code is not re-scanned; collect, verify with **verify-sub-agent-results**, synthesize → update the findings doc → evaluate → apply **draft-area-adrs**.
-3. **Sync downstream artifacts** — apply **sync-update-artifacts**: refresh the solution doc via **compile-solution-doc** if ADR changes affect the system-level view, and the change summary if one exists.
-4. **Present results** — ADRs and solution doc rewritten in place to the latest state (see **latest-state-doctrine**); run the **no-note scan**; narrate the delta in conversation, never in the document.
-5. Ask whether to continue with another round or conclude; a continuation becomes the new scope. Full procedure: **reference/deep-dive-procedure.md**.
-</deep-dive-specific-areas>
+<continue-prior-spike>
+1. Load the prior spike's artifacts — scope summary, findings docs, ADRs, solution doc, change summary (if any). If unavailable, ask the user to share or summarize them.
+2. Confirm the continuation scope: which areas to revisit, the open question for each, and which areas stand as-is.
+3. Validate: selected areas independently decidable; unselected areas' decisions preserved.
+4. Run the standard workflow in revise-in-place mode per **continuation-mode**: **investigate-per-area** (seed sub-agents with existing evidence maps so covered code is not re-scanned; target only what answers the open questions), then **compile-findings-doc** → **evaluate-solutions-per-area** → **draft-area-adrs**.
+5. Apply **sync-update-artifacts** to propagate changes downstream.
+6. Ask whether to continue with another round or conclude; a continuation becomes the new scope via **define-spike-scope**.
+</continue-prior-spike>
 
 <suggest-spike-on-adr-uncertainty>
 1. Detect uncertainty signals via **adr-uncertainty-signals** — unverified assumption, unknown feasibility, missing measurement, undecidable comparison, uninvestigated dependency, reviewer disagreement.
@@ -249,14 +245,13 @@ Propagation stops at the first artifact a change does not affect. The change sum
 <rule>When the user initiates a spike investigation, apply **run-spike-workflow** to orchestrate all phases from scope definition through solution compilation.</rule>
 <rule>If the user provides pre-existing investigation findings, skip **investigate-per-area** and proceed directly to **compile-findings-doc**, then continue to **evaluate-solutions-per-area**.</rule>
 <rule>If the spike has only one area, the workflow still applies in full. If the problem is greenfield, adapt **investigate-per-area** per **greenfield-scenarios**.</rule>
-<rule>Mid-spike modifications: add an area → apply **define-spike-scope** then the remaining capabilities; revise an assumed solution → re-apply **draft-area-adrs** then **compile-solution-doc**; deep-dive unresolved areas → apply **deep-dive-specific-areas**.</rule>
-<rule>If the user asks for a quick recommendation without formal documentation, decline (see **inappropriate-scenarios**). If sub-agents are not available, fall back to direct execution.</rule>
+<rule>Mid-spike modifications: add an area → apply **define-spike-scope** then the remaining capabilities; revise an assumed solution → re-apply **draft-area-adrs** then **compile-solution-doc**; continue unresolved areas from a previous spike → apply **continue-prior-spike**, then the standard workflow.</rule>
+<rule>If the user asks for a quick recommendation without formal documentation, decline (see **inappropriate-scenarios**).</rule>
 <rule>When dispatching to a sub-agent, include the area's findings doc (or its evidence sections) in the brief and instruct it to skip covered code.</rule>
-<rule>When compiling or updating an artifact — findings docs, ADRs, or the solution doc — or evaluating solutions per area, dispatch to a sub-agent whenever one is available; fall back to direct execution only when none exists (see **multi-agent-orchestration**).</rule>
 <rule>After the solution doc is compiled: if the user wants implementation scope, apply **summarize-required-changes**; if the doc is large, apply the modularity steps in **compile-solution-doc**.</rule>
 <rule>When the user discusses an ADR (drafting, reviewing, or adjusting it) and the decision depends on an unverified assumption, unknown feasibility, missing evidence, or an unresolved option comparison, apply **suggest-spike-on-adr-uncertainty** before the ADR is finalized.</rule>
 <rule>When updating or revising an ADR, always apply **draft-area-adrs** (through `draft-adr`); when updating or refreshing the solution doc, always apply **compile-solution-doc** (through `write-solution-doc`); never hand-edit either (see **professional-doc-authoring**).</rule>
-<rule>When a fact or decision changes — new evidence, findings correction, ADR revision, deep-dive, or solution-doc refresh — apply **sync-update-artifacts** to propagate the change through every affected downstream artifact.</rule>
+<rule>When a fact or decision changes — new evidence, findings correction, ADR revision, continuation round, or solution-doc refresh — apply **sync-update-artifacts** to propagate the change through every affected downstream artifact.</rule>
 <rule>When the user wants tech implementation detail per option (diagrams, code diffs, change locations), delegate to `draft-adr`'s **detail-options-tech** during **evaluate-solutions-per-area** (see **option-tech-details**).</rule>
 <rule>When compiling or updating any artifact, apply **save-artifacts** to write it into its spike folder location per **spike-artifact-layout**.</rule>
 </rules>

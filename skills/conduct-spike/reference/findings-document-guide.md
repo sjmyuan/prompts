@@ -41,11 +41,11 @@ Claims are the spike's questions ("Is there a circuit breaker?"); the verdict is
 
 Dead-end searches recorded so later sub-agents don't repeat them; open questions still to investigate.
 
-**Maintenance**: update the embedded evidence map the moment new evidence is found during any later work (deep-dive, follow-ups) — no round/version tracking, never rebuilt from scratch. Pass the findings doc (or its evidence sections) to sub-agents so covered code is not re-scanned.
+**Maintenance**: update the embedded evidence map the moment new evidence is found during any later work (continuation rounds, follow-ups) — no round/version tracking, never rebuilt from scratch. Pass the findings doc (or its evidence sections) to sub-agents so covered code is not re-scanned.
 
 ## Relationship to other artifacts
 
 - **ADRs** reference findings docs for evidence: "The current C2 topology (Findings Doc §2) shows all payment types sharing a single database..."
 - **The solution document** is produced by loading the findings doc(s) and applying `write-solution-doc` in **baseline-input mode** — evolving each section as-is → to-be (see `write-solution-doc`'s **reference/current-state-mode.md**).
-- When findings change (e.g., after a deep-dive), update the affected findings doc and any ADRs that reference it.
+- When findings change (e.g., after a continuation round), update the affected findings doc and any ADRs that reference it.
 - **ADRs and the solution document stay clean**: investigation detail and raw data live only in this findings document. ADRs and the solution doc carry the decision and the target-state architecture, citing the findings doc for evidence rather than embedding it.
