@@ -1,10 +1,10 @@
 # Example: Saving Spike Artifacts into One Per-Spike Folder
 
-**Scenario**: A payment-migration spike (4 areas) has produced its findings docs, 4 ADRs, a solution doc, and a change summary. The user asks: "Keep all spike artifacts in one folder so we can version them together." The assistant applies **save-artifacts** to place every artifact in the spike's folder per **spike-artifact-layout**.
+**Scenario**: A payment-migration spike (4 areas) has produced its findings docs, 4 ADRs, a solution doc, and a change summary. The user asks: "Keep all spike artifacts in one folder so we can version them together." The assistant places every artifact in the spike's folder per **spike-artifact-layout**.
 
 **What makes this distinct**: Every other example focuses on *producing* an artifact; this one shows *where* each artifact lands once produced — the per-spike folder that downstream consumers (**orchestrate-feature-delivery**, sub-agents, reviewers) read paths from.
 
-**Applies**: **save-artifacts**
+**Applies**: **spike-artifact-layout** (knowledge convention) — applied by every producing capability when it saves its output
 
 ## Input (artifacts produced)
 

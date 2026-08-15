@@ -57,7 +57,7 @@ Load the `write-solution-doc` skill's SKILL.md and apply its capabilities in **c
 
 ### Evidence-map embedding and validation (both paths)
 
-**Embed each area's evidence map inline** per **reference/findings-document-guide.md**: `file:line` entry points, call chains as sequence diagrams, an **Evidence & Verification** section per area — evidence ledger (claim → verdict → evidence `file:line` → confidence, `investigate-code` 5-tag model) and searched-negatives. Never vague references like "the service layer"; never present inference as evidence. Cross-reference between findings docs (if per-area). Present each doc and ask: "Does this accurately capture the current state? Anything to add, correct, or remove?" Save to `<spike-folder>/docs/findings-<area>.md` (apply **save-artifacts**). Findings docs are the **current-state baseline and evidence home**; update the evidence map the moment new evidence is found — no round/version tracking.
+**Embed each area's evidence map inline** per **reference/findings-document-guide.md**: `file:line` entry points, call chains as sequence diagrams, an **Evidence & Verification** section per area — evidence ledger (claim → verdict → evidence `file:line` → confidence, `investigate-code` 5-tag model) and searched-negatives. Never vague references like "the service layer"; never present inference as evidence. Cross-reference between findings docs (if per-area). Present each doc and ask: "Does this accurately capture the current state? Anything to add, correct, or remove?" Save to `<spike-folder>/docs/findings-<area>.md` per **spike-artifact-layout**. Findings docs are the **current-state baseline and evidence home**; update the evidence map the moment new evidence is found — no round/version tracking.
 
 ## Compile solution doc (compile-solution-doc)
 
@@ -75,7 +75,7 @@ Load the `write-solution-doc` skill's SKILL.md and apply its capabilities in **b
 
 2. **Assess size and modularity** per **solution-doc-modularity**: if the doc exceeds ~3000 words, has 5+ major sections, or has independently useful sections, identify candidates for extraction.
 3. **Extract independent sections**: for each candidate, create a standalone doc with standalone context and back-reference, replace it in the hub with a 2–4 sentence summary and cross-reference link. Skip extraction for small, single-service solutions.
-4. Compile the output bundle — findings docs, N ADRs, 1 solution doc (hub), modular sub-docs (if extracted) — and save per **spike-artifact-layout** (apply **save-artifacts**): findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`.
+4. Compile the output bundle — findings docs, N ADRs, 1 solution doc (hub), modular sub-docs (if extracted) — and save per **spike-artifact-layout**: findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`.
 5. Keep the solution doc at the latest state per **artifact-maintenance-doctrine** (see **reference/artifact-maintenance-guide.md**): only target-state architecture, no process notes; on refresh route through `write-solution-doc` and rewrite affected sections in place — delete superseded text, never annotate.
 6. Validate the bundle: every ADR's chosen solution is reflected, cross-references between all artifacts are consistent, diagrams match assumed solutions, extracted sub-docs have correct back-references. Run the **no-note scan** on the solution doc and rewrite until none remain.
 7. Present the bundle and remind the user: findings docs are the current-state record (keep even if decisions change); ADRs are formal decision records (review and approve with the team); the solution doc is the target-state architecture; version-control all artifacts together in the spike folder.
@@ -95,7 +95,7 @@ Load the `write-solution-doc` skill's SKILL.md and apply its capabilities in **b
 2. Determine code access: ask "Can I access the current codebase to verify the scope of changes?" **With access**: trace code paths and estimate scope concretely (file counts, LOC ranges, classes to modify), mark code-verified. **Without access**: generate at architectural level, mark estimates as unverified approximations.
 3. For each area/ADR, map the delta from current state to target state using the categories in **change-summary-guide** (New, Modified, Retired, Configuration, Data, Dependency, Test).
 4. Group changes by area/service, labeling each cluster with its ADR reference; identify cross-cutting concerns spanning multiple areas.
-5. Compile the change summary following **change-summary-guide**; include a notes section for caveats, assumptions, and open questions. Save to `<spike-folder>/change-summary.md` (apply **save-artifacts**).
+5. Compile the change summary following **change-summary-guide**; include a notes section for caveats, assumptions, and open questions. Save to `<spike-folder>/change-summary.md` per **spike-artifact-layout**.
 6. Present and ask: "Does this change scope look accurate? Anything missing, overestimated, or underestimated?"
 7. The change summary is **never final** — if findings or the solution doc change, apply **sync-update-artifacts** to refresh it.
 
