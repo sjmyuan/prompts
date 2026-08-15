@@ -66,7 +66,7 @@ Dispatch investigation, findings-doc compilation, evaluation, ADR drafting, and 
 </multi-agent-orchestration>
 
 <sub-agent-verification>
-Sub-agent results (Phases 2, 2b, 4, 5) are questioned and verified before acceptance. The original instance is never reused — every verifier/re-investigator is a NEW same-type sub-agent. Principles: independence, primary sources, traceability (verdict → one challenge). Phase 3 returns **provisional assumed solutions** verified at Phase 4. Loop caps at 3 rounds — at the cap, present both versions. Full rules: **reference/verification-protocol.md**.
+Sub-agent results (Phases 2, 2b, 4, 5) are verified before acceptance via `question-everything`'s **verify-sub-agent-results** — question, verify with a NEW same-type sub-agent (never the original instance), accept or re-investigate, capped at 3 rounds. Phase 3 returns **provisional assumed solutions** — definitive verification lands on the Phase 4 ADR. Full rules: `question-everything`'s **reference/verification-protocol.md**.
 </sub-agent-verification>
 
 <problem-decomposition-guide>
@@ -107,8 +107,8 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 | Preparing a phase dispatch brief | Per-phase brief templates | [reference/dispatch-briefs.md](reference/dispatch-briefs.md) |
 | Executing a workflow phase directly | Direct-execution procedures, validation checklists | [reference/workflow-procedure.md](reference/workflow-procedure.md) |
 | Raising challenges on sub-agent results | Questioning dimensions | `question-everything`: [questioning-dimensions.md](../question-everything/reference/questioning-dimensions.md) |
-| Verifying challenges before acceptance | Verification brief, loop control | [reference/verification-protocol.md](reference/verification-protocol.md) |
-| Worked verification loop (accept/contradict) | Verification examples | [examples/confirming-result.md](examples/confirming-result.md), [examples/contradicting-result.md](examples/contradicting-result.md) |
+| Verifying challenges before acceptance | Verification brief, loop control | `question-everything`: [verification-protocol.md](../question-everything/reference/verification-protocol.md) |
+| Worked verification loop (accept/contradict) | Verification examples | `question-everything`: [confirming-result.md](../question-everything/examples/confirming-result.md), [contradicting-result.md](../question-everything/examples/contradicting-result.md) |
 | Producing/understanding findings docs | Format, evidence-map rules | [reference/findings-document-guide.md](reference/findings-document-guide.md) |
 | Syncing artifacts after a fact/decision change | Rewrite-in-place protocol, propagation | [reference/artifact-maintenance-guide.md](reference/artifact-maintenance-guide.md) |
 | ADR discussion hinging on unverified assumptions | Uncertainty-spike suggestion example | [examples/adr-uncertainty-spike-suggestion.md](examples/adr-uncertainty-spike-suggestion.md) |
@@ -123,7 +123,7 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 
 <run-spike-workflow>
 1. Apply **define-spike-scope**; do not proceed until scope is confirmed.
-2. Apply **investigate-per-area** (dispatch when available; record **evidence maps**; verify with **verify-sub-agent-results**); a new direction loops to step 1.
+2. Apply **investigate-per-area** (dispatch when available; record **evidence maps**; verify via `question-everything`'s **verify-sub-agent-results**); a new direction loops to step 1.
 3. Apply **compile-findings-doc**, embedding each area's evidence map inline.
 4. Apply **evaluate-problem-solutions** to select an assumed solution per problem.
 5. Apply **draft-problem-adrs**, verifying each before saving.
@@ -151,7 +151,7 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 <investigate-per-area>
 1. Dispatch each area's investigation to `code-investigator` per **multi-agent-orchestration**; brief per **reference/dispatch-briefs.md**.
 2. Direct fallback: apply the direct investigation procedure per **reference/workflow-procedure.md** (load `investigate-code` **spike-integration**).
-3. Verify each area's result with **verify-sub-agent-results** — a NEW same-type sub-agent with the verification brief (**reference/verification-protocol.md**), never the original investigator.
+3. Verify each area's result via `question-everything`'s **verify-sub-agent-results**.
 4. Ask: "Is the investigation complete, or continue in a new direction?" — a new direction loops to scope.
 5. Hand off to **compile-findings-doc** with the evidence maps.
 </investigate-per-area>
@@ -166,24 +166,16 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 <draft-problem-adrs>
 1. Dispatch ADR drafting for each **problem** to `adr-writer` per **multi-agent-orchestration**; batch a whole area's problems in one brief when they share its evidence (brief per **reference/dispatch-briefs.md**).
 2. Direct fallback: apply the direct drafting/revising procedure per **reference/workflow-procedure.md** (load `draft-adr` **compile-adr** seeded with the evaluation results; run the full chain only if evaluation was skipped; never hand-edit — see **professional-doc-authoring**).
-3. Verify each drafted ADR with **verify-sub-agent-results** — a NEW same-type sub-agent with the verification brief (**reference/verification-protocol.md**), never the drafting agent.
+3. Verify each drafted ADR via `question-everything`'s **verify-sub-agent-results**.
 4. Save each ADR to `<spike-folder>/adrs/adr-<area>-<NN>-<problem>.md` per **spike-artifact-layout**, carrying its `Area:` tag from the scope map.
 5. Ask: "Would you like to adjust any ADR before compiling the solution document?" On uncertainty, apply **suggest-spike-on-adr-uncertainty** first.
 6. Validate via `draft-adr`'s **compile-adr** checklist + spike checks (tech details in each option, standalone-readable, cites findings doc); run the **no-note scan** until clean.
 </draft-problem-adrs>
 
-<verify-sub-agent-results>
-1. Apply `question-everything`'s **question-the-result** to raise prioritized challenges.
-2. Dispatch a NEW same-type sub-agent — never the original — to verify each challenge against primary sources; collect per-challenge verdicts (AGREE / DISAGREE / UNCERTAIN), each traceable to its challenge.
-3. Accept only if every material verdict is AGREE; if any is DISAGREE or UNCERTAIN, dispatch a NEW same-type sub-agent to redo the investigation with the corrected understanding, then loop to step 1.
-4. Loop until all AGREE or the 3-round cap; at the cap, present both versions to the user — never silently pick one.
-5. Synthesize into the findings doc or save the ADR only after verification. Full loop: **reference/verification-protocol.md**.
-</verify-sub-agent-results>
-
 <compile-solution-doc>
 1. Dispatch solution-doc compilation to `solution-doc-writer` per **multi-agent-orchestration**; brief per **reference/dispatch-briefs.md**.
 2. Direct fallback: apply the direct compilation procedure per **reference/workflow-procedure.md** (load `write-solution-doc` in **baseline-input mode** — for compiling AND revising; never hand-edit — see **professional-doc-authoring**).
-3. Verify the compiled doc with **verify-sub-agent-results** — a NEW same-type sub-agent with the verification brief (**reference/verification-protocol.md**).
+3. Verify the compiled doc via `question-everything`'s **verify-sub-agent-results**.
 4. Save per **spike-artifact-layout** (scope map → `scope.md`, findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`); keep at the latest state (see **artifact-maintenance-doctrine**).
 5. Validate: the solution doc mirrors every ADR's chosen solution **grouped by area** (per **scope-map**), cross-references consistent, diagrams match; run the **no-note scan** until clean.
 6. Present the bundle: findings = current-state record; ADRs = decision records (review/approve); solution doc = target-state architecture; version-control together.
@@ -193,7 +185,7 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 1. Determine the document strategy: **per-area** (2+ loosely-coupled areas) or **one consolidated doc** (tightly-coupled or single-area). Ask the user.
 2. Dispatch findings-doc compilation to `solution-doc-writer` per **multi-agent-orchestration**; brief per **reference/dispatch-briefs.md**.
 3. Direct fallback: apply the direct compilation procedure per **reference/workflow-procedure.md** (load `write-solution-doc` in **current-state mode**, see `write-solution-doc`'s **reference/current-state-mode.md**; never hand-edit — see **professional-doc-authoring**).
-4. Verify the compiled doc with **verify-sub-agent-results** — a NEW same-type sub-agent with the verification brief (**reference/verification-protocol.md**).
+4. Verify the compiled doc via `question-everything`'s **verify-sub-agent-results**.
 5. Validate per **reference/findings-document-guide.md**: each area's evidence map embedded inline — `file:line` entry points, call-chain sequence diagrams, an **Evidence & Verification** section per area (ledger: claim → verdict → `file:line` → confidence, 5-tag model; searched-negatives). Never vague references; never present inference as evidence.
 6. Cross-reference between findings docs (if per-area): note cross-area constraints.
 7. Ask: "Does this accurately capture the current state? Anything to add, correct, or remove?"

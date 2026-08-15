@@ -2,7 +2,7 @@
 
 **Scenario**: A code-exploration sub-agent concluded "Service X syncs orders to the warehouse via Kafka topic `orders.warehouse`". The finding feeds an integration-design area, so the spike orchestrator runs the verification loop before embedding it in the findings doc.
 
-Applies **verify-sub-agent-results** (via `conduct-spike`) — the **question-the-result** (via `question-everything`) → verify → compare → reinvestigate loop, repeated across two rounds.
+Applies **verify-sub-agent-results** (via `question-everything`) — the **question-the-result** → verify → compare → reinvestigate loop, repeated across two rounds.
 
 ## Input / Context
 - **Original sub-agent result**: "Order sync to the warehouse uses Kafka topic `orders.warehouse`; latency ~2s."

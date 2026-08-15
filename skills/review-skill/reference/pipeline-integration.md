@@ -39,5 +39,5 @@ A parent dispatches an agent with "load skill X, apply capability Y" (e.g., `dra
 ## Cross-references
 
 - `conduct-spike` **reference/multi-agent-orchestration.md** — dispatch pattern, why to dispatch even a single task
-- `conduct-spike` **reference/verification-protocol.md** — verification loop, independence rules, traps
+- `question-everything` **reference/verification-protocol.md** — verification loop, independence rules, traps
 - `learn-from-history` **reference/agent-orchestration-pattern.md** — agent detection protocol, prompt templates

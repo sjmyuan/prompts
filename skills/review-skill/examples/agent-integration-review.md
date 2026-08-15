@@ -20,7 +20,7 @@
 #### Dispatched drafts are merged without verification
 - **File**: [SKILL.md](SKILL.md#L41-L52) (capability `<dispatch-chapter-drafting>`)
 - **Issue**: The capability dispatches a drafting agent per chapter and merges the returned drafts directly into the final document with no verification step. Sub-agent output must be treated as unverified claims; merging unverified drafts propagates hallucinations into the shipped document.
-- **Recommendation**: Add a verification step — question each returned draft, then dispatch a NEW same-type agent (never the original instance) to verify claims against primary sources before merging. See **reference/pipeline-integration.md** Axis 2 Direction A point 4 and `conduct-spike` **reference/verification-protocol.md**.
+- **Recommendation**: Add a verification step — question each returned draft, then dispatch a NEW same-type agent (never the original instance) to verify claims against primary sources before merging. See **reference/pipeline-integration.md** Axis 2 Direction A point 4 and `question-everything` **reference/verification-protocol.md**.
 
 ### 🟡 Minor Issues
 

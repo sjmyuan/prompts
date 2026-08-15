@@ -38,7 +38,7 @@ Load the `write-solution-doc` skill's SKILL.md and apply its capabilities in **c
 
 ### Evidence-map embedding and validation (both paths)
 
-**Embed each area's evidence map inline** per **reference/findings-document-guide.md**: `file:line` entry points, call chains as sequence diagrams, an **Evidence & Verification** section per area — evidence ledger (claim → verdict → evidence `file:line` → confidence, `investigate-code` 5-tag model) and searched-negatives. Never vague references like "the service layer"; never present inference as evidence. Cross-reference between findings docs (if per-area). Present each doc and ask: "Does this accurately capture the current state? Anything to add, correct, or remove?" Save to `<spike-folder>/docs/findings-<area>.md` per **spike-artifact-layout**. Findings docs are the **current-state baseline and evidence home**; update the evidence map the moment new evidence is found — no round/version tracking.
+**Embed each area's evidence map inline** — the embedding format (`file:line` entry points, call-chain sequence diagrams, the Evidence & Verification ledger with the `investigate-code` 5-tag model, searched-negatives) and its anti-patterns (no vague references, no inference-as-evidence) are owned by **reference/findings-document-guide.md**; follow it directly. Cross-reference between findings docs (if per-area). Present each doc and ask: "Does this accurately capture the current state? Anything to add, correct, or remove?" Save to `<spike-folder>/docs/findings-<area>.md` per **spike-artifact-layout**. Findings docs are the **current-state baseline and evidence home**; update the evidence map the moment new evidence is found — no round/version tracking.
 
 ## Compile solution doc (compile-solution-doc)
 

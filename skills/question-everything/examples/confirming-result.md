@@ -2,7 +2,7 @@
 
 **Scenario**: A code-exploration sub-agent reported that the auth token cache is invalidated on password change, citing `TokenCacheService.java:42`. The finding feeds a security-audit area, so the spike orchestrator runs the verification loop before embedding it in the findings doc.
 
-Applies **verify-sub-agent-results** (via `conduct-spike`) — the **question-the-result** (via `question-everything`) → verify → compare → accept loop.
+Applies **verify-sub-agent-results** (via `question-everything`) — the **question-the-result** → verify → compare → accept loop.
 
 ## Input / Context
 - **Original sub-agent result**: "Password change invalidates cached tokens — `TokenCacheService.java:42` calls `cache.invalidate(userId)`."
