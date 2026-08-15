@@ -50,6 +50,10 @@ Sizes are measured by **character count** (≈ tokens × 4) — the real context
 - **Gaming detection**: when the line budget passes but the char budget is exceeded, flag the char-budget severity AND note that the line count is misleading — content was reformatted (line-merging), not reduced.
 </size-limits>
 
+<size-remediation>
+Ordered remediation actions for files over budget — redistribute first, then reduce, then escalate — plus the anti-patterns to never suggest (merging steps into one sentence, line-merging, cutting structural sections). Load **reference/size-remediation.md** when recommending fixes for size overruns.
+</size-remediation>
+
 <evaluation-process>
 A well-structured skill should define an evaluation process to assess the quality of its own output. Look for:
 
@@ -137,6 +141,7 @@ Apply these checks when the skill's description, when-to-use, or skill-boundary 
 | Executing step 11 (individual example file review) | Quality criteria checklist for example files | [reference/example-quality-criteria.md](reference/example-quality-criteria.md) |
 | Checking naming conventions for skill name and capability names (step 8) | Action-verb naming convention rules for skill name, capability names, and knowledge subsection names | See `<action-verb-naming-convention>` in `<knowledge>` |
 | Checking file size (steps 1c, 5, 11f) | Char/line budgets, max-line-length guard, and gaming-detection rule for SKILL.md, reference, and example files | See `<size-limits>` in `<knowledge>` |
+| Recommending fixes for size overruns (both budgets exceeded, or char overrun) | Remediation action menu, priority order, and anti-patterns | [reference/size-remediation.md](reference/size-remediation.md) |
 | Checking for output evaluation process (step 4) | Evaluation process patterns, common checklist patterns, and severity guidance | See `<evaluation-process>` in `<knowledge>` |
 | Checking conciseness across all files (step 5) | Unnecessary-content patterns per file type and severity guidance | [reference/conciseness-check.md](reference/conciseness-check.md) |
 | Checking writing style — voice, BLUF, banned phrases, narration (step 5a) | Writing-style rubric for skill files: directive voice, hard caps, atomic bullets, per-file rules, severity | [reference/writing-style.md](reference/writing-style.md) |
@@ -158,7 +163,7 @@ Apply these checks when the skill's description, when-to-use, or skill-boundary 
 1. Read the full skill file to understand its domain and all sections.
    a. Verify all expected top-level sections are present: frontmatter YAML, `<when-to-use-this-skill>`, `<knowledge>`, and `<capabilities>`; flag any missing required section as 🔴 Major.
    b. Verify sections appear in the correct order: frontmatter → `<when-to-use-this-skill>` → `<knowledge>` → `<capabilities>` → `<rules>` (if present); flag out-of-order sections as 🟡 Minor.
-   c. Measure the file's size — count total lines AND estimate total characters (sum line lengths while reading). Apply `<size-limits>`: flag char-budget overruns per the table; count lines > 120 chars and > 200 chars and flag each as a single aggregated finding (🟢 Nit / 🟡 Minor); flag bundling of 2+ logical items in one line as 🟡 Minor; and when the line budget passes but the char budget is exceeded, note the mismatch as suspected line-merging (severity follows the char budget).
+   c. Measure the file's size — count total lines AND estimate total characters (sum line lengths while reading). Apply `<size-limits>`: flag char-budget overruns per the table; count lines > 120 chars and > 200 chars and flag each as a single aggregated finding (🟢 Nit / 🟡 Minor); flag bundling of 2+ logical items in one line as 🟡 Minor; and when the line budget passes but the char budget is exceeded, note the mismatch as suspected line-merging (severity follows the char budget). When BOTH budgets are exceeded, load **reference/size-remediation.md** and recommend fixes in priority order (redistribute → reduce → escalate); never suggest merging steps into one sentence (anti-pattern).
 2. **Check description quality and trigger consistency** — load **reference/trigger-correctness.md** first:
    a. Verify the frontmatter `description` follows the two-part template (domain summary + trigger phrase) — load **reference/description-template.md**; flag a missing trigger phrase as 🔴 Major.
    b. Score the description using the five-dimension quality metric — load **reference/description-scoring.md**; report the score (x/10) and flag a score ≤5 as 🔴 Major; flag a score of 6–8 as 🟡 Minor.
@@ -171,7 +176,7 @@ Apply these checks when the skill's description, when-to-use, or skill-boundary 
     - 🟢 Nit for a single verbose file.
     - 🟡 Minor for systematic verbosity across multiple files.
     - 🔴 Major if the skill could be cut by >30% without losing meaning.
-   Apply the `<size-limits>` budgets and max-line-length guard to each `reference/` file.
+   Apply the `<size-limits>` budgets and max-line-length guard to each `reference/` file; when a reference file is over budget, recommend remediation per **reference/size-remediation.md**.
    a. **Check writing style** — Load **reference/writing-style.md**. Verify directive voice in capability steps, BLUF openings, hard caps (≤20-word sentences, ≤3-sentence paragraphs, 1-claim bullets), absence of banned phrases, and no meta-commentary or process narration in any file. Flag per the reference's severity table.
 6. For each rule, verify it answers "when scenario X → use capability Y" — flag any rule that re-states content already in a capability (duplication). If the skill has only one capability and no `<rules>` section, do not flag its absence.
 7. Check that a `<knowledge>` section exists and contains all reference material (tables, layouts, API signatures, platform constraints) that capabilities currently cite inline. Also check that large reference rubrics are not embedded directly in SKILL.md — they should be in `reference/` files loaded on demand; flag inline rubrics as 🔴 Major.
@@ -187,7 +192,7 @@ Apply these checks when the skill's description, when-to-use, or skill-boundary 
     c. Check the scenario is realistic and non-trivial relative to the capability's complexity — flag toy/hello-world inputs for complex capabilities as 🟡 Minor.
     d. Check the example does not contradict any rule or knowledge entry in the parent skill — flag contradictions as 🔴 Major.
     e. Check that the example references the current capability name; flag stale names that no longer match the skill as 🟢 Nit.
-    f. Apply the `<size-limits>` example budget (≤ 9,000 chars / 150 lines) and max-line-length guard; flag overruns as 🟡 Minor.
+    f. Apply the `<size-limits>` example budget (≤ 9,000 chars / 150 lines) and max-line-length guard; flag overruns as 🟡 Minor and recommend remediation per **reference/size-remediation.md** when over budget.
     Load **reference/example-quality-criteria.md** for the full rubric.
 12. Surface inconsistencies: mixed styles within a section type, two conflicting patterns, or differing levels of procedural detail across capabilities of the same kind. Present both variants with file/line references and ask the user which should be canonical — do not silently pick one.
 13. Include a **Positive Highlights** section that acknowledges at least one well-structured aspect of the skill.
