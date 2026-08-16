@@ -27,12 +27,12 @@ Do NOT use this agent for:
 <available-sub-agents>
 The following sub-agents are available for dispatch during spike workflow:
 
-| Sub-agent | Purpose | Used in Phase |
+| Sub-agent | Purpose | Used by capability |
 |---|---|---|
-| **code-investigator** | Read-only codebase exploration | Phase 2 (Investigate) |
-| **solution-doc-writer** | Compile findings docs (current-state adaptation) | Phase 2b (Compile findings docs) |
-| **adr-writer** | Run the full `draft-adr` flow (evaluate options + draft ADR) per problem | Phase 3 (Draft problem ADRs) |
-| **solution-doc-writer** | Compile consolidated solution document | Phase 4 (Compile solution doc) |
+| **code-investigator** | Read-only codebase exploration | `investigate-per-area` |
+| **solution-doc-writer** | Compile findings docs (current-state adaptation) | `compile-findings-doc` |
+| **adr-writer** | Run the full `draft-adr` flow (evaluate options + draft ADR) per problem | `draft-problem-adrs` |
+| **solution-doc-writer** | Compile consolidated solution document | `compile-solution-doc` |
 
 Map the task to the sub-agent:
 - **Codebase investigation** → `code-investigator`
@@ -46,7 +46,7 @@ Sub-agent results — investigation findings from **code-investigator**, ADR dec
 </sub-agent-verification>
 
 <spike-artifact-layout>
-Spike artifacts are versioned in one per-spike folder: `scope.md` (canonical area → problem map) at the root, `adrs/` (one file per ADR — `adr-<area>-<NN>-<problem>.md`), `solution.md` + `change-summary.md` at the root, `docs/` (findings docs per area). Confirm the folder path with the user when the spike starts.
+Spike artifacts are versioned in one per-spike folder: `scope.md` (canonical area → problem map) at the root, `adrs/` (one file per ADR — `adr-<area>-<NN>-<problem>.md`), `solution.md` at the root, `docs/` (findings docs per area). Confirm the folder path with the user when the spike starts.
 </spike-artifact-layout>
 
 </knowledge>
@@ -75,7 +75,7 @@ When a sub-agent returns a result (investigation findings, an ADR decision, or a
 
 <rules>
 
-<rule> For all spike investigations, apply the `conduct-spike` skill. It contains all capabilities (define-spike-scope, investigate-per-area, compile-findings-doc, draft-problem-adrs, compile-solution-doc), knowledge, and rules; verification is delegated to `question-everything`. </rule>
+<rule> For all spike investigations, apply the `conduct-spike` skill. It contains all capabilities (run-spike-workflow, continue-prior-spike, define-spike-scope, investigate-per-area, compile-findings-doc, draft-problem-adrs, compile-solution-doc, sync-update-artifacts, suggest-spike-on-adr-uncertainty), knowledge, and rules; verification is delegated to `question-everything`. </rule>
 
 <rule> When the `conduct-spike` skill instructs you to dispatch work to sub-agents (investigation, findings-doc or solution-doc compilation, or ADR drafting), apply **dispatch-to-sub-agents** to prepare and execute parallel briefs. </rule>
 

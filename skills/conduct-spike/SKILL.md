@@ -1,6 +1,6 @@
 ---
 name: conduct-spike
-description: Conduct spike investigations producing ADRs, findings, and solution docs. Use when scoping, investigating decisions, evaluating options, discussing undecided ADRs, formalizing findings, continuing spikes, syncing updates.
+description: Conduct spike investigations producing ADRs, findings, and solution docs. Use when scoping, investigating, evaluating, producing ADRs, discussing undecided ADRs, understanding current state, formalizing findings, continuing spikes, syncing updates.
 ---
 
 <when-to-use-this-skill>
@@ -34,7 +34,7 @@ spikes/<spike-name>/
 
 Artifacts cross-reference each other with relative paths inside the spike folder.
 
-Every producing capability saves its output per this layout: determine the spike folder path (ask the user or detect an existing `spikes/<spike-name>/`), create `adrs/` and `docs/` as needed, then confirm the layout after saving.
+All producing capabilities save their output into this layout. The spike folder path is asked of the user or detected from an existing `spikes/<spike-name>/`; `adrs/` and `docs/` are created as needed; saving is confirmed with the user.
 </spike-artifact-layout>
 
 <scope-map>
@@ -112,9 +112,9 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 | Compiling the findings doc | Full compile-findings-doc procedure | [reference/findings-doc-compilation.md](reference/findings-doc-compilation.md) |
 | Compiling the solution doc | Full compile-solution-doc procedure | [reference/solution-doc-compilation.md](reference/solution-doc-compilation.md) |
 | Drafting ADRs for the area's problems | Full draft-problem-adrs procedure | [reference/draft-problem-adrs-procedure.md](reference/draft-problem-adrs-procedure.md) |
-| Raising challenges on sub-agent results | Questioning dimensions | `question-everything`: [questioning-dimensions.md](../question-everything/reference/questioning-dimensions.md) |
-| Verifying challenges before acceptance | Verification brief, loop control | `question-everything`: [verification-protocol.md](../question-everything/reference/verification-protocol.md) |
-| Worked verification loop (accept/contradict) | Verification examples | `question-everything`: [confirming-result.md](../question-everything/examples/confirming-result.md), [contradicting-result.md](../question-everything/examples/contradicting-result.md) |
+| Raising challenges on sub-agent results | Questioning dimensions | [questioning-dimensions.md](../question-everything/reference/questioning-dimensions.md) |
+| Verifying challenges before acceptance | Verification brief, loop control | [verification-protocol.md](../question-everything/reference/verification-protocol.md) |
+| Worked verification loop (accept/contradict) | Verification examples | [confirming-result.md](../question-everything/examples/confirming-result.md), [contradicting-result.md](../question-everything/examples/contradicting-result.md) |
 | Producing/understanding findings docs | Format, evidence-map rules | [reference/findings-document-guide.md](reference/findings-document-guide.md) |
 | Syncing artifacts after a fact/decision change | Rewrite-in-place protocol, propagation | [reference/artifact-maintenance-guide.md](reference/artifact-maintenance-guide.md) |
 | ADR discussion hinging on unverified assumptions | Uncertainty-spike suggestion example | [examples/adr-uncertainty-spike-suggestion.md](examples/adr-uncertainty-spike-suggestion.md) |
@@ -131,13 +131,12 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 1. Apply **define-spike-scope**.
 2. Do not proceed until the scope is confirmed.
 3. Apply **investigate-per-area**, recording each area's **evidence map**.
-4. Verify each result via `question-everything`'s **verify-sub-agent-results**.
-5. Loop to step 1 when a new investigation direction emerges.
-6. Apply **compile-findings-doc**, embedding each area's evidence map inline.
-7. Apply **draft-problem-adrs** — evaluating options and drafting each ADR via `draft-adr`, verifying each before saving.
-8. Apply **compile-solution-doc** to consolidate ADRs into the solution document.
-9. Pause for user confirmation after each capability.
-10. Skip a pause only if the user requests it.
+4. Loop to step 1 when a new investigation direction emerges.
+5. Apply **compile-findings-doc**, embedding each area's evidence map inline.
+6. Apply **draft-problem-adrs** — evaluating options and drafting each ADR via `draft-adr`, verifying each before saving.
+7. Apply **compile-solution-doc** to consolidate ADRs into the solution document.
+8. Pause for user confirmation after each capability.
+9. Skip a pause only if the user requests it.
 </run-spike-workflow>
 
 <continue-prior-spike>
@@ -156,10 +155,8 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 13. Apply **compile-findings-doc**.
 14. Apply **draft-problem-adrs**, evaluating options and drafting each ADR via `draft-adr`.
 15. Apply **sync-update-artifacts** to propagate changes downstream.
-16. Propagate a new area's delta to its findings doc, ADRs, and solution section.
-17. Propagate a new problem's delta to its ADR and solution subsection.
-18. Ask whether to continue with another round or conclude.
-19. Apply **define-spike-scope** when continuing, adopting the continuation as the new scope.
+16. Ask whether to continue with another round or conclude.
+17. Apply **define-spike-scope** when continuing, adopting the continuation as the new scope.
 </continue-prior-spike>
 
 <define-spike-scope>
@@ -221,4 +218,6 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 <rules>
 <rule>When the user initiates a spike investigation from scratch, apply **run-spike-workflow** to orchestrate the full workflow from scope definition through solution compilation.</rule>
 <rule>When the user starts from existing material instead of a blank slate, apply **continue-prior-spike** to continue the previous spike.</rule>
+<rule>When a fact or decision changes after spike artifacts exist, apply **sync-update-artifacts** to propagate the change across the findings doc, ADRs, and solution doc.</rule>
+<rule>When ADR discussion hinges on an unverified assumption, unknown feasibility, or missing evidence, apply **suggest-spike-on-adr-uncertainty** before finalizing the ADR.</rule>
 </rules>

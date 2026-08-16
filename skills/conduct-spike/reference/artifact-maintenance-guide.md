@@ -43,6 +43,7 @@ Before presenting any ADR or solution document, scan it for banned process langu
 |---|---|---|
 | Findings doc (new evidence or correction) | ADR → solution doc | Evidence only confirms existing facts and decisions |
 | ADR decision change | Solution doc | Decision has no target-state impact |
+| Scope-map delta (add/adjust area or problem) | Affected ADR(s) → solution doc area section | New problem has no ADR drafted yet |
 
 Propagation always stops at the first artifact the change does not affect.
 
