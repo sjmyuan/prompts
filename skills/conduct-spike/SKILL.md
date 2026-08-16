@@ -26,7 +26,7 @@ All spike artifacts version together in **one folder per spike**:
 
 ```
 spikes/<spike-name>/
-├── scope.md                # canonical area → problem map (see scope-map)
+├── scope.md                # canonical area → problem map + status dashboard (see scope-map)
 ├── adrs/                   # one file per ADR — adr-<area>-<NN>-<problem>.md, …
 ├── solution.md             # the solution document (hub, decisions grouped by area)
 └── docs/                   # findings documents — findings-<area>.md each
@@ -38,8 +38,12 @@ Every producing capability saves its output per this layout: determine the spike
 </spike-artifact-layout>
 
 <scope-map>
-`scope.md` is the spike's **canonical area → problem map** — the single source of truth for grouping. Record it at **define-spike-scope** (goal + areas, each with its problems); confirm and edit it at **continue-prior-spike** (add/adjust areas; add/adjust problems under an area). Each problem maps to one ADR; each ADR carries its `Area:` tag; `solution.md` renders the map grouped by area.
+`scope.md` is the spike's **canonical area → problem map** — the single source of truth for grouping and a live **status dashboard** (see **scope-map-status**). Record it at **define-spike-scope** (goal + areas, each with its findings-doc link, status, and problems); confirm and edit it at **continue-prior-spike** (add/adjust areas; add/adjust problems under an area). Each problem maps to one ADR; each ADR carries its `Area:` tag; `solution.md` renders the map grouped by area.
 </scope-map>
+
+<scope-map-status>
+`scope.md` also tracks live status so the spike's state is readable at a glance. **Problem status** (stored — ground truth): `investigating` (no ADR yet) → `deciding` (ADR drafted, option awaiting user confirmation) → `done` (ADR + user-confirmed option). **Area status** (derived from its problems + findings link, never stored separately): `preparing` (findings doc not compiled) · `spiking` (findings compiled, ≥1 problem not `done`) · `done` (all problems `done`). Transitions: findings doc saved → area `preparing`→`spiking`; ADR saved → problem `investigating`→`deciding`; user confirms option → problem `deciding`→`done`; all problems `done` → area `spiking`→`done`; new evidence or changed decision reopens (`done`→`deciding`). Validate on save: a `done` problem has its ADR present; an area is never `done` with an open problem.
+</scope-map-status>
 
 <inappropriate-scenarios>
 Do NOT use for: quick answers without formal documentation, already-decided problems needing only implementation, trivial scope with no architectural impact, or immediate prototyping — spikes produce decisions, not production code.
@@ -54,7 +58,7 @@ ADR option tech details (target-state diagrams + code change profiles) come from
 </option-tech-details>
 
 <continuation-mode>
-Continuing a spike = **another round of the same workflow**, seeded with prior artifacts: confirm the **scope map** (`scope.md`) — add/adjust areas, add/adjust problems under areas; each delta maps to its affected ADR(s) and the solution doc's area section. Unchanged items stay as-is; run capabilities in **revise-in-place** mode; **sync-update-artifacts** propagates downstream. See **examples/continue-prior-spike.md**.
+Continuing a spike = **another round of the same workflow**, seeded with prior artifacts: read `scope.md`'s statuses (see **scope-map-status**) to pick open work — `investigating` problems need investigation, `deciding` need confirmation; confirm add/adjust areas and problems; each delta maps to its affected ADR(s) and the solution doc's area section. Unchanged items stay as-is; run capabilities in **revise-in-place** mode, updating statuses as phases complete; **sync-update-artifacts** propagates downstream. See **examples/continue-prior-spike.md**.
 </continuation-mode>
 
 <greenfield-scenarios>
@@ -133,9 +137,9 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 
 <continue-prior-spike>
 1. Load the prior spike's artifacts — scope summary, findings docs, ADRs, solution doc. If unavailable, ask the user to share or summarize them.
-2. Confirm the continuation scope against the **scope map** (`scope.md`): which areas to add/adjust/remove, which problems to add/adjust/remove under each, and which stand as-is — each delta maps to its affected ADR(s) and solution section.
+2. Confirm the continuation scope against the **scope map** (`scope.md`): read statuses to surface open problems (`investigating`/`deciding` per **scope-map-status**), then decide which areas to add/adjust/remove and which problems to add/adjust/remove under each — each delta maps to its affected ADR(s) and solution section.
 3. Validate: changed problems independently decidable; unchanged items' decisions preserved; the scope map reflects the confirmed deltas.
-4. Run the standard workflow in revise-in-place mode per **continuation-mode**: **investigate-per-area** (seed sub-agents with existing evidence maps; target only what answers the open problems), then **compile-findings-doc** → **evaluate-problem-solutions** → **draft-problem-adrs**.
+4. Run the standard workflow in revise-in-place mode per **continuation-mode**, updating `scope.md` statuses as each phase completes: **investigate-per-area** (seed sub-agents with existing evidence maps; target only what answers the open problems), then **compile-findings-doc** → **evaluate-problem-solutions** → **draft-problem-adrs**.
 5. Apply **sync-update-artifacts** to propagate changes downstream (new area → findings doc + ADRs + solution section; new problem → ADR + solution subsection).
 6. Ask whether to continue with another round or conclude; a continuation becomes the new scope via **define-spike-scope**.
 </continue-prior-spike>
@@ -144,7 +148,7 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 1. Ask: "What technical problem or feature do you want to spike? Describe it in 2–4 sentences." Then clarify the goal — what question(s) to answer, what uncertainty to reduce?
 2. Decompose into **investigation areas** per **problem-decomposition-guide** (target 2–5): propose a breakdown with one-line descriptions; confirm split/merge/add/remove.
 3. For each area, enumerate its **problems** ("How to …?" — one per ADR, target 1–3): propose them; confirm split/merge/add/remove.
-4. Record the **scope map** in `scope.md` per **scope-map**: goal (1 sentence) + areas, each with its problems — the grouping source of truth.
+4. Record the **scope map** in `scope.md` per **scope-map** and **scope-map-status**: goal (1 sentence) + areas (`preparing`, empty findings link), each with its problems (`investigating`).
 5. Validate: each problem independently decidable (areas are shared-subject groupings), 2–5 areas and ~1–3 problems per area (or justified), goal clear enough to know completion; note greenfield (see **greenfield-scenarios**).
 </define-spike-scope>
 
@@ -167,8 +171,8 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 1. Dispatch ADR drafting for each **problem** to `adr-writer` per **multi-agent-orchestration**; batch a whole area's problems in one brief when they share its evidence (brief per **reference/dispatch-briefs.md**).
 2. Direct fallback: apply the direct drafting/revising procedure per **reference/workflow-procedure.md** (load `draft-adr` **compile-adr** seeded with the evaluation results; run the full chain only if evaluation was skipped; never hand-edit — see **professional-doc-authoring**).
 3. Verify each drafted ADR via `question-everything`'s **verify-sub-agent-results**.
-4. Save each ADR to `<spike-folder>/adrs/adr-<area>-<NN>-<problem>.md` per **spike-artifact-layout**, carrying its `Area:` tag from the scope map.
-5. Ask: "Would you like to adjust any ADR before compiling the solution document?" On uncertainty, apply **suggest-spike-on-adr-uncertainty** first.
+4. Save each ADR to `<spike-folder>/adrs/adr-<area>-<NN>-<problem>.md` per **spike-artifact-layout**, carrying its `Area:` tag from the scope map; mark the problem `deciding` in `scope.md` per **scope-map-status**.
+5. Ask: "Would you like to adjust any ADR before compiling the solution document?" On uncertainty, apply **suggest-spike-on-adr-uncertainty** first. On user confirmation, mark each confirmed problem `done` in `scope.md` per **scope-map-status**.
 6. Validate via `draft-adr`'s **compile-adr** checklist + spike checks (tech details in each option, standalone-readable, cites findings doc); run the **no-note scan** until clean.
 </draft-problem-adrs>
 
@@ -176,7 +180,7 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 1. Dispatch solution-doc compilation to `solution-doc-writer` per **multi-agent-orchestration**; brief per **reference/dispatch-briefs.md**.
 2. Direct fallback: apply the direct compilation procedure per **reference/workflow-procedure.md** (load `write-solution-doc` in **baseline-input mode** — for compiling AND revising; never hand-edit — see **professional-doc-authoring**).
 3. Verify the compiled doc via `question-everything`'s **verify-sub-agent-results**.
-4. Save per **spike-artifact-layout** (scope map → `scope.md`, findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`); keep at the latest state (see **artifact-maintenance-doctrine**).
+4. Save per **spike-artifact-layout** (scope map → `scope.md`, findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`); keep at the latest state (see **artifact-maintenance-doctrine**); recompute each area's derived status per **scope-map-status**.
 5. Validate: the solution doc mirrors every ADR's chosen solution **grouped by area** (per **scope-map**), cross-references consistent, diagrams match; run the **no-note scan** until clean.
 6. Present the bundle: findings = current-state record; ADRs = decision records (review/approve); solution doc = target-state architecture; version-control together.
 </compile-solution-doc>
@@ -189,11 +193,11 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 5. Validate per **reference/findings-document-guide.md**: each area's evidence map embedded inline — `file:line` entry points, call-chain sequence diagrams, an **Evidence & Verification** section per area (ledger: claim → verdict → `file:line` → confidence, 5-tag model; searched-negatives). Never vague references; never present inference as evidence.
 6. Cross-reference between findings docs (if per-area): note cross-area constraints.
 7. Ask: "Does this accurately capture the current state? Anything to add, correct, or remove?"
-8. Save to `<spike-folder>/docs/findings-<area>.md` per **spike-artifact-layout**; findings docs are the **current-state baseline and evidence home** — update the evidence map on new evidence, no round/version tracking.
+8. Save to `<spike-folder>/docs/findings-<area>.md` per **spike-artifact-layout**, then set the area's findings link and mark it `spiking` in `scope.md` per **scope-map-status**; findings docs are the **current-state baseline and evidence home** — update the evidence map on new evidence, no round/version tracking.
 </compile-findings-doc>
 
 <sync-update-artifacts>
-1. Identify the change and its origin artifact: new evidence/correction (findings doc), changed decision (ADR), changed problem or area (scope map), or target-state change (solution doc).
+1. Identify the change and its origin artifact: new evidence/correction (findings doc), changed decision (ADR — reopen the problem to `deciding` in `scope.md` per **scope-map-status**), changed problem or area (scope map), or target-state change (solution doc).
 2. Trace the propagation path with **artifact-maintenance-doctrine** — per area: findings → that area's ADRs → the solution doc's area section; a scope-map delta (add/adjust area or problem) propagates to the affected ADR(s) and solution sections.
 3. Apply the change at the origin through its owning skill — `draft-adr` for ADRs, `write-solution-doc` for findings/solution docs (see **professional-doc-authoring**) — rewriting affected sections **in place** per the latest-state protocol.
 4. Run the **no-note scan** on each touched ADR and solution doc (see **reference/artifact-maintenance-guide.md**); rewrite until clean.

@@ -26,6 +26,7 @@
 | `adr-database-01-break-up-database.md` | ❌ Unresolved — options identified, no decision |
 | `adr-migration-01-zero-downtime-migration.md` | ✅ Drafted |
 | Solution doc | Draft — "database strategy TBD" |
+| `scope.md` (status dashboard) | Service/Communication/Migration areas `done`; Database `spiking` (db-01 `deciding`, schema-migration `investigating`) |
 
 **`adr-database-01` prior context**: single PostgreSQL, ~80 tables; `transactions`/`accounts`/`audit_log` shared across payment types; 2000+ lines of settlement procedures; two options surfaced, not evaluated.
 
@@ -45,7 +46,7 @@
 
 - **Independently decidable**: yes — the other ADRs are decided, providing constraints only.
 - **Narrow enough**: yes — answer "can we split the DB without breaking settlement?" and "how to migrate the schema safely?", not re-open the spike.
-- **Scope map updated**: `scope.md` gains the new problem under `Database decomposition` → `adr-database-02-schema-migration.md`.
+- **Scope map updated**: `scope.md` gains the new problem under `Database decomposition` → `adr-database-02-schema-migration.md` (`investigating`).
 
 ---
 
