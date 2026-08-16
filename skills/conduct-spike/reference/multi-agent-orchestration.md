@@ -20,7 +20,7 @@ Each capability's brief template lives in its own reference file (see the table 
 ## Dispatching Pattern
 
 1. Identify independent work units (one per investigation area, or one per problem/ADR — batching a whole area's problems into one brief when they share its evidence; including a single unit).
-2. For each unit, prepare a focused brief from the capability's template (see the table above) — context, scope, expected output, and the shared evidence-map input/output rules (in **reference/dispatch-briefs.md**).
+2. For each unit, fill the capability's ready-to-fill brief (see the table above) per the **structured brief shape** — substitute the `[bracketed]` fields; the shared evidence-map input/output contract lives in **reference/dispatch-briefs.md**.
 3. Dispatch the briefs — all units concurrently when there are multiple, or the single unit on its own when there is one. Sub-agents operate independently and do not communicate with each other.
 4. Collect results from all sub-agents when they complete.
 5. Verify each collected result via `question-everything`'s **verify-sub-agent-results** — dispatch NEW same-type sub-agents per the verification protocol — then synthesize the accepted results into the consolidated format required by the next step. Review for completeness and consistency across areas, and embed the returned per-area evidence maps into the findings doc(s) (see **reference/findings-document-guide.md**).

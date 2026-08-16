@@ -1,6 +1,6 @@
 # Dispatch Briefs
 
-Brief index + the shared evidence-map input/output contract for dispatching spike work to sub-agents. The capability→agent mapping and dispatch rules live in **reference/multi-agent-orchestration.md**. Each brief template lives in its own file, loaded on demand:
+Brief index + the shared **structured brief shape** and evidence-map input/output contract for dispatching spike work to sub-agents. The capability→agent mapping and dispatch rules live in **reference/multi-agent-orchestration.md**. Each ready-to-fill brief lives in its own file, loaded on demand:
 
 | Capability → agent | Brief file |
 |---|---|
@@ -9,7 +9,21 @@ Brief index + the shared evidence-map input/output contract for dispatching spik
 | draft-problem-adrs → `adr-writer` | [adr-drafting-brief.md](adr-drafting-brief.md) |
 | compile-solution-doc → `solution-doc-writer` | [solution-doc-brief.md](solution-doc-brief.md) |
 
-Dispatch multiple work units concurrently, a single unit on its own. Each brief is dispatched to the mapped agent (per the table above). After collection, review each returned result against the capability's spike-specific checks (in its brief file). All briefs carry the shared evidence-map input/output contract below.
+Dispatch multiple work units concurrently, a single unit on its own. Fill each brief from its file per the **structured brief shape**, dispatch it to the mapped agent, then review each returned result against the capability's spike-specific checks (in its brief file). All briefs carry the shared evidence-map input/output contract below.
+
+## Structured brief shape
+
+Every dispatch brief follows the same 7-section skeleton so a filled brief is self-contained — the sub-agent follows the sections in order and never guesses. Each brief file (table above) is the ready-to-fill form: the orchestrator substitutes the `[bracketed]` fields and dispatches verbatim to the mapped agent.
+
+| # | Section | Filled as |
+|---|---|---|
+| 1 | Mission | Who I am + the one-sentence deliverable |
+| 2 | Context | Spike goal, scope, brownfield/greenfield |
+| 3 | Inputs | Paths to load + how to use each |
+| 4 | Tasks | Ordered actions to perform |
+| 5 | Output contract | Exactly what to return and its format |
+| 6 | Constraints | Guardrails — what never to do |
+| 7 | Report back | What to flag to the orchestrator |
 
 ## Evidence map in every brief
 

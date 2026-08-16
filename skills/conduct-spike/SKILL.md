@@ -108,7 +108,7 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 | Heavy multi-area spike with parallel sub-agents | Parallel dispatch walkthrough | [examples/multi-agent-investigation.md](examples/multi-agent-investigation.md) |
 | Continuing a spike into unresolved areas | Continuation walkthrough (revise-in-place) | [examples/continue-prior-spike.md](examples/continue-prior-spike.md) |
 | Dispatching workflow steps to sub-agents | Dispatch pattern | [reference/multi-agent-orchestration.md](reference/multi-agent-orchestration.md) |
-| Preparing a dispatch brief | Brief index + shared evidence-map contract | [reference/dispatch-briefs.md](reference/dispatch-briefs.md) |
+| Preparing a dispatch brief | Brief index + structured brief shape + evidence-map contract | [reference/dispatch-briefs.md](reference/dispatch-briefs.md) |
 | Compiling the findings doc | Full compile-findings-doc procedure | [reference/findings-doc-compilation.md](reference/findings-doc-compilation.md) |
 | Compiling the solution doc | Full compile-solution-doc procedure | [reference/solution-doc-compilation.md](reference/solution-doc-compilation.md) |
 | Drafting ADRs for the area's problems | Full draft-problem-adrs procedure | [reference/draft-problem-adrs-procedure.md](reference/draft-problem-adrs-procedure.md) |
