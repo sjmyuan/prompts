@@ -128,44 +128,81 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 <capabilities>
 
 <run-spike-workflow>
-1. Apply **define-spike-scope**; do not proceed until scope is confirmed.
-2. Apply **investigate-per-area** (dispatch; record **evidence maps**; verify via `question-everything`'s **verify-sub-agent-results**); a new direction loops to step 1.
-3. Apply **compile-findings-doc**, embedding each area's evidence map inline.
-4. Apply **evaluate-problem-solutions** to select an assumed solution per problem.
-5. Apply **draft-problem-adrs**, verifying each before saving.
-6. Apply **compile-solution-doc** to consolidate ADRs into the solution document.
-7. Pause for user confirmation after each phase; skip only if the user requests it.
+1. Apply **define-spike-scope**.
+2. Do not proceed until the scope is confirmed.
+3. Apply **investigate-per-area**, recording each area's **evidence map**.
+4. Verify each result via `question-everything`'s **verify-sub-agent-results**.
+5. Loop to step 1 when a new investigation direction emerges.
+6. Apply **compile-findings-doc**, embedding each area's evidence map inline.
+7. Apply **evaluate-problem-solutions** to select an assumed solution per problem.
+8. Apply **draft-problem-adrs**, verifying each before saving.
+9. Apply **compile-solution-doc** to consolidate ADRs into the solution document.
+10. Pause for user confirmation after each phase.
+11. Skip a pause only if the user requests it.
 </run-spike-workflow>
 
 <continue-prior-spike>
-1. Load the prior spike's artifacts — scope summary, findings docs, ADRs, solution doc. If unavailable, ask the user to share or summarize them.
-2. Confirm the continuation scope against the **scope map** (`scope.md`): read statuses to surface open problems (`investigating`/`deciding` per **scope-map-status**), then decide which areas to add/adjust/remove and which problems to add/adjust/remove under each — each delta maps to its affected ADR(s) and solution section.
-3. Validate: changed problems independently decidable; unchanged items' decisions preserved; the scope map reflects the confirmed deltas.
-4. Run the standard workflow in revise-in-place mode per **continuation-mode**, updating `scope.md` statuses as each phase completes: **investigate-per-area** (seed sub-agents with existing evidence maps; target only what answers the open problems), then **compile-findings-doc** → **evaluate-problem-solutions** → **draft-problem-adrs**.
-5. Apply **sync-update-artifacts** to propagate changes downstream (new area → findings doc + ADRs + solution section; new problem → ADR + solution subsection).
-6. Ask whether to continue with another round or conclude; a continuation becomes the new scope via **define-spike-scope**.
+1. Load the prior spike's artifacts — scope summary, findings docs, ADRs, solution doc.
+2. Ask the user to share or summarize them when any are unavailable.
+3. Confirm the continuation scope against the **scope map** (`scope.md`).
+4. Read statuses to surface open problems (`investigating`/`deciding` per **scope-map-status**).
+5. Decide which areas to add, adjust, or remove and which problems to add, adjust, or remove under each.
+6. Map each delta to its affected ADR(s) and solution section.
+7. Validate changed problems are independently decidable.
+8. Validate unchanged items' decisions are preserved.
+9. Validate the scope map reflects the confirmed deltas.
+10. Run the standard workflow in revise-in-place mode per **continuation-mode**.
+11. Update `scope.md` statuses as each phase completes.
+12. Apply **investigate-per-area**, seeding sub-agents with existing evidence maps and targeting only what answers the open problems.
+13. Apply **compile-findings-doc**.
+14. Apply **evaluate-problem-solutions**.
+15. Apply **draft-problem-adrs**.
+16. Apply **sync-update-artifacts** to propagate changes downstream.
+17. Propagate a new area's delta to its findings doc, ADRs, and solution section.
+18. Propagate a new problem's delta to its ADR and solution subsection.
+19. Ask whether to continue with another round or conclude.
+20. Apply **define-spike-scope** when continuing, adopting the continuation as the new scope.
 </continue-prior-spike>
 
 <define-spike-scope>
-1. Ask: "What technical problem or feature do you want to spike? Describe it in 2–4 sentences." Then clarify the goal — what question(s) to answer, what uncertainty to reduce?
-2. Decompose into **investigation areas** per **problem-decomposition-guide** (target 2–5): propose a breakdown with one-line descriptions; confirm split/merge/add/remove.
-3. For each area, enumerate its **problems** ("How to …?" — one per ADR, target 1–3): propose them; confirm split/merge/add/remove.
-4. Record the **scope map** in `scope.md` per **scope-map** and **scope-map-status**: goal (1 sentence) + areas (`preparing`, empty findings link), each with its problems (`investigating`).
-5. Validate: each problem independently decidable (areas are shared-subject groupings), 2–5 areas and ~1–3 problems per area (or justified), goal clear enough to know completion; note greenfield (see **greenfield-scenarios**).
+1. Ask: "What technical problem or feature do you want to spike? Describe it in 2–4 sentences."
+2. Clarify the goal — what question(s) to answer, what uncertainty to reduce.
+3. Decompose into **investigation areas** per **problem-decomposition-guide** (target 2–5).
+4. Propose a breakdown with one-line descriptions for each area.
+5. Confirm split, merge, add, or remove of areas.
+6. Enumerate each area's **problems** ("How to …?" — one per ADR, target 1–3).
+7. Propose the problems for each area.
+8. Confirm split, merge, add, or remove of problems.
+9. Record the **scope map** in `scope.md` per **scope-map** and **scope-map-status**.
+10. Record the goal (1 sentence) and each area (`preparing`, empty findings link) with its problems (`investigating`).
+11. Validate each problem is independently decidable (areas are shared-subject groupings).
+12. Validate 2–5 areas and ~1–3 problems per area (or justified).
+13. Validate the goal is clear enough to know completion.
+14. Note greenfield per **greenfield-scenarios**.
 </define-spike-scope>
 
 <investigate-per-area>
-1. Dispatch each area's investigation to `code-investigator` per **multi-agent-orchestration**; brief per **reference/investigation-brief.md**.
-2. Verify each area's result via `question-everything`'s **verify-sub-agent-results**.
-3. Ask: "Is the investigation complete, or continue in a new direction?" — a new direction loops to scope.
-4. Hand off to **compile-findings-doc** with the evidence maps.
+1. Dispatch each area's investigation to `code-investigator` per **multi-agent-orchestration**.
+2. Brief each investigation per **reference/investigation-brief.md**.
+3. Verify each area's result via `question-everything`'s **verify-sub-agent-results**.
+4. Ask: "Is the investigation complete, or continue in a new direction?"
+5. Loop to scope when a new direction is chosen.
+6. Hand off to **compile-findings-doc** with the evidence maps.
 </investigate-per-area>
 
 <evaluate-problem-solutions>
-1. Dispatch each **problem's** evaluation to `adr-writer` per **multi-agent-orchestration**; batch a whole area's problems in one brief when they share its subject/evidence (brief per **reference/evaluation-brief.md**; the interactive `draft-adr` evaluate chain runs inside the `adr-writer` session).
-2. Record the **assumed solution** per problem returned by the dispatched agent — provisional until ADR review.
-3. **Check for findings gaps**: update the findings doc if an option revealed a constraint, risk, or fact it lacks.
-4. Validate spike-specifically: tech details grounded in the evidence map (no invented code); assumed solution follows logically; corrections captured. Present the summary table per area → problem — handoff to **draft-problem-adrs**.
+1. Dispatch each **problem's** evaluation to `adr-writer` per **multi-agent-orchestration**.
+2. Batch a whole area's problems in one brief when they share its subject or evidence.
+3. Brief per **reference/evaluation-brief.md**.
+4. Run the interactive `draft-adr` evaluate chain inside the `adr-writer` session.
+5. Record the **assumed solution** per problem — provisional until ADR review.
+6. Check for **findings gaps**.
+7. Update the findings doc when an option revealed a constraint, risk, or fact it lacks.
+8. Validate tech details are grounded in the evidence map — no invented code.
+9. Validate the assumed solution follows logically.
+10. Validate corrections are captured.
+11. Present the summary table per area → problem.
+12. Hand off to **draft-problem-adrs**.
 </evaluate-problem-solutions>
 
 <draft-problem-adrs>
@@ -186,9 +223,14 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 
 <suggest-spike-on-adr-uncertainty>
 1. Detect uncertainty signals via **adr-uncertainty-signals**.
-2. Name the uncertainty precisely: "This decision seems to hinge on [the unverified assumption / the unknown fact / the unresolved comparison]." Explain why it matters.
-3. Offer: "Would you like to spike this before finalizing the ADR?" — never start without explicit confirmation. If agreed, define a focused scope (single goal, 1–3 areas) via **define-spike-scope**; treat the ADR as provisional.
-4. If declined, continue the ADR flow (via `draft-adr` per **professional-doc-authoring**) and record the uncertainty as a **risk** in the ADR's Consequences section — never a free-form note.
+2. Name the uncertainty precisely: "This decision seems to hinge on [the unverified assumption / the unknown fact / the unresolved comparison]."
+3. Explain why the uncertainty matters.
+4. Offer: "Would you like to spike this before finalizing the ADR?"
+5. Never start without explicit confirmation.
+6. Define a focused scope (single goal, 1–3 areas) via **define-spike-scope** when the user agrees.
+7. Treat the ADR as provisional.
+8. Continue the ADR flow via `draft-adr` per **professional-doc-authoring** when the user declines.
+9. Record the uncertainty as a **risk** in the ADR's Consequences section — never a free-form note.
 </suggest-spike-on-adr-uncertainty>
 
 </capabilities>
