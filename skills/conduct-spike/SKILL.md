@@ -66,7 +66,7 @@ No existing implementation: research industry approaches and similar systems, st
 </greenfield-scenarios>
 
 <multi-agent-orchestration>
-Dispatch investigation, findings-doc compilation, evaluation, ADR drafting, and solution-doc compilation — including single-task spikes — to sub-agents whenever available; direct execution is only the fallback. Goal: keep the orchestrating agent's context small; parallel speed secondary. Details: **reference/multi-agent-orchestration.md**.
+Dispatch investigation, findings-doc compilation, evaluation, ADR drafting, and solution-doc compilation — including single-task spikes — to sub-agents; a sub-agent is always available. Goal: keep the orchestrating agent's context small; parallel speed secondary. Details: **reference/multi-agent-orchestration.md**.
 </multi-agent-orchestration>
 
 <sub-agent-verification>
@@ -107,9 +107,11 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 | Decomposing a complex problem into areas and problems | Decomposition rubric + edge cases | [reference/decomposition-rubric.md](reference/decomposition-rubric.md) |
 | Heavy multi-area spike with parallel sub-agents | Parallel dispatch walkthrough | [examples/multi-agent-investigation.md](examples/multi-agent-investigation.md) |
 | Continuing a spike into unresolved areas | Continuation walkthrough (revise-in-place) | [examples/continue-prior-spike.md](examples/continue-prior-spike.md) |
-| Dispatching phase work to sub-agents | Dispatch pattern, fallback rules | [reference/multi-agent-orchestration.md](reference/multi-agent-orchestration.md) |
-| Preparing a phase dispatch brief | Per-phase brief templates | [reference/dispatch-briefs.md](reference/dispatch-briefs.md) |
-| Executing a workflow phase directly | Direct-execution procedures, validation checklists | [reference/workflow-procedure.md](reference/workflow-procedure.md) |
+| Dispatching phase work to sub-agents | Dispatch pattern | [reference/multi-agent-orchestration.md](reference/multi-agent-orchestration.md) |
+| Preparing a phase dispatch brief | Brief index + shared evidence-map contract | [reference/dispatch-briefs.md](reference/dispatch-briefs.md) |
+| Compiling the findings doc (Phase 3) | Full compile-findings-doc procedure | [reference/findings-doc-compilation.md](reference/findings-doc-compilation.md) |
+| Compiling the solution doc (Phase 5) | Full compile-solution-doc procedure | [reference/solution-doc-compilation.md](reference/solution-doc-compilation.md) |
+| Drafting ADRs for the area's problems (Phase 4) | Full draft-problem-adrs procedure | [reference/draft-problem-adrs-procedure.md](reference/draft-problem-adrs-procedure.md) |
 | Raising challenges on sub-agent results | Questioning dimensions | `question-everything`: [questioning-dimensions.md](../question-everything/reference/questioning-dimensions.md) |
 | Verifying challenges before acceptance | Verification brief, loop control | `question-everything`: [verification-protocol.md](../question-everything/reference/verification-protocol.md) |
 | Worked verification loop (accept/contradict) | Verification examples | `question-everything`: [confirming-result.md](../question-everything/examples/confirming-result.md), [contradicting-result.md](../question-everything/examples/contradicting-result.md) |
@@ -127,7 +129,7 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 
 <run-spike-workflow>
 1. Apply **define-spike-scope**; do not proceed until scope is confirmed.
-2. Apply **investigate-per-area** (dispatch when available; record **evidence maps**; verify via `question-everything`'s **verify-sub-agent-results**); a new direction loops to step 1.
+2. Apply **investigate-per-area** (dispatch; record **evidence maps**; verify via `question-everything`'s **verify-sub-agent-results**); a new direction loops to step 1.
 3. Apply **compile-findings-doc**, embedding each area's evidence map inline.
 4. Apply **evaluate-problem-solutions** to select an assumed solution per problem.
 5. Apply **draft-problem-adrs**, verifying each before saving.
@@ -153,57 +155,33 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 </define-spike-scope>
 
 <investigate-per-area>
-1. Dispatch each area's investigation to `code-investigator` per **multi-agent-orchestration**; brief per **reference/dispatch-briefs.md**.
-2. Direct fallback: apply the direct investigation procedure per **reference/workflow-procedure.md** (load `investigate-code` **spike-integration**).
-3. Verify each area's result via `question-everything`'s **verify-sub-agent-results**.
-4. Ask: "Is the investigation complete, or continue in a new direction?" — a new direction loops to scope.
-5. Hand off to **compile-findings-doc** with the evidence maps.
+1. Dispatch each area's investigation to `code-investigator` per **multi-agent-orchestration**; brief per **reference/investigation-brief.md**.
+2. Verify each area's result via `question-everything`'s **verify-sub-agent-results**.
+3. Ask: "Is the investigation complete, or continue in a new direction?" — a new direction loops to scope.
+4. Hand off to **compile-findings-doc** with the evidence maps.
 </investigate-per-area>
 
 <evaluate-problem-solutions>
-1. Dispatch each **problem's** evaluation to `adr-writer` per **multi-agent-orchestration**; batch a whole area's problems in one brief when they share its subject/evidence (brief per **reference/dispatch-briefs.md**; the interactive `draft-adr` evaluate chain runs inside the `adr-writer` session).
-2. Direct fallback: apply the direct evaluation procedure per **reference/workflow-procedure.md** (load `draft-adr` evaluate chain seeded with the findings doc). Record the **assumed solution** per problem — provisional until ADR review.
+1. Dispatch each **problem's** evaluation to `adr-writer` per **multi-agent-orchestration**; batch a whole area's problems in one brief when they share its subject/evidence (brief per **reference/evaluation-brief.md**; the interactive `draft-adr` evaluate chain runs inside the `adr-writer` session).
+2. Record the **assumed solution** per problem returned by the dispatched agent — provisional until ADR review.
 3. **Check for findings gaps**: update the findings doc if an option revealed a constraint, risk, or fact it lacks.
 4. Validate spike-specifically: tech details grounded in the evidence map (no invented code); assumed solution follows logically; corrections captured. Present the summary table per area → problem — handoff to **draft-problem-adrs**.
 </evaluate-problem-solutions>
 
 <draft-problem-adrs>
-1. Dispatch ADR drafting for each **problem** to `adr-writer` per **multi-agent-orchestration**; batch a whole area's problems in one brief when they share its evidence (brief per **reference/dispatch-briefs.md**).
-2. Direct fallback: apply the direct drafting/revising procedure per **reference/workflow-procedure.md** (load `draft-adr` **compile-adr** seeded with the evaluation results; run the full chain only if evaluation was skipped; never hand-edit — see **professional-doc-authoring**).
-3. Verify each drafted ADR via `question-everything`'s **verify-sub-agent-results**.
-4. Save each ADR to `<spike-folder>/adrs/adr-<area>-<NN>-<problem>.md` per **spike-artifact-layout**, carrying its `Area:` tag from the scope map; mark the problem `deciding` in `scope.md` per **scope-map-status**.
-5. Ask: "Would you like to adjust any ADR before compiling the solution document?" On uncertainty, apply **suggest-spike-on-adr-uncertainty** first. On user confirmation, mark each confirmed problem `done` in `scope.md` per **scope-map-status**.
-6. Validate via `draft-adr`'s **compile-adr** checklist + spike checks (tech details in each option, standalone-readable, cites findings doc); run the **no-note scan** until clean.
+1. Apply the ADR-drafting procedure per **reference/draft-problem-adrs-procedure.md**: dispatch → verify → save → ask → validate.
 </draft-problem-adrs>
 
 <compile-solution-doc>
-1. Dispatch solution-doc compilation to `solution-doc-writer` per **multi-agent-orchestration**; brief per **reference/dispatch-briefs.md**.
-2. Direct fallback: apply the direct compilation procedure per **reference/workflow-procedure.md** (load `write-solution-doc` in **baseline-input mode** — for compiling AND revising; never hand-edit — see **professional-doc-authoring**).
-3. Verify the compiled doc via `question-everything`'s **verify-sub-agent-results**.
-4. Save per **spike-artifact-layout** (scope map → `scope.md`, findings → `docs/`, ADRs → `adrs/`, solution doc → `solution.md`); keep at the latest state (see **artifact-maintenance-doctrine**); recompute each area's derived status per **scope-map-status**.
-5. Validate: the solution doc mirrors every ADR's chosen solution **grouped by area** (per **scope-map**), cross-references consistent, diagrams match; run the **no-note scan** until clean.
-6. Present the bundle: findings = current-state record; ADRs = decision records (review/approve); solution doc = target-state architecture; version-control together.
+1. Apply the solution-doc compilation procedure per **reference/solution-doc-compilation.md**: dispatch → verify → save → validate → present.
 </compile-solution-doc>
 
 <compile-findings-doc>
-1. Determine the document strategy: **per-area** (2+ loosely-coupled areas) or **one consolidated doc** (tightly-coupled or single-area). Ask the user.
-2. Dispatch findings-doc compilation to `solution-doc-writer` per **multi-agent-orchestration**; brief per **reference/dispatch-briefs.md**.
-3. Direct fallback: apply the direct compilation procedure per **reference/workflow-procedure.md** (load `write-solution-doc` in **current-state mode**, see `write-solution-doc`'s **reference/current-state-mode.md**; never hand-edit — see **professional-doc-authoring**).
-4. Verify the compiled doc via `question-everything`'s **verify-sub-agent-results**.
-5. Validate per **reference/findings-document-guide.md**: each area's evidence map embedded inline — `file:line` entry points, call-chain sequence diagrams, an **Evidence & Verification** section per area (ledger: claim → verdict → `file:line` → confidence, 5-tag model; searched-negatives). Never vague references; never present inference as evidence.
-6. Cross-reference between findings docs (if per-area): note cross-area constraints.
-7. Ask: "Does this accurately capture the current state? Anything to add, correct, or remove?"
-8. Save to `<spike-folder>/docs/findings-<area>.md` per **spike-artifact-layout**, then set the area's findings link and mark it `spiking` in `scope.md` per **scope-map-status**; findings docs are the **current-state baseline and evidence home** — update the evidence map on new evidence, no round/version tracking.
+1. Apply the findings-doc compilation procedure per **reference/findings-doc-compilation.md**: confirm strategy → dispatch → verify → validate → save (mark the area `spiking` in `scope.md` per **scope-map-status**).
 </compile-findings-doc>
 
 <sync-update-artifacts>
-1. Identify the change and its origin artifact: new evidence/correction (findings doc), changed decision (ADR — reopen the problem to `deciding` in `scope.md` per **scope-map-status**), changed problem or area (scope map), or target-state change (solution doc).
-2. Trace the propagation path with **artifact-maintenance-doctrine** — per area: findings → that area's ADRs → the solution doc's area section; a scope-map delta (add/adjust area or problem) propagates to the affected ADR(s) and solution sections.
-3. Apply the change at the origin through its owning skill — `draft-adr` for ADRs, `write-solution-doc` for findings/solution docs (see **professional-doc-authoring**) — rewriting affected sections **in place** per the latest-state protocol.
-4. Run the **no-note scan** on each touched ADR and solution doc (see **reference/artifact-maintenance-guide.md**); rewrite until clean.
-5. Propagate downstream in order, re-running the owning capability seeded with the current artifact plus the delta.
-6. Validate consistency — every artifact reflects the latest facts; ADRs cite only current findings; the solution doc mirrors every ADR grouped by area.
-7. Present the delta in conversation, never inside the artifacts (see **artifact-maintenance-doctrine**).
+1. Apply the sync procedure per **reference/artifact-maintenance-guide.md**: capture the change and its origin, trace the propagation path, apply at the origin via the owning skill, run the no-note scan, propagate downstream, validate and present the delta.
 </sync-update-artifacts>
 
 <suggest-spike-on-adr-uncertainty>

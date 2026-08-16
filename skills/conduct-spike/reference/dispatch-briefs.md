@@ -1,38 +1,16 @@
 # Dispatch Briefs
 
-Per-phase brief templates for dispatching spike work to sub-agents. Dispatch-vs-direct rules and the phase→agent mapping live in **reference/multi-agent-orchestration.md**; direct-execution procedures live in **reference/workflow-procedure.md**.
+Per-phase brief index + the shared evidence-map input/output contract for dispatching spike work to sub-agents. The phase→agent mapping and dispatch rules live in **reference/multi-agent-orchestration.md**. Each phase's brief template lives in its own file, loaded on demand:
 
-Dispatch multiple work units concurrently, a single unit on its own. Each brief is dispatched to the mapped agent (below). After collection, review each returned result against the phase's spike-specific checks. All briefs carry the shared evidence-map input/output contract (see **Evidence map in every brief** below).
+| Phase | Capability → agent | Brief file |
+|---|---|---|
+| 2. Investigate | investigate-per-area → `code-investigator` | [investigation-brief.md](investigation-brief.md) |
+| 2b. Compile findings docs | compile-findings-doc → `solution-doc-writer` | [findings-doc-brief.md](findings-doc-brief.md) |
+| 3. Evaluate problem solutions | evaluate-problem-solutions → `adr-writer` | [evaluation-brief.md](evaluation-brief.md) |
+| 4. Draft problem ADRs | draft-problem-adrs → `adr-writer` | [adr-drafting-brief.md](adr-drafting-brief.md) |
+| 5. Compile solution doc | compile-solution-doc → `solution-doc-writer` | [solution-doc-brief.md](solution-doc-brief.md) |
 
-## Investigation — investigate-per-area → `code-investigator`
-
-**Announce**: "Dispatching investigation of [N] area(s) to a sub-agent."
-
-Brief per area: area name + description, spike goal, brownfield/greenfield. Carry the area's existing findings doc / evidence map when one exists; require a per-area evidence map back (see **Evidence map in every brief**). After collection, synthesize, resolving cross-area inconsistencies for the findings doc.
-
-## Evaluation — evaluate-problem-solutions → `adr-writer`
-
-**Announce**: "Dispatching evaluation of [N] problem(s) to a sub-agent."
-
-Brief per problem (batch a whole area's problems in one brief when they share its subject/evidence): problem name ("How to …?"), its area + description, spike goal, the area's findings doc (evidence sections). Instructions: load `draft-adr` and run the interactive evaluate chain — **define-decision-drivers** → **define-considered-options** → **evaluate-options** — with the user dialog inside the sub-agent session. Expected output: the problem's assumed solution. After collection, review each for fidelity to the findings doc and cross-area consistency; definitive verification lands on the Phase 4 ADR.
-
-## ADR drafting — draft-problem-adrs → `adr-writer`
-
-**Announce**: "Dispatching ADR drafting for [N] problem(s) to a sub-agent."
-
-Brief per problem (batch a whole area's problems in one brief when they share its evidence): problem name ("How to …?"), its area + description, evaluation results (decision drivers, options with pros/cons, **tech details per option**, assumed solution), the area's findings doc (evidence sections). Instructions: load `draft-adr` and apply **compile-adr** seeded with the evaluation results; tag the ADR with its `Area:`. After collection, review each ADR.
-
-## Findings-doc compilation — compile-findings-doc → `solution-doc-writer`
-
-**Announce**: "Dispatching findings-doc compilation to a sub-agent."
-
-Brief: document strategy (per-area vs. consolidated), Phase 2 results (investigation summaries **with each area's evidence map**). Instructions: load `write-solution-doc` and produce a **current-state document** in **current-state mode** (see `write-solution-doc`'s **reference/current-state-mode.md**), with evidence maps embedded per **reference/findings-document-guide.md**. After collection, review for evidence-map fidelity and cross-area consistency.
-
-## Solution-doc compilation — compile-solution-doc → `solution-doc-writer`
-
-**Announce**: "Dispatching solution-doc compilation to a sub-agent."
-
-Brief: business context (spike goal), current-state baseline (findings docs), assumed solutions (chosen option from each ADR). Instructions: load `write-solution-doc` and produce a **target-state** document in **baseline-input mode**. After collection, review for completeness and consistency with the ADRs.
+Dispatch multiple work units concurrently, a single unit on its own. Each brief is dispatched to the mapped agent (per the table above). After collection, review each returned result against the phase's spike-specific checks (in its brief file). All briefs carry the shared evidence-map input/output contract below.
 
 ## Evidence map in every brief
 

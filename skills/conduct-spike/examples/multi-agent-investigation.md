@@ -175,12 +175,12 @@ Load draft-adr skill and produce a complete ADR tagged Area: Service Decompositi
 
 ---
 
-## Key Takeaways: Direct vs. Sub-Agent Dispatch
+## Key Takeaways: Sub-Agent Dispatch
 
-| Aspect | Direct (fallback only) | Sub-Agent (default) |
-|---|---|---|
-| Orchestrator context | High — all reasoning stays in its window | Low — work happens in isolated contexts |
-| Time | Sum of all areas/ADRs | Max of any single one when concurrent |
-| Coordination | None | Brief prep + synthesis |
-| When used | Only when no suitable sub-agent exists | Always — even single-task spikes |
-| Risk | Orchestrator context bloat | Incomplete briefs need re-prompting |
+| Aspect | Value |
+|---|---|
+| Orchestrator context | Low — work happens in isolated contexts |
+| Time | Max of any single unit when concurrent |
+| Coordination | Brief prep + synthesis |
+| When used | Always — a sub-agent is available for every phase; even single-task spikes |
+| Risk | Incomplete briefs need re-prompting |

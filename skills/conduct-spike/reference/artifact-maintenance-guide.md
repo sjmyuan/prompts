@@ -48,12 +48,12 @@ Propagation always stops at the first artifact the change does not affect.
 
 ## Sync procedure
 
-1. Capture the change: what changed, which artifact is the origin, and what triggered it.
-2. Trace the propagation path; identify every affected downstream artifact.
+1. Capture the change: what changed, which artifact is the origin (findings doc / ADR / scope map / solution doc), and what triggered it. A changed decision reopens its problem to `deciding` in `scope.md` per the scope-map status.
+2. Trace the propagation path per the **Propagation matrix** — per area: findings → that area's ADRs → the solution doc's area section; a scope-map delta (add/adjust area or problem) propagates to the affected ADR(s) and solution sections.
 3. Apply the change at the origin through its owning skill — `draft-adr` for ADRs, `write-solution-doc` for findings/solution docs (the findings doc carries the evidence map). Never hand-edit.
 4. Run the **no-note scan** on each touched ADR and solution doc; rewrite until clean.
 5. Propagate downstream one artifact at a time, seeding each with the current artifact plus the delta.
-6. Validate consistency and present the delta in conversation.
+6. Validate consistency — every artifact reflects the latest facts; ADRs cite only current findings; the solution doc mirrors every ADR grouped by area — and present the delta in conversation, never inside the artifacts.
 
 ## Consistency checklist (validation gate)
 
