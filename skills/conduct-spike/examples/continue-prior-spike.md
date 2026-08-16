@@ -2,7 +2,7 @@
 
 **Scenario**: The user completed a spike on migrating a payment monolith to microservices. Four ADRs were drafted, but database decomposition was left unresolved. Now they ask to dig into that one area to reach a conclusion.
 
-**Applies**: `continue-prior-spike` → `investigate-per-area` → `compile-findings-doc` → `evaluate-problem-solutions` → `draft-problem-adrs` → `sync-update-artifacts`
+**Applies**: `continue-prior-spike` → `investigate-per-area` → `compile-findings-doc` → `draft-problem-adrs` (option evaluation via `draft-adr`) → `sync-update-artifacts`
 
 **What makes this distinct**: Not a full spike (scope already defined, other ADRs exist), not "from existing findings" (the area needs new investigation), and not a plain ADR revision (the problem was never resolved). It shows a continuation round: one area revisited **plus a new problem added under it** — the scope-map delta drives which ADRs change and how `solution.md`'s area section grows.
 
@@ -69,11 +69,11 @@
 
 ---
 
-## Step 4: Evaluate With New Depth
+## Step 4: Draft/Revise Problem ADRs — Evaluate + Draft (Rewrite In Place)
 
-*[evaluate-problem-solutions applied per problem, seeded with the updated findings doc]*
+*[draft-problem-adrs applied per problem, seeded with the updated findings doc; each ADR's evaluation runs via `draft-adr`'s **evaluate-options** inside the drafting session]*
 
-**Problem 1 — break up the database**:
+**Problem 1 — break up the database — evaluation**:
 
 > "The dependency graph shows settlement procedures are the critical coupling point. That opens a third option: extracting settlement as its own service."
 
@@ -104,9 +104,7 @@
 
 ---
 
-## Step 5: Draft/Revise Problem ADRs (Rewrite In Place)
-
-*[draft-problem-adrs revising `adr-database-01-break-up-database.md` and drafting new `adr-database-02-schema-migration.md` through `draft-adr`]*
+*[The ADRs below are compiled from the evaluations above via `draft-adr`'s **compile-adr** — `adr-database-01-break-up-database.md` revised in place, `adr-database-02-schema-migration.md` drafted new.]*
 
 **`adr-database-01-break-up-database.md`: Gradual Database Decomposition with Settlement Extraction**
 

@@ -2,7 +2,7 @@
 
 **Scenario**: The user wants to spike the choice of database for a new analytics service. Since this is a greenfield service with a single clear decision, it's a single-area spike.
 
-**Applies**: All capabilities — `define-spike-scope` → `investigate-per-area` → `compile-findings-doc` → `evaluate-problem-solutions` → `draft-problem-adrs` → `compile-solution-doc`
+**Applies**: All capabilities — `define-spike-scope` → `investigate-per-area` → `compile-findings-doc` → `draft-problem-adrs` (option evaluation via `draft-adr`) → `compile-solution-doc`
 
 **What makes this distinct**: Single investigation area with greenfield context (no existing implementation to investigate). Demonstrates the workflow still applies in full but with a lighter touch — and that even a **single** task is dispatched to a sub-agent to keep the orchestrating agent's context small (see `reference/multi-agent-orchestration.md`).
 
@@ -96,9 +96,9 @@
 > *Since this is greenfield, the findings document captures organizational and operational constraints rather than existing code architecture — the baseline evaluation compares options against.*
 
 ---
-## Phase 3: Evaluate Problem Solutions
+## Phase 3: Draft Problem ADR — EVALUATE + DRAFT, SINGLE-TASK DISPATCH
 
-*(Evaluation dispatched to an ADR-writer sub-agent per **evaluate-problem-solutions** — even a single problem; the `draft-adr` evaluate chain below ran interactively with the user inside the sub-agent session.)*
+*(Even a single problem is dispatched — an `adr-writer` sub-agent runs the full `draft-adr` flow — drivers → options → **evaluate-options** → compile-adr — interactively with the user. The evaluation below is the evaluate stage of that drafting session.)*
 
 ### Area 1: Database Selection
 
@@ -117,8 +117,6 @@
 **Assumed Solution**: Option E (ClickHouse Cloud) — managed, purpose-built for analytics, SQL-compatible, integrates with AWS. Trade-off is a new vendor and technology learning curve, but the managed aspect reduces operational risk.
 
 ---
-
-## Phase 4: Draft Problem ADR — SINGLE-TASK DISPATCH
 
 ### ADR: Database selection — pick the database
 
@@ -150,7 +148,7 @@
 
 ---
 
-## Phase 5: Compile Solution Doc
+## Phase 4: Compile Solution Doc
 
 *[write-solution-doc skill applied]*
 

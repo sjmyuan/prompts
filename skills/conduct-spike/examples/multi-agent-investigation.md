@@ -2,7 +2,7 @@
 
 **Scenario**: The user wants to conduct a heavy spike with 4 investigation areas on migrating a legacy payment service. The orchestrating agent dispatches investigation and ADR drafting to sub-agents in parallel to reduce wall-clock time.
 
-**Applies**: `define-spike-scope` → `investigate-per-area` (parallel dispatch) → `compile-findings-doc` → `evaluate-problem-solutions` → `draft-problem-adrs` (parallel dispatch) → `compile-solution-doc`
+**Applies**: `define-spike-scope` → `investigate-per-area` (parallel dispatch) → `compile-findings-doc` → `draft-problem-adrs` (parallel dispatch, option evaluation via `draft-adr`) → `compile-solution-doc`
 
 **What makes this distinct**: Demonstrates parallel sub-agent orchestration — the orchestrator delegates independent work units concurrently, then synthesizes. Dispatch is the default for **all** spikes (even single-area) to preserve the orchestrating agent's context; parallel speed is secondary (see `reference/multi-agent-orchestration.md`).
 
@@ -21,7 +21,7 @@
 | 3 | Database decomposition strategy | How to break up the monolithic database? One DB per service, shared DB with views, or event-driven? |
 | 4 | Migration strategy | How to transition from monolith to microservices with zero downtime? |
 
-> *User confirms the breakdown. The orchestrator notes: 4 areas → parallel dispatch for Phase 2 (investigation, per area) and Phase 4 (ADR drafting, per problem).*
+> *User confirms the breakdown. The orchestrator notes: 4 areas → parallel dispatch for Phase 2 (investigation, per area) and Phase 3 (ADR drafting, per problem).*
 
 ---
 
@@ -109,11 +109,11 @@ The orchestrator prepares 4 self-contained briefs, one per area — area descrip
 
 ---
 
-## Phase 3: Evaluate Problem Solutions
+## Phase 3: Draft ADRs — PARALLEL DISPATCH
 
-*(Evaluation proceeds as in `examples/end-to-end-spike.md` — same options and decision drivers. See that example for the full evaluation dialog; here it is dispatched per problem to ADR-writer sub-agents, per **evaluate-problem-solutions** — a whole area's problems share one brief.)*
+*(Each problem's ADR — evaluation included — is drafted by an `adr-writer` sub-agent running the full `draft-adr` flow; a whole area's problems share one brief. The assumed solutions below are the evaluate stage of each drafting session.)*
 
-**Assumed Solutions Summary** (per area → problem):
+**Assumed Solutions Summary** (per area → problem, from each session's evaluation):
 
 | Area → Problem | Assumed Solution |
 |---|---|
@@ -121,10 +121,6 @@ The orchestrator prepares 4 self-contained briefs, one per area — area descrip
 | Inter-service communication → service communication | Hybrid: REST for queries, Kafka events for commands |
 | Database decomposition → break up the database | Database per service, phased by payment type |
 | Migration strategy → zero-downtime migration | Strangler Fig, starting with Wallet payments |
-
----
-
-## Phase 4: Draft ADRs — PARALLEL DISPATCH
 
 ### Orchestrator: Prepare Briefs
 
@@ -165,7 +161,7 @@ Load draft-adr skill and produce a complete ADR tagged Area: Service Decompositi
 
 ---
 
-## Phase 5: Compile Solution Doc — SINGLE-TASK DISPATCH
+## Phase 4: Compile Solution Doc — SINGLE-TASK DISPATCH
 
 *The solution doc is one unit synthesizing all ADRs, so it dispatches as a single task (context preservation, not parallelism). Brief: business context, findings doc, 4 assumed solutions; load `write-solution-doc`, produce the target-state doc.*
 

@@ -54,7 +54,7 @@ Captures **current-state architecture** (via `write-solution-doc` **current-stat
 </findings-document>
 
 <option-tech-details>
-ADR option tech details (target-state diagrams + code change profiles) come from `draft-adr` **detail-options-tech**, grounded in the findings doc's evidence map — delegate to `draft-adr` during evaluation and ADR drafting (see **professional-doc-authoring**).
+ADR option tech details (target-state diagrams + code change profiles) come from `draft-adr` **detail-options-tech**, grounded in the findings doc's evidence map — delegate to `draft-adr` during ADR drafting (see **professional-doc-authoring**).
 </option-tech-details>
 
 <continuation-mode>
@@ -66,11 +66,11 @@ No existing implementation: research industry approaches and similar systems, st
 </greenfield-scenarios>
 
 <multi-agent-orchestration>
-Dispatch investigation, findings-doc compilation, evaluation, ADR drafting, and solution-doc compilation — including single-task spikes — to sub-agents; a sub-agent is always available. Goal: keep the orchestrating agent's context small; parallel speed secondary. Details: **reference/multi-agent-orchestration.md**.
+Dispatch investigation, findings-doc compilation, ADR drafting (including option evaluation via `draft-adr`), and solution-doc compilation — including single-task spikes — to sub-agents; a sub-agent is always available. Goal: keep the orchestrating agent's context small; parallel speed secondary. Details: **reference/multi-agent-orchestration.md**.
 </multi-agent-orchestration>
 
 <sub-agent-verification>
-Sub-agent results (Phases 2, 2b, 4, 5) are verified before acceptance via `question-everything`'s **verify-sub-agent-results** — question, verify with a NEW same-type sub-agent (never the original instance), accept or re-investigate, capped at 3 rounds. Phase 3 returns **provisional assumed solutions** — definitive verification lands on the Phase 4 ADR. Full rules: `question-everything`'s **reference/verification-protocol.md**.
+Sub-agent results (Phases 2, 2b, 3, 4) are verified before acceptance via `question-everything`'s **verify-sub-agent-results** — question, verify with a NEW same-type sub-agent (never the original instance), accept or re-investigate, capped at 3 rounds. Full rules: `question-everything`'s **reference/verification-protocol.md**.
 </sub-agent-verification>
 
 <problem-decomposition-guide>
@@ -109,9 +109,9 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 | Continuing a spike into unresolved areas | Continuation walkthrough (revise-in-place) | [examples/continue-prior-spike.md](examples/continue-prior-spike.md) |
 | Dispatching phase work to sub-agents | Dispatch pattern | [reference/multi-agent-orchestration.md](reference/multi-agent-orchestration.md) |
 | Preparing a phase dispatch brief | Brief index + shared evidence-map contract | [reference/dispatch-briefs.md](reference/dispatch-briefs.md) |
-| Compiling the findings doc (Phase 3) | Full compile-findings-doc procedure | [reference/findings-doc-compilation.md](reference/findings-doc-compilation.md) |
-| Compiling the solution doc (Phase 5) | Full compile-solution-doc procedure | [reference/solution-doc-compilation.md](reference/solution-doc-compilation.md) |
-| Drafting ADRs for the area's problems (Phase 4) | Full draft-problem-adrs procedure | [reference/draft-problem-adrs-procedure.md](reference/draft-problem-adrs-procedure.md) |
+| Compiling the findings doc (Phase 2b) | Full compile-findings-doc procedure | [reference/findings-doc-compilation.md](reference/findings-doc-compilation.md) |
+| Compiling the solution doc (Phase 4) | Full compile-solution-doc procedure | [reference/solution-doc-compilation.md](reference/solution-doc-compilation.md) |
+| Drafting ADRs for the area's problems (Phase 3) | Full draft-problem-adrs procedure | [reference/draft-problem-adrs-procedure.md](reference/draft-problem-adrs-procedure.md) |
 | Raising challenges on sub-agent results | Questioning dimensions | `question-everything`: [questioning-dimensions.md](../question-everything/reference/questioning-dimensions.md) |
 | Verifying challenges before acceptance | Verification brief, loop control | `question-everything`: [verification-protocol.md](../question-everything/reference/verification-protocol.md) |
 | Worked verification loop (accept/contradict) | Verification examples | `question-everything`: [confirming-result.md](../question-everything/examples/confirming-result.md), [contradicting-result.md](../question-everything/examples/contradicting-result.md) |
@@ -134,11 +134,10 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 4. Verify each result via `question-everything`'s **verify-sub-agent-results**.
 5. Loop to step 1 when a new investigation direction emerges.
 6. Apply **compile-findings-doc**, embedding each area's evidence map inline.
-7. Apply **evaluate-problem-solutions** to select an assumed solution per problem.
-8. Apply **draft-problem-adrs**, verifying each before saving.
-9. Apply **compile-solution-doc** to consolidate ADRs into the solution document.
-10. Pause for user confirmation after each phase.
-11. Skip a pause only if the user requests it.
+7. Apply **draft-problem-adrs** — evaluating options and drafting each ADR via `draft-adr`, verifying each before saving.
+8. Apply **compile-solution-doc** to consolidate ADRs into the solution document.
+9. Pause for user confirmation after each phase.
+10. Skip a pause only if the user requests it.
 </run-spike-workflow>
 
 <continue-prior-spike>
@@ -155,13 +154,12 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 11. Update `scope.md` statuses as each phase completes.
 12. Apply **investigate-per-area**, seeding sub-agents with existing evidence maps and targeting only what answers the open problems.
 13. Apply **compile-findings-doc**.
-14. Apply **evaluate-problem-solutions**.
-15. Apply **draft-problem-adrs**.
-16. Apply **sync-update-artifacts** to propagate changes downstream.
-17. Propagate a new area's delta to its findings doc, ADRs, and solution section.
-18. Propagate a new problem's delta to its ADR and solution subsection.
-19. Ask whether to continue with another round or conclude.
-20. Apply **define-spike-scope** when continuing, adopting the continuation as the new scope.
+14. Apply **draft-problem-adrs**, evaluating options and drafting each ADR via `draft-adr`.
+15. Apply **sync-update-artifacts** to propagate changes downstream.
+16. Propagate a new area's delta to its findings doc, ADRs, and solution section.
+17. Propagate a new problem's delta to its ADR and solution subsection.
+18. Ask whether to continue with another round or conclude.
+19. Apply **define-spike-scope** when continuing, adopting the continuation as the new scope.
 </continue-prior-spike>
 
 <define-spike-scope>
@@ -190,23 +188,8 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 6. Hand off to **compile-findings-doc** with the evidence maps.
 </investigate-per-area>
 
-<evaluate-problem-solutions>
-1. Dispatch each **problem's** evaluation to `adr-writer` per **multi-agent-orchestration**.
-2. Batch a whole area's problems in one brief when they share its subject or evidence.
-3. Brief per **reference/evaluation-brief.md**.
-4. Run the interactive `draft-adr` evaluate chain inside the `adr-writer` session.
-5. Record the **assumed solution** per problem — provisional until ADR review.
-6. Check for **findings gaps**.
-7. Update the findings doc when an option revealed a constraint, risk, or fact it lacks.
-8. Validate tech details are grounded in the evidence map — no invented code.
-9. Validate the assumed solution follows logically.
-10. Validate corrections are captured.
-11. Present the summary table per area → problem.
-12. Hand off to **draft-problem-adrs**.
-</evaluate-problem-solutions>
-
 <draft-problem-adrs>
-1. Apply the ADR-drafting procedure per **reference/draft-problem-adrs-procedure.md**: dispatch → verify → save → ask → validate.
+1. Apply the ADR-drafting procedure per **reference/draft-problem-adrs-procedure.md**: dispatch → evaluate + draft via `draft-adr` → verify → sync findings gaps → save → ask → validate.
 </draft-problem-adrs>
 
 <compile-solution-doc>

@@ -2,9 +2,9 @@
 
 **Scenario**: The user has already done informal investigation on a caching strategy problem and has notes. They want to formalize the findings into ADRs and a solution document without re-doing the investigation.
 
-**Applies**: `define-spike-scope` → `compile-findings-doc` → `evaluate-problem-solutions` → `draft-problem-adrs` → `compile-solution-doc` (skipping `investigate-per-area`; compile-findings-doc formalizes the provided findings)
+**Applies**: `define-spike-scope` → `compile-findings-doc` → `draft-problem-adrs` (option evaluation via `draft-adr`) → `compile-solution-doc` (skipping `investigate-per-area`; compile-findings-doc formalizes the provided findings)
 
-**What makes this distinct**: The investigation phase is skipped because the user already has findings. The spike starts from evaluation, demonstrating the "provide pre-existing findings" rule.
+**What makes this distinct**: The investigation phase is skipped because the user already has findings. The spike starts from ADR drafting (evaluation included), demonstrating the "provide pre-existing findings" rule.
 
 ---
 
@@ -68,9 +68,9 @@
 
 ---
 
-## Phase 3: Evaluate Problem Solutions
+## Phase 3: Draft Problem ADRs — Evaluate + Draft
 
-*[Evaluation dispatched to an ADR-writer sub-agent per **evaluate-problem-solutions**; based on the user's notes, the sub-agent helps structure and complete the evaluation interactively]*
+*[Per problem, an ADR-writer sub-agent runs the full `draft-adr` flow — drivers → options → **evaluate-options** → compile-adr — interactively with the user, seeded from the provided notes. The evaluation tables below are the evaluate stage of each drafting session.]*
 
 ### Area 1: Cache Topology
 
@@ -93,8 +93,6 @@
 **Assumed Solution**: Option C (Cache-aside with CDC) — services write to DB only; Debezium CDC captures changes and publishes invalidation events to Kafka; cache consumers listen and invalidate affected keys.
 
 ---
-
-## Phase 4: Draft Problem ADRs
 
 ### ADR: Cache topology — position caches
 
@@ -124,7 +122,7 @@
 
 ---
 
-## Phase 5: Compile Solution Doc
+## Phase 4: Compile Solution Doc
 
 *[write-solution-doc skill applied]*
 

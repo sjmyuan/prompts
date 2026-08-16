@@ -2,7 +2,7 @@
 
 **Scenario**: The user wants to spike migrating a legacy payment processing service from a monolithic architecture to microservices. The spike should produce ADRs for each key decision problem (grouped by area) and a consolidated solution document.
 
-**Applies**: All capabilities in sequence — `define-spike-scope` → `investigate-per-area` → `compile-findings-doc` → `evaluate-problem-solutions` → `draft-problem-adrs` → `compile-solution-doc`
+**Applies**: All capabilities in sequence — `define-spike-scope` → `investigate-per-area` → `compile-findings-doc` → `draft-problem-adrs` (option evaluation via `draft-adr`) → `compile-solution-doc`
 
 **What makes this distinct**: Full multi-area brownfield spike demonstrating the complete 5-phase workflow end to end (see `examples/multi-agent-investigation.md` for the parallel-dispatch variant).
 
@@ -78,9 +78,9 @@
 
 ---
 
-## Phase 3: Evaluate Problem Solutions
+## Phase 3: Draft Problem ADRs — Evaluate + Draft
 
-*(Evaluation dispatched per problem to an ADR-writer sub-agent per **evaluate-problem-solutions** — a whole area's problems share one brief when evidence is shared; the `draft-adr` evaluate chain below ran interactively with the user inside the sub-agent session.)*
+*(Per problem, an `adr-writer` sub-agent runs the full `draft-adr` flow — decision drivers → options → **evaluate-options** → compile-adr — interactively with the user; a whole area's problems share one brief when evidence is shared. The evaluation tables below are the evaluate stage of each drafting session.)*
 
 ### Area 1: Service Decomposition — problem: How to split the monolith?
 
@@ -126,8 +126,6 @@
 
 ---
 
-## Phase 4: Draft Problem ADRs
-
 ### ADR: Service decomposition — split the monolith
 
 *[draft-adr skill applied — full ADR produced; saved as `adr-service-decomposition-01-split-monolith.md`, tagged `Area: Service decomposition`]*
@@ -150,7 +148,7 @@
 
 ---
 
-## Phase 5: Compile Solution Doc
+## Phase 4: Compile Solution Doc
 
 *[write-solution-doc skill applied]*
 

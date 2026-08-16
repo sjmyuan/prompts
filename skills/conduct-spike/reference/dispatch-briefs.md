@@ -6,9 +6,8 @@ Per-phase brief index + the shared evidence-map input/output contract for dispat
 |---|---|---|
 | 2. Investigate | investigate-per-area → `code-investigator` | [investigation-brief.md](investigation-brief.md) |
 | 2b. Compile findings docs | compile-findings-doc → `solution-doc-writer` | [findings-doc-brief.md](findings-doc-brief.md) |
-| 3. Evaluate problem solutions | evaluate-problem-solutions → `adr-writer` | [evaluation-brief.md](evaluation-brief.md) |
-| 4. Draft problem ADRs | draft-problem-adrs → `adr-writer` | [adr-drafting-brief.md](adr-drafting-brief.md) |
-| 5. Compile solution doc | compile-solution-doc → `solution-doc-writer` | [solution-doc-brief.md](solution-doc-brief.md) |
+| 3. Draft problem ADRs (evaluate + draft) | draft-problem-adrs → `adr-writer` | [adr-drafting-brief.md](adr-drafting-brief.md) |
+| 4. Compile solution doc | compile-solution-doc → `solution-doc-writer` | [solution-doc-brief.md](solution-doc-brief.md) |
 
 Dispatch multiple work units concurrently, a single unit on its own. Each brief is dispatched to the mapped agent (per the table above). After collection, review each returned result against the phase's spike-specific checks (in its brief file). All briefs carry the shared evidence-map input/output contract below.
 

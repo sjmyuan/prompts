@@ -1,20 +1,19 @@
 # Sub-Agent Orchestration for Spikes
 
-Dispatch task execution to sub-agents — for Phases 2 (investigate), 2b (compile findings docs), 3 (evaluate solutions), 4 (draft ADRs), and 5 (compile solution doc) — **even when the spike has only a single task**. A sub-agent is always available; the primary goal is **preserving the orchestrating agent's context**: running a task in the orchestrator consumes its context window with file reads, search output, and intermediate reasoning, crowding out the cross-cutting state it must hold (scope, findings, decisions). Parallel speed is a secondary benefit that applies automatically when multiple units are dispatched at once.
+Dispatch task execution to sub-agents — for Phases 2 (investigate), 2b (compile findings docs), 3 (draft ADRs, including option evaluation via `draft-adr`), and 4 (compile solution doc) — **even when the spike has only a single task**. A sub-agent is always available; the primary goal is **preserving the orchestrating agent's context**: running a task in the orchestrator consumes its context window with file reads, search output, and intermediate reasoning, crowding out the cross-cutting state it must hold (scope, findings, decisions). Parallel speed is a secondary benefit that applies automatically when multiple units are dispatched at once.
 
 | Phase | Agent | Applies skill | Brief template |
 |---|---|---|---|
 | 2. Investigate | `code-investigator` | `investigate-code` | Investigation brief — [investigation-brief.md](investigation-brief.md) |
 | 2b. Compile findings docs | `solution-doc-writer` | `write-solution-doc` (current-state mode) | Findings-doc brief — [findings-doc-brief.md](findings-doc-brief.md) |
-| 3. Evaluate problem solutions | `adr-writer` | `draft-adr` (evaluate chain, interactive) | Evaluation brief — [evaluation-brief.md](evaluation-brief.md) |
-| 4. Draft problem ADRs | `adr-writer` | `draft-adr` (compile-adr) | ADR-drafting brief — [adr-drafting-brief.md](adr-drafting-brief.md) |
-| 5. Compile solution doc | `solution-doc-writer` | `write-solution-doc` (baseline-input mode) | Solution-doc brief — [solution-doc-brief.md](solution-doc-brief.md) |
+| 3. Draft problem ADRs (evaluate + draft) | `adr-writer` | `draft-adr` (full flow) | ADR-drafting brief — [adr-drafting-brief.md](adr-drafting-brief.md) |
+| 4. Compile solution doc | `solution-doc-writer` | `write-solution-doc` (baseline-input mode) | Solution-doc brief — [solution-doc-brief.md](solution-doc-brief.md) |
 
-Each phase's brief template lives in its own reference file (see the table above) — prepare the brief from it, then dispatch to the mapped agent. Every phase is dispatched even for a single task (see below). Evaluation dispatch (Phase 3) runs the interactive `draft-adr` evaluate chain inside the `adr-writer` session — the agent asks the user for drivers, options, and the assumed solution, then returns the result to the orchestrator.
+Each phase's brief template lives in its own reference file (see the table above) — prepare the brief from it, then dispatch to the mapped agent. Every phase is dispatched even for a single task (see below). ADR drafting (Phase 3) runs the full `draft-adr` flow — decision drivers → options → evaluation → compile-adr — inside the `adr-writer` session; the agent asks the user for drivers, options, and the chosen option, then returns the ADR.
 
 ## Why Dispatch Even a Single Task
 
-- **Context preservation (primary)**: the orchestrator keeps its window for synthesis and orchestration; the sub-agent's reading, reasoning, and interactive user dialog (e.g., evaluation) stays in its own context.
+- **Context preservation (primary)**: the orchestrator keeps its window for synthesis and orchestration; the sub-agent's reading, reasoning, and interactive user dialog (e.g., ADR evaluation) stays in its own context.
 - **Speed (secondary)**: multiple units dispatched together run concurrently.
 - **Consistency**: one dispatch pattern for all spikes — no separate single-task code path to maintain.
 
@@ -29,11 +28,11 @@ Each phase's brief template lives in its own reference file (see the table above
 
 ## Verifying Returned Results
 
-Every sub-agent result — investigation findings, ADR decisions, and dispatched findings/solution-doc compilations — is verified before acceptance via `question-everything`'s **verify-sub-agent-results**: challenge the result across the six dimensions, dispatch a NEW same-type sub-agent to verify each challenge against primary sources, accept when all material challenges AGREE, or re-investigate with another NEW same-type sub-agent when any DISAGREE/UNCERTAIN. Loop until all agree or the 3-round cap; escalate to the user at the cap. The original sub-agent instance is never reused. Dispatched findings/solution-doc compilations synthesize already-verified material, so verification focuses on fidelity to that material rather than a fresh fact-check. Dispatched evaluation results return **provisional assumed solutions** — the orchestrator reviews them for fidelity to the findings doc and cross-area consistency, and the definitive verification lands on the ADR drafted in Phase 4. Full loop: `question-everything`'s **reference/verification-protocol.md**.
+Every sub-agent result — investigation findings, ADR decisions, and dispatched findings/solution-doc compilations — is verified before acceptance via `question-everything`'s **verify-sub-agent-results**: challenge the result across the six dimensions, dispatch a NEW same-type sub-agent to verify each challenge against primary sources, accept when all material challenges AGREE, or re-investigate with another NEW same-type sub-agent when any DISAGREE/UNCERTAIN. Loop until all agree or the 3-round cap; escalate to the user at the cap. The original sub-agent instance is never reused. Dispatched findings/solution-doc compilations synthesize already-verified material, so verification focuses on fidelity to that material rather than a fresh fact-check. Full loop: `question-everything`'s **reference/verification-protocol.md**.
 
 ## When NOT to Dispatch
 
-- **Phase 1 (define scope)**: stays in the orchestrating agent — it establishes the cross-cutting scope (goal + areas and problems) that every dispatch brief depends on and sets up the spike. All later phases, including evaluation, dispatch to a sub-agent; evaluation's user dialog runs inside the dispatched sub-agent.
+- **Phase 1 (define scope)**: stays in the orchestrating agent — it establishes the cross-cutting scope (goal + areas and problems) that every dispatch brief depends on and sets up the spike. All later phases dispatch to a sub-agent; the ADR-drafting user dialog (drivers, options, evaluation) runs inside the dispatched sub-agent.
 - **Single-task spikes are NOT exempt**: a single area, single ADR, or single document is still dispatched — context preservation is the goal, not parallelism.
 
 ## Platform Detection
