@@ -58,11 +58,11 @@ ADR option tech details (target-state diagrams + code change profiles) come from
 </option-tech-details>
 
 <continuation-mode>
-Continuing a spike = **another round of the same workflow**, seeded with prior artifacts: read `scope.md`'s statuses (see **scope-map-status**) to pick open work — `investigating` problems need investigation, `deciding` need confirmation; confirm add/adjust areas and problems; each delta maps to its affected ADR(s) and the solution doc's area section. Unchanged items stay as-is; run capabilities in **revise-in-place** mode, updating statuses as phases complete; **sync-update-artifacts** propagates downstream. See **examples/continue-prior-spike.md**.
+Continuing a spike = **another round of the same workflow**, seeded with prior artifacts: read `scope.md`'s statuses (see **scope-map-status**) to pick open work — `investigating` problems need investigation, `deciding` need confirmation; confirm add/adjust areas and problems; each delta maps to its affected ADR(s) and the solution doc's area section. Unchanged items stay as-is; run capabilities in **revise-in-place** mode, updating statuses as each step completes; **sync-update-artifacts** propagates downstream. See **examples/continue-prior-spike.md**.
 </continuation-mode>
 
 <greenfield-scenarios>
-No existing implementation: research industry approaches and similar systems, study operational constraints (cloud, team, compliance), build proof-of-concept prototypes instead of tracing code; remaining phases unchanged.
+No existing implementation: research industry approaches and similar systems, study operational constraints (cloud, team, compliance), build proof-of-concept prototypes instead of tracing code; remaining workflow unchanged.
 </greenfield-scenarios>
 
 <multi-agent-orchestration>
@@ -70,7 +70,7 @@ Dispatch investigation, findings-doc compilation, ADR drafting (including option
 </multi-agent-orchestration>
 
 <sub-agent-verification>
-Sub-agent results (Phases 2, 2b, 3, 4) are verified before acceptance via `question-everything`'s **verify-sub-agent-results** — question, verify with a NEW same-type sub-agent (never the original instance), accept or re-investigate, capped at 3 rounds. Full rules: `question-everything`'s **reference/verification-protocol.md**.
+All dispatched sub-agent results (investigation, findings, ADRs, solution doc) are verified before acceptance via `question-everything`'s **verify-sub-agent-results** — question, verify with a NEW same-type sub-agent (never the original instance), accept or re-investigate, capped at 3 rounds. Full rules: `question-everything`'s **reference/verification-protocol.md**.
 </sub-agent-verification>
 
 <problem-decomposition-guide>
@@ -101,17 +101,17 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 
 | Load when | Provides | File |
 |---|---|---|
-| Full end-to-end spike (scope → solution doc) | 5-phase walkthrough | [examples/end-to-end-spike.md](examples/end-to-end-spike.md) |
+| Full end-to-end spike (scope → solution doc) | End-to-end walkthrough | [examples/end-to-end-spike.md](examples/end-to-end-spike.md) |
 | Single-area spike, narrow scope | Single-area workflow | [examples/single-area-spike.md](examples/single-area-spike.md) |
 | Starting from pre-existing findings | Workflow without re-investigation | [examples/from-existing-findings.md](examples/from-existing-findings.md) |
 | Decomposing a complex problem into areas and problems | Decomposition rubric + edge cases | [reference/decomposition-rubric.md](reference/decomposition-rubric.md) |
 | Heavy multi-area spike with parallel sub-agents | Parallel dispatch walkthrough | [examples/multi-agent-investigation.md](examples/multi-agent-investigation.md) |
 | Continuing a spike into unresolved areas | Continuation walkthrough (revise-in-place) | [examples/continue-prior-spike.md](examples/continue-prior-spike.md) |
-| Dispatching phase work to sub-agents | Dispatch pattern | [reference/multi-agent-orchestration.md](reference/multi-agent-orchestration.md) |
-| Preparing a phase dispatch brief | Brief index + shared evidence-map contract | [reference/dispatch-briefs.md](reference/dispatch-briefs.md) |
-| Compiling the findings doc (Phase 2b) | Full compile-findings-doc procedure | [reference/findings-doc-compilation.md](reference/findings-doc-compilation.md) |
-| Compiling the solution doc (Phase 4) | Full compile-solution-doc procedure | [reference/solution-doc-compilation.md](reference/solution-doc-compilation.md) |
-| Drafting ADRs for the area's problems (Phase 3) | Full draft-problem-adrs procedure | [reference/draft-problem-adrs-procedure.md](reference/draft-problem-adrs-procedure.md) |
+| Dispatching workflow steps to sub-agents | Dispatch pattern | [reference/multi-agent-orchestration.md](reference/multi-agent-orchestration.md) |
+| Preparing a dispatch brief | Brief index + shared evidence-map contract | [reference/dispatch-briefs.md](reference/dispatch-briefs.md) |
+| Compiling the findings doc | Full compile-findings-doc procedure | [reference/findings-doc-compilation.md](reference/findings-doc-compilation.md) |
+| Compiling the solution doc | Full compile-solution-doc procedure | [reference/solution-doc-compilation.md](reference/solution-doc-compilation.md) |
+| Drafting ADRs for the area's problems | Full draft-problem-adrs procedure | [reference/draft-problem-adrs-procedure.md](reference/draft-problem-adrs-procedure.md) |
 | Raising challenges on sub-agent results | Questioning dimensions | `question-everything`: [questioning-dimensions.md](../question-everything/reference/questioning-dimensions.md) |
 | Verifying challenges before acceptance | Verification brief, loop control | `question-everything`: [verification-protocol.md](../question-everything/reference/verification-protocol.md) |
 | Worked verification loop (accept/contradict) | Verification examples | `question-everything`: [confirming-result.md](../question-everything/examples/confirming-result.md), [contradicting-result.md](../question-everything/examples/contradicting-result.md) |
@@ -136,7 +136,7 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 6. Apply **compile-findings-doc**, embedding each area's evidence map inline.
 7. Apply **draft-problem-adrs** — evaluating options and drafting each ADR via `draft-adr`, verifying each before saving.
 8. Apply **compile-solution-doc** to consolidate ADRs into the solution document.
-9. Pause for user confirmation after each phase.
+9. Pause for user confirmation after each capability.
 10. Skip a pause only if the user requests it.
 </run-spike-workflow>
 
@@ -151,7 +151,7 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 8. Validate unchanged items' decisions are preserved.
 9. Validate the scope map reflects the confirmed deltas.
 10. Run the standard workflow in revise-in-place mode per **continuation-mode**.
-11. Update `scope.md` statuses as each phase completes.
+11. Update `scope.md` statuses as each step completes.
 12. Apply **investigate-per-area**, seeding sub-agents with existing evidence maps and targeting only what answers the open problems.
 13. Apply **compile-findings-doc**.
 14. Apply **draft-problem-adrs**, evaluating options and drafting each ADR via `draft-adr`.
@@ -219,6 +219,6 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 </capabilities>
 
 <rules>
-<rule>When the user initiates a spike investigation from scratch, apply **run-spike-workflow** to orchestrate all phases from scope definition through solution compilation.</rule>
+<rule>When the user initiates a spike investigation from scratch, apply **run-spike-workflow** to orchestrate the full workflow from scope definition through solution compilation.</rule>
 <rule>When the user starts from existing material instead of a blank slate, apply **continue-prior-spike** to continue the previous spike.</rule>
 </rules>

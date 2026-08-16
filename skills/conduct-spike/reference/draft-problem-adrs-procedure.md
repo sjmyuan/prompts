@@ -1,6 +1,6 @@
 # Draft-Problem-ADRs Procedure
 
-Full procedure for the `draft-problem-adrs` capability — loaded on demand when the spike reaches the ADR-drafting phase, so the compile and investigation procedures are never pulled in. Dispatch briefs: **reference/adr-drafting-brief.md**; latest-state rules: **reference/artifact-maintenance-guide.md**.
+Full procedure for the `draft-problem-adrs` capability — loaded on demand when the spike reaches ADR drafting, so the compile and investigation procedures are never pulled in. Dispatch briefs: **reference/adr-drafting-brief.md**; latest-state rules: **reference/artifact-maintenance-guide.md**.
 
 1. Dispatch ADR drafting for each **problem** to `adr-writer` per **multi-agent-orchestration**; batch a whole area's problems in one brief when they share its evidence (brief per **reference/adr-drafting-brief.md**). Each brief runs the full `draft-adr` flow — decision drivers → options → evaluation → compilation — so evaluation and drafting happen in one session per problem.
 2. Verify each drafted ADR via `question-everything`'s **verify-sub-agent-results**.

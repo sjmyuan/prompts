@@ -4,11 +4,11 @@
 
 **Applies**: `define-spike-scope` → `compile-findings-doc` → `draft-problem-adrs` (option evaluation via `draft-adr`) → `compile-solution-doc` (skipping `investigate-per-area`; compile-findings-doc formalizes the provided findings)
 
-**What makes this distinct**: The investigation phase is skipped because the user already has findings. The spike starts from ADR drafting (evaluation included), demonstrating the "provide pre-existing findings" rule.
+**What makes this distinct**: Investigation is skipped because the user already has findings. The spike starts from ADR drafting (evaluation included), demonstrating the "provide pre-existing findings" rule.
 
 ---
 
-## Phase 1: Define Spike Scope
+## Define Spike Scope
 
 ### User Input
 > "I've already looked into our caching problem. Here's what I found: [pastes notes]. Can you help me turn this into proper ADRs and a solution doc?"
@@ -28,13 +28,13 @@
 
 ---
 
-## Phase 2: Investigate Per Area — SKIPPED
+## Investigate Per Area — SKIPPED
 
-*User provided pre-existing investigation findings. Skipping investigation phase per the "pre-existing findings" rule.*
+*User provided pre-existing investigation findings. Skipping investigation per the "pre-existing findings" rule.*
 
 ---
 
-## Phase 2b: Compile Findings Document
+## Compile Findings Document
 
 *[compile-findings-doc applied to formalize the user's pre-existing investigation notes]*
 
@@ -68,7 +68,7 @@
 
 ---
 
-## Phase 3: Draft Problem ADRs — Evaluate + Draft
+## Draft Problem ADRs — Evaluate + Draft
 
 *[Per problem, an ADR-writer sub-agent runs the full `draft-adr` flow — drivers → options → **evaluate-options** → compile-adr — interactively with the user, seeded from the provided notes. The evaluation tables below are the evaluate stage of each drafting session.]*
 
@@ -122,7 +122,7 @@
 
 ---
 
-## Phase 4: Compile Solution Doc
+## Compile Solution Doc
 
 *[write-solution-doc skill applied]*
 
@@ -140,4 +140,4 @@
 
 ### Wrap-Up (conversation level — not written into any artifact)
 
-> This spike skipped the investigation phase because you provided existing findings. If any investigation gaps are discovered during ADR review, we can re-run the investigation phase for specific areas.
+> This spike skipped the investigation because you provided existing findings. If any investigation gaps are discovered during ADR review, we can re-run the investigation for specific areas.

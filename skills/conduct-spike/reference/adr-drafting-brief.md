@@ -1,6 +1,6 @@
 # ADR-Drafting Brief
 
-Per-phase dispatch brief for `draft-problem-adrs` → `adr-writer` — loaded on demand when dispatching ADR drafting so the other phases' briefs are never pulled in. Shared evidence-map input/output contract: **reference/dispatch-briefs.md**.
+Dispatch brief for `draft-problem-adrs` → `adr-writer` — loaded on demand when dispatching ADR drafting so the other briefs are never pulled in. Shared evidence-map input/output contract: **reference/dispatch-briefs.md**.
 
 **Announce**: "Dispatching ADR drafting for [N] problem(s) to a sub-agent."
 

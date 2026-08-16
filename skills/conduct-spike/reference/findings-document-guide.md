@@ -1,12 +1,12 @@
 # Findings Document Guide
 
-A findings document documents the **current-state architecture** — what exists in the code today. It uses the same format as a solution document (C4 diagrams, sequence diagrams, API/event contracts, dependency maps) but describes the as-is rather than the to-be. This makes findings documents directly transformable into the solution document during Phase 4.
+A findings document documents the **current-state architecture** — what exists in the code today. It uses the same format as a solution document (C4 diagrams, sequence diagrams, API/event contracts, dependency maps) but describes the as-is rather than the to-be. This makes findings documents directly transformable into the solution document during solution-doc compilation.
 
 ## Why the solution-doc format?
 
 Most of the time, the current implementation *is* a solution — just the existing one. Documenting it in solution-doc format means:
 
-- The solution document (Phase 4) can start from the findings doc and evolve diagrams from as-is → to-be, rather than drawing from scratch.
+- The solution document can start from the findings doc and evolve diagrams from as-is → to-be, rather than drawing from scratch.
 - ADRs have a precise, structured baseline to compare options against: "The current architecture (see Findings Doc §3, C2 diagram) couples payment types via shared tables..."
 - Reviewers can diff the findings doc against the solution doc to see exactly what changes are proposed.
 

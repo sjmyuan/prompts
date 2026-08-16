@@ -8,7 +8,7 @@
 
 ---
 
-## Phase 1: Define Spike Scope
+## Define Spike Scope
 
 ### User Input
 > "We're building a new analytics service that needs to ingest clickstream events and support real-time dashboards. I need to decide what database to use."
@@ -25,7 +25,7 @@
 
 ---
 
-## Phase 2: Investigate Per Area — SINGLE-TASK DISPATCH
+## Investigate Per Area — SINGLE-TASK DISPATCH
 
 ### Area 1: Database Selection
 
@@ -47,7 +47,7 @@
 
 ---
 
-## Phase 2a: Completion Checkpoint
+## Completion Checkpoint
 
 *[Investigation complete — the assistant confirms the result before formalizing findings]*
 
@@ -65,7 +65,7 @@
 
 ---
 
-## Phase 2b: Compile Findings Document
+## Compile Findings Document
 
 *[compile-findings-doc applied — greenfield adaptation; no existing code to document]*
 
@@ -96,7 +96,7 @@
 > *Since this is greenfield, the findings document captures organizational and operational constraints rather than existing code architecture — the baseline evaluation compares options against.*
 
 ---
-## Phase 3: Draft Problem ADR — EVALUATE + DRAFT, SINGLE-TASK DISPATCH
+## Draft Problem ADR — EVALUATE + DRAFT, SINGLE-TASK DISPATCH
 
 *(Even a single problem is dispatched — an `adr-writer` sub-agent runs the full `draft-adr` flow — drivers → options → **evaluate-options** → compile-adr — interactively with the user. The evaluation below is the evaluate stage of that drafting session.)*
 
@@ -148,7 +148,7 @@
 
 ---
 
-## Phase 4: Compile Solution Doc
+## Compile Solution Doc
 
 *[write-solution-doc skill applied]*
 

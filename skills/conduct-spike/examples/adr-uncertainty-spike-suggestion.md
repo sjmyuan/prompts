@@ -1,6 +1,6 @@
 # Example: ADR Uncertainty Triggers a Focused Spike Suggestion
 
-**Scenario**: The spike workflow has reached the ADR drafting phase. The user is reviewing `adr-communication-01-service-communication.md` (problem: how to handle service-to-service communication) and hesitates: "I'm not sure about EventBridge — can it actually handle our peak volume?" The decision hinges on an unverified assumption, so instead of finalizing the ADR on guesswork, the skill names the uncertainty and offers a focused spike before the ADR is recorded.
+**Scenario**: The spike workflow has reached ADR drafting. The user is reviewing `adr-communication-01-service-communication.md` (problem: how to handle service-to-service communication) and hesitates: "I'm not sure about EventBridge — can it actually handle our peak volume?" The decision hinges on an unverified assumption, so instead of finalizing the ADR on guesswork, the skill names the uncertainty and offers a focused spike before the ADR is recorded.
 
 **Applies**: `suggest-spike-on-adr-uncertainty` — invoked when ADR discussion reveals the decision depends on facts that haven't been established
 
@@ -14,7 +14,7 @@
 
 **Areas → problems**: (1) service boundaries → split the monolith, (2) communication mechanism → service-to-service communication, (3) data consistency → keep data consistent.
 
-**Phase**: `draft-problem-adrs` — `adr-communication-01-service-communication.md` is being reviewed. The assumed solution is AWS EventBridge with an `OrderReceived` event, chosen because it is already present in the codebase.
+**Step**: `draft-problem-adrs` — `adr-communication-01-service-communication.md` is being reviewed. The assumed solution is AWS EventBridge with an `OrderReceived` event, chosen because it is already present in the codebase.
 
 **User's hesitation**: "I'm not sure about committing to EventBridge as the assumed solution. It's already in the codebase, but I don't actually know if it can handle our peak of 10K orders/sec — or whether we'd be better off with a Kafka-style bus for replay."
 

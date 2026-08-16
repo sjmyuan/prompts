@@ -1,15 +1,15 @@
 # Dispatch Briefs
 
-Per-phase brief index + the shared evidence-map input/output contract for dispatching spike work to sub-agents. The phase→agent mapping and dispatch rules live in **reference/multi-agent-orchestration.md**. Each phase's brief template lives in its own file, loaded on demand:
+Brief index + the shared evidence-map input/output contract for dispatching spike work to sub-agents. The capability→agent mapping and dispatch rules live in **reference/multi-agent-orchestration.md**. Each brief template lives in its own file, loaded on demand:
 
-| Phase | Capability → agent | Brief file |
-|---|---|---|
-| 2. Investigate | investigate-per-area → `code-investigator` | [investigation-brief.md](investigation-brief.md) |
-| 2b. Compile findings docs | compile-findings-doc → `solution-doc-writer` | [findings-doc-brief.md](findings-doc-brief.md) |
-| 3. Draft problem ADRs (evaluate + draft) | draft-problem-adrs → `adr-writer` | [adr-drafting-brief.md](adr-drafting-brief.md) |
-| 4. Compile solution doc | compile-solution-doc → `solution-doc-writer` | [solution-doc-brief.md](solution-doc-brief.md) |
+| Capability → agent | Brief file |
+|---|---|
+| investigate-per-area → `code-investigator` | [investigation-brief.md](investigation-brief.md) |
+| compile-findings-doc → `solution-doc-writer` | [findings-doc-brief.md](findings-doc-brief.md) |
+| draft-problem-adrs → `adr-writer` | [adr-drafting-brief.md](adr-drafting-brief.md) |
+| compile-solution-doc → `solution-doc-writer` | [solution-doc-brief.md](solution-doc-brief.md) |
 
-Dispatch multiple work units concurrently, a single unit on its own. Each brief is dispatched to the mapped agent (per the table above). After collection, review each returned result against the phase's spike-specific checks (in its brief file). All briefs carry the shared evidence-map input/output contract below.
+Dispatch multiple work units concurrently, a single unit on its own. Each brief is dispatched to the mapped agent (per the table above). After collection, review each returned result against the capability's spike-specific checks (in its brief file). All briefs carry the shared evidence-map input/output contract below.
 
 ## Evidence map in every brief
 

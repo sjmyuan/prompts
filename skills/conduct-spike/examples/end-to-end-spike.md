@@ -4,11 +4,11 @@
 
 **Applies**: All capabilities in sequence — `define-spike-scope` → `investigate-per-area` → `compile-findings-doc` → `draft-problem-adrs` (option evaluation via `draft-adr`) → `compile-solution-doc`
 
-**What makes this distinct**: Full multi-area brownfield spike demonstrating the complete 5-phase workflow end to end (see `examples/multi-agent-investigation.md` for the parallel-dispatch variant).
+**What makes this distinct**: Full multi-area brownfield spike demonstrating the complete workflow end to end (see `examples/multi-agent-investigation.md` for the parallel-dispatch variant).
 
 ---
 
-## Phase 1: Define Spike Scope
+## Define Spike Scope
 
 ### User Input
 > "We need to spike migrating our payment processing service from the monolith to microservices. It handles credit card, bank transfer, and wallet payments. Currently it's a single Spring Boot app with ~200K LOC."
@@ -28,7 +28,7 @@
 
 ---
 
-## Phase 2: Investigate Per Area
+## Investigate Per Area
 
 ### Area 1: Service Decomposition Boundaries
 
@@ -49,7 +49,7 @@
 
 ---
 
-## Phase 2a: Completion Checkpoint
+## Completion Checkpoint
 
 *[Investigation complete — the assistant confirms the result before formalizing findings]*
 
@@ -60,7 +60,7 @@
 
 ---
 
-## Phase 2b: Compile Findings Documents
+## Compile Findings Documents
 
 *[compile-findings-doc applied — producing one consolidated findings document for 4 tightly-coupled areas]*
 
@@ -78,7 +78,7 @@
 
 ---
 
-## Phase 3: Draft Problem ADRs — Evaluate + Draft
+## Draft Problem ADRs — Evaluate + Draft
 
 *(Per problem, an `adr-writer` sub-agent runs the full `draft-adr` flow — decision drivers → options → **evaluate-options** → compile-adr — interactively with the user; a whole area's problems share one brief when evidence is shared. The evaluation tables below are the evaluate stage of each drafting session.)*
 
@@ -148,7 +148,7 @@
 
 ---
 
-## Phase 4: Compile Solution Doc
+## Compile Solution Doc
 
 *[write-solution-doc skill applied]*
 

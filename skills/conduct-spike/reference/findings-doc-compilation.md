@@ -1,6 +1,6 @@
 # Findings-Doc Compilation
 
-Full procedure for the `compile-findings-doc` capability — loaded on demand when the spike reaches the findings-doc compilation phase, so the solution-doc procedure is never pulled in. Dispatch briefs: **reference/findings-doc-brief.md**; evidence-map rules: **reference/findings-document-guide.md**.
+Full procedure for the `compile-findings-doc` capability — loaded on demand when the spike reaches findings-doc compilation, so the solution-doc procedure is never pulled in. Dispatch briefs: **reference/findings-doc-brief.md**; evidence-map rules: **reference/findings-document-guide.md**.
 
 1. Determine the document strategy: **per-area** (2+ loosely-coupled areas) or **one consolidated doc** (tightly-coupled or single-area). Ask the user.
 2. Dispatch findings-doc compilation to `solution-doc-writer` per **multi-agent-orchestration**; brief per **reference/findings-doc-brief.md**.

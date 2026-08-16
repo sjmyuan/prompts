@@ -8,7 +8,7 @@
 
 ---
 
-## Phase 1: Define Spike Scope
+## Define Spike Scope
 
 *(Scope definition proceeds as in `examples/end-to-end-spike.md` — the same payment service migration problem with 4 investigation areas. See that example for the full scope-definition dialog.)*
 
@@ -21,11 +21,11 @@
 | 3 | Database decomposition strategy | How to break up the monolithic database? One DB per service, shared DB with views, or event-driven? |
 | 4 | Migration strategy | How to transition from monolith to microservices with zero downtime? |
 
-> *User confirms the breakdown. The orchestrator notes: 4 areas → parallel dispatch for Phase 2 (investigation, per area) and Phase 3 (ADR drafting, per problem).*
+> *User confirms the breakdown. The orchestrator notes: 4 areas → parallel dispatch for investigation (per area) and ADR drafting (per problem).*
 
 ---
 
-## Phase 2: Investigate Per Area — PARALLEL DISPATCH
+## Investigate Per Area — PARALLEL DISPATCH
 
 ### Orchestrator: Prepare Briefs
 
@@ -74,7 +74,7 @@ The orchestrator prepares 4 self-contained briefs, one per area — area descrip
 
 ---
 
-## Phase 2b: Compile Findings Documents
+## Compile Findings Documents
 
 *[Orchestrator applies compile-findings-doc — producing one consolidated findings document from the synthesized investigation results of all 4 sub-agents]*
 
@@ -109,7 +109,7 @@ The orchestrator prepares 4 self-contained briefs, one per area — area descrip
 
 ---
 
-## Phase 3: Draft ADRs — PARALLEL DISPATCH
+## Draft ADRs — PARALLEL DISPATCH
 
 *(Each problem's ADR — evaluation included — is drafted by an `adr-writer` sub-agent running the full `draft-adr` flow; a whole area's problems share one brief. The assumed solutions below are the evaluate stage of each drafting session.)*
 
@@ -161,7 +161,7 @@ Load draft-adr skill and produce a complete ADR tagged Area: Service Decompositi
 
 ---
 
-## Phase 4: Compile Solution Doc — SINGLE-TASK DISPATCH
+## Compile Solution Doc — SINGLE-TASK DISPATCH
 
 *The solution doc is one unit synthesizing all ADRs, so it dispatches as a single task (context preservation, not parallelism). Brief: business context, findings doc, 4 assumed solutions; load `write-solution-doc`, produce the target-state doc.*
 
@@ -178,5 +178,5 @@ Load draft-adr skill and produce a complete ADR tagged Area: Service Decompositi
 | Orchestrator context | Low — work happens in isolated contexts |
 | Time | Max of any single unit when concurrent |
 | Coordination | Brief prep + synthesis |
-| When used | Always — a sub-agent is available for every phase; even single-task spikes |
+| When used | Always — a sub-agent is available for every step; even single-task spikes |
 | Risk | Incomplete briefs need re-prompting |

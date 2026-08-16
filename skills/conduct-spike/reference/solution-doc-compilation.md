@@ -1,6 +1,6 @@
 # Solution-Doc Compilation
 
-Full procedure for the `compile-solution-doc` capability — loaded on demand when the spike reaches the solution-doc compilation phase, so the findings-doc procedure is never pulled in. Dispatch briefs: **reference/solution-doc-brief.md**; latest-state rules: **reference/artifact-maintenance-guide.md**.
+Full procedure for the `compile-solution-doc` capability — loaded on demand when the spike reaches solution-doc compilation, so the findings-doc procedure is never pulled in. Dispatch briefs: **reference/solution-doc-brief.md**; latest-state rules: **reference/artifact-maintenance-guide.md**.
 
 1. Dispatch solution-doc compilation to `solution-doc-writer` per **multi-agent-orchestration**; brief per **reference/solution-doc-brief.md**.
 2. Verify the compiled doc via `question-everything`'s **verify-sub-agent-results**.

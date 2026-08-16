@@ -1,6 +1,6 @@
 # Investigation Brief
 
-Per-phase dispatch brief for `investigate-per-area` → `code-investigator` — loaded on demand when dispatching an area's investigation so the other phases' briefs are never pulled in. Shared evidence-map input/output contract: **reference/dispatch-briefs.md** (see **Evidence map in every brief**).
+Dispatch brief for `investigate-per-area` → `code-investigator` — loaded on demand when dispatching an area's investigation so the other briefs are never pulled in. Shared evidence-map input/output contract: **reference/dispatch-briefs.md** (see **Evidence map in every brief**).
 
 **Announce**: "Dispatching investigation of [N] area(s) to a sub-agent."
 

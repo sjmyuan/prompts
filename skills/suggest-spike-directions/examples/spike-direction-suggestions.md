@@ -2,7 +2,7 @@
 
 **Scenario**: The user just completed a spike round investigating "how to reduce order API latency" and asks what to investigate next. The findings revealed the bottleneck is in `order-processing-worker`'s DB queries, not the REST layer. The skill suggests 6 concrete next-step candidates — 3 to go deeper on unresolved details, 3 to broaden to adjacent concerns.
 
-**Applies**: `suggest-spike-directions` — run manually after a spike round completes (e.g., after `conduct-spike`'s investigation phase)
+**Applies**: `suggest-spike-directions` — run manually after a spike round completes (e.g., after `conduct-spike`'s investigation step)
 
 **What makes this distinct**: The suggestions are all grounded in specific findings from the investigation. None are generic ("maybe look at caching?"). Each cites exactly what was found and why going deeper or broader matters.
 
