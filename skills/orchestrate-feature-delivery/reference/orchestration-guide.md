@@ -6,13 +6,13 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 
 - **Always delegate — never do the work yourself.** The orchestrator only dispatches and tracks. Every delivery task maps to a dedicated agent:
 
-| Task | Delegated agent | Applies | Result |
+| Task | Delegated agent (role → example) | Applies | Result |
 |---|---|---|---|
-| Spike a rework | **spike-conductor** | **conduct-spike** | focused findings / ADR / solution-doc updates + change summary |
-| Plan a cell | **coding-assistant** | **plan-development-task** | `plan.md` + `context.md` |
-| Execute a cell | **coding-assistant** | **execute-plan** | code changes + commits |
-| Update solution doc | **solution-doc-writer** | **write-solution-doc** | revised sections, rewrite in place |
-| Update ADR | **adr-writer** | **draft-adr** | revised ADR, rewrite in place |
+| Spike a rework | spike agent → **spike-conductor** | **conduct-spike** | focused findings / ADR / solution-doc updates + change summary |
+| Plan a cell | planning agent → **coding-assistant** | **plan-development-task** | `plan.md` + `context.md` |
+| Execute a cell | execution agent → **coding-assistant** | **execute-plan** | code changes + commits |
+| Update solution doc | solution-doc agent → **solution-doc-writer** | **write-solution-doc** | revised sections, rewrite in place |
+| Update ADR | ADR agent → **adr-writer** | **draft-adr** | revised ADR, rewrite in place |
 
 - **One cell per agent.** Planning agents apply **plan-development-task** and write `deliveries/<epic-name>/{repo}/{feature-name}/plan.md` + `context.md` (feature folder named by the kebab-case feature name, e.g. `wallet-contracts`). Execution agents apply **execute-plan** and run the plan.
 - **Artifact updates are delegated too.** When a plan or execution surfaces changes to the spike's solution doc or ADRs, dispatch a **solution-doc-writer** / **adr-writer** agent for the update — never edit those artifacts from the orchestrator.

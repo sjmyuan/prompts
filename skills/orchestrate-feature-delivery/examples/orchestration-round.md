@@ -31,16 +31,20 @@ F2 and F3 become develop-ready (F1 planned; contract-first allows planning in pa
 - **Agent B** (coding-assistant) → plan `order-service/F2`
 - **Agent C** (coding-assistant) → plan `api-gateway/F3`
 
-## 5. Collect + update index
+## 5. Push approval + merge
+
+F1's execution completes. Per **branch-and-push-conventions**, the branch is pushed and the PR opened only after user approval — F1 becomes **done** only after the PR merges / the user verifies the code.
+
+## 6. Collect + update index
 
 | Cell | Status | Agent | Location |
 |---|---|---|---|
-| shared-contracts/F1 | **done** | agent-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
+| shared-contracts/F1 | **done** (PR merged after approval) | agent-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
 | order-service/F2 | **planned** | agent-B | deliveries/payment-migration/order-service/wallet-service/ |
 | api-gateway/F3 | **planned** | agent-C | deliveries/payment-migration/api-gateway/wallet-api-gateway/ |
 | order-service/F4 | unplanned | — | — |
 | api-gateway/F4 | unplanned | — | — |
 
-## 6. Next actions
+## 7. Next actions
 
-Execute F2 + F3 in parallel (both develop-ready, no conflict); F4 cells remain wave-2 until F2 + F3 merge. All status changes landed in the index before the next round was dispatched.
+Execute F2 + F3 in parallel (both develop-ready, no conflict); with F1 **done**, F2 and F3 are now merge-ready. F4 cells remain wave-2 until F2 + F3 merge. All status changes landed in the index before the next round was dispatched.
