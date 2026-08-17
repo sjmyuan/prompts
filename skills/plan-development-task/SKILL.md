@@ -1,6 +1,6 @@
 ---
 name: plan-development-task
-description: Classify, clarify, and generate TDD-based step-by-step plans for bug fixes, features, and refactors. Use when planning / investigating / designing changes or appending rework for bugs, regressions, new features, enhancements, refactoring, or technical debt.
+description: Classify, clarify, and generate TDD-based step-by-step plans for bug fixes, features, refactors, or POCs. Use when planning, investigating, designing changes, or appending rework.
 ---
 
 <when-to-use-this-skill>
@@ -21,7 +21,7 @@ description: Classify, clarify, and generate TDD-based step-by-step plans for bu
 
 **Differentiation rules** (when multiple skills could apply):
 - **Both restructure AND add new behavior?** → Apply **plan-refactor** first to stabilize, then **plan-feature-implementation** for the new behavior
-- **Multi-feature / multi-repo decomposition of spike results?** → Do NOT plan a whole breakdown here — apply **orchestrate-feature-delivery** first to split, sequence, and orchestrate features, then plan each feature × repo cell with this skill
+- **Multi-feature / multi-repo decomposition?** → Do NOT plan the whole breakdown here — apply **orchestrate-feature-delivery** first, then plan each feature × repo cell with this skill
 - **Rework append for an already-delivered feature?** → Apply this skill in append mode per **rework-plan-convention** — orchestrate-feature-delivery triggers it; never rewrite the implemented plan
 </when-to-use-this-skill>
 
@@ -41,7 +41,7 @@ When unsure, ask the user: "Is the goal to fix something that's broken (bug), ad
 </change-type-classification>
 
 <tdd-approach-selection>
-Load **[reference/tdd-approach-selection.md](reference/tdd-approach-selection.md)** and select the appropriate TDD variant based on the change type and sub-type. Document the rationale for the chosen variant in the plan.
+TDD variant is selected by change type and sub-type — table in **[reference/tdd-approach-selection.md](reference/tdd-approach-selection.md)**. The plan documents the chosen variant with rationale.
 </tdd-approach-selection>
 
 <plan-prerequisites>
@@ -67,30 +67,37 @@ Every plan carries an explicit **Scope Boundary** that the executor checks durin
 | **Rule** | No step, error-recovery fix, or review fix may require changes beyond **In scope**. If one does, the executor refuses and asks the user — never adapts silently |
 | **Minor exceptions** | Proceed without asking: doc/comment-only edits; changes confined to files already in **In scope**; test-only changes for this plan's own tests |
 
-Derive the boundary from the classified change type, the confirmed scope, and (for orchestrator cells) the governing ADR decision. Present it to the user for ratification during plan confirmation, then persist it via **export-plan**. Rework sections inherit the original boundary and tighten it to the governing ADR.
+The boundary derives from the classified change type, the confirmed scope, and (for orchestrator cells) the governing ADR decision. The user ratifies it before **export-plan** persists it. Rework sections inherit the original boundary and tighten it to the governing ADR.
 </scope-boundary>
 <poc-plan>
-A POC plan (from **orchestrate-feature-delivery**'s **poc-definition**) builds a **standalone feature** — a full, coherent slice demonstrating one ADR option, never a snippet. It carries `type: poc`, the option's **success criteria** (measurable evidence for the decision gate), and a final **evaluation step** that collects that evidence. The **Scope Boundary** covers the option's target area; other options and ADRs stay **Out of scope**.
+A POC plan (from **orchestrate-feature-delivery**'s **poc-definition**) is a **standalone feature** proving one ADR option, never a snippet:
+
+| Property | Content |
+|---|---|
+| `type` | `poc` |
+| **Success criteria** | Measurable evidence for the decision gate |
+| **Evaluation step** | Final step that collects that evidence |
+| **Scope Boundary** | Option's target area **In scope**; other options and ADRs **Out of scope** |
 </poc-plan>
 
 <rework-plan-convention>
-When the plan is a **rework append** for an already-implemented feature (triggered by **orchestrate-feature-delivery**'s **handle-post-implementation-issue**), the feature folder already exists with an implemented `plan.md`:
-- **Append, never rewrite**: write a `## Rework <date>` section at the end of the existing `plan.md`; implemented steps stay byte-for-byte unchanged.
-- New steps are numbered within the rework section, reference the triggering issue and the reworked ADR decision, and follow the classified change type (usually a bug-fix/feature plan).
-- The rework section carries its own **Scope Boundary** (see **scope-boundary**): it inherits the original **In scope** and tightens it to the governing ADR decision.
-- Before appending, check the rework request against the original boundary: if it would change something in the original **Out of scope** or reopen another ADR, refuse and ask the user — this may be a new feature cell rather than a rework append.
-- **Prepare Environment** (see **plan-prerequisites**) still applies — the rework runs on its own branch per the repo's branch convention (the original branch/PR may already be merged).
-- If the plan is very long, use a sibling `rework-plan.md` and record it in the delivery index.
+A rework append (triggered by **orchestrate-feature-delivery**'s **handle-post-implementation-issue**) adds to the existing `plan.md`:
+- Adds a `## Rework <date>` section — implemented steps stay byte-for-byte unchanged
+- Inherits and tightens the original **Scope Boundary** to the governing ADR decision
+- Refuses and asks the user if it would change the original **Out of scope** or reopen another ADR (likely a new feature cell)
+- Runs on its own branch (see **plan-prerequisites**); very long reworks use a sibling `rework-plan.md` in the delivery index
+
+Worked example: [examples/rework-scope-boundary.md](examples/rework-scope-boundary.md).
 </rework-plan-convention>
 
 <concise-writing>
-All prose in `plan.md` / `context.md` follows **reference/writing-style.md** — BLUF takeaways, hard caps (step objective 1 sentence, bullet 1 claim, paragraph ≤ 3 sentences, sentence ≤ 20 words), atomic bullets, no banned phrases, So-what test. Plan files are table-first; context files are takeaway-first.
+All `plan.md` / `context.md` prose follows **reference/writing-style.md** — BLUF takeaways, hard caps (1 sentence per step objective / bullet / ≤20-word sentence), atomic bullets, no banned phrases. Plan files are table-first; context files are takeaway-first.
 </concise-writing>
 
 <context-loading-guide>
 Load only the examples directly relevant to the current change type to minimize context size.
 
-**Bug fix examples** — cover the full workflow: classify → define-scope → plan-bug-fix.
+**Examples & references** — load only the files relevant to the current change type.
 
 | Load when | Provides | File |
 |---|---|---|
@@ -111,6 +118,7 @@ Load only the examples directly relevant to the current change type to minimize 
 | Full POC plan walkthrough | plan-poc end-to-end output | [examples/plan-adr-option-poc.md](examples/plan-adr-option-poc.md) |
 | POC round from dispatch to decision gate (shared with the orchestrator) | End-to-end POC walkthrough | [../orchestrate-feature-delivery/examples/adr-option-poc.md](../orchestrate-feature-delivery/examples/adr-option-poc.md) |
 | Writing or reviewing plan.md / context.md prose | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets | [reference/writing-style.md](reference/writing-style.md) |
+| Persisting a confirmed plan to `plan.md` + `context.md` | plan.md + context.md layout for **export-plan** | [examples/export-plan.md](examples/export-plan.md) |
 </context-loading-guide>
 
 <skill-boundary>
@@ -135,7 +143,8 @@ This skill produces a **plan** but does not execute changes. After the plan is c
 
 <define-scope>
 1. Gather relevant information from the codebase, knowledge base, test results, and user input to define the scope for the classified change type.
-2. **Bug fix**: analyze for root-cause patterns and test hypotheses through code inspection, debugging, or logging. **Feature / refactor**: identify and clarify ambiguous terms and implicit assumptions.
+2. **Bug fix**: analyze root-cause patterns and test hypotheses through code inspection, debugging, or logging.
+   **Feature / refactor**: identify and clarify ambiguous terms and implicit assumptions.
 3. Ask the user targeted questions until the scope is well-defined — root cause confirmed for bugs; requirement or constraints confirmed for features/refactors.
 4. Present the result (root cause + reasoning, or a structured scope summary) and request confirmation or refinements.
 5. Hand the confirmed scope to the corresponding plan capability and **define-scope-boundary**.
@@ -153,11 +162,7 @@ Load **[reference/plan-feature-implementation.md](reference/plan-feature-impleme
 Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its steps.
 </plan-refactor>
 <plan-poc>
-1. Load the ADR and the option's **tech details** (from **draft-adr**'s **detail-options-tech** — target-state diagrams + code change profile); for an **orchestrate-feature-delivery** cell use the agent brief's spike references.
-2. Clarify with the user: which option, the **success criteria** (measurable — latency, complexity, migration cost), and the standalone feature slice that demonstrates it end-to-end.
-3. Apply **define-scope-boundary** — the option's target area is **In scope**; other options and ADRs are **Out of scope**.
-4. Produce a feature plan per **reference/plan-poc.md** — build the full slice TDD-style, then a final **evaluation step** that measures/collects evidence against each success criterion.
-5. Mark the plan `type: poc`; record success criteria + evaluation method in `context.md` via **export-plan**.
+Load **[reference/plan-poc.md](reference/plan-poc.md)** and follow its steps.
 </plan-poc>
 
 <define-scope-boundary>
@@ -170,29 +175,27 @@ Load **[reference/plan-refactor.md](reference/plan-refactor.md)** and follow its
 
 <export-plan>
 1. After the user confirms the plan, ask whether they would like to persist it to a feature folder for later execution by **execute-plan**.
-2. If the user agrees, determine the storage location: for an **orchestrate-feature-delivery** cell use the epic's delivery folder `deliveries/<epic-name>/{repo}/{feature-name}/` (created by the orchestrator); otherwise ask the user or default to `docs/feature-implementations/`.
+2. Determine the storage location: for an **orchestrate-feature-delivery** cell use `deliveries/<epic-name>/{repo}/{feature-name}/`; otherwise ask the user or default to `docs/feature-implementations/`.
 3. Derive a short kebab-case feature name from the plan's objective (e.g., `fix-null-pointer-in-transformer`).
-4. Determine the repo name when the plan belongs to a specific repo (an **orchestrate-feature-delivery** cell); use the **repo-first** layout `{location}/{repo}/{feature-name}/` — the delivery folder already exists, write into it; fall back to `{location}/{feature-name}/` when no repo applies so all plans for one repo live together.
-5. Write `plan.md` — start with the ratified `## Scope Boundary` block (see **scope-boundary**), then the complete numbered step list with objectives. When appending a rework plan (per **rework-plan-convention**), append a `## Rework <date>` section (with its own boundary) to the existing `plan.md` instead of overwriting it.
-6. Write `context.md` concisely (see **concise-writing**): one bolded takeaway per section, tables for requirements/constraints, compact bullet lists for references — original request, change type, root cause/requirement summary, TDD rationale, boundary rationale (see **scope-boundary**), branch + base (see **plan-prerequisites**), constraints, assumptions, codebase references; for an **orchestrate-feature-delivery** cell add the agent brief's spike references (change-summary items, ADR files, solution-doc sections).
-7. Validate conciseness (see **concise-writing**): each step states one objective in one sentence, scope-boundary bullets are one claim each, context.md prose ≤3 sentences per paragraph, no banned phrases.
-8. Inform the user of the saved location so they can invoke **execute-plan** to carry it out.
+4. Use the **repo-first** layout `{location}/{repo}/{feature-name}/` when a repo applies (the delivery folder already exists); else `{location}/{feature-name}/`.
+5. Write `plan.md` + `context.md` per **[reference/plan-file-format.md](reference/plan-file-format.md)**.
+6. Validate conciseness (see **concise-writing**): one objective per step sentence, one claim per scope-boundary bullet, context.md prose ≤3 sentences per paragraph, no banned phrases.
+7. Inform the user of the saved location so they can invoke **execute-plan** to carry it out.
 </export-plan>
 
 </capabilities>
 
 <rules>
 
-<rule> When the user makes a request about code changes, first apply **classify-change-type** to determine whether it is a bug fix, feature, or refactor. </rule>
-<rule> If the classified type is **Bug Fix**: apply **define-scope** to identify the root cause, then apply **plan-bug-fix** to generate the fix plan. </rule>
-<rule> If the classified type is **Feature**: apply **define-scope** to clarify the requirement, then apply **plan-feature-implementation** to generate the implementation plan. </rule>
-<rule> If the classified type is **Refactor**: apply **define-scope** to clarify the scope and constraints, then apply **plan-refactor** to generate the refactoring plan. </rule>
-<rule> If the classified type is **POC**: apply **plan-poc** to generate the proof-of-concept plan. </rule>
-<rule> When both restructuring and new behavior are needed: apply **plan-refactor** first to stabilize the structure, then apply **plan-feature-implementation** for the new behavior. </rule>
-<rule> After the plan is confirmed by the user: optionally apply **export-plan** to persist the plan to files for later execution by execute-plan. </rule>
-<rule> When generating any plan (bug fix, feature, or refactor): always include the **Prepare Environment** prerequisites step first per **plan-prerequisites**; if any check is not ready, raise it to the user instead of starting execution. </rule>
-<rule> When generating any plan: apply **define-scope-boundary** and include the ratified boundary as a `## Scope Boundary` block so the executor can check against it. </rule>
-<rule> When appending a rework plan to an already-implemented feature (triggered by **orchestrate-feature-delivery**), apply **rework-plan-convention** and **export-plan** in append mode — never overwrite the implemented steps. </rule>
-<rule> When appending a rework: check the rework request against the original boundary (see **rework-plan-convention**); if it exceeds it, refuse and ask the user — never append silently. </rule>
+<rule> When the user makes a request about code changes, first apply **classify-change-type** to determine whether it is a bug fix, feature, refactor, or POC. </rule>
+<rule> If the classified type is **Bug Fix**: apply **define-scope**, then **plan-bug-fix**. </rule>
+<rule> If the classified type is **Feature**: apply **define-scope**, then **plan-feature-implementation**. </rule>
+<rule> If the classified type is **Refactor**: apply **define-scope**, then **plan-refactor**. </rule>
+<rule> If the classified type is **POC**: apply **plan-poc**. </rule>
+<rule> When both restructuring and new behavior are needed: apply **plan-refactor** first, then **plan-feature-implementation**. </rule>
+<rule> After the plan is confirmed: optionally apply **export-plan** to persist it for execution by **execute-plan**. </rule>
+<rule> When generating any plan, apply **plan-prerequisites** and **define-scope-boundary**. </rule>
+<rule> When appending a rework to an implemented feature, apply **rework-plan-convention** and **export-plan** in append mode — never overwrite implemented steps. </rule>
+<rule> When a rework would exceed the original boundary, refuse and ask the user — never append silently. </rule>
 
 </rules>

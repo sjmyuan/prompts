@@ -41,6 +41,11 @@ Applies **define-scope** (refactor).
 
 Applies **plan-refactor**.
 
+### Scope Boundary
+**In scope**: `DataImportedHandler` decomposition into `CategoryMappingService` + `PriceTransformationService`, tests
+**Out of scope**: behavior change, other handlers
+**Rule**: no step may change anything beyond **In scope**
+
 **TDD Approach**: Full TDD cycle for each service extraction — preserving existing behavior requires thorough test coverage
 
 **Steps:**

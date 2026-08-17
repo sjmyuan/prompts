@@ -41,6 +41,11 @@ Applies **define-scope** (bug fix).
 
 Applies **plan-bug-fix**.
 
+### Scope Boundary
+**In scope**: `ProductRepository` query and its tests
+**Out of scope**: serializer, controller, other endpoints
+**Rule**: no step may change anything beyond **In scope**
+
 **Root Cause**: `ProductRepository.findByKeyword()` returns product entities with lazy-loaded `category` and `tags` associations; the serializer triggers one additional query per product
 
 **TDD Approach**: Full TDD cycle extended with performance benchmarks — performance bugs require both a failing benchmark and a query-count assertion

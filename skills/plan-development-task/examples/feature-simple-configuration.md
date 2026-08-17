@@ -40,6 +40,11 @@ Applies **define-scope** (feature).
 
 Applies **plan-feature-implementation**.
 
+### Scope Boundary
+**In scope**: retry config properties, `RetryConfig`, `EventPublisherImpl` retry usage, their tests
+**Out of scope**: message format, other Azure Service Bus settings
+**Rule**: no step may change anything beyond **In scope**
+
 **TDD Approach**: Streamlined — simple configuration changes with minimal logic; test loading, defaults, and application of settings
 
 **Steps:**

@@ -42,6 +42,11 @@ Applies **define-scope** (feature).
 
 Applies **plan-feature-implementation**.
 
+### Scope Boundary
+**In scope**: `LocaleAttributeTransformer`, `FallbackLocaleResolver`, handler integration, their tests
+**Out of scope**: product catalog, serialization, other locale logic
+**Rule**: no step may change anything beyond **In scope**
+
 **TDD Approach**: Full TDD cycle for each major component — complex business logic requires rigorous testing
 
 **Consolidation rationale**: `LocaleAttributeTransformer` and `FallbackLocaleResolver` form a single cohesive unit — the transformer delegates entirely to the resolver and they share test fixtures. Consolidating them into one TDD cycle reduces the total step count.

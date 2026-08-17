@@ -41,6 +41,11 @@ Applies **define-scope** (bug fix).
 
 Applies **plan-bug-fix**.
 
+### Scope Boundary
+**In scope**: `DataImportedHandler` ID-passing logic and its tests
+**Out of scope**: transformer logic, publisher, other handlers
+**Rule**: no step may change anything beyond **In scope**
+
 **Root Cause**: Using transformed ID instead of original ID in the outgoing message
 
 **TDD Approach**: Full TDD cycle (simple logic error — test-first provides safety for data correctness)
