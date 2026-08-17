@@ -1,6 +1,6 @@
 ---
 name: execute-plan
-description: Execute structured development plans with progress tracking, validation checkpoints, and error recovery. Use when executing / carrying out / resuming / reviewing a plan from plan-development-task, or a delivery cell / rework from orchestrate-feature-delivery.
+description: Execute structured development plans with progress tracking, validation, and recovery. Use when executing, carrying out, resuming, recovering, or reviewing a plan from plan-development-task, or a delivery cell / rework from orchestrate-feature-delivery.
 ---
 
 <when-to-use-this-skill>
@@ -30,80 +30,27 @@ Status emojis used to track each step:
 </step-status-definitions>
 
 <step-tracking-format>
-Record each step in the plan file using this format (each line one fact, see **concise-writing**):
-
-```
-### Step N: [Step Title] [Status Emoji]
-**Objective**: [What this step achieves — 1 sentence]
-**Files**: [Files created, modified, or deleted]
-**Implementation**: [Key changes — 1 line]
-**Validation**: [Test results / verification — 1 line]
-**Status**: [Status emoji] [Status description — 1 line]
-```
+Record each step in `plan.md` with the `### Step N: [Title] [emoji]` block (Objective / Files / Implementation / Validation / Status, one line per fact, see **concise-writing**) per **reference/step-tracking-format.md**.
 </step-tracking-format>
 
 <feature-folder-structure>
-Each feature implementation lives in its own folder with two files:
-
-```
-{location}/{repo}/{feature-name}/
-├── plan.md      # Step-by-step execution plan with live status tracking
-└── context.md   # All context, references, requirements, constraints that define the plan
-```
-
-- **Location**: For an **orchestrate-feature-delivery** cell use the epic's delivery folder `deliveries/<epic-name>/{repo}/{feature-name}/` (already created by the orchestrator); otherwise ask the user or default to `docs/feature-implementations/`.
-- **Repo-first layout**: When a plan belongs to a specific repo (a cell from **orchestrate-feature-delivery**), use `deliveries/<epic-name>/{repo}/{feature-name}/`; fall back to `{location}/{feature-name}/` when no repo applies.
-- **Feature name**: Derive a short, descriptive kebab-case name from the plan's objective (e.g., `add-auth-system`, `refactor-validation-handler`, `fix-null-pointer-in-transformer`).
-- **Plan file**: Contains the numbered step list with status emojis, updated in real-time as execution progresses. Serves as the live execution dashboard.
-- **Context file**: Captures all background material that informed the plan — requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, and decisions. Written once at plan creation and not modified during execution.
-- Both files are kept as a permanent record after execution completes — they are never deleted.
+Each feature lives in its own folder with `plan.md` (live step tracking) + `context.md` (background material); both are a permanent record — never deleted. Layout, naming, and repo-first rules: **reference/feature-folder-structure.md**.
 </feature-folder-structure>
 
 <plan-input-schema>
-A plan consumed by this skill consists of numbered steps. Each step must have:
-- **Step number**: Sequential integer starting from 1
-- **Title**: Short descriptive name of the step
-- **Objective**: What the step achieves
-
-The plan may be provided as:
-- An existing `plan.md` file in a feature folder (created by **export-plan** in plan-development-task, an **orchestrate-feature-delivery** cell folder, or a previous execution)
-- A plan summarized in the conversation by plan-development-task
-- A plan described ad-hoc by the user
-
-This skill is responsible for materializing the plan into `plan.md` with the **step-tracking-format** if it does not already exist as a file.
+A plan consumed by this skill is numbered steps, each with number/title/objective; it may come as a `plan.md` file, a plan summarized in conversation, or an ad-hoc plan — materialized into `plan.md` per **reference/plan-input-schema.md**.
 </plan-input-schema>
 
 <commit-conventions>
-Small-step commit rules applied throughout execution:
-
-| Rule | Detail |
-|---|---|
-| Commit frequency | One commit per step, after the step is validated and marked ✅ |
-| Commit size | A single logical change — the step's objective only |
-| Message format | Follow the repo's existing convention (check recent `git log`); default to `type(scope): summary` |
-| Message content | Neutral description of the change. NEVER include AI-related words or hints: `AI`, `Copilot`, `assistant`, `agent`, `LLM`, `model`, `generated`, `automated`, or any reference to how the change was produced |
-| Staging | Stage only the files belonging to this step (`git add <file>...`); never blind `git add -A` |
-| Push gating | Never push to remote without explicit user confirmation (see **request-push-approval**) |
-| Pre-commit check | Commit only after the step's validation checkpoint (tests/lint) passes |
+Small-step commit rules (frequency, size, message format/content, staging, push gating, pre-commit check): **reference/commit-conventions.md**.
 </commit-conventions>
 
 <code-comment-conventions>
-Generated code must match the repo's existing comment style: detect it first, then follow it. Comment the **why** (non-obvious intent, workarounds, invariants, edge cases), never restate the **what**; never narrate the change (no plan-step references, "added/generated" markers, section banners, or AI mentions); match the repo's density — a sparse repo gets sparse comments, docstrings only where the repo already uses them (public API only); keep line comments ≤ 15 words. Detect the repo's convention during **verify-prerequisites** and enforce it in **commit-step**. Full rubric: **reference/code-comment-style.md**.
+Generated code must match the repo's existing comment style. Comments explain **why** (non-obvious intent, workarounds, invariants, edge cases), never restate the **what**; no process narration (plan-step references, "added/generated" markers, section banners, AI mentions); match the repo's density — sparse repo gets sparse comments, docstrings only where the repo uses them (public API only); line comments ≤ 15 words. Convention detected during **verify-prerequisites**, enforced in **commit-step**. Full rubric: **reference/code-comment-style.md**.
 </code-comment-conventions>
 
 <test-placement>
-Before writing any test code for a step, decide where tests belong — check existing coverage first, then extend existing tests when possible; create a new file only when no natural home exists.
-
-| Situation | Action |
-|---|---|
-| Behavior already covered by an existing test | Run it; add nothing unless an assertion is wrong or missing |
-| Changed class/module has an existing test file | Add new test methods there (extend) |
-| New behavior is a variant/edge case of an existing scenario | Add a method or parameterized case to the covering test |
-| New class/component with no existing test home | Create a new test file mirroring the class (e.g., `XTest` for `X`) |
-| New test is a different level than the natural existing file (unit vs integration) | Create a file at the right level |
-| Existing test file is unfocused or bloated (mixed concerns) | Create a new focused test file |
-
-Reuse the existing test's fixtures and mocks instead of duplicating setup. Extending an existing test file is a test-only change for this plan's own tests — within the **Scope Boundary**'s Minor exceptions. Record the placement decision in the plan file's step notes.
+Before writing tests, check existing coverage first and prefer extending existing test files; create a new file only when no natural home exists per **reference/test-placement.md**.
 </test-placement>
 
 <rework-plan-execution>
@@ -127,6 +74,10 @@ The plan file's `## Scope Boundary` block (written by **export-plan** in plan-de
 All prose written into `plan.md` / `context.md` follows **reference/writing-style.md** — BLUF takeaways, hard caps (step objective 1 sentence, step note 1 line, bullet 1 claim, paragraph ≤ 3 sentences, sentence ≤ 20 words), atomic bullets, tables over prose, no banned phrases or process narration, So-what test.
 </concise-writing>
 
+<orchestrator-handoff>
+When executed inside a dispatched agent (e.g., by **orchestrate-feature-delivery** via the **coding-assistant** agent), hand back the final status list and commit hashes so the orchestrator can update its delivery index; a POC's completion routes to the decision gate.
+</orchestrator-handoff>
+
 <context-loading-guide>
 Load only the example most relevant to the current execution scenario to minimize context size.
 
@@ -137,10 +88,10 @@ Load only the example most relevant to the current execution scenario to minimiz
 | Generating code that needs to match the repo's comment style before committing | Output model: convention detection + pre-commit comment scan in action | [examples/comment-hygiene.md](examples/comment-hygiene.md) |
 | Executing a small, focused plan (single component or focused task) | Output model: detailed progress updates for a simple focused execution | [examples/single-component-refactor.md](examples/single-component-refactor.md) |
 | Executing a plan that spans multiple files and architectural layers | Output model: execution tracking across multiple files and layers | [examples/multi-file-implementation.md](examples/multi-file-implementation.md) |
+| Executing a plan that should validate after each change and at milestones | Output model: incremental validation checkpoints across a plan | [examples/validation-checkpoints.md](examples/validation-checkpoints.md) |
 | A step fails with compilation errors or unexpected output | Output model: error recovery, ❌→✅ status transitions, and retry patterns | [examples/handling-failed-steps.md](examples/handling-failed-steps.md) |
 | Executing a plan with 10+ steps requiring context preservation | Output model: long plan progress tracking and context continuity | [examples/long-plan-execution.md](examples/long-plan-execution.md) |
 | All plan steps are complete and post-execution review is needed | Output model: applying review-code after completion, adding fix steps, keeping plan as permanent record | [examples/post-execution-review.md](examples/post-execution-review.md) |
-| A step is ambiguous, requires user input, or cannot proceed due to a missing dependency or external blocker | Output model: pausing execution at a blocked step, informing the user, and resuming after input | [examples/handling-failed-steps.md](examples/handling-failed-steps.md) |
 | Executing a plan with prerequisite checks, one commit per step, and push approval at the end | Output model: verify-prerequisites, commit-step, and request-push-approval in action | [examples/small-step-commits.md](examples/small-step-commits.md) |
 | Executing a plan with an appended `## Rework` section (run only the rework steps) | Rework execution walkthrough (shared with the orchestrator) | [../orchestrate-feature-delivery/examples/post-implementation-rework.md](../orchestrate-feature-delivery/examples/post-implementation-rework.md) |
 | Executing a POC plan (stop at evaluation report, no merge) | POC execution mode + evaluation report walkthrough | [examples/execute-adr-option-poc.md](examples/execute-adr-option-poc.md) |
@@ -154,14 +105,18 @@ Load only the example most relevant to the current execution scenario to minimiz
 <capabilities>
 
 <track-plan>
-1. Locate or create the feature folder and its two files (`plan.md` + `context.md`) per **feature-folder-structure**; for an **orchestrate-feature-delivery** cell use the existing `deliveries/<epic-name>/{repo}/{feature-name}/`, otherwise ask the user or default to `docs/feature-implementations/`.
-2. Derive a short kebab-case feature name from the plan's objective (e.g., `add-auth-system`, `fix-null-pointer-in-transformer`) per **feature-folder-structure**.
-3. Before creating a new plan, check if the feature folder already exists with a plan file. If it contains an appended `## Rework <date>` section, execute only the rework steps (see **rework-plan-execution**) — never re-run or modify the completed original steps. If a plan file has steps with ❌ failed or 🚫 blocked status, ask the user whether to **resume** from the last known state or **start fresh** (create a new folder/overwrite).
-4. Materialize the plan into `plan.md` per **plan-input-schema**: list each step with its number, title, objective (one sentence each, see **concise-writing**), and initial status ⏳ pending, using the **step-tracking-format**.
-5. Populate `context.md` concisely (see **concise-writing**): one bolded takeaway per section, tables for requirements/constraints, compact bullet lists for references — requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, decisions.
-6. Update step status in the plan file immediately after each state change (⏳ → 🔄 → ✅, or ❌/🚫 on failure); keep each note to one line per fact. Refer to **step-status-definitions** for emoji meanings.
-7. Never modify plan structure, objectives, steps, or the **Scope Boundary** block except to update statuses or add clarifying notes.
-8. Report progress: at plan start show all steps with ⏳ pending; after each step completion show the full list with current statuses and per-step details (files, implementation, validation); never summarize multiple steps together; at plan end show the final all-✅ list with a summary of accomplishments.
+1. Locate or create the feature folder and its two files (`plan.md` + `context.md`) per **reference/feature-folder-structure.md**; for an **orchestrate-feature-delivery** cell use the existing `deliveries/<epic-name>/{repo}/{feature-name}/`, otherwise ask the user or default to `docs/feature-implementations/`.
+2. Derive a short kebab-case feature name from the plan's objective (e.g., `add-auth-system`, `fix-null-pointer-in-transformer`) per **reference/feature-folder-structure.md**.
+3. Before creating a new plan, check whether the feature folder already exists with a plan file.
+4. If the plan file contains an appended `## Rework <date>` section, execute only the rework steps (see **rework-plan-execution**); never re-run or modify the completed original steps.
+5. If a plan file has steps with ❌ failed or 🚫 blocked status, ask the user whether to **resume** from the last known state or **start fresh** (create a new folder/overwrite).
+6. Materialize the plan into `plan.md` per **reference/plan-input-schema.md**: list each step with its number, title, objective (one sentence each, see **concise-writing**), and initial status ⏳ pending, per **reference/step-tracking-format.md**.
+7. Populate `context.md` concisely (see **concise-writing**): one bolded takeaway per section, tables for requirements/constraints, compact bullet lists for references — requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, decisions.
+8. Update step status in the plan file immediately after each state change (⏳ → 🔄 → ✅, or ❌/🚫 on failure); keep each note to one line per fact. Refer to **step-status-definitions** for emoji meanings.
+9. Never modify plan structure, objectives, steps, or the **Scope Boundary** block except to update statuses or add clarifying notes.
+10. Report progress at plan start: show all steps with ⏳ pending.
+11. After each step completion, show the full list with current statuses and per-step details (files, implementation, validation); never summarize multiple steps together.
+12. At plan end, show the final all-✅ list with a summary of accomplishments.
 </track-plan>
 
 <execute-step>
@@ -203,7 +158,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 <place-tests>
 1. When a step writes or modifies tests, locate existing test files for the changed production code first — same class/module and same level (unit vs integration), per the repo's test layout.
 2. Assess existing coverage by reading the relevant tests: is the new behavior already covered, partially covered, or uncovered?
-3. Decide placement per **test-placement**: already covered → run the existing tests and add nothing (tighten a wrong assertion only); natural home exists → extend that file with new methods or parameterized cases, reusing its fixtures and mocks; no natural home → create a new test file mirroring the class and level.
+3. Decide placement per **reference/test-placement.md**: already covered → run the existing tests and add nothing (tighten a wrong assertion only); natural home exists → extend that file with new methods or parameterized cases, reusing its fixtures and mocks; no natural home → create a new test file mirroring the class and level.
 4. Write the tests following the repo's test conventions (framework, naming, assertion style).
 5. Record the placement decision and rationale in the plan file's step notes, then run the affected tests to confirm they pass.
 </place-tests>
@@ -223,19 +178,22 @@ Load only the example most relevant to the current execution scenario to minimiz
 
 
 <verify-prerequisites>
-1. Before starting the first step, verify the environment is ready: the correct feature branch is checked out (create it if the plan requires one and the user confirms the branch name and base, naming it per the **repo's branch convention** — detect from existing branches / git config / team docs, or ask the user; never assume a prefix), the working tree has no unrelated uncommitted changes, dependencies and toolchain are available, and baseline tests/lint pass. Also detect the repo's comment style per **code-comment-conventions** (sample recently modified files, `.editorconfig`, CONTRIBUTING docs) and record a one-line convention note in the plan file.
-2. If anything is missing or failing, STOP and raise it to the user: state exactly what is not ready, what is needed to proceed, and ask how to proceed. Do not start executing steps until it is resolved.
-3. Record the outcome (ready or blockers) in the plan file before execution begins.
+1. Verify the correct feature branch is checked out; create it if the plan requires one and the user confirms the branch name and base, naming it per the repo's branch convention (detect from existing branches / git config / team docs, or ask; never assume a prefix).
+2. Verify the working tree has no unrelated uncommitted changes; verify dependencies and toolchain are available; verify baseline tests/lint pass.
+3. Detect the repo's comment style per **code-comment-conventions** (sample recently modified files, `.editorconfig`, CONTRIBUTING docs) and record a one-line convention note in the plan file.
+4. If anything is missing or failing, STOP and raise it to the user: state exactly what is not ready, what is needed to proceed, and ask how to proceed; do not start executing steps until it is resolved.
+5. Record the outcome (ready or blockers) in the plan file before execution begins.
 </verify-prerequisites>
 
 <commit-step>
 1. After a step is validated and marked ✅, run `git status` and `git diff` to identify the files changed by this step.
 2. Stage only those files — never unrelated or pre-existing changes.
-3. Scan the staged diff against **code-comment-conventions**: remove or shorten restating comments, process-narration markers (plan-step references, "added/generated" notes, section banners, AI mentions), and comments that exceed the repo's density; re-stage after trimming.
-4. Write a small commit message following **commit-conventions**: repo convention if known, else `type(scope): summary`, describing the change neutrally.
-5. Scan the message for AI-related words (see **commit-conventions**) and rewrite until none remain.
-6. Commit locally; report the commit hash and message. Never push.
-7. If the step produced no code change (e.g., documentation-only), note that no commit is needed.
+3. Scan the staged diff against **code-comment-conventions**.
+4. Remove or shorten restating comments, process-narration markers (plan-step references, "added/generated" notes, section banners, AI mentions), and comments that exceed the repo's density; re-stage after trimming.
+5. Write a small commit message following **reference/commit-conventions.md**: repo convention if known, else `type(scope): summary`, describing the change neutrally.
+6. Scan the message for AI-related words (see **reference/commit-conventions.md**) and rewrite until none remain.
+7. Commit locally; report the commit hash and message. Never push.
+8. If the step produced no code change (e.g., documentation-only), note that no commit is needed.
 </commit-step>
 
 <produce-poc-report>
@@ -265,21 +223,21 @@ Load only the example most relevant to the current execution scenario to minimiz
 
 <rules>
 
-<rule> **At Plan Start**: Apply **track-plan** to create the feature folder with plan and context files before executing any step. </rule>
-<rule> **During Each Step**: Apply **execute-step** for every step in the plan. </rule>
-<rule> **Throughout Execution**: Apply **track-plan** — keep the step list current and show the full list with statuses after every step. </rule>
+<rule> **At Plan Start**: Apply **track-plan** before executing any step. </rule>
+<rule> **During Each Step**: Apply **execute-step**. </rule>
+<rule> **Throughout Execution**: Apply **track-plan** — keep the step list current and show it after every step. </rule>
 <rule> **When a Step Fails**: Apply **handle-errors** immediately. </rule>
-<rule> **At Validation Points**: Apply **run-validation-checkpoints** after code changes and at major milestones. Validate incrementally, not just at the end. </rule>
-<rule> **When a Step Writes or Modifies Tests**: Apply **place-tests** before writing any test code — locate existing tests and prefer extending them over creating new files. </rule>
+<rule> **At Validation Points**: Apply **run-validation-checkpoints** — validate incrementally, not just at the end. </rule>
+<rule> **When a Step Writes or Modifies Tests**: Apply **place-tests** before writing test code. </rule>
 <rule> **When Facing Ambiguity or Blockers**: Apply **manage-user-interaction** — pause and ask rather than assuming. </rule>
 <rule> **After All Steps Complete**: Apply **review-post-execution**. </rule>
-<rule> **Before Starting the First Step**: Apply **verify-prerequisites** — if the branch or environment is not ready, raise it to the user and wait. </rule>
-<rule> **After Each ✅ Step**: Apply **commit-step** to record the change as one small commit. </rule>
-<rule> **Before Any Push**: Apply **request-push-approval** — never push to remote without the user's confirmation. </rule>
-<rule> **When the Plan Contains a Rework Section**: Execute per **rework-plan-execution** — apply **track-plan** and **execute-step** to the appended `## Rework` steps only; never modify the completed original steps. </rule>
-<rule> **When the Plan is a POC** (type: poc): Execute per **poc-execution-mode** — apply **track-plan** and **execute-step**; never merge before the decision gate. </rule>
-<rule> **After the Final Evaluation Step of a POC**: Apply **produce-poc-report** and route to the orchestrator's decision gate. </rule>
-<rule> **When a Step, Recovery Fix, or Review Fix Exceeds the Boundary**: Apply **check-scope-boundary** — refuse and ask the user with options, never adapt silently. </rule>
+<rule> **Before Starting the First Step**: Apply **verify-prerequisites** — raise and wait if the environment is not ready. </rule>
+<rule> **After Each ✅ Step**: Apply **commit-step**. </rule>
+<rule> **Before Any Push**: Apply **request-push-approval** — never push without user confirmation. </rule>
+<rule> **When the Plan Contains a Rework Section**: Apply **track-plan** and **execute-step** to the appended `## Rework` steps only. </rule>
+<rule> **When the Plan is a POC** (type: poc): Apply **track-plan** and **execute-step**; never merge before the decision gate. </rule>
+<rule> **After the Final Evaluation Step of a POC**: Apply **produce-poc-report** and route to the decision gate. </rule>
+<rule> **When a Step, Recovery Fix, or Review Fix Exceeds the Boundary**: Apply **check-scope-boundary** — refuse and ask with options. </rule>
 <rule> **When Deviating from the Plan**: Apply **check-scope-boundary** before adapting. </rule>
 
 </rules>

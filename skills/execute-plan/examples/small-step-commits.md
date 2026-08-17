@@ -1,6 +1,6 @@
 # Plan Executor: Small-Step Commits with Push Approval Example
 
-**Scenario**: A 4-step feature plan executes with one small commit per step, and the branch is pushed only after explicit user confirmation. Demonstrates **verify-prerequisites**, **commit-step**, and **request-push-approval**.
+**Scenario**: A 4-step feature plan executes with one small commit per step, and the branch is pushed only after explicit user confirmation. Demonstrates **verify-prerequisites**, **commit-step**, **request-push-approval**, and **manage-user-interaction** (branch-creation ask, push approval).
 
 ---
 
