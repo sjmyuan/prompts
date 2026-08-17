@@ -17,7 +17,7 @@ One example per capability:
 - `examples/handle-missing-fields.md` → **validate-data** edge case (missing columns)
 - `examples/report-error-summary.md` → **report-errors** (error aggregation output)
 
-Each includes a scenario heading, setup paragraph, `Applies **...**`, input, and expected output matching the capability steps.
+Each includes a scenario heading, setup paragraph, `Applies **...**`, input, and expected output matching the capability steps. Each is written per **writing-style** and measured per **size-limits** — examples ≤9,000 chars / 150 lines, the reference ≤12,000 / 150.
 
 ## Expected Output
 ```

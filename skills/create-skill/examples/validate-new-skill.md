@@ -14,11 +14,16 @@ Freshly created `skills/commit-message-writer/SKILL.md` plus its examples and re
 | Description score | ✅ 9/10, trigger covers all scenarios |
 | Capability naming | ✅ `<write-commit-message>` action verb |
 | Knowledge placement | ✅ rubric extracted, guide condition-first |
-| Example coverage | 🟡 1 of 2 capabilities have examples |
+| Writing style | ✅ directive voice, BLUF, no banned phrases |
+| Size | 🟡 SKILL.md 12,400/12,000 chars — over char budget |
+| Conciseness | ✅ one line = one idea |
+| Evaluation process | ✅ `<write-commit-message>` ends with a verify step |
+| Example coverage | 🔴 `<verify-message>` has no linked example |
 | Rules routing | ✅ "when → capability", no content restated |
 
-## Issue Found & Fix
-- Missing example for `<verify-message>` → return to **create-skill-examples**, add `examples/verify-message.md`, then re-validate.
+## Issues Found & Fix
+- Size overrun (🟡 Minor) → apply **size-remediation**: extract the footer-format table to `reference/commit-format.md`, re-measure, then re-validate.
+- Missing example for `<verify-message>` (🔴 Major) → return to **create-skill-examples**, add `examples/verify-message.md`, then re-validate.
 
 ## Final
-Validation passes after the fix; report the final file tree to the user.
+Validation passes after the fixes; report the final file tree to the user.

@@ -1,6 +1,6 @@
 # Platform-Agnostic Writing
 
-Used by **create-skill-file** (all steps) and **validate-created-skill** (knowledge step 4).
+Used by **create-skill-file** (step 8) and **validate-created-skill** (step 6).
 
 Skills must be portable across AI platforms:
 - **Avoid platform-specific tool names**: replace `vscode_askQuestions`/`run_in_terminal` with generic actions — "ask the user for confirmation" instead of "use `vscode_askQuestions`", "run the command" instead of "use `run_in_terminal`"
