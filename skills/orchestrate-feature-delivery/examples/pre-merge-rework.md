@@ -6,7 +6,7 @@
 
 ## 1. Identify scope + status
 
-- Affected cell: `order-service/F4` — status **in-progress** (implemented, not merged/committed/pushed)
+- Affected cell: `order-service/F4` — status **in-progress** (implemented, not pushed/merged)
 - Governing decision: `adr-wallet-01-payment-failure-handling.md` (payment failure handling) — **not challenged**; only the timeout error mapping is wrong
 - Mode: **pre-merge rework** (see **rework-modes**) — same append-only rule as post-merge, but the rework stays on this cell (no new feature/wave)
 

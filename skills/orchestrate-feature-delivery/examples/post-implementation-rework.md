@@ -72,4 +72,4 @@ Original `plan.md` steps 1–N remain byte-for-byte unchanged.
 ## 6. Next actions
 
 - After execution, update the index (`F2-r1` → in-progress → done after PR merge); ask the user before pushing or opening a PR.
-- Pre-merge variant: when the cell is implemented but not yet merged/committed/pushed (status **in-progress**), the rework is still **append-only** (implemented steps never modified) but stays on the same cell — see **examples/pre-merge-rework.md**.
+- Pre-merge variant: when the cell is implemented but not yet pushed/merged (status **in-progress**), the rework is still **append-only** (implemented steps never modified) but stays on the same cell — see **examples/pre-merge-rework.md**.

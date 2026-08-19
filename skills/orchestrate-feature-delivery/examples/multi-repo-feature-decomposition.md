@@ -52,13 +52,13 @@ Written to `deliveries/payment-migration/index.md` (see **delivery-layout**); pl
 - **ADRs**: spikes/payment-migration/adrs/adr-wallet-01-payment-failure-handling.md · adr-cutover-01-service-cutover.md
 
 ## Cell plan status
-| Cell | Status | Agent | Plan location |
-|---|---|---|---|
-| shared-contracts/F1 | unplanned | — | — |
-| order-service/F2 | unplanned | — | — |
-| api-gateway/F3 | unplanned | — | — |
-| order-service/F4 | unplanned | — | — |
-| api-gateway/F4 | unplanned | — | — |
+| Cell | Branch | PR | Status | Agent | Plan location |
+|---|---|---|---|---|---|
+| shared-contracts/F1 | — | — | unplanned | — | — |
+| order-service/F2 | — | — | unplanned | — | — |
+| api-gateway/F3 | — | — | unplanned | — | — |
+| order-service/F4 | — | — | unplanned | — | — |
+| api-gateway/F4 | — | — | unplanned | — | — |
 ```
 
 Branches are assigned when a cell is planned (per **branch-and-push-conventions**) and recorded in the index — the Branch column is empty here because all 5 cells start **unplanned**.

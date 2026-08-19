@@ -78,7 +78,7 @@ Two modes, chosen by the cell's status (see **rework-modes** in the SKILL.md kno
 5. **Execute the rework plan**: dispatch **execute-plan** (coding-assistant) to run only the new rework steps.
 6. Update the index; ask the user before pushing / opening a PR.
 
-**Pre-merge** (cell **in-progress** — implemented but not merged/committed/pushed): nothing is merged yet, same append-only rule.
+**Pre-merge** (cell **in-progress** — implemented but not pushed/merged): nothing is merged yet, same append-only rule.
 
 1. **Scope**: no focused spike unless the issue challenges the governing ADR decision — if it does, dispatch **spike-conductor** and **adr-writer** / **solution-doc-writer** as above.
 2. **Write the rework plan**: dispatch **plan-development-task** (coding-assistant) to write a sibling `rework-<date>.md` in the feature folder — `plan.md` stays the frozen original, implemented steps never modified; no new rework feature/wave (rework stays on the same cell).

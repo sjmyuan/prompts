@@ -130,7 +130,7 @@ The index tracks **state only** — rework never adds work history to a status c
 - Add the rework as a new feature/cell (e.g., `F2-r1`) in a **new wave** after the original feature, with metadata `**Rework of**: F2`; it depends on the original cell's PR (already merged).
 - Its plan location points at the rework file: `deliveries/<epic-name>/order-service/wallet-service/rework-2026-08-08.md`.
 
-**Pre-merge (cell in-progress — implemented but not merged/committed/pushed)** — no index change:
+**Pre-merge (cell in-progress — implemented but not pushed/merged)** — no index change:
 
 - Keep the cell's identity and **in-progress** status; no new feature/wave, no note.
 - A sibling `rework-<date>.md` is written (implemented steps never modified) — that file is the record; the cell proceeds to push approval after the rework.
