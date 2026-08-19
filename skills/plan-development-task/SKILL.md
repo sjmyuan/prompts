@@ -1,6 +1,6 @@
 ---
 name: plan-development-task
-description: Classify, clarify, and generate TDD-based step-by-step plans for bug fixes, features, refactors, or POCs. Use when planning, investigating, designing changes, or writing rework.
+description: Classify, clarify, and generate TDD-based step-by-step plans for bug fixes, features, refactors, or POCs. Use when fixing bugs, adding features, refactoring, exploring feasibility, planning a POC, or reworking.
 ---
 
 <when-to-use-this-skill>
@@ -20,7 +20,6 @@ description: Classify, clarify, and generate TDD-based step-by-step plans for bu
 - User wants to plan rework for an already-implemented feature — write a sibling `rework-<date>.md`, a focused rework triggered by orchestrate-feature-delivery's handle-post-implementation-issue flow
 
 **Differentiation rules** (when multiple skills could apply):
-- **Both restructure AND add new behavior?** → Apply **plan-refactor** first to stabilize, then **plan-feature-implementation** for the new behavior
 - **Multi-feature / multi-repo decomposition?** → Do NOT plan the whole breakdown here — apply **orchestrate-feature-delivery** first, then plan each feature × repo cell with this skill
 - **Rework for an already-delivered feature?** → Apply this skill per **rework-plan-convention** — write a sibling `rework-<date>.md`; orchestrate-feature-delivery triggers it; never rewrite the implemented plan
 </when-to-use-this-skill>
@@ -35,7 +34,7 @@ Classify the user's request into one of three types:
 | "bug", "broken", "error", "exception", "not working", "incorrect", "wrong output", "failing", "regression" | **Bug Fix** | Something is producing incorrect or unexpected results |
 | "new", "add", "implement", "create", "support", "enhance", "extend", "feature", "capability" | **Feature** | New observable behavior is being introduced |
 | "refactor", "clean up", "restructure", "extract", "organize", "improve quality", "reduce debt", "split", "consolidate" | **Refactor** | Internal structure changes without behavior change |
-| "poc", "proof of concept", "prove which option", "compare approaches", "validate option" | **POC** | An uncertain ADR option needs evidence — build a standalone feature that demonstrates it (see **poc-plan**) |
+| "poc", "proof of concept", "prove which option", "compare approaches", "validate option" | **POC** | An uncertain ADR option needs evidence — build a standalone feature that demonstrates it (see **poc-plan-definition**) |
 
 When unsure, ask the user: "Is the goal to fix something that's broken (bug), add new behavior (feature), or restructure without changing behavior (refactor)?"
 </change-type-classification>
@@ -69,7 +68,7 @@ Every plan carries an explicit **Scope Boundary** that the executor checks durin
 
 The boundary derives from the classified change type, the confirmed scope, and (for orchestrator cells) the governing ADR decision. The user ratifies it before **export-plan** persists it. Rework files inherit the original boundary and tighten it to the governing ADR.
 </scope-boundary>
-<poc-plan>
+<poc-plan-definition>
 A POC plan (from **orchestrate-feature-delivery**'s **poc-definition**) is a **standalone feature** proving one ADR option, never a snippet:
 
 | Property | Content |
@@ -78,7 +77,7 @@ A POC plan (from **orchestrate-feature-delivery**'s **poc-definition**) is a **s
 | **Success criteria** | Measurable evidence for the decision gate |
 | **Evaluation step** | Final step that collects that evidence |
 | **Scope Boundary** | Option's target area **In scope**; other options and ADRs **Out of scope** |
-</poc-plan>
+</poc-plan-definition>
 
 <rework-plan-convention>
 A rework (triggered by **orchestrate-feature-delivery**'s **handle-post-implementation-issue**) is written as a new sibling file `rework-<date>.md` in the feature folder — `plan.md` is the frozen original and is never modified:
@@ -98,8 +97,6 @@ All `plan.md` / `context.md` prose follows **reference/writing-style.md** — BL
 <context-loading-guide>
 Load only the examples directly relevant to the current change type to minimize context size.
 
-**Examples & references** — load only the files relevant to the current change type.
-
 | Load when | Provides | File |
 |---|---|---|
 | Selecting TDD variant per sub-type | 15-row TDD approach selection table | [reference/tdd-approach-selection.md](reference/tdd-approach-selection.md) |
@@ -118,7 +115,6 @@ Load only the examples directly relevant to the current change type to minimize 
 | Planning a POC (standalone feature proving one ADR option) | POC plan steps, success criteria, evaluation step | [reference/plan-poc.md](reference/plan-poc.md) |
 | Full POC plan walkthrough | plan-poc end-to-end output | [examples/plan-adr-option-poc.md](examples/plan-adr-option-poc.md) |
 | POC round from dispatch to decision gate (shared with the orchestrator) | End-to-end POC walkthrough | [../orchestrate-feature-delivery/examples/adr-option-poc.md](../orchestrate-feature-delivery/examples/adr-option-poc.md) |
-| Writing or reviewing plan.md / context.md prose | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets | [reference/writing-style.md](reference/writing-style.md) |
 | Persisting a confirmed plan to `plan.md` + `context.md` | plan.md + context.md layout for **export-plan** | [examples/export-plan.md](examples/export-plan.md) |
 </context-loading-guide>
 

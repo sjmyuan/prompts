@@ -1,6 +1,6 @@
 ---
 name: execute-plan
-description: Execute structured development plans with progress tracking, validation, and recovery. Use when executing, carrying out, resuming, recovering, or reviewing a plan from plan-development-task, or a delivery cell / rework from orchestrate-feature-delivery.
+description: Execute structured development plans with progress tracking, validation, and recovery. Use when executing, resuming, recovering, or reviewing an executed plan from plan-development-task, or a delivery cell / rework from orchestrate-feature-delivery.
 ---
 
 <when-to-use-this-skill>
@@ -46,7 +46,12 @@ Small-step commit rules (frequency, size, message format/content, staging, push 
 </commit-conventions>
 
 <code-comment-conventions>
-Generated code must match the repo's existing comment style. Comments explain **why** (non-obvious intent, workarounds, invariants, edge cases), never restate the **what**; no process narration (plan-step references, "added/generated" markers, section banners, AI mentions); match the repo's density — sparse repo gets sparse comments, docstrings only where the repo uses them (public API only); line comments ≤ 15 words. Convention detected during **verify-prerequisites**, enforced in **commit-step**. Full rubric: **reference/code-comment-style.md**.
+Generated code must match the repo's comment style (rubric: **reference/code-comment-style.md**):
+- Comments explain **why** — non-obvious intent, workarounds, invariants, edge cases — never restate the **what**
+- No process narration: plan-step references, "added/generated" markers, section banners, AI/tool mentions
+- Match the repo's density — sparse repo gets sparse comments; docstrings only where the repo uses them (public API only)
+- Line comments ≤ 15 words
+- Detected during **verify-prerequisites**; enforced in **commit-step**
 </code-comment-conventions>
 
 <test-placement>
@@ -54,15 +59,10 @@ Before writing tests, check existing coverage first and prefer extending existin
 </test-placement>
 
 <rework-plan-execution>
-A rework plan (triggered by **orchestrate-feature-delivery**'s **handle-post-implementation-issue**) is a sibling `rework-<date>.md` in the feature folder — `plan.md` is the frozen original:
-- Execute **only** the rework file's steps — the original steps are all ✅ and are never re-run or modified.
-- Treat the rework steps as a fresh step sequence with **step-status-definitions** statuses (⏳ → 🔄 → ✅).
-- When resuming, find the active rework file via the `## Reworks` manifest in `context.md` (the latest file with incomplete steps).
-- **verify-prerequisites** still applies — the rework runs on its own branch per the repo's branch convention (the original branch/PR may already be merged).
-- Commit conventions, **request-push-approval**, and **review-post-execution** apply exactly as for a normal plan.
+Rework mode: a rework is a sibling `rework-<date>.md`; run only its steps; resume via the `## Reworks` manifest. Full mode: **reference/execution-modes.md**.
 </rework-plan-execution>
 <poc-execution-mode>
-A POC plan (from **plan-development-task**'s **plan-poc** / an **orchestrate-feature-delivery** POC cell) executes like a normal feature on a **POC branch** — track, small-step commits, validation — but stops before merging: after the final **evaluation step**, produce the evaluation report (see **produce-poc-report**) and **STOP**. Pushing a POC branch is for review/evidence only (ask the user); merging happens only after the orchestrator's decision gate adopts it. Completion routes to the decision gate — never to plain **done**.
+POC mode: run like a feature on a **POC branch**, stop after the final **evaluation step**; never merge before the gate. Full mode: **reference/execution-modes.md**.
 </poc-execution-mode>
 
 <scope-boundary-check>
@@ -98,7 +98,6 @@ Load only the example most relevant to the current execution scenario to minimiz
 | Executing a POC plan (stop at evaluation report, no merge) | POC execution mode + evaluation report walkthrough | [examples/execute-adr-option-poc.md](examples/execute-adr-option-poc.md) |
 | POC round from dispatch to decision gate (shared with the orchestrator) | End-to-end POC walkthrough | [../orchestrate-feature-delivery/examples/adr-option-poc.md](../orchestrate-feature-delivery/examples/adr-option-poc.md) |
 | A step, recovery fix, or review fix risks exceeding the plan's scope boundary | Output model: refusal + decision options | [examples/refusing-out-of-scope-rework.md](examples/refusing-out-of-scope-rework.md) |
-| Writing or updating plan.md / context.md prose | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets | [reference/writing-style.md](reference/writing-style.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -238,7 +237,6 @@ Load only the example most relevant to the current execution scenario to minimiz
 <rule> **When the Folder Contains a Rework Plan**: Apply **track-plan** and **execute-step** to the active `rework-<date>.md` steps only. </rule>
 <rule> **When the Plan is a POC** (type: poc): Apply **track-plan** and **execute-step**; never merge before the decision gate. </rule>
 <rule> **After the Final Evaluation Step of a POC**: Apply **produce-poc-report** and route to the decision gate. </rule>
-<rule> **When a Step, Recovery Fix, or Review Fix Exceeds the Boundary**: Apply **check-scope-boundary** — refuse and ask with options. </rule>
-<rule> **When Deviating from the Plan**: Apply **check-scope-boundary** before adapting. </rule>
+<rule> **When a Step, Recovery Fix, or Review Fix Exceeds the Boundary, or When Deviating from the Plan**: Apply **check-scope-boundary** — refuse and ask with options. </rule>
 
 </rules>
