@@ -11,7 +11,7 @@ description: Execute structured development plans with progress tracking, valida
 - A step has failed or is blocked and needs error recovery before proceeding
 - A delivery index from orchestrate-feature-delivery points to planned feature × repo cells ready for execution
 - You need to execute a POC plan (a standalone feature proving one ADR option) and stop at an evaluation report for the decision gate
-- You need to execute a plan containing an appended `## Rework <date>` section (a rework triggered by orchestrate-feature-delivery) — run only the rework steps, never re-run the completed original steps
+- You need to execute a rework plan (`rework-<date>.md`, triggered by orchestrate-feature-delivery) — run only the rework file's steps, never re-run the completed original steps
 - Do NOT load when no plan has been generated yet — if the user describes a problem without referencing an existing plan, let plan-development-task handle it first
 </when-to-use-this-skill>
 
@@ -54,9 +54,10 @@ Before writing tests, check existing coverage first and prefer extending existin
 </test-placement>
 
 <rework-plan-execution>
-When the plan file contains an appended `## Rework <date>` section (a rework triggered by **orchestrate-feature-delivery**'s **handle-post-implementation-issue**):
-- Execute **only** the rework section — the original steps are all ✅ and are never re-run or modified.
+A rework plan (triggered by **orchestrate-feature-delivery**'s **handle-post-implementation-issue**) is a sibling `rework-<date>.md` in the feature folder — `plan.md` is the frozen original:
+- Execute **only** the rework file's steps — the original steps are all ✅ and are never re-run or modified.
 - Treat the rework steps as a fresh step sequence with **step-status-definitions** statuses (⏳ → 🔄 → ✅).
+- When resuming, find the active rework file via the `## Reworks` manifest in `context.md` (the latest file with incomplete steps).
 - **verify-prerequisites** still applies — the rework runs on its own branch per the repo's branch convention (the original branch/PR may already be merged).
 - Commit conventions, **request-push-approval**, and **review-post-execution** apply exactly as for a normal plan.
 </rework-plan-execution>
@@ -93,7 +94,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 | Executing a plan with 10+ steps requiring context preservation | Output model: long plan progress tracking and context continuity | [examples/long-plan-execution.md](examples/long-plan-execution.md) |
 | All plan steps are complete and post-execution review is needed | Output model: applying review-code after completion, adding fix steps, keeping plan as permanent record | [examples/post-execution-review.md](examples/post-execution-review.md) |
 | Executing a plan with prerequisite checks, one commit per step, and push approval at the end | Output model: verify-prerequisites, commit-step, and request-push-approval in action | [examples/small-step-commits.md](examples/small-step-commits.md) |
-| Executing a plan with an appended `## Rework` section (run only the rework steps) | Rework execution walkthrough (shared with the orchestrator) | [../orchestrate-feature-delivery/examples/post-implementation-rework.md](../orchestrate-feature-delivery/examples/post-implementation-rework.md) |
+| Executing a rework plan (`rework-<date>.md` — run only the rework steps) | Rework execution walkthrough (shared with the orchestrator) | [../orchestrate-feature-delivery/examples/post-implementation-rework.md](../orchestrate-feature-delivery/examples/post-implementation-rework.md) |
 | Executing a POC plan (stop at evaluation report, no merge) | POC execution mode + evaluation report walkthrough | [examples/execute-adr-option-poc.md](examples/execute-adr-option-poc.md) |
 | POC round from dispatch to decision gate (shared with the orchestrator) | End-to-end POC walkthrough | [../orchestrate-feature-delivery/examples/adr-option-poc.md](../orchestrate-feature-delivery/examples/adr-option-poc.md) |
 | A step, recovery fix, or review fix risks exceeding the plan's scope boundary | Output model: refusal + decision options | [examples/refusing-out-of-scope-rework.md](examples/refusing-out-of-scope-rework.md) |
@@ -108,7 +109,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 1. Locate or create the feature folder and its two files (`plan.md` + `context.md`) per **reference/feature-folder-structure.md**; for an **orchestrate-feature-delivery** cell use the existing `deliveries/<epic-name>/{repo}/{feature-name}/`, otherwise ask the user or default to `docs/feature-implementations/`.
 2. Derive a short kebab-case feature name from the plan's objective (e.g., `add-auth-system`, `fix-null-pointer-in-transformer`) per **reference/feature-folder-structure.md**.
 3. Before creating a new plan, check whether the feature folder already exists with a plan file.
-4. If the plan file contains an appended `## Rework <date>` section, execute only the rework steps (see **rework-plan-execution**); never re-run or modify the completed original steps.
+4. If the folder contains a sibling `rework-<date>.md` (per the `context.md` manifest), execute only the active rework file's steps (see **rework-plan-execution**); never re-run or modify the completed original steps.
 5. If a plan file has steps with ❌ failed or 🚫 blocked status, ask the user whether to **resume** from the last known state or **start fresh** (create a new folder/overwrite).
 6. Materialize the plan into `plan.md` per **reference/plan-input-schema.md**: list each step with its number, title, objective (one sentence each, see **concise-writing**), and initial status ⏳ pending, per **reference/step-tracking-format.md**.
 7. Populate `context.md` concisely (see **concise-writing**): one bolded takeaway per section, tables for requirements/constraints, compact bullet lists for references — requirements docs, ADRs, user stories, spike findings, codebase references, constraints, assumptions, decisions.
@@ -234,7 +235,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 <rule> **Before Starting the First Step**: Apply **verify-prerequisites** — raise and wait if the environment is not ready. </rule>
 <rule> **After Each ✅ Step**: Apply **commit-step**. </rule>
 <rule> **Before Any Push**: Apply **request-push-approval** — never push without user confirmation. </rule>
-<rule> **When the Plan Contains a Rework Section**: Apply **track-plan** and **execute-step** to the appended `## Rework` steps only. </rule>
+<rule> **When the Folder Contains a Rework Plan**: Apply **track-plan** and **execute-step** to the active `rework-<date>.md` steps only. </rule>
 <rule> **When the Plan is a POC** (type: poc): Apply **track-plan** and **execute-step**; never merge before the decision gate. </rule>
 <rule> **After the Final Evaluation Step of a POC**: Apply **produce-poc-report** and route to the decision gate. </rule>
 <rule> **When a Step, Recovery Fix, or Review Fix Exceeds the Boundary**: Apply **check-scope-boundary** — refuse and ask with options. </rule>

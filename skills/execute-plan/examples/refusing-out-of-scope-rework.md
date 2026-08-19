@@ -26,4 +26,4 @@ Applying **check-scope-boundary**: the fix exceeds the boundary, so the executor
 
 **User decision**: (a) extend the boundary.
 
-The executor updates the boundary block in `plan.md`, retries the step, and marks it ✅.
+The executor updates the boundary block in the active `rework-<date>.md`, retries the step, and marks it ✅.

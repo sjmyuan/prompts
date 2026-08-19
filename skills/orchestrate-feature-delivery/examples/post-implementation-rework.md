@@ -15,7 +15,7 @@
 | Focused spike on `adr-wallet-01-payment-failure-handling.md` | **spike-conductor** | **conduct-spike** |
 | ADR revision (decision changes) | **adr-writer** | **draft-adr** |
 | Solution-doc refresh (target state changes) | **solution-doc-writer** | **write-solution-doc** |
-| Append rework plan | **coding-assistant** | **plan-development-task** |
+| Write rework plan | **coding-assistant** | **plan-development-task** |
 | Execute rework plan | **coding-assistant** | **execute-plan** |
 
 ## 2. Focused spike
@@ -28,30 +28,46 @@
 | Cell | Branch | PR | Status | Agent | Plan location |
 |---|---|---|---|---|---|
 | order-service/F2 | 1234-f2-wallet | #42 (merged) | done | — | deliveries/payment-migration/order-service/wallet-service/ |
-| order-service/F2-r1 (Rework of F2) | — | — | unplanned | — | deliveries/payment-migration/order-service/wallet-service/plan.md (## Rework 2026-08-08) |
+| order-service/F2-r1 (Rework of F2) | — | — | unplanned | — | deliveries/payment-migration/order-service/wallet-service/rework-2026-08-08.md |
 
-The index records state + pointers — F2's status stays **done**, its branch + merged PR stay recorded; the rework's spike focus and steps live in the appended plan section (see §4).
+The index records state + pointers — F2's status stays **done**, its branch + merged PR stay recorded; the rework's spike focus and steps live in the sibling rework file (see §4).
 
 New **Wave 3**: `F2-r1` (after F2 merged). New change-summary items 9–11 trace to `adr-wallet-01-payment-failure-handling.md`.
 
-## 4. Append the plan (never modify implemented steps)
+## 4. Write the rework plan (never modify the original)
 
-`plan-development-task` appends to the existing `deliveries/payment-migration/order-service/wallet-service/plan.md`:
+`plan-development-task` writes a new sibling `deliveries/payment-migration/order-service/wallet-service/rework-2026-08-08.md` — the existing `plan.md` is the frozen original and never gains a section:
 
 ```markdown
-## Rework 2026-08-08
-Trigger: partial-payment failure handling (`adr-wallet-01-payment-failure-handling.md` revised)
-Boundary: confined to the `adr-wallet-01-payment-failure-handling.md` decision + original **In scope**; original **Out of scope** unchanged
+# Rework 2026-08-08 — compensating transactions on partial payment failure
+Mode: post-merge   ·   Cell: order-service/F2-r1   ·   ADR focus: adr-wallet-01-payment-failure-handling.md
+
+## Scope Boundary
+**In scope**: wallet-service `application/` + `test/`; compensating-transaction rollback per the revised ADR decision
+**Out of scope**: other ADRs, other modules — original **Out of scope** unchanged
+**Rule**: no step or fix may change code beyond **In scope**; refuse and ask if it does
+**Minor exceptions**: doc/comment-only edits; test-only changes for this plan's own tests
+
+## Steps
 - [ ] Add compensating-transaction rollback on partial failure
 - [ ] Update payment-gateway client error mapping
 - [ ] Update checkout integration test for partial failures
 ```
 
-Original steps 1–N remain byte-for-byte unchanged.
+`context.md` gains a `## Reworks` manifest row:
 
-## 5. Execute the appended plan
+```markdown
+## Reworks
+| Date | Mode | Cell | Trigger | File | Status |
+|---|---|---|---|---|---|
+| 2026-08-08 | post-merge | F2-r1 | partial-payment failure handling (ADR revised) | rework-2026-08-08.md | ⏳ |
+```
 
-- Dispatch **execute-plan** to run **only** the `## Rework` steps; completed original steps are never re-run.
+Original `plan.md` steps 1–N remain byte-for-byte unchanged.
+
+## 5. Execute the rework plan
+
+- Dispatch **execute-plan** to run **only** `rework-2026-08-08.md`; completed original steps are never re-run.
 
 ## 6. Next actions
 

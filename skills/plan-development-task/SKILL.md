@@ -1,6 +1,6 @@
 ---
 name: plan-development-task
-description: Classify, clarify, and generate TDD-based step-by-step plans for bug fixes, features, refactors, or POCs. Use when planning, investigating, designing changes, or appending rework.
+description: Classify, clarify, and generate TDD-based step-by-step plans for bug fixes, features, refactors, or POCs. Use when planning, investigating, designing changes, or writing rework.
 ---
 
 <when-to-use-this-skill>
@@ -17,12 +17,12 @@ description: Classify, clarify, and generate TDD-based step-by-step plans for bu
 - User asks for code cleanup, restructuring, or quality improvements
 - User wants to reduce technical debt or improve code organization
 - User requests improvements to maintainability, readability, or performance without changing behavior
-- User wants to append rework steps to an already-implemented feature plan — a focused rework triggered by orchestrate-feature-delivery's handle-post-implementation-issue flow
+- User wants to plan rework for an already-implemented feature — write a sibling `rework-<date>.md`, a focused rework triggered by orchestrate-feature-delivery's handle-post-implementation-issue flow
 
 **Differentiation rules** (when multiple skills could apply):
 - **Both restructure AND add new behavior?** → Apply **plan-refactor** first to stabilize, then **plan-feature-implementation** for the new behavior
 - **Multi-feature / multi-repo decomposition?** → Do NOT plan the whole breakdown here — apply **orchestrate-feature-delivery** first, then plan each feature × repo cell with this skill
-- **Rework append for an already-delivered feature?** → Apply this skill in append mode per **rework-plan-convention** — orchestrate-feature-delivery triggers it; never rewrite the implemented plan
+- **Rework for an already-delivered feature?** → Apply this skill per **rework-plan-convention** — write a sibling `rework-<date>.md`; orchestrate-feature-delivery triggers it; never rewrite the implemented plan
 </when-to-use-this-skill>
 
 <knowledge>
@@ -67,7 +67,7 @@ Every plan carries an explicit **Scope Boundary** that the executor checks durin
 | **Rule** | No step, error-recovery fix, or review fix may require changes beyond **In scope**. If one does, the executor refuses and asks the user — never adapts silently |
 | **Minor exceptions** | Proceed without asking: doc/comment-only edits; changes confined to files already in **In scope**; test-only changes for this plan's own tests |
 
-The boundary derives from the classified change type, the confirmed scope, and (for orchestrator cells) the governing ADR decision. The user ratifies it before **export-plan** persists it. Rework sections inherit the original boundary and tighten it to the governing ADR.
+The boundary derives from the classified change type, the confirmed scope, and (for orchestrator cells) the governing ADR decision. The user ratifies it before **export-plan** persists it. Rework files inherit the original boundary and tighten it to the governing ADR.
 </scope-boundary>
 <poc-plan>
 A POC plan (from **orchestrate-feature-delivery**'s **poc-definition**) is a **standalone feature** proving one ADR option, never a snippet:
@@ -81,11 +81,12 @@ A POC plan (from **orchestrate-feature-delivery**'s **poc-definition**) is a **s
 </poc-plan>
 
 <rework-plan-convention>
-A rework append (triggered by **orchestrate-feature-delivery**'s **handle-post-implementation-issue**) adds to the existing `plan.md`:
-- Adds a `## Rework <date>` section — implemented steps stay byte-for-byte unchanged
+A rework (triggered by **orchestrate-feature-delivery**'s **handle-post-implementation-issue**) is written as a new sibling file `rework-<date>.md` in the feature folder — `plan.md` is the frozen original and is never modified:
+- Each file opens with `# Rework <date>` + one-line trigger, then its own **Scope Boundary** and numbered steps
 - Inherits and tightens the original **Scope Boundary** to the governing ADR decision
 - Refuses and asks the user if it would change the original **Out of scope** or reopen another ADR (likely a new feature cell)
-- Runs on its own branch (see **plan-prerequisites**); very long reworks use a sibling `rework-plan.md` in the delivery index
+- Runs on its own branch (see **plan-prerequisites**)
+- Registers a row in the feature's `## Reworks` manifest in `context.md` (date, mode, cell, trigger, file, status) so resume finds the active file
 
 Worked example: [examples/rework-scope-boundary.md](examples/rework-scope-boundary.md).
 </rework-plan-convention>
@@ -106,8 +107,8 @@ Load only the examples directly relevant to the current change type to minimize 
 | Generating feature implementation plan | Detailed steps for plan-feature-implementation | [reference/plan-feature-implementation.md](reference/plan-feature-implementation.md) |
 | Generating refactor plan | Detailed steps for plan-refactor | [reference/plan-refactor.md](reference/plan-refactor.md) |
 | Validating plan quality | Checklist: coverage, sequencing, steps, TDD, clarity | [reference/plan-quality-checklist.md](reference/plan-quality-checklist.md) |
-| Appending a rework plan to an implemented feature plan | Append-only rework section (shared with the orchestrator) | [../orchestrate-feature-delivery/examples/post-implementation-rework.md](../orchestrate-feature-delivery/examples/post-implementation-rework.md) |
-| Rework append that risks exceeding the feature's scope boundary | Boundary definition + refusal with decision options | [examples/rework-scope-boundary.md](examples/rework-scope-boundary.md) |
+| Writing a rework plan (`rework-<date>.md`) for an implemented feature | Sibling rework file + manifest (shared with the orchestrator) | [../orchestrate-feature-delivery/examples/post-implementation-rework.md](../orchestrate-feature-delivery/examples/post-implementation-rework.md) |
+| Rework that risks exceeding the feature's scope boundary | Boundary definition + refusal with decision options | [examples/rework-scope-boundary.md](examples/rework-scope-boundary.md) |
 | Bug: simple logic / timing errors | Full workflow example | [examples/bug-fix-simple-logic.md](examples/bug-fix-simple-logic.md) |
 | Bug: slow responses, N+1 queries | Full workflow example | [examples/bug-fix-performance.md](examples/bug-fix-performance.md) |
 | Feature: complex algorithms or business rules | Full workflow example | [examples/feature-complex-transformation.md](examples/feature-complex-transformation.md) |
@@ -195,7 +196,7 @@ Load **[reference/plan-poc.md](reference/plan-poc.md)** and follow its steps.
 <rule> When both restructuring and new behavior are needed: apply **plan-refactor** first, then **plan-feature-implementation**. </rule>
 <rule> After the plan is confirmed: optionally apply **export-plan** to persist it for execution by **execute-plan**. </rule>
 <rule> When generating any plan, apply **plan-prerequisites** and **define-scope-boundary**. </rule>
-<rule> When appending a rework to an implemented feature, apply **rework-plan-convention** and **export-plan** in append mode — never overwrite implemented steps. </rule>
-<rule> When a rework would exceed the original boundary, refuse and ask the user — never append silently. </rule>
+<rule> When planning a rework for an implemented feature, apply **rework-plan-convention** and **export-plan** to write a sibling `rework-<date>.md` — never overwrite implemented steps. </rule>
+<rule> When a rework would exceed the original boundary, refuse and ask the user — never write silently. </rule>
 
 </rules>

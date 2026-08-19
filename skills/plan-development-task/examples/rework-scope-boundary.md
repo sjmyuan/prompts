@@ -1,6 +1,6 @@
-# Example: Rework Append That Risks Exceeding the Feature Scope
+# Example: Rework That Risks Exceeding the Feature Scope
 
-**Scenario**: A rework append is requested for a delivered feature, but the rework would change code listed in the original plan's **Out of scope**. Demonstrates **define-scope-boundary** and the rework guard — refuse and ask, never append silently.
+**Scenario**: A rework is requested for a delivered feature, but the rework would change code listed in the original plan's **Out of scope**. Demonstrates **define-scope-boundary** and the rework guard — refuse and ask, never write silently.
 
 **Applies**: **define-scope-boundary**, **rework-plan-convention**
 
@@ -22,24 +22,30 @@ The rework request requires changing `payment-gateway/` credential retry logic �
 
 ## Refusal + Decision Options
 
-The rework exceeds the original boundary, so the planner refuses to append silently and presents options:
+The rework exceeds the original boundary, so the planner refuses to write silently and presents options:
 
-> "This rework requires changing `payment-gateway/` credential retry logic, which is **Out of scope** (original boundary). Options: (a) extend the boundary to include `payment-gateway/` credential handling, (b) keep it out and file a follow-up feature, (c) treat it as a new feature cell `F2-r2` instead of an append."
+> "This rework requires changing `payment-gateway/` credential retry logic, which is **Out of scope** (original boundary). Options: (a) extend the boundary to include `payment-gateway/` credential handling, (b) keep it out and file a follow-up feature, (c) treat it as a new feature cell `F2-r2` instead of a rework."
 
 **User decision**: (a) extend the boundary for this rework only.
 
-## Appended Plan (Boundary Updated)
+## Rework File (Boundary Updated)
 
-The rework section inherits the original boundary, tightened and extended per the user decision:
+The rework is written as a new sibling `rework-2026-08-10.md`; the original `plan.md` is never modified. It inherits the original boundary, tightened and extended per the user decision:
 
 ```markdown
-## Rework 2026-08-10
-Trigger: compensating rollback uses wrong credentials on partial failure
-Boundary: original **In scope** + `payment-gateway/` credential retry (user-approved extension);
-original **Out of scope** otherwise unchanged
+# Rework 2026-08-10 — compensating rollback credential retry
+Mode: post-merge   ·   Cell: order-service/F2-r1   ·   ADR focus: adr-wallet-01-payment-failure-handling.md
+
+## Scope Boundary
+**In scope**: original **In scope** + `payment-gateway/` credential retry (user-approved extension)
+**Out of scope**: original **Out of scope** otherwise unchanged
+**Rule**: no step or fix may change code beyond **In scope**; refuse and ask if it does
+**Minor exceptions**: doc/comment-only edits; test-only changes for this plan's own tests
+
+## Steps
 - [ ] Fix credential retry selection in compensating rollback
 - [ ] Update payment-gateway client tests for partial failures
 - [ ] Validate linting, formatting, type checking
 ```
 
-Original steps 1–N remain byte-for-byte unchanged.
+`context.md` gains a `## Reworks` manifest row for this file. Original `plan.md` steps 1–N remain byte-for-byte unchanged.

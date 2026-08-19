@@ -10,7 +10,7 @@ Before presenting a development plan to the user, verify all items below.
 ## Scope Boundary
 - [ ] Plan includes a `## Scope Boundary` block with **In scope** and **Out of scope** lists
 - [ ] Boundary derived from the change type and governing ADR (for orchestrator cells) and ratified by the user
-- [ ] Rework sections carry their own boundary — inherits the original **In scope**, tightened to the governing ADR
+- [ ] Rework files (`rework-<date>.md`) carry their own boundary — inherits the original **In scope**, tightened to the governing ADR; `plan.md` untouched
 
 ## Coverage
 - [ ] Every identified issue/functionality/objective has a corresponding TDD cycle in the plan

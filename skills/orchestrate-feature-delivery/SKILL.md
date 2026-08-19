@@ -9,8 +9,8 @@ description: Orchestrate spiked-epic delivery via dispatched agents and a tracki
 - User wants to dispatch parallel agents to plan (plan-development-task) or execute (execute-plan) feature × repo cells of an epic
 - User wants to resume or continue delivery of an existing spiked epic — load the index and derive next actions from its status
 - User wants to review or update the delivery index status (cells planned / in-progress / done / failed / blocked)
-- User found an issue after a feature was implemented (a cell is done/merged, or implemented but not yet merged/committed/pushed) and wants the rework handled — focused spike on the governing ADR, an appended plan, and its execution
-- User wants suggestions for which skill handles each part of a rework (spike, ADR update, plan append, execution)
+- User found an issue after a feature was implemented (a cell is done/merged, or implemented but not yet merged/committed/pushed) and wants the rework handled — focused spike on the governing ADR, a sibling rework file, and its execution
+- User wants suggestions for which skill handles each part of a rework (spike, ADR update, rework plan, execution)
 - Do NOT load before a spike's change summary / solution doc exists — let conduct-spike produce them first
 - Do NOT load to plan or execute a single, already-scoped change — plan-development-task and execute-plan handle single cells
 - Do NOT load to run a standalone spike — conduct-spike runs spikes; this skill only triggers a focused spike to rework an implemented feature
@@ -40,7 +40,7 @@ deliveries/<epic-name>/               # one folder per epic (epic-name = spike n
 ```
 - **index.md** is the delivery index — it lives at the epic folder root (see **reference/delivery-index-format.md**).
 - **Feature folders are named by the feature's kebab-case name** (e.g. `wallet-contracts`), never its ID (`F1`) — IDs are reference shorthand only (waves, dependencies).
-- **context.md** carries the distilled spike context; **plan.md** is written by **plan-development-task** and executed by **execute-plan** (rework per **rework-modes** — always appends `## Rework <date>`, implemented steps never modified).
+- **context.md** carries the distilled spike context and the `## Reworks` manifest; **plan.md** is the original plan from **plan-development-task** — each rework is a sibling `rework-<date>.md` (per **rework-modes**), implemented steps never modified.
 </delivery-layout>
 <dependency-edge-types>
 Classify each feature pair (A → B) by edge type:
@@ -70,12 +70,12 @@ Execution agents commit locally and small-step; pushing or opening PRs happens o
 - A cell is **done** only after its PR merges or the user confirms the code is verified; pushing alone is not done.
 </branch-and-push-conventions>
 <rework-modes>
-Rework is **always append-only** — implemented steps never change, scoped to the cell only (usually its governing ADR), never the whole epic. Both modes append a `## Rework <date>` section to the existing `plan.md` (sibling `rework-plan.md` only if very long); execution runs **only** the appended steps. The index records **state only** — the rework cell + its plan pointer; trigger, ADR focus, boundary, and steps live in `plan.md` / `context.md` (see **delivery-index-format.md**).
+Rework is **always append-only** — implemented steps never change, scoped to the cell only (usually its governing ADR), never the whole epic. Each rework is its **own sibling file** `rework-<date>.md` in the feature folder — `plan.md` stays the frozen original and never grows. Execution runs **only** the rework file's steps. A `## Reworks` manifest in `context.md` lists every rework (date, mode, cell, file, status) so resume finds the active one. The index records **state only** — the rework cell + its plan pointer; trigger, ADR focus, boundary, and steps live in the rework file (see **delivery-index-format.md**).
 
 | Mode | When | Handling |
 |---|---|---|
 | **Post-merge** | cell **done** (merged/verified) | focused spike (**conduct-spike**) + ADR / solution-doc updates; new rework feature (e.g. `F2-r1`) in a new wave |
-| **Pre-merge** | cell **in-progress** (implemented, not merged/committed/pushed) | spike + ADR / solution-doc updates only if the issue challenges the ADR decision; rework stays on the same cell — appended steps merge with the original work |
+| **Pre-merge** | cell **in-progress** (implemented, not merged/committed/pushed) | spike + ADR / solution-doc updates only if the issue challenges the ADR decision; rework stays on the same cell — rework steps merge with the original work |
 </rework-modes>
 <concise-writing>
 All prose in the delivery index follows **reference/writing-style.md** — table-first, one-line Summary, atomic bullets, one-sentence feature descriptions, no process narration, So-what test.
@@ -86,8 +86,8 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 | Dispatching parallel agents, gating, status transitions, or failure handling | Agent dispatch, orchestration loop, resume, failure rules | [reference/orchestration-guide.md](reference/orchestration-guide.md) |
 | Classifying dependency edges, computing waves, or intra-feature merge order | Edge types, wave algorithm, develop-vs-merge | [reference/dependency-ordering-guide.md](reference/dependency-ordering-guide.md) |
 | Writing or updating the delivery index | Index schema, per-cell briefs, status lifecycle | [reference/delivery-index-format.md](reference/delivery-index-format.md) |
-| Handling a post-merge rework (cell **done**) | Focused spike, append-only plan, execution | [examples/post-implementation-rework.md](examples/post-implementation-rework.md) |
-| Handling a pre-merge rework (cell **in-progress** — implemented but not merged/committed/pushed) | Append-only rework on an unmerged cell | [examples/pre-merge-rework.md](examples/pre-merge-rework.md) |
+| Handling a post-merge rework (cell **done**) | Focused spike, sibling rework file, execution | [examples/post-implementation-rework.md](examples/post-implementation-rework.md) |
+| Handling a pre-merge rework (cell **in-progress** — implemented but not merged/committed/pushed) | Sibling rework file on an unmerged cell | [examples/pre-merge-rework.md](examples/pre-merge-rework.md) |
 | Running a full end-to-end decomposition from change summary to index | End-to-end multi-repo example | [examples/multi-repo-feature-decomposition.md](examples/multi-repo-feature-decomposition.md) |
 | Running one orchestration round with parallel agents | Dispatch + status-update walkthrough | [examples/orchestration-round.md](examples/orchestration-round.md) |
 | Continuing an interrupted epic | Resume walkthrough with mixed statuses | [examples/resume-after-interruption.md](examples/resume-after-interruption.md) |
@@ -160,11 +160,11 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 1. Identify the affected cell, its governing ADR, and its status — **done** (merged/verified) or **in-progress** (implemented but not merged/committed/pushed).
 2. Scope investigation narrowly to that decision — never the whole epic.
 3. Present the routing for user confirmation — **append-only in both modes** (per **rework-modes**):
-   - **Plan**: dispatch the planning agent (**plan-development-task**) to append `## Rework <date>` — implemented steps never modified.
-   - **Execute**: dispatch the execution agent (**execute-plan**) to run only the appended steps.
+   - **Plan**: dispatch the planning agent (**plan-development-task**) to write a sibling `rework-<date>.md` — implemented steps never modified.
+   - **Execute**: dispatch the execution agent (**execute-plan**) to run only the rework file's steps.
    - **Investigate**: dispatch the spike agent (**spike-conductor**) + ADR / solution-doc agent updates for post-merge; for pre-merge only if the issue challenges the governing ADR decision.
 4. Apply **update-delivery-index** — post-merge adds a new rework feature (e.g. `F2-r1`, `Rework of: F2`) in a new wave; the original cell's status stays **done**.
-5. For pre-merge, keep the rework on the same cell (no new feature/wave) — no index change; the appended `## Rework` section in `plan.md` is the record.
+5. For pre-merge, keep the rework on the same cell (no new feature/wave) — no index change; the sibling `rework-<date>.md` is the record.
 6. Ask the user before pushing or opening a PR (per **branch-and-push-conventions**).
 </handle-post-implementation-issue>
 <define-poc-scope>

@@ -102,7 +102,7 @@ Each cell carries a brief that seeds **plan-development-task**:
 |---|---|---|
 | **unplanned** | No plan files yet | Dispatch a planning agent (plan-development-task) |
 | **planned** | `plan.md` + `context.md` exist | Dispatch an execution agent (execute-plan) |
-| **in-progress** | Execution running — incl. implemented-but-not-yet-merged cells awaiting push approval | Resume from the last step in `plan.md` (incl. an appended `## Rework` section); pre-merge rework needs no index change |
+| **in-progress** | Execution running — incl. implemented-but-not-yet-merged cells awaiting push approval | Resume from the last step in the active `rework-<date>.md` (per the `context.md` manifest), or `plan.md` if no rework; pre-merge rework needs no index change |
 | **poc-ready** | POC implemented + evaluation report written | Wait for the user to record **adopted**/**rejected** in the index |
 | **adopted** | POC proved the option | Promote (merge → done) or feed the **poc-gated** feature |
 | **rejected** | POC failed the criteria | Close the cell; delivery proceeds on the other option |
@@ -122,15 +122,15 @@ A POC proves one option of one ADR as a **standalone feature** (see **poc-defini
 
 ## Rework after implementation
 
-The index tracks **state only** — rework never adds work history to a status cell. Record rework per the cell's status (see **rework-modes** in the SKILL.md knowledge); the details (trigger, ADR focus, boundary, steps) live in the appended `## Rework <date>` section of `plan.md` / `context.md` — written by **plan-development-task**, never repeated in the index.
+The index tracks **state only** — rework never adds work history to a status cell. Record rework per the cell's status (see **rework-modes** in the SKILL.md knowledge); the details (trigger, ADR focus, boundary, steps) live in a sibling `rework-<date>.md` — written by **plan-development-task**, never repeated in the index. `plan.md` is the frozen original; each rework gets its own file so it never grows. A `## Reworks` manifest in `context.md` lists every rework file + status (see **plan-file-format.md**).
 
 **Post-merge (cell done)** — original cell unchanged, rework is its own cell:
 
 - Keep the original cell exactly as-is (status **done**; no note, no history).
 - Add the rework as a new feature/cell (e.g., `F2-r1`) in a **new wave** after the original feature, with metadata `**Rework of**: F2`; it depends on the original cell's PR (already merged).
-- Its plan location points at the appended section: `deliveries/<epic-name>/order-service/wallet-service/plan.md (## Rework 2026-08-08)`.
+- Its plan location points at the rework file: `deliveries/<epic-name>/order-service/wallet-service/rework-2026-08-08.md`.
 
 **Pre-merge (cell in-progress — implemented but not merged/committed/pushed)** — no index change:
 
 - Keep the cell's identity and **in-progress** status; no new feature/wave, no note.
-- A `## Rework <date>` section is appended to the existing `plan.md` (implemented steps never modified) — that section is the record; the cell proceeds to push approval after the rework.
+- A sibling `rework-<date>.md` is written (implemented steps never modified) — that file is the record; the cell proceeds to push approval after the rework.
