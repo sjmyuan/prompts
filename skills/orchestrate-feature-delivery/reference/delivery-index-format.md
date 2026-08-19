@@ -46,6 +46,7 @@ deliveries/<epic-name>/               # one folder per epic (no docs/ prefix)
 - **ADRs**: [adr-<area>-<NN>-<problem>.md ...]
 - **Change summary items**: [item ids]
 - **Type**: `poc` (optional) — **ADR**: adr-<area>-<NN>-<problem>.md · **Option**: [option] · **Success criteria**: [measurable] · **Replaces**: F2 (optional) · **Compare**: F5 (optional, sibling POC)
+- **Rework of**: F2 (optional — rework cell that fixes a delivered feature; see **Rework after implementation**)
 - **Repos**: repo-a (PR) · repo-c (PR)
 - **Intra-feature merge order**: repo-c → repo-a
 - **Dependencies**: blocked-by [F2] (merge-blocked) · blocks [F4]
@@ -58,14 +59,14 @@ deliveries/<epic-name>/               # one folder per epic (no docs/ prefix)
 - F2 (after F1 merges)
 
 ## Cell plan status
-| Cell | Branch | Status | Agent | Plan location |
-|---|---|---|---|---|
-| repo-a/F1 | 1234-f1-api | planned | agent-A | deliveries/<epic-name>/repo-a/wallet-contracts/ |
-| repo-b/F2 | f2-schema | in-progress | agent-B | deliveries/<epic-name>/repo-b/wallet-service/ |
-| repo-c/F4 | — | unplanned | — | — |
+| Cell | Branch | PR | Status | Agent | Plan location |
+|---|---|---|---|---|---|
+| repo-a/F1 | 1234-f1-api | — | planned | agent-A | deliveries/<epic-name>/repo-a/wallet-contracts/ |
+| repo-b/F2 | f2-schema | #42 | in-progress | agent-B | deliveries/<epic-name>/repo-b/wallet-service/ |
+| repo-c/F4 | — | — | unplanned | — | — |
 ```
 
-Plan locations use the feature's **kebab-case name** (e.g. `wallet-contracts` for F1), never its ID (`F1`).
+Plan locations use the feature's **kebab-case name** (e.g. `wallet-contracts` for F1), never its ID (`F1`). **Branch** and **PR** are pointers — always tracked in the index (easy to find, easy to verify); work history stays in `plan.md` / `context.md`. The branch is recorded when the cell is planned; the PR reference (number or URL) is filled in once a PR is opened — `—` until then.
 
 ## Per-cell scope brief
 
@@ -78,6 +79,7 @@ Each cell carries a brief that seeds **plan-development-task**:
 - **Dependency context**: what must be merged before this cell's PR (other repos / features)
 - **Constraints**: one PR per repo per feature (soft — may merge with other features when convenient)
 - **Branch**: the branch name to use for this cell, matching the **repo's branch convention** (per **branch-and-push-conventions**); created during the agent's Prepare Environment step, pushed only after user confirmation
+- **PR**: the pull-request reference (number or URL) to record in the index once the PR is opened (per **branch-and-push-conventions**); `—` until then
 
 ## Status lifecycle
 
@@ -100,12 +102,12 @@ Each cell carries a brief that seeds **plan-development-task**:
 |---|---|---|
 | **unplanned** | No plan files yet | Dispatch a planning agent (plan-development-task) |
 | **planned** | `plan.md` + `context.md` exist | Dispatch an execution agent (execute-plan) |
-| **in-progress** | Execution running — incl. implemented-but-not-yet-merged cells awaiting push approval | Resume from the last completed step; pre-merge rework appends like post-merge |
+| **in-progress** | Execution running — incl. implemented-but-not-yet-merged cells awaiting push approval | Resume from the last step in `plan.md` (incl. an appended `## Rework` section); pre-merge rework needs no index change |
 | **poc-ready** | POC implemented + evaluation report written | Wait for the user to record **adopted**/**rejected** in the index |
 | **adopted** | POC proved the option | Promote (merge → done) or feed the **poc-gated** feature |
 | **rejected** | POC failed the criteria | Close the cell; delivery proceeds on the other option |
 | **superseded** | Existing implementation replaced by an adopted POC | Skip; keep as history |
-| **done** | Merged / verified | Skip; unlock downstream cells |
+| **done** | Merged / verified (PR reference recorded) | Skip; unlock downstream cells |
 | **failed** | Agent error (reason recorded) | Ask user: re-plan or retry |
 | **blocked** | Waiting on blocker (recorded) | Wait; re-check when blocker clears |
 
@@ -120,16 +122,15 @@ A POC proves one option of one ADR as a **standalone feature** (see **poc-defini
 
 ## Rework after implementation
 
-Record rework according to the cell's status (see **rework-modes** in the SKILL.md knowledge).
+The index tracks **state only** — rework never adds work history to a status cell. Record rework per the cell's status (see **rework-modes** in the SKILL.md knowledge); the details (trigger, ADR focus, boundary, steps) live in the appended `## Rework <date>` section of `plan.md` / `context.md` — written by **plan-development-task**, never repeated in the index.
 
-**Post-merge (cell done)** — record without erasing history:
+**Post-merge (cell done)** — original cell unchanged, rework is its own cell:
 
-- Keep the original cell status **done** and append a **Rework** note, e.g. `Rework: F2-r1 · adr-wallet-01-payment-failure-handling.md focused spike · appended plan deliveries/<epic-name>/order-service/wallet-service/plan.md (## Rework 2026-08-08)`.
-- Add the rework as a new feature/cell (e.g., `F2-r1`) in a **new wave** after the original feature — it depends on the original cell's PR (already merged).
-- The appended plan lives at the end of the feature's existing `plan.md` (or a sibling `rework-plan.md`); implemented steps are never modified.
+- Keep the original cell exactly as-is (status **done**; no note, no history).
+- Add the rework as a new feature/cell (e.g., `F2-r1`) in a **new wave** after the original feature, with metadata `**Rework of**: F2`; it depends on the original cell's PR (already merged).
+- Its plan location points at the appended section: `deliveries/<epic-name>/order-service/wallet-service/plan.md (## Rework 2026-08-08)`.
 
-**Pre-merge (cell in-progress — implemented but not merged/committed/pushed)** — same append-only rule, no new feature/wave:
+**Pre-merge (cell in-progress — implemented but not merged/committed/pushed)** — no index change:
 
-- Keep the cell's identity and **in-progress** status; no new feature/wave.
-- Note the rework, e.g. `Rework: appended plan deliveries/<epic-name>/order-service/order-wallet-integration/plan.md (## Rework 2026-08-08)`.
-- A `## Rework <date>` section is appended to the existing `plan.md` (implemented steps never modified); the cell proceeds to push approval after the rework.
+- Keep the cell's identity and **in-progress** status; no new feature/wave, no note.
+- A `## Rework <date>` section is appended to the existing `plan.md` (implemented steps never modified) — that section is the record; the cell proceeds to push approval after the rework.

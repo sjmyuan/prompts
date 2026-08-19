@@ -65,11 +65,12 @@ Dispatch one agent per task, in parallel, subject to **develop-gating** (see **d
 <branch-and-push-conventions>
 Execution agents commit locally and small-step; pushing or opening PRs happens only after user confirmation.
 - One branch per repo per cell, named per the **repo's branch convention** (detect from existing branches / git config / team docs — or ask; never assume a prefix like `feat/`); created during the execution agent's **Prepare Environment** step.
+- The index records the branch up front and the PR reference (number/URL) once a PR is opened — pointers only, easy to track; work history stays in `plan.md` (see **delivery-index-format.md**).
 - Commit after each ✅ step, with no AI-related wording (see **execute-plan** commit-conventions).
 - A cell is **done** only after its PR merges or the user confirms the code is verified; pushing alone is not done.
 </branch-and-push-conventions>
 <rework-modes>
-Rework is **always append-only** — implemented steps never change, scoped to the cell only (usually its governing ADR), never the whole epic. Both modes append a `## Rework <date>` section to the existing `plan.md` (sibling `rework-plan.md` only if very long); execution runs **only** the appended steps; the index records the appended plan location + ADR focus.
+Rework is **always append-only** — implemented steps never change, scoped to the cell only (usually its governing ADR), never the whole epic. Both modes append a `## Rework <date>` section to the existing `plan.md` (sibling `rework-plan.md` only if very long); execution runs **only** the appended steps. The index records **state only** — the rework cell + its plan pointer; trigger, ADR focus, boundary, and steps live in `plan.md` / `context.md` (see **delivery-index-format.md**).
 
 | Mode | When | Handling |
 |---|---|---|
@@ -134,7 +135,7 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 4. Dispatch the POC follow-ups per **reference/poc-lifecycle.md**: the ADR agent (**adr-writer**) records the outcome in the ADR.
 5. On **adopted** — **POC-as-implementation**: ask before promoting/merging the branch, then mark the `replaces` cell **superseded**; **POC-as-decision-input**: dispatch the **poc-gated** feature with the decided option. On **rejected**: close the cell — archive or discard the branch (ask the user).
 6. When a cell's PR merges, re-check downstream cells — any now develop-ready (dependencies planned) or merge-ready (dependencies done) become dispatchable.
-7. Record the agent assignment, plan location, and branch name for each cell (per **branch-and-push-conventions**).
+7. Record the agent assignment, plan location, and branch name for each cell; record the PR reference (number/URL) once a PR is opened (per **branch-and-push-conventions**).
 8. Keep the index as the single source of truth; never leave status changes only in conversation.
 9. Verify the updated index against **reference/delivery-index-format.md** — status values, readiness, recorded branches, concise prose (see **concise-writing**).
 </update-delivery-index>
@@ -162,8 +163,8 @@ All prose in the delivery index follows **reference/writing-style.md** — table
    - **Plan**: dispatch the planning agent (**plan-development-task**) to append `## Rework <date>` — implemented steps never modified.
    - **Execute**: dispatch the execution agent (**execute-plan**) to run only the appended steps.
    - **Investigate**: dispatch the spike agent (**spike-conductor**) + ADR / solution-doc agent updates for post-merge; for pre-merge only if the issue challenges the governing ADR decision.
-4. Apply **update-delivery-index** — post-merge adds a new rework feature (e.g. `F2-r1`) in a new wave.
-5. For pre-merge, keep the rework on the same cell (no new feature/wave).
+4. Apply **update-delivery-index** — post-merge adds a new rework feature (e.g. `F2-r1`, `Rework of: F2`) in a new wave; the original cell's status stays **done**.
+5. For pre-merge, keep the rework on the same cell (no new feature/wave) — no index change; the appended `## Rework` section in `plan.md` is the record.
 6. Ask the user before pushing or opening a PR (per **branch-and-push-conventions**).
 </handle-post-implementation-issue>
 <define-poc-scope>

@@ -25,10 +25,12 @@
 
 ## 3. Update the delivery index
 
-| Cell | Status | Agent | Plan location |
-|---|---|---|---|
-| order-service/F2 | done · Rework: F2-r1 · adr-wallet-01-payment-failure-handling.md spike · appended plan | spike-conductor (rework) | deliveries/payment-migration/order-service/wallet-service/ |
-| order-service/F2-r1 | unplanned | — | deliveries/payment-migration/order-service/wallet-service/ (append) |
+| Cell | Branch | PR | Status | Agent | Plan location |
+|---|---|---|---|---|---|
+| order-service/F2 | 1234-f2-wallet | #42 (merged) | done | — | deliveries/payment-migration/order-service/wallet-service/ |
+| order-service/F2-r1 (Rework of F2) | — | — | unplanned | — | deliveries/payment-migration/order-service/wallet-service/plan.md (## Rework 2026-08-08) |
+
+The index records state + pointers — F2's status stays **done**, its branch + merged PR stay recorded; the rework's spike focus and steps live in the appended plan section (see §4).
 
 New **Wave 3**: `F2-r1` (after F2 merged). New change-summary items 9–11 trace to `adr-wallet-01-payment-failure-handling.md`.
 

@@ -30,11 +30,11 @@ Original steps 1–N remain byte-for-byte unchanged.
 
 ## 4. Update the index
 
-| Cell | Status | Agent | Plan location |
-|---|---|---|---|
-| order-service/F4 | in-progress · Rework: appended plan (## Rework 2026-08-08) | coding-assistant | deliveries/payment-migration/order-service/order-wallet-integration/ |
+| Cell | Branch | PR | Status | Agent | Plan location |
+|---|---|---|---|---|---|
+| order-service/F4 | 1234-f4 | — | in-progress | coding-assistant | deliveries/payment-migration/order-service/order-wallet-integration/ |
 
-`F4` keeps its identity and **in-progress** status — no `F4-r1`, no new wave.
+`F4` keeps its identity and **in-progress** status — no `F4-r1`, no new wave, and no index change; the appended `## Rework` section in `plan.md` is the only record of the rework.
 
 ## 5. Next actions
 
