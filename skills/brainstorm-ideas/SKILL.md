@@ -52,6 +52,7 @@ End the session with a structured, actionable plan. Details: [reference/plan-out
 |---|---|---|
 | Running a session on a new, unformed idea | End-to-end walkthrough of the full session | [examples/full-session-example.md](examples/full-session-example.md) |
 | Improving a rough existing idea with clear gaps | Walkthrough applying capabilities selectively | [examples/refining-existing-idea.md](examples/refining-existing-idea.md) |
+| Brainstorming a process or writing improvement, not a product | Full-session walkthrough on a writing topic | [examples/concise-document-writing.md](examples/concise-document-writing.md) |
 </context-loading-guide>
 </knowledge>
 
