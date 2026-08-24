@@ -11,6 +11,7 @@
 - `api-gateway/F3` — **failed** (compile errors; reason recorded)
 - `order-service/F4` — **unplanned** (wave 2, waits F2 + F3)
 - `api-gateway/F4` — **unplanned** (wave 2, waits F2 + F3)
+- **ADR currency**: confirmed with the user — no governing ADR changed since the last run.
 
 ## 2. Resume decisions
 
@@ -30,13 +31,13 @@
 
 ## 4. Update index
 
-| Cell | Branch | PR | Status | Agent | Location |
-|---|---|---|---|---|---|
-| shared-contracts/F1 | 1234-f1-contracts | #1 | done | agent-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
-| order-service/F2 | 1234-f2-wallet | — | in-progress (step 4 🔄) | agent-A | deliveries/payment-migration/order-service/wallet-service/ |
-| api-gateway/F3 | 1234-f3-gateway | — | failed (pending) | — | — |
-| order-service/F4 | — | — | unplanned (blocked-by F2/F3) | — | — |
-| api-gateway/F4 | — | — | unplanned (blocked-by F2/F3) | — | — |
+| Cell | Branch | PR | Commit | Status | Agent | Location |
+|---|---|---|---|---|---|---|
+| shared-contracts/F1 | 1234-f1-contracts | #1 | a1b2c3d | done | agent-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
+| order-service/F2 | 1234-f2-wallet | — | d4e5f6a | in-progress (step 4 🔄) | agent-A | deliveries/payment-migration/order-service/wallet-service/ |
+| api-gateway/F3 | 1234-f3-gateway | — | — | failed (pending) | — | — |
+| order-service/F4 | — | — | — | unplanned (blocked-by F2/F3) | — | — |
+| api-gateway/F4 | — | — | — | unplanned (blocked-by F2/F3) | — | — |
 
 ## 5. Reported to the user
 

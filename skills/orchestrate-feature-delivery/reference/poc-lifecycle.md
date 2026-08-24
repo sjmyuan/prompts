@@ -23,7 +23,7 @@ Rules for POC cells in `orchestrate-feature-delivery` (**define-poc-scope**).
 
 ## Decision gate
 
-The orchestrator never evaluates or decides. At **poc-ready**, the user reads the evaluation report vs **success-criteria** and records **adopted** or **rejected** directly in the index. Once recorded, the orchestrator reacts:
+The orchestrator never evaluates or decides. At **poc-ready**, the user reads the evaluation report vs **success-criteria** and records **adopted** or **rejected** directly in the index. If the governing ADR changes while the POC is in flight, its success criteria may be moot — surface the change to the user first (see **handle-adr-change**). Once recorded, the orchestrator reacts:
 
 1. Dispatch **adr-writer** (draft-adr) to record the outcome in the ADR.
 2. **Adopted** — apply the matching adoption model below.

@@ -19,9 +19,9 @@
 
 ## 3. Collect + update index
 
-| Cell | Branch | PR | Status | Agent | Location |
-|---|---|---|---|---|---|
-| shared-contracts/F1 | 1234-f1-contracts | — | **planned** | agent-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
+| Cell | Branch | PR | Commit | Status | Agent | Location |
+|---|---|---|---|---|---|---|
+| shared-contracts/F1 | 1234-f1-contracts | — | — | **planned** | agent-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
 
 F2 and F3 become develop-ready (F1 planned; contract-first allows planning in parallel).
 
@@ -37,13 +37,13 @@ F1's execution completes. Per **branch-and-push-conventions**, the branch is pus
 
 ## 6. Collect + update index
 
-| Cell | Branch | PR | Status | Agent | Location |
-|---|---|---|---|---|---|
-| shared-contracts/F1 | 1234-f1-contracts | #1 | **done** (PR merged after approval) | agent-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
-| order-service/F2 | 1234-f2-wallet | — | **planned** | agent-B | deliveries/payment-migration/order-service/wallet-service/ |
-| api-gateway/F3 | 1234-f3-gateway | — | **planned** | agent-C | deliveries/payment-migration/api-gateway/wallet-api-gateway/ |
-| order-service/F4 | — | — | unplanned | — | — |
-| api-gateway/F4 | — | — | unplanned | — | — |
+| Cell | Branch | PR | Commit | Status | Agent | Location |
+|---|---|---|---|---|---|---|
+| shared-contracts/F1 | 1234-f1-contracts | #1 | a1b2c3d | **done** (PR merged after approval) | agent-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
+| order-service/F2 | 1234-f2-wallet | — | — | **planned** | agent-B | deliveries/payment-migration/order-service/wallet-service/ |
+| api-gateway/F3 | 1234-f3-gateway | — | — | **planned** | agent-C | deliveries/payment-migration/api-gateway/wallet-api-gateway/ |
+| order-service/F4 | — | — | — | unplanned | — | — |
+| api-gateway/F4 | — | — | — | unplanned | — | — |
 
 ## 7. Next actions
 

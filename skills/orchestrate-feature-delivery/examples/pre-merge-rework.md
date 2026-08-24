@@ -47,9 +47,9 @@ Original `plan.md` steps 1–N remain byte-for-byte unchanged.
 
 ## 4. Update the index
 
-| Cell | Branch | PR | Status | Agent | Plan location |
-|---|---|---|---|---|---|
-| order-service/F4 | 1234-f4 | — | in-progress | coding-assistant | deliveries/payment-migration/order-service/order-wallet-integration/ |
+| Cell | Branch | PR | Commit | Status | Agent | Plan location |
+|---|---|---|---|---|---|---|
+| order-service/F4 | 1234-f4 | — | d4e5f6a | in-progress | coding-assistant | deliveries/payment-migration/order-service/order-wallet-integration/ |
 
 `F4` keeps its identity and **in-progress** status — no `F4-r1`, no new wave, and no index change; the sibling `rework-2026-08-08.md` (listed in the `context.md` manifest) is the only record of the rework.
 

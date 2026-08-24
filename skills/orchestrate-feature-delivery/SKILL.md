@@ -11,6 +11,7 @@ description: Orchestrate spiked-epic delivery via dispatched agents and a tracki
 - User wants to resume or continue delivery of an existing spiked epic — load the index and derive next actions from its status
 - User wants to review or update the delivery index status (cells planned / in-progress / done / failed / blocked)
 - User found an issue after a feature was implemented (a cell is done, or implemented but not yet pushed/merged) and wants rework — focused spike on the governing ADR, a sibling rework file, and its execution
+- User reports an ADR decision changed mid-delivery — re-route the cells governed by it (see **handle-adr-change**)
 - User wants suggestions for which skill handles each part of a rework (spike, ADR update, rework plan, execution)
 - Do NOT load before a spike's change summary / solution doc exists — let conduct-spike produce them first
 - Do NOT load to plan or execute a single, already-scoped change — plan-development-task and execute-plan handle single cells
@@ -67,8 +68,9 @@ Dispatch one agent per task in parallel, subject to **develop-gating** (see **de
 Execution agents commit locally and small-step; pushing or opening PRs happens only after user confirmation.
 - One branch per repo per cell, named per the **repo's branch convention** (detect from existing branches / git config / team docs — or ask; never assume a prefix like `feat/`); created during the execution agent's **Prepare Environment** step.
 - The index records the branch up front and the PR reference (number/URL) once a PR is opened — pointers only, easy to track; work history stays in `plan.md` (see **delivery-index-format.md**).
+- The index records the **head commit** from the execution handoff — a pointer like Branch/PR.
 - Commit after each ✅ step, with no AI-related wording (see **execute-plan** commit-conventions).
-- A cell is **done** only after its PR merges or the user confirms the code is verified; pushing alone is not done.
+- A cell is **done** only after its PR merges with the recorded head commit included, or the user confirms the code is verified; pushing alone is not done.
 </branch-and-push-conventions>
 <rework-modes>
 Rework is **always append-only** — implemented steps never change; scoped to the cell (usually its governing ADR), never the whole epic. Each rework is a sibling `rework-<date>.md` — `plan.md` stays the frozen original. Execution runs **only** the rework file's steps. `context.md` holds a `## Reworks` manifest (date, mode, cell, file, status) so resume finds the active file. The index records **state only** — the rework cell + plan pointer; details live in the rework file (see **delivery-index-format.md**).
@@ -77,7 +79,12 @@ Rework is **always append-only** — implemented steps never change; scoped to t
 |---|---|---|
 | **Post-merge** | cell **done** (merged/verified) | focused spike (**conduct-spike**) + ADR / solution-doc updates; new rework feature (e.g. `F2-r1`) in a new wave |
 | **Pre-merge** | cell **in-progress** (implemented, not pushed/merged) | spike + ADR / solution-doc updates only if the issue challenges the ADR decision; rework stays on the same cell — rework steps merge with the original work |
+
+- **Rework lineage**: `F2-r1` reworks `F2`; `F2-r2` reworks `F2-r1` (latest delivered state); `Rework of:` names it. Rework files key by date — same-day collision suffix `-2`, `-3`. The `## Reworks` manifest is the canonical chain.
 </rework-modes>
+<adr-drift>
+ADRs are **versionless** — drift is signaled by the **adr-writer** agent's return or the user's report, never by diffing the ADR file. Route governed cells by status per the **ADR changes** section in **reference/orchestration-guide.md**.
+</adr-drift>
 <concise-writing>
 All prose in the delivery index follows **reference/writing-style.md** — table-first, one-line Summary, atomic bullets, one-sentence feature descriptions, no process narration, So-what test. **rewrite-concise** is the mandatory final gate: move facts to tables, then shorten to the shortest faithful form — never present prose that fails a cap.
 </concise-writing>
@@ -97,6 +104,8 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 | Running a full POC round (compare POCs → user-recorded decision → adopt/reject) | End-to-end POC walkthrough | [examples/adr-option-poc.md](examples/adr-option-poc.md) |
 | Writing or updating the delivery index prose | BLUF rules, rewrite transforms, banned-phrase list | [reference/writing-style.md](reference/writing-style.md) |
 | Rewriting wordy index prose to its shortest faithful form | Move-then-shorten walkthrough, before/after model | [examples/concise-rewrite.md](examples/concise-rewrite.md) |
+| Handling an ADR change mid-delivery (cells at any status) | ADR-change routing + resume currency check | [reference/orchestration-guide.md](reference/orchestration-guide.md) |
+| ADR change mid-delivery with mixed statuses | done / planned / in-progress walkthrough | [examples/adr-change-mid-delivery.md](examples/adr-change-mid-delivery.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -139,8 +148,8 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 6. On **adopted** — **POC-as-implementation**: ask before promoting/merging the branch, then mark the `replaces` cell **superseded**.
 7. On **adopted** — **POC-as-decision-input**: dispatch the **poc-gated** feature with the decided option.
 8. On **rejected**: close the cell — archive or discard the branch (ask the user).
-9. When a cell's PR merges, re-check downstream cells — any now develop-ready (dependencies planned) or merge-ready (dependencies done) become dispatchable.
-10. Record the agent assignment, plan location, and branch name for each cell; record the PR reference (number/URL) once a PR is opened (per **branch-and-push-conventions**).
+9. When a cell's PR merges, confirm the recorded head commit is in the merged PR before marking **done** (see **branch-and-push-conventions**); then re-check downstream cells — any now develop-ready (dependencies planned) or merge-ready (dependencies done) become dispatchable.
+10. Record the agent assignment, plan location, branch name, and the **head commit** from the execution handoff for each cell; record the PR reference (number/URL) once a PR is opened (per **branch-and-push-conventions**).
 11. Keep the index as the single source of truth; never leave status changes only in conversation.
 12. Verify the updated index against **reference/delivery-index-format.md** — status values, readiness, recorded branches — then apply **rewrite-concise**.
 </update-delivery-index>
@@ -158,9 +167,10 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 </orchestrate-delivery>
 <resume-delivery>
 1. Load the existing delivery index plus the spike output.
-2. Determine the current state: completed waves (skip), in-progress cells (resume from the last step in `plan.md`), failed cells (ask the user to re-plan or retry), blocked cells (wait for the blocker), unplanned cells (plan next).
-3. Apply **orchestrate-delivery** from that state — never redo completed work.
-4. Tell the user exactly what is resumed vs skipped before dispatching.
+2. Confirm ADR currency with the user — if any governing ADR changed since the last run, apply **handle-adr-change** first.
+3. Determine the current state: completed waves (skip), in-progress cells (resume from the last step in `plan.md`), failed cells (ask the user to re-plan or retry), blocked cells (wait for the blocker), unplanned cells (plan next).
+4. Apply **orchestrate-delivery** from that state — never redo completed work.
+5. Tell the user exactly what is resumed vs skipped before dispatching.
 </resume-delivery>
 <handle-post-implementation-issue>
 1. Identify the affected cell, its governing ADR, and its status — **done** (merged/verified) or **in-progress** (implemented, not pushed/merged).
@@ -173,6 +183,12 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 5. For pre-merge, keep the rework on the same cell (no new feature/wave) — no index change; the sibling `rework-<date>.md` is the record.
 6. Ask the user before pushing or opening a PR (per **branch-and-push-conventions**).
 </handle-post-implementation-issue>
+<handle-adr-change>
+1. Confirm the changed ADR and its new decision — from the user or the **adr-writer** agent's return (see **adr-drift**).
+2. List the cells governed by that ADR from the index's per-feature `ADRs:` entries.
+3. Route each by status per **reference/orchestration-guide.md** (ADR changes) — planned → re-plan (**plan-development-task**); in-progress → pre-merge rework; done → post-merge rework; surface in-flight POCs.
+4. Apply **update-delivery-index** and **rewrite-concise**; present routing and confirm before dispatching.
+</handle-adr-change>
 <define-poc-scope>
 1. During **decompose-change-into-features**, when an ADR option needs proof before a decision, flag the mapped cell `type: poc`.
 2. Fill the POC metadata per **poc-definition**: `adr`, `option`, `success-criteria`, `replaces` (if it may supersede an existing implementation), `compare` (sibling POC cells for other options).
@@ -202,6 +218,7 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 <rule> When dispatching any delivery task (plan, execute, solution-doc update, or ADR update), always dispatch the owning agent per **agent-dispatch** — never perform the task directly. </rule>
 <rule> When the user asks about a single cell's plan or status, read the delivery index and route the cell to **plan-development-task** or **execute-plan** — do not re-run the whole orchestration. </rule>
 <rule> When an issue surfaces after a feature was implemented (a cell is **done** or **in-progress** — implemented but not pushed/merged), apply **handle-post-implementation-issue** — never re-run **decompose-change-into-features** on the whole epic. </rule>
+<rule> When the user reports an ADR change or an **adr-writer** agent returns a revision, apply **handle-adr-change** — never dispatch a planned cell on a stale decision. </rule>
 <rule> When decomposing change items and an ADR option needs proof before a decision, apply **define-poc-scope** to flag and sequence POC cells. </rule>
 <rule> When a POC cell reaches **poc-ready**, do not evaluate or decide — wait for the user to record **adopted**/**rejected** directly in the index. </rule>
 <rule> When the user records a POC decision (**adopted**/**rejected**) in the index, apply **update-delivery-index** to record it and dispatch the follow-ups (ADR update, branch promotion, **poc-gated** feature). </rule>

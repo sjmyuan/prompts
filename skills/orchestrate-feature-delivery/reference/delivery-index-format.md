@@ -59,14 +59,14 @@ deliveries/<epic-name>/               # one folder per epic (no docs/ prefix)
 - F2 (after F1 merges)
 
 ## Cell plan status
-| Cell | Branch | PR | Status | Agent | Plan location |
-|---|---|---|---|---|---|
-| repo-a/F1 | 1234-f1-api | — | planned | agent-A | deliveries/<epic-name>/repo-a/wallet-contracts/ |
-| repo-b/F2 | f2-schema | #42 | in-progress | agent-B | deliveries/<epic-name>/repo-b/wallet-service/ |
-| repo-c/F4 | — | — | unplanned | — | — |
+| Cell | Branch | PR | Commit | Status | Agent | Plan location |
+|---|---|---|---|---|---|---|
+| repo-a/F1 | 1234-f1-api | — | — | planned | agent-A | deliveries/<epic-name>/repo-a/wallet-contracts/ |
+| repo-b/F2 | f2-schema | #42 | e5f6a7b | in-progress | agent-B | deliveries/<epic-name>/repo-b/wallet-service/ |
+| repo-c/F4 | — | — | — | unplanned | — | — |
 ```
 
-Plan locations use the feature's **kebab-case name** (e.g. `wallet-contracts` for F1), never its ID (`F1`). **Branch** and **PR** are pointers — always tracked in the index (easy to find, easy to verify); work history stays in `plan.md` / `context.md`. The branch is recorded when the cell is planned; the PR reference (number or URL) is filled in once a PR is opened — `—` until then.
+Plan locations use the feature's **kebab-case name** (e.g. `wallet-contracts` for F1), never its ID (`F1`). **Branch**, **PR**, and **Commit** are pointers — always tracked in the index (easy to find, easy to verify); work history stays in `plan.md` / `context.md`. The branch is recorded when the cell is planned; the **Commit** (head commit from the execution handoff) once the cell first commits; the PR reference (number or URL) once a PR is opened — `—` until then. A cell is **done** only when its merged PR includes the recorded head commit (or the user confirms verified).
 
 ## Per-cell scope brief
 
@@ -80,12 +80,13 @@ Each cell carries a brief that seeds **plan-development-task**:
 - **Constraints**: one PR per repo per feature (soft — may merge with other features when convenient)
 - **Branch**: the branch name to use for this cell, matching the **repo's branch convention** (per **branch-and-push-conventions**); created during the agent's Prepare Environment step, pushed only after user confirmation
 - **PR**: the pull-request reference (number or URL) to record in the index once the PR is opened (per **branch-and-push-conventions**); `—` until then
+- **Commit**: the head commit the execution agent reports on handoff, recorded in the index (per **branch-and-push-conventions**); `—` until the first commit
 
 ## Status lifecycle
 
 - **unplanned** → **planned**: a planning agent wrote `plan.md` + `context.md`
 - **planned** → **in-progress**: an execution agent started
-- **in-progress** → **done**: PR merged / code verified
+- **in-progress** → **done**: PR merged (with the recorded head commit) / code verified
 - POC cells: **in-progress** → **poc-ready** (evaluation report written) → **adopted** (promote → merge → done) or **rejected** (closed); a replaced feature is marked **superseded**
 - any → **failed** (reason): recover by re-plan or retry
 - any → **blocked** (blocker): waits for a dependency merge or user decision
@@ -107,7 +108,7 @@ Each cell carries a brief that seeds **plan-development-task**:
 | **adopted** | POC proved the option | Promote (merge → done) or feed the **poc-gated** feature |
 | **rejected** | POC failed the criteria | Close the cell; delivery proceeds on the other option |
 | **superseded** | Existing implementation replaced by an adopted POC | Skip; keep as history |
-| **done** | Merged / verified (PR reference recorded) | Skip; unlock downstream cells |
+| **done** | Merged / verified (PR + head commit recorded) | Skip; unlock downstream cells |
 | **failed** | Agent error (reason recorded) | Ask user: re-plan or retry |
 | **blocked** | Waiting on blocker (recorded) | Wait; re-check when blocker clears |
 
@@ -119,6 +120,10 @@ A POC proves one option of one ADR as a **standalone feature** (see **poc-defini
 - **Decision gate**: at **poc-ready**, the user reads the evaluation report vs success criteria and records **adopted**/**rejected** directly in the index — the orchestrator never evaluates or decides; the ADR records the outcome.
 - **Adopt**: **POC-as-implementation** — promote the branch (merge → done; mark `replaces` **superseded**); **POC-as-decision-input** — close the POC, dispatch the **poc-gated** feature with the decided option.
 - **Reject**: close the cell (branch archived or discarded); delivery proceeds on the other option.
+
+## ADR changes mid-delivery
+
+ADRs are **versionless** — drift is signaled by the **adr-writer** agent's return or the user's report, never by diffing the ADR. Routing by status: **reference/orchestration-guide.md** (ADR changes). Record each cell's re-route (status + note) in the index before dispatching.
 
 ## Rework after implementation
 

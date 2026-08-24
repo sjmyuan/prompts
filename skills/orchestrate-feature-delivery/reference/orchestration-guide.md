@@ -24,7 +24,7 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
   - **No conflict in parallel**: never run two cells that touch the same repo with a conflict edge at the same time — serialize them.
   - **Capacity**: match the number of parallel agents to what the platform supports; ask the user when unsure.
 - Use the platform's agent/sub-agent mechanism — detect what is available (e.g., coding-assistant agents) and dispatch accordingly.
-- **Branches**: one branch per repo per cell, named to match the **repo's branch convention** (detect from existing branches / git config / team docs, or ask the user — never assume a prefix); the branch is recorded in the delivery index and included in the agent brief (the PR reference is recorded once opened); execution agents create the branch during their Prepare Environment step and commit small-step locally (see **branch-and-push-conventions**).
+- **Branches**: one branch per repo per cell, named to match the **repo's branch convention** (detect from existing branches / git config / team docs, or ask the user — never assume a prefix); the branch is recorded in the delivery index and included in the agent brief (the PR reference is recorded once opened); execution agents create the branch during their Prepare Environment step and commit small-step locally (see **branch-and-push-conventions**). The **head commit** from each execution handoff is recorded in the index (a pointer, like Branch/PR).
 - **Push gating**: never push a branch or open a PR automatically — after a cell's work is complete and ready to integrate, ask the user for confirmation first.
 
 ## Orchestration loop
@@ -38,12 +38,26 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 
 ## Status updates
 
-- After every agent result, update the cell status; when a PR is opened, record its reference in the index; when it merges, mark its cell **done** and re-check downstream cells for develop/merge-readiness.
+- After every agent result, update the cell status; record the **head commit** from each execution handoff; when a PR is opened, record its reference; when it merges, confirm the recorded head commit is in the merged PR before marking **done**, then re-check downstream cells for develop/merge-readiness.
 - Never let conversation text be the source of truth — the delivery index is.
+
+## ADR changes
+
+ADRs are **versionless** — drift is signaled by the **adr-writer** agent's return or the user's report, never by diffing the ADR (see **handle-adr-change**). Route governed cells by status:
+
+| Status | Route |
+|---|---|
+| unplanned | no action — planned against the current ADR when dispatched |
+| planned | re-plan in place (**plan-development-task**) — nothing implemented, no history to preserve |
+| in-progress | pre-merge rework if the change touches the cell's decision (sibling `rework-<date>.md`) |
+| done | post-merge rework (new rework feature `F2-r1`) |
+| poc cell | surface to the user — the change may invalidate success criteria |
+
+Never dispatch a planned cell on a stale decision.
 
 ## Resume
 
-- On resume, load the index: completed waves are skipped; in-progress cells resume from the last step in the active `rework-<date>.md` (or `plan.md` if no rework — see the `context.md` manifest); failed cells are re-planned or retried with the user; blocked cells wait for their blocker.
+- On resume, confirm ADR currency with the user first — if a governing ADR changed, apply **handle-adr-change** before resuming. Then load the index: completed waves are skipped; in-progress cells resume from the last step in the active `rework-<date>.md` (or `plan.md` if no rework — see the `context.md` manifest); failed cells are re-planned or retried with the user; blocked cells wait for their blocker.
 - Report what is resumed vs skipped before dispatching.
 
 ## Failure handling
@@ -77,6 +91,8 @@ Two modes, chosen by the cell's status (see **rework-modes** in the SKILL.md kno
 4. **Write the rework plan**: dispatch **plan-development-task** (coding-assistant) to write a sibling `rework-<date>.md` in the feature folder — `plan.md` stays the frozen original, implemented steps never modified.
 5. **Execute the rework plan**: dispatch **execute-plan** (coding-assistant) to run only the new rework steps.
 6. Update the index; ask the user before pushing / opening a PR.
+
+**Rework lineage**: rework features chain to the state they rework — `F2-r1` reworks `F2`; `F2-r2` reworks `F2-r1` (the latest delivered state); `Rework of:` names that state. Rework files key by date — on a same-day collision suffix `-2`, `-3` (`rework-2026-08-24-2.md`). The `context.md` `## Reworks` manifest is the canonical chain.
 
 **Pre-merge** (cell **in-progress** — implemented but not pushed/merged): nothing is merged yet, same append-only rule.
 

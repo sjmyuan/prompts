@@ -21,12 +21,12 @@ I dispatched agent-A to plan shared-contracts/F1, and it was successful, so F1 i
 5 features · 3 repos · 3 waves · critical path: F1 → F2/F3 → F4
 
 ## Cell plan status
-| Cell | Branch | PR | Status | Agent | Plan location |
-|---|---|---|---|---|---|
-| shared-contracts/F1 | 1234-f1 | — | planned | agent-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
-| order-service/F2 | f2-svc | — | in-progress | agent-B | deliveries/payment-migration/order-service/wallet-service/ |
-| api-gateway/F3 | — | — | unplanned | — | — |
-| order-service/F4 | — | — | unplanned | — | — |
+| Cell | Branch | PR | Commit | Status | Agent | Plan location |
+|---|---|---|---|---|---|---|
+| shared-contracts/F1 | 1234-f1 | — | — | planned | agent-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
+| order-service/F2 | f2-svc | — | c3d4e5f | in-progress | agent-B | deliveries/payment-migration/order-service/wallet-service/ |
+| api-gateway/F3 | — | — | — | unplanned | — | — |
+| order-service/F4 | — | — | — | unplanned | — | — |
 ```
 
 ## What moved

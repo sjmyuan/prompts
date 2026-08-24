@@ -25,10 +25,10 @@
 
 ## 3. Update the delivery index
 
-| Cell | Branch | PR | Status | Agent | Plan location |
-|---|---|---|---|---|---|
-| order-service/F2 | 1234-f2-wallet | #42 (merged) | done | — | deliveries/payment-migration/order-service/wallet-service/ |
-| order-service/F2-r1 (Rework of F2) | — | — | unplanned | — | deliveries/payment-migration/order-service/wallet-service/rework-2026-08-08.md |
+| Cell | Branch | PR | Commit | Status | Agent | Plan location |
+|---|---|---|---|---|---|---|
+| order-service/F2 | 1234-f2-wallet | #42 (merged) | e5f6a7b | done | — | deliveries/payment-migration/order-service/wallet-service/ |
+| order-service/F2-r1 (Rework of F2) | — | — | — | unplanned | — | deliveries/payment-migration/order-service/wallet-service/rework-2026-08-08.md |
 
 The index records state + pointers — F2's status stays **done**, its branch + merged PR stay recorded; the rework's spike focus and steps live in the sibling rework file (see §4).
 

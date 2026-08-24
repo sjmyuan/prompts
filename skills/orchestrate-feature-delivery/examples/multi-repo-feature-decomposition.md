@@ -52,15 +52,15 @@ Written to `deliveries/payment-migration/index.md` (see **delivery-layout**); pl
 - **ADRs**: spikes/payment-migration/adrs/adr-wallet-01-payment-failure-handling.md · adr-cutover-01-service-cutover.md
 
 ## Cell plan status
-| Cell | Branch | PR | Status | Agent | Plan location |
-|---|---|---|---|---|---|
-| shared-contracts/F1 | — | — | unplanned | — | — |
-| order-service/F2 | — | — | unplanned | — | — |
-| api-gateway/F3 | — | — | unplanned | — | — |
-| order-service/F4 | — | — | unplanned | — | — |
-| api-gateway/F4 | — | — | unplanned | — | — |
+| Cell | Branch | PR | Commit | Status | Agent | Plan location |
+|---|---|---|---|---|---|---|
+| shared-contracts/F1 | — | — | — | unplanned | — | — |
+| order-service/F2 | — | — | — | unplanned | — | — |
+| api-gateway/F3 | — | — | — | unplanned | — | — |
+| order-service/F4 | — | — | — | unplanned | — | — |
+| api-gateway/F4 | — | — | — | unplanned | — | — |
 ```
 
-Branches are assigned when a cell is planned (per **branch-and-push-conventions**) and recorded in the index — the Branch column is empty here because all 5 cells start **unplanned**.
+Branches are assigned when a cell is planned and the head **Commit** is recorded on the first execution handoff (per **branch-and-push-conventions**) — both columns are empty here because all 5 cells start **unplanned**.
 
 All 5 cells start **unplanned** → the epic is now driven by **orchestrate-delivery** (see **examples/orchestration-round.md**): wave 0 dispatches `shared-contracts/F1`, then F2/F3 in parallel, then F4.
