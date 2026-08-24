@@ -79,7 +79,7 @@ Rework is **always append-only** — implemented steps never change; scoped to t
 | **Pre-merge** | cell **in-progress** (implemented, not pushed/merged) | spike + ADR / solution-doc updates only if the issue challenges the ADR decision; rework stays on the same cell — rework steps merge with the original work |
 </rework-modes>
 <concise-writing>
-All prose in the delivery index follows **reference/writing-style.md** — table-first, one-line Summary, atomic bullets, one-sentence feature descriptions, no process narration, So-what test.
+All prose in the delivery index follows **reference/writing-style.md** — table-first, one-line Summary, atomic bullets, one-sentence feature descriptions, no process narration, So-what test. **rewrite-concise** is the mandatory final gate: move facts to tables, then shorten to the shortest faithful form — never present prose that fails a cap.
 </concise-writing>
 <context-loading-guide>
 | Load when | Provides | File |
@@ -95,7 +95,8 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 | Distinguishing parallel vs merge-blocked features | Dependency-ordering-focused example | [examples/parallel-vs-sequential-waves.md](examples/parallel-vs-sequential-waves.md) |
 | Marking, sequencing, or gating POC cells, or handling a user-recorded POC decision | POC definition, lifecycle, adoption models | [reference/poc-lifecycle.md](reference/poc-lifecycle.md) |
 | Running a full POC round (compare POCs → user-recorded decision → adopt/reject) | End-to-end POC walkthrough | [examples/adr-option-poc.md](examples/adr-option-poc.md) |
-| Writing or updating the delivery index prose | BLUF rules, one-line Summary, atomic bullets, banned-phrase list | [reference/writing-style.md](reference/writing-style.md) |
+| Writing or updating the delivery index prose | BLUF rules, rewrite transforms, banned-phrase list | [reference/writing-style.md](reference/writing-style.md) |
+| Rewriting wordy index prose to its shortest faithful form | Move-then-shorten walkthrough, before/after model | [examples/concise-rewrite.md](examples/concise-rewrite.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -126,7 +127,7 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 2. Include the **Spike References** block: change summary file, ADR files, solution-doc sections.
 3. Create per-repo plan folders in the **repo-first** layout: `deliveries/<epic-name>/{repo}/{feature-name}/plan.md` + `context.md` (see **delivery-layout**).
 4. Mark each cell's initial status **unplanned** and its plan location.
-5. Verify the index against **reference/delivery-index-format.md** — structure, status values, develop/merge readiness, concise prose (see **concise-writing**).
+5. Verify the index against **reference/delivery-index-format.md** — structure, status values, develop/merge readiness — then apply **rewrite-concise** as the final prose gate (see **concise-writing**).
 6. Confirm the index location with the user — from here the epic is driven by **orchestrate-delivery**.
 </produce-delivery-index>
 <update-delivery-index>
@@ -141,7 +142,7 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 9. When a cell's PR merges, re-check downstream cells — any now develop-ready (dependencies planned) or merge-ready (dependencies done) become dispatchable.
 10. Record the agent assignment, plan location, and branch name for each cell; record the PR reference (number/URL) once a PR is opened (per **branch-and-push-conventions**).
 11. Keep the index as the single source of truth; never leave status changes only in conversation.
-12. Verify the updated index against **reference/delivery-index-format.md** — status values, readiness, recorded branches, concise prose (see **concise-writing**).
+12. Verify the updated index against **reference/delivery-index-format.md** — status values, readiness, recorded branches — then apply **rewrite-concise**.
 </update-delivery-index>
 <orchestrate-delivery>
 1. Load the delivery index — or create it first via **decompose-change-into-features** → **map-features-to-repos** → **order-feature-delivery** → **produce-delivery-index** if it does not exist.
@@ -178,6 +179,19 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 3. Sequence POC cells **early** (Wave 0) — run `compare` siblings in parallel; add a **poc-gated** edge from the implementing feature to its POC cell.
 4. Present the POC cells and success criteria to the user and confirm before recording them in the index.
 </define-poc-scope>
+<rewrite-concise>
+**Objective**: Rewrite any target doc's prose to the shortest form that preserves all facts — the mandatory final gate before presenting or confirming the delivery index.
+
+**Note**: An internal pass — show only the rewritten result, never the process or a before/after unless the user asks. Facts outrank brevity: never drop a fact to hit a cap.
+
+**Steps**:
+1. Draft freely — do not self-edit while writing.
+2. Treat every sentence as suspicious; scan and label each violation class per **reference/writing-style.md** (filler, redundancy, hedge, narration, multi-claim, over-cap).
+3. **Move-then-shorten**: if a fact belongs in a table (status, wave, dependency, PR), move it there first, then shorten what remains.
+4. Apply the class-specific transforms per **reference/writing-style.md**.
+5. Apply the **So-what test** — delete any sentence that adds no fact; do not reword it.
+6. Re-scan against the hard caps; loop until zero violations (max 2 passes).
+</rewrite-concise>
 
 </capabilities>
 
@@ -191,5 +205,6 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 <rule> When decomposing change items and an ADR option needs proof before a decision, apply **define-poc-scope** to flag and sequence POC cells. </rule>
 <rule> When a POC cell reaches **poc-ready**, do not evaluate or decide — wait for the user to record **adopted**/**rejected** directly in the index. </rule>
 <rule> When the user records a POC decision (**adopted**/**rejected**) in the index, apply **update-delivery-index** to record it and dispatch the follow-ups (ADR update, branch promotion, **poc-gated** feature). </rule>
+<rule> When presenting or confirming any delivery index (new or updated), apply **rewrite-concise** as the final gate — never present a draft that fails a **writing-style.md** cap. </rule>
 
 </rules>
