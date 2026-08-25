@@ -2,7 +2,7 @@
 
 **Scenario**: A user has a finalized solution decision for migrating their monolithic e-commerce platform to a microservices architecture and wants to produce a complete solution document covering all nine sections. The user starts from scratch with no pre-existing content.
 
-**Applies**: Capabilities 1, 2, and 10 in detail, with truncated output for capabilities 3–9 — demonstrates the end-to-end sequencing pattern including both sequence diagrams and flowcharts where appropriate.
+**Applies**: `clarify-business-context`, `draw-c4-topology`, and `structure-solution-doc` in detail, with truncated output for the other capabilities — demonstrates the end-to-end sequencing pattern including both sequence diagrams and flowcharts where appropriate.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: write-solution-doc
-description: Produce solution documentation with C4 diagrams, sequence/flowchart diagrams, API contracts, RAID analysis, and RACI matrices. Use when documenting, writing, or authoring a solution decision, architecture, or technical document; producing C4/sequence/flowchart diagrams; defining API/event schemas; performing RAID analysis; creating RACI matrices; or compiling a multi-section solution document.
+description: Produce solution documentation with C4/sequence/flowchart diagrams, API/event schemas, RAID, and RACI — for decisions, architectures, and current-state findings. Use when documenting, authoring, producing, defining, performing, creating, or compiling solution-doc content.
 ---
 
 <when-to-use-this-skill>
@@ -21,7 +21,7 @@ A complete solution document has 9 sections, produced in order: Business Context
 </solution-doc-structure>
 
 <current-state-mode>
-The same 9-section format also documents the **current state** (as-is findings docs) and supports compiling a **target-state** document from a current-state baseline. Load **reference/current-state-mode.md** when producing a current-state document or evolving a baseline as-is → to-be.
+The same 9-section format also documents the **current state** (as-is findings docs) and supports compiling a **target-state** document from a current-state baseline. Load **reference/current-state-mode.md** when producing a current-state document or evolving a baseline as-is → to-be. When embedded in a `conduct-spike` dispatch, also load **reference/seed-input-contract.md** for the seed, return, and guard contract.
 </current-state-mode>
 
 <c4-model>
@@ -61,7 +61,7 @@ The assistant supports both English and Chinese (中文) output:
 </bilingual-support>
 
 <concise-writing>
-All solution-doc prose follows BLUF (conclusion first), hard caps, atomic bullets, diagrams-and-tables-over-prose, and single-source-of-truth. Every heading's first line is a bolded one-line takeaway; no banned phrases; every sentence passes the reader-anchored "so what?" test — it must add a fact a reader needs to understand, implement, or maintain the solution. Finish with a delete-by-default pass (cut ~20%) before presenting. Load **reference/writing-style.md** for the full rules (caps table, banned-phrase list, sentence surgery).
+All solution-doc prose follows BLUF, hard caps, atomic bullets, diagrams-and-tables-over-prose, and single-source-of-truth, plus a delete-by-default pass (~20% cut) before presenting. Details: [reference/writing-style.md](reference/writing-style.md)
 </concise-writing>
 
 <context-loading-guide>
@@ -73,10 +73,8 @@ All solution-doc prose follows BLUF (conclusion first), hard caps, atomic bullet
 | User needs API/event contract definitions | Detailed API schema and event schema design output | [examples/api-contracts.md](examples/api-contracts.md) |
 | User needs to list related documents, external deps, and maintainers | Document-listing and dependency-tracking workflow | [examples/dependencies-and-maintainers.md](examples/dependencies-and-maintainers.md) |
 | Writing Mermaid diagrams (C4, sequence, flowchart) | Diagram syntax, formatting rules, and conventions for all diagram types | [reference/mermaid-standards.md](reference/mermaid-standards.md) |
-| Choosing the right diagram type for an interaction, or normalizing existing diagrams | Full decision matrix, interop rules, and decision rule | [reference/diagram-selection-guide.md](reference/diagram-selection-guide.md) |
-| Compiling the final document or recalling section order | 9-section description and Markdown template | [reference/solution-doc-structure.md](reference/solution-doc-structure.md) |
 | Producing a current-state (as-is) document, or evolving a current-state baseline into a target-state (to-be) document | Current-state mode and baseline-input rules — diagram labeling, RAID/RACI substitution, as-is → to-be evolution | [reference/current-state-mode.md](reference/current-state-mode.md) |
-| Writing or reviewing any solution-doc prose | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets, single source of truth, reader-anchored "so what?" test | [reference/writing-style.md](reference/writing-style.md) |
+| Embedding the skill in a sub-agent dispatch (conduct-spike / solution-doc-writer) | Seed input schema, guard clause, and return contract | [reference/seed-input-contract.md](reference/seed-input-contract.md) |
 | User corrects content or new findings emerge mid-session and diagrams need to stay current | Walkthrough of **sync-diagrams** updating affected diagrams and adding new ones | [examples/diagram-sync.md](examples/diagram-sync.md) |
 
 </context-loading-guide>
@@ -220,11 +218,9 @@ All solution-doc prose follows BLUF (conclusion first), hard caps, atomic bullet
 
 <rule>Follow the documentation sequence strictly unless the user explicitly requests a different order or asks to skip a section. The default sequence is: clarify-business-context → draw-c4-topology → draw-interaction-diagrams → design-api-event-schema → list-related-documents → list-external-dependencies → list-maintainers → list-raids → list-raci → structure-solution-doc. **sync-diagrams** is cross-cutting — it is not part of the sequence and applies on any correction or new finding.</rule>
 
-<rule>When feedback on a capability's output changes any confirmed content → apply **sync-diagrams** to keep the diagrams current before continuing the sequence.</rule>
+<rule>When feedback on a capability's output or a user correction changes any previously confirmed content (topology, interactions, schemas, dependencies, or sections) → apply **sync-diagrams** to update the affected diagrams and add new diagrams for newly revealed context before continuing the sequence.</rule>
 
 <rule>When the user provides existing diagrams or documented architecture → incorporate them directly into the relevant capability instead of redrawing. Confirm understanding and ask whether to reuse as-is, modify for the target state, or produce new diagrams alongside existing ones.</rule>
-
-<rule>When the user corrects or revises any previously confirmed content (topology, interactions, schemas, dependencies, or sections) → apply **sync-diagrams** to update the affected diagrams and add new diagrams for newly revealed context before continuing the sequence.</rule>
 
 <rule>When new findings emerge mid-session (a new component, a changed integration, a new edge case or flow) → apply **sync-diagrams** to keep all existing diagrams current and add new diagrams to explain the new context.</rule>
 
