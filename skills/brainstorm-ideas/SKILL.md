@@ -1,40 +1,35 @@
 ---
 name: brainstorm-ideas
-description: Facilitate structured brainstorming sessions that generate, evaluate, and refine ideas into actionable plans. Use when brainstorming, defining, exploring, generating, evaluating, or refining an idea to reach a goal.
+description: Facilitate structured brainstorming sessions that generate, evaluate, and refine ideas into actionable plans. Use when brainstorming, defining, exploring, generating, evaluating, refining, or iterating on an idea to reach a goal.
 ---
 
 <when-to-use-this-skill>
 - User wants to brainstorm a rough idea into a concrete, actionable plan
-- User wants to define goals or objectives for an idea
-- User wants to explore potential challenges or obstacles
-- User wants to generate creative ideas or solutions
-- User wants to evaluate or prioritize competing ideas
+- User wants to define goals or explore challenges for an idea
+- User wants to generate, evaluate, or prioritize ideas
 - User wants to refine an idea into a stronger, more focused form
 </when-to-use-this-skill>
 
 <knowledge>
 <brainstorming-principles>
 - Great ideas come from asking the right questions, not just producing answers
-- Challenging assumptions leads to stronger concepts
-- Visual organization reveals connections and gaps
+- Challenging assumptions and visual organization reveal connections and gaps
 - Evaluation and prioritization matter as much as generation
 </brainstorming-principles>
 <questioning-protocol>
-Drive the session with targeted questions:
-- Ask one question at a time and wait for the response before the next
-- Ask **7 to 100** targeted questions across the session
-- Provide possible answers or examples with each question
-- Ask follow-up questions when an answer is vague or incomplete
+- Ask **7 to 100** targeted questions, one at a time, waiting for each response
+- Provide possible answers or examples with each question; follow up when an answer is vague
 - Stop asking once the idea is clear and the plan is actionable
 </questioning-protocol>
 <facilitation-techniques>
-Keep the user engaged and grounded:
 - Use the user's preferred language; default to the language of their request
 - Keep a casual, conversational tone using "we" language
 - Use "what if" and "how might we" to explore possibilities
-- Use examples or analogies to help visualize improvements
-- Keep suggestions practical and feasible
+- Use examples and analogies; keep suggestions practical and feasible
 </facilitation-techniques>
+<adaptive-pacing>
+Match session depth to idea maturity and user energy. Details: [reference/adaptive-pacing.md](reference/adaptive-pacing.md)
+</adaptive-pacing>
 <idea-generation>
 Generate 5–7 diverse ideas using thinking techniques and present them as a mind map. Details: [reference/idea-generation.md](reference/idea-generation.md)
 </idea-generation>
@@ -53,22 +48,25 @@ End the session with a structured, actionable plan. Details: [reference/plan-out
 | Running a session on a new, unformed idea | End-to-end walkthrough of the full session | [examples/full-session-example.md](examples/full-session-example.md) |
 | Improving a rough existing idea with clear gaps | Walkthrough applying capabilities selectively | [examples/refining-existing-idea.md](examples/refining-existing-idea.md) |
 | Brainstorming a process or writing improvement, not a product | Full-session walkthrough on a writing topic | [examples/concise-document-writing.md](examples/concise-document-writing.md) |
+| Running a second round on a refined idea | Walkthrough of round-2 iteration and the updated plan | [examples/iterating-on-a-plan.md](examples/iterating-on-a-plan.md) |
 </context-loading-guide>
 </knowledge>
 
 <capabilities>
 <facilitate-session>
 **Objective**: Run a structured brainstorm from idea to actionable plan.
-1. Gather the idea or draft.
-2. When a draft exists, extract the clear parts and note the gaps.
-3. Apply **clarify-idea**.
-4. Apply **identify-goals**.
-5. Apply **explore-challenges**.
-6. Apply **generate-ideas**.
-7. Apply **evaluate-ideas**.
-8. Apply **challenge-ideas**.
-9. Apply **refine-idea**.
-10. Apply **compile-actionable-plan** and present the final plan.
+1. Set the session mode per **reference/adaptive-pacing.md**.
+2. Gather the idea or draft.
+3. When a draft exists, extract the clear parts and note the gaps.
+4. Apply **clarify-idea**.
+5. Apply **identify-goals**.
+6. Apply **explore-challenges**.
+7. Apply **generate-ideas**.
+8. Apply **evaluate-ideas**.
+9. Apply **challenge-ideas**.
+10. Apply **refine-idea**.
+11. Apply **compile-actionable-plan** and present the final plan.
+12. Offer **iterate-session** to deepen, combine, or pivot.
 </facilitate-session>
 <clarify-idea>
 **Objective**: Produce a plain-language statement of the user's idea.
@@ -102,7 +100,7 @@ End the session with a structured, actionable plan. Details: [reference/plan-out
 3. Request confirmation before proceeding.
 </generate-ideas>
 <evaluate-ideas>
-**Objective**: Score and prioritize the candidate ideas.
+**Objective**: Objectively score and prioritize the candidates — save the devil's advocate for the next phase.
 1. Evaluate each idea across the dimensions per **reference/idea-evaluation.md**.
 2. Identify risks, challenges, and trade-offs for each idea.
 3. Prioritize the ideas with a simple framework (effort vs impact, MoSCoW).
@@ -110,7 +108,7 @@ End the session with a structured, actionable plan. Details: [reference/plan-out
 5. Request confirmation before proceeding.
 </evaluate-ideas>
 <challenge-ideas>
-**Objective**: Stress-test the prioritized ideas before refining.
+**Objective**: Attack the prioritized ideas as devil's advocate before refining.
 1. Play devil's advocate on the top ideas per **reference/challenging-ideas.md**.
 2. Question scope creep and push for simpler, more focused solutions.
 3. Suggest MVP or phased approaches when scope is too large.
@@ -134,10 +132,17 @@ End the session with a structured, actionable plan. Details: [reference/plan-out
 5. Present the plan per **reference/plan-output-format.md**.
 6. Ask the user to review and confirm the plan.
 </compile-actionable-plan>
+<iterate-session>
+**Objective**: Run a second round — deepen, combine, or pivot.
+1. Offer round 2 and let the user choose a direction.
+2. Re-apply only the phases that direction needs and update the plan.
+3. Cap at 1–2 rounds; repeat only if the user asks.
+</iterate-session>
 </capabilities>
 
 <rules>
 <rule>When the user wants to brainstorm an idea into an actionable plan, use **facilitate-session**.</rule>
 <rule>When the user provides a rough idea, use **facilitate-session** and apply capabilities only for the gaps.</rule>
 <rule>When the user requests one phase in isolation, apply that capability directly.</rule>
+<rule>When a plan exists and the user wants to go further, apply **iterate-session**.</rule>
 </rules>

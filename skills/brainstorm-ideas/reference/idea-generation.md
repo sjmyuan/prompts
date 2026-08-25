@@ -14,6 +14,8 @@ Apply one technique per pass to force different angles:
 | Inversion | Flip the problem or a constraint | "How could users read less? Reverse it" |
 | Combination | Merge two unrelated ideas | "Book club + habit tracker" |
 | Elimination | Remove a core element and rebuild | "No manual logging at all" |
+| Constraint flip | Remove or reverse a hard constraint | "What if it worked with no internet?" |
+| Branch combine | Merge two existing branches | "Weekly summary + buddy system" |
 
 ## Perspectives
 Cover these across the set:
@@ -27,8 +29,7 @@ Cover these across the set:
 - Frame ideas as outcomes and value, not just features
 
 ## Present as a mind map
-Show relationships as a tree; keep depth to 2–3 levels; use descriptive labels, not keywords.
-
+Show relationships as a tree; keep depth to 2–3 levels; use descriptive labels, not keywords.- Label each branch with the technique that produced it so the diversity is visible
 ```
 Central Theme
 ├── Branch 1
