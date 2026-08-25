@@ -25,7 +25,7 @@ When producing the final ADR document, use the exact structure below. Wrap place
 
 ## Consequences
 
-[ 1-line trade-off takeaway, e.g. "**Trade-off:** self-managed ops for lower cost." ]
+[ 1-line trade-off takeaway, e.g. "**Trade-off:** self-managed ops for lower cost." Keep to ≤4 items per subsection. ]
 
 ### Positive Consequences <!-- optional -->
 
@@ -44,7 +44,7 @@ When producing the final ADR document, use the exact structure below. Wrap place
 
 ## Decision Drivers <!-- optional -->
 
-* [ one driver per bullet — a fact, not a sentence ]
+* [ one driver per bullet — a fact, not a sentence; ≤6 drivers total ]
 * ...
 
 ## Considered Options

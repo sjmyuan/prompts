@@ -1,6 +1,6 @@
 # Concise Writing Style
 
-Applies to all prose in ADRs and solution documents. Tables and diagrams carry the detail; prose states takeaways.
+Applies to all prose in ADRs and solution documents. Tables and diagrams carry the detail; prose states takeaways. All caps below apply to prose only — diagrams, tables, and code blocks (Mermaid, JSON/YAML schemas) are exempt and carry the full detail.
 
 ## Core rule: BLUF (Bottom Line Up Front)
 - Open every section with the conclusion in one line, then the why.
@@ -14,8 +14,11 @@ Applies to all prose in ADRs and solution documents. Tables and diagrams carry t
 | Section opening takeaway | 1 sentence (≤15 words) |
 | Context / problem statement | ≤3 sentences |
 | Decision justification | 1 sentence |
+| Decision rationale (alternatives & why chosen) | ≤3 sentences |
+| RAID item | ≤10 words, one claim |
 | Consequence / risk item | ≤10 words |
 | Pros / Cons bullet | 1 claim, no justification |
+| Table row / cell | one claim, no justification |
 | Paragraph | ≤3 sentences |
 | Sentence | ≤20 words, one clause |
 
@@ -23,12 +26,19 @@ Applies to all prose in ADRs and solution documents. Tables and diagrams carry t
 - Each bullet = one claim (fact or verdict), not a sentence with reasoning.
 - Reasoning goes in the table or the section takeaway — never inside bullets.
 
-## Tables over prose
+## Diagrams & tables over prose
 - Anything comparative (drivers × options, pros/cons, RAID, RACI) is a table.
-- Prose's only job: one line summarizing the table.
+- If a diagram or table can carry it, prose must not restate it — the caption or a one-line summary is the only prose allowed.
+- Prefer a diagram when it conveys the relationship or flow in less reading time than the prose it replaces; otherwise a single sentence beats a sprawling diagram.
+- Prose's only job: one line summarizing the table or diagram.
+
+## Single source of truth
+- Every fact appears exactly once in the document; every other mention is a reference, never a restatement.
+- Never repeat a fact already given in Context, a table, or a diagram elsewhere in the document.
 
 ## Sentence surgery
 - Active voice, subject–verb–object, one clause.
+- Prefer a number to an adjective: "fast" → "2×", "significant" → "3 ms", "large" → "500 users".
 - Banned phrases — delete or rewrite:
   - "It is important to note that…" / "It should be noted that…"
   - "In order to" → "To"
@@ -39,6 +49,6 @@ Applies to all prose in ADRs and solution documents. Tables and diagrams carry t
   - "This means that" / "What this means is"
 - Never restate what a diagram or table already shows.
 
-## The "So what?" test
-- Every sentence must add a new fact or answer "So what?" — otherwise delete it.
-- Run this check on the final document before presenting.
+## The reader-anchored "So what?" test
+- Every sentence must add a fact a reader needs to understand, implement, or maintain the solution — otherwise delete it.
+- Run the delete-by-default pass before presenting: cut ~20% (every sentence that fails the test), then re-add only what is load-bearing.

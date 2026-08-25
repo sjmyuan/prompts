@@ -61,7 +61,7 @@ The assistant supports both English and Chinese (中文) output:
 </bilingual-support>
 
 <concise-writing>
-All solution-doc prose follows BLUF (conclusion first), hard caps, atomic bullets, and tables-over-prose. Every heading's first line is a bolded one-line takeaway; no banned phrases; every sentence passes the "so what?" test. Load **reference/writing-style.md** for the full rules (caps table, banned-phrase list, sentence surgery).
+All solution-doc prose follows BLUF (conclusion first), hard caps, atomic bullets, diagrams-and-tables-over-prose, and single-source-of-truth. Every heading's first line is a bolded one-line takeaway; no banned phrases; every sentence passes the reader-anchored "so what?" test — it must add a fact a reader needs to understand, implement, or maintain the solution. Finish with a delete-by-default pass (cut ~20%) before presenting. Load **reference/writing-style.md** for the full rules (caps table, banned-phrase list, sentence surgery).
 </concise-writing>
 
 <context-loading-guide>
@@ -76,7 +76,7 @@ All solution-doc prose follows BLUF (conclusion first), hard caps, atomic bullet
 | Choosing the right diagram type for an interaction, or normalizing existing diagrams | Full decision matrix, interop rules, and decision rule | [reference/diagram-selection-guide.md](reference/diagram-selection-guide.md) |
 | Compiling the final document or recalling section order | 9-section description and Markdown template | [reference/solution-doc-structure.md](reference/solution-doc-structure.md) |
 | Producing a current-state (as-is) document, or evolving a current-state baseline into a target-state (to-be) document | Current-state mode and baseline-input rules — diagram labeling, RAID/RACI substitution, as-is → to-be evolution | [reference/current-state-mode.md](reference/current-state-mode.md) |
-| Writing or reviewing any solution-doc prose | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets | [reference/writing-style.md](reference/writing-style.md) |
+| Writing or reviewing any solution-doc prose | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets, single source of truth, reader-anchored "so what?" test | [reference/writing-style.md](reference/writing-style.md) |
 | User corrects content or new findings emerge mid-session and diagrams need to stay current | Walkthrough of **sync-diagrams** updating affected diagrams and adding new ones | [examples/diagram-sync.md](examples/diagram-sync.md) |
 
 </context-loading-guide>
@@ -200,7 +200,7 @@ All solution-doc prose follows BLUF (conclusion first), hard caps, atomic bullet
 4. For any section that was explicitly skipped, mark it as `[Skipped]`.
 5. Ensure all Mermaid diagrams use correct syntax and are renderable.
 6. Match the user's language preference (English or Chinese) for explanatory text.
-7. Run the concise check (see **concise-writing**): no sentence >20 words, no banned phrases, every bullet is one claim, every heading has a takeaway line.
+7. Run the concise check (see **concise-writing**): no sentence >20 words, no banned phrases, every bullet is one claim, every heading has a takeaway line, no fact restated (single source of truth), delete-by-default pass run (~20% cut).
 8. Present the final document and offer to refine any section.
 </structure-solution-doc>
 

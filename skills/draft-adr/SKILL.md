@@ -57,7 +57,7 @@ Use diagrams proactively whenever explaining context or a solution — never wai
 | Decision driver map | The trade-off space that drives the decision | Hard constraints vs soft preferences |
 | Option comparison matrix + elimination tree | How options compare against the drivers, or why options were dropped | Driver satisfaction per option, elimination reasoning |
 
-Zoom in level by level: C4 context → container → component for structure, then a flowchart or sequence diagram for a specific flow or interaction. The solution architecture is simply a C4/flowchart view of the target state — no separate diagram type is required. Draw C4 diagrams with Mermaid's native C4 types — `C4Context` (context), `C4Container` (container), `C4Component` (component) — with C4-PlantUML-compatible syntax (`Person`, `System`, `System_Ext`, `Container`, `ContainerDb`, `Component`, `Rel`, `System_Boundary`, `Container_Boundary`). Keep each diagram to a single message. Load **reference/diagram-guide.md** for the notation and snippets.
+Zoom in level by level: C4 context → container → component for structure, then a flowchart or sequence diagram for a specific flow or interaction. The solution architecture is simply a C4/flowchart view of the target state — no separate diagram type is required. Draw C4 diagrams with Mermaid's native C4 types — `C4Context` (context), `C4Container` (container), `C4Component` (component) — with C4-PlantUML-compatible syntax (`Person`, `System`, `System_Ext`, `Container`, `ContainerDb`, `Component`, `Rel`, `System_Boundary`, `Container_Boundary`). Keep each diagram to a single message; its caption is the takeaway, and never add prose that restates it. Prefer a diagram when it conveys the relationship or flow in less reading time than the prose it replaces — otherwise a single sentence beats a sprawling diagram. Load **reference/diagram-guide.md** for the notation and snippets.
 </diagram-selection>
 
 <option-tech-details>
@@ -65,7 +65,7 @@ Tech details make each option's implementation concrete in the ADR: **target-sta
 </option-tech-details>
 
 <concise-writing>
-All ADR prose follows BLUF (conclusion first), hard caps, atomic bullets, and tables-over-prose. Every heading's first line is a bolded one-line takeaway; no banned phrases; every sentence passes the "so what?" test. Load **reference/writing-style.md** for the full rules (caps table, banned-phrase list, sentence surgery).
+All ADR prose follows BLUF (conclusion first), hard caps, atomic bullets, diagrams-and-tables-over-prose, and single-source-of-truth. Every heading's first line is a bolded one-line takeaway; no banned phrases; every sentence passes the driver-anchored "so what?" test — it must move a decision-driver score or add a fact a future reader needs. Finish with a delete-by-default pass (cut ~20%) before presenting. Load **reference/writing-style.md** for the full rules (caps table, banned-phrase list, sentence surgery).
 </concise-writing>
 
 <context-loading-guide>
@@ -79,7 +79,7 @@ All ADR prose follows BLUF (conclusion first), hard caps, atomic bullets, and ta
 | User corrects content or new findings emerge mid-session and diagrams need to stay current | Walkthrough of **sync-diagrams** updating affected diagrams and adding new ones | [examples/diagram-sync.md](examples/diagram-sync.md) |
 | Detailing each option's technical implementation (diagrams + code changes) during evaluation, or rendering tech details in the ADR | Per-option tech details format, grounding contract, and code-access handling | [reference/option-tech-details-guide.md](reference/option-tech-details-guide.md) |
 | Seeing per-option tech details with C4/sequence diagrams and code diffs grounded in a code reference | Worked example of detailing two options for one area, and how they render in the ADR | [examples/option-tech-details-example.md](examples/option-tech-details-example.md) |
-| Writing or reviewing any ADR prose | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets | [reference/writing-style.md](reference/writing-style.md) |
+| Writing or reviewing any ADR prose | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets, single source of truth, driver-anchored "so what?" test | [reference/writing-style.md](reference/writing-style.md) |
 
 </context-loading-guide>
 
@@ -108,7 +108,8 @@ All ADR prose follows BLUF (conclusion first), hard caps, atomic bullets, and ta
 1. Ask the user: "What options have you already considered for addressing this problem?"
 2. If the user has only one option, brainstorm alternatives together using the prompts in **option-brainstorming-prompts**.
 3. For each option, ensure it is concrete and distinct from the others (avoid near-duplicates).
-4. Present the final list of options and ask the user to confirm before evaluating any.
+4. Fold near-duplicates and cap the list at 3–4 distinct options — fewer, well-differentiated options keep the ADR scannable. If more than 4 genuinely distinct options remain, ask the user which 3–4 to evaluate and park the rest.
+5. Present the final list of options and ask the user to confirm before evaluating any.
 </define-considered-options>
 
 <evaluate-options>
@@ -152,6 +153,9 @@ All ADR prose follows BLUF (conclusion first), hard caps, atomic bullets, and ta
    - [ ] Every section opens with a bolded one-line takeaway (BLUF)
    - [ ] No sentence exceeds 20 words; no banned phrases (see **concise-writing**)
    - [ ] Pros/cons and consequences are one-claim bullets, no justification
+   - [ ] Delete-by-default pass run: every sentence moves a driver or adds a fact a future reader needs; ~20% cut applied
+   - [ ] Single source of truth: no fact is restated across sections, tables, or diagrams
+   - [ ] Diagram/table captions carry the takeaway; no prose restates what a diagram/table shows
 7. Present the completed ADR to the user for final review and ask: "Would you like to adjust any section before saving?"
 </compile-adr>
 
