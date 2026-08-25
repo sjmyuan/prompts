@@ -130,7 +130,7 @@ End the session with a structured, actionable plan. Details: [reference/plan-out
 1. Summarize the refined idea per **reference/plan-output-format.md**.
 2. Map each confirmed challenge to its chosen solution.
 3. List the essential components.
-4. Write concrete next steps with owners or timeframes where possible.
+4. Write concrete, actionable next steps — no timelines or scheduling.
 5. Present the plan per **reference/plan-output-format.md**.
 6. Ask the user to review and confirm the plan.
 </compile-actionable-plan>

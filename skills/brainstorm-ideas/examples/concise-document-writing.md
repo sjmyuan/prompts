@@ -129,10 +129,10 @@ A concise-writing workflow for team documents built on BLUF structure, one-claim
 - One-page style guide with examples
 
 ## Next Steps
-- Week 1: Write the one-page style guide with BLUF and bullet rules
-- Week 2: Draft the checklist with the "so what?" test
-- Week 3: Rewrite one existing doc as a before/after example
-- Week 4: Pilot on two new docs and measure length
-- Month 2: Review adoption and adjust the checklist
+- Write the one-page style guide with BLUF and bullet rules
+- Draft the checklist with the "so what?" test
+- Rewrite one existing doc as a before/after example
+- Pilot on two new docs and measure length
+- Review adoption and adjust the checklist
 
 Facilitator: "Here is the plan. Would you like to refine any section before we finalize?"

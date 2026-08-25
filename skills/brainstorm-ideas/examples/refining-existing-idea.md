@@ -117,10 +117,10 @@ A weekly neighborhood running group for any pace, built on two pace groups and a
 - Group chat coordination
 
 ## Next Steps
-- Week 1: Recruit 5 committed co-runners
-- Week 2: Set the route, time, and pace split
-- Week 3: Launch the group chat and first runs
-- Month 1: Add post-run coffee as a social hook
-- Month 3: Review attendance and adjust
+- Recruit 5 committed co-runners
+- Set the route, time, and pace split
+- Launch the group chat and first runs
+- Add post-run coffee as a social hook
+- Review attendance and adjust
 
 Facilitator: "Here is the plan. Would you like to refine any section before we finalize?"

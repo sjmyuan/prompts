@@ -123,11 +123,11 @@ A mobile app for casual readers that pairs goal-setting onboarding with one-tap 
 - Daily reminder
 
 ## Next Steps
-- Week 1: Define the MVP data model
-- Week 2: Build one-tap logging
-- Week 3: Add the weekly summary
-- Week 4: Prototype onboarding and reminder
-- Month 2: Run the closed beta
-- Month 3: Launch and iterate
+- Define the MVP data model
+- Build one-tap logging
+- Add the weekly summary
+- Prototype onboarding and reminder
+- Run the closed beta
+- Launch and iterate
 
 Facilitator: "Here is the plan. Would you like to refine any section before we finalize?"
