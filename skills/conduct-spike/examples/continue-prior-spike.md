@@ -52,7 +52,7 @@
 
 ## Step 3: Investigate Deeper (Seeded, Targeted)
 
-*[Dispatched to a code-exploration sub-agent seeded with the area's existing findings doc (evidence map) so covered code is not re-scanned — see `reference/multi-agent-orchestration.md`. The sub-agent applies `investigate-code` with narrow focus.]*
+*(Dispatched to a code-exploration sub-agent seeded with the area's existing evidence map so covered code is not re-scanned — see `reference/multi-agent-orchestration.md`.)*
 
 > "Deep-diving into: Database Decomposition Strategy — can we split the monolithic DB without breaking settlement logic? And which schema-migration approach fits the stored procedures?"
 
@@ -71,7 +71,7 @@
 
 ## Step 4: Draft/Revise Problem ADRs — Evaluate + Draft (Rewrite In Place)
 
-*[draft-problem-adrs applied per problem, seeded with the updated findings doc; each ADR's evaluation runs via `draft-adr`'s **evaluate-options** inside the drafting session]*
+*(draft-problem-adrs applied per problem, seeded with the updated findings doc; each ADR's evaluation runs via `draft-adr`'s **evaluate-options** inside the drafting session.)*
 
 **Problem 1 — break up the database — evaluation**:
 
@@ -79,8 +79,8 @@
 
 | Option | Description | Verdict |
 |---|---|---|
-| A: One DB per service | Each service owns its DB; `transactions` split or duplicated | Rejected — immediate full rewrite of settlement logic; too risky in one step |
-| B: Shared DB + views | Single PostgreSQL; services access tables + views | Rejected — scaling bottleneck remains; no domain boundaries; defers the hard problem |
+| A: One DB per service | Each service owns its DB; `transactions` split or duplicated | Rejected — full rewrite of settlement logic; too risky in one step |
+| B: Shared DB + views | Single PostgreSQL; services access tables + views | Rejected — scaling bottleneck remains; defers the hard problem |
 | C: Shared DB + settlement extraction (NEW) | Payment services own type-specific tables; settlement service owns `transactions` + `accounts`; events via Kafka | **Chosen** — incremental; settlement scales independently; reuses the Kafka decision |
 | D: Event sourcing + CQRS | Immutable event stream; per-service read models | Rejected — paradigm shift; zero team experience; overengineered |
 
@@ -104,39 +104,27 @@
 
 ---
 
-*[The ADRs below are compiled from the evaluations above via `draft-adr`'s **compile-adr** — `adr-database-01-break-up-database.md` revised in place, `adr-database-02-schema-migration.md` drafted new.]*
+**`adr-database-01-break-up-database.md`: Gradual Database Decomposition with Settlement Extraction** *(rewritten in place — old unresolved draft deleted, no version markers; see `reference/artifact-maintenance-guide.md`)*
 
-**`adr-database-01-break-up-database.md`: Gradual Database Decomposition with Settlement Extraction**
-
-**Problem**: The payment monolith uses a single PostgreSQL database (~80 tables) shared across all payment types. Decomposing into microservices requires a database strategy that keeps data consistent while services evolve independently. The nightly settlement batch (45 min, 500K transactions) is the critical coupling point — its procedures span all payment types.
-
-**Decision Drivers**: Hard — must not break the nightly settlement batch (45-min SLA); must maintain transactional consistency for payment capture. Soft — prefer incremental migration over big-bang; prefer solutions that leverage the Kafka decision; minimize procedure rewrites initially.
-
-**Considered Options**: A (one DB per service) — rejected: full rewrite of settlement logic in one step; B (shared DB + views) — rejected: keeps the bottleneck, defers the hard problem; C (shared DB + settlement extraction) — **chosen**: incremental, settlement scales independently, reuses Kafka; D (event sourcing + CQRS) — rejected: paradigm shift beyond team expertise.
-
-**Chosen Option**: Phase 1 — payment-type services own type-specific tables; settlement service owns `transactions` + `accounts`; payment services publish events to Kafka for settlement consumption. Phase 2 — further decompose or move to per-service databases.
-
-**Consequences**: (+) incremental migration; (+) settlement independently deployable/scalable; (+) reuses the Kafka decision; (+) incremental procedure rewrites; (−) settlement becomes a critical runtime dependency; (−) eventual consistency between capture and settlement — needs monitoring.
-
-*[The ADR was **rewritten in place**: the old unresolved draft's content was deleted and replaced by this single coherent decision. Corrections live in the findings doc; the ADR carries no "updated" markers — see `reference/artifact-maintenance-guide.md`.]*
+- **Problem**: The payment monolith uses a single PostgreSQL DB (~80 tables) shared across all payment types; the nightly settlement batch (45 min, 500K transactions) is the critical coupling point — its procedures span all types.
+- **Decision Drivers**: Hard — must not break the settlement batch (45-min SLA); must keep payment-capture consistency. Soft — prefer incremental over big-bang; prefer solutions that leverage the Kafka decision.
+- **Considered Options**: A (one DB per service) — rejected: full rewrite of settlement logic; B (shared DB + views) — rejected: keeps the bottleneck; C (shared DB + settlement extraction) — **chosen**: incremental, settlement scales independently, reuses Kafka; D (event sourcing + CQRS) — rejected: paradigm shift beyond team expertise.
+- **Chosen Option**: Phase 1 — payment-type services own type-specific tables; settlement service owns `transactions` + `accounts`; payment services publish events to Kafka. Phase 2 — further decompose or move to per-service databases.
+- **Consequences**: (+) incremental; (+) settlement scales independently; (+) reuses Kafka; (−) settlement becomes a critical runtime dependency; (−) eventual consistency needs monitoring.
 
 **`adr-database-02-schema-migration.md`: Schema Migration via Expand-Contract** (new — added problem under the same area)
 
-**Problem**: Splitting the monolithic database needs a schema-migration approach that keeps the 2000+ line stored procedures working during the phased transition.
-
-**Decision Drivers**: Hard — no downtime; must not break the nightly settlement batch. Soft — prefer migrations shipped with each service; prefer reversible steps.
-
-**Considered Options**: A (expand-contract) — **chosen**: additive, reversible per service, aligns with Option C's phasing; B (copy-and-switch) — rejected: downtime during switch, risky with cross-type procedures; C (big-bang) — rejected: contradicts the incremental strategy.
-
-**Chosen Option**: Expand-contract — additive columns first, backfill, then drop; each migration ships with its owning service.
-
-**Consequences**: (+) reversible; (+) no downtime; (+) matches phased DB split; (−) temporary dual-schema window; (−) backfill volume on large tables needs batching.
+- **Problem**: Splitting the monolithic database needs a schema-migration approach that keeps the 2000+ line stored procedures working during the phased transition.
+- **Decision Drivers**: Hard — no downtime; must not break the nightly settlement batch. Soft — prefer migrations shipped with each service; prefer reversible steps.
+- **Considered Options**: A (expand-contract) — **chosen**: additive, reversible per service, aligns with Option C's phasing; B (copy-and-switch) — rejected: downtime during switch, risky with cross-type procedures; C (big-bang) — rejected: contradicts the incremental strategy.
+- **Chosen Option**: Expand-contract — additive columns first, backfill, then drop; each migration ships with its owning service.
+- **Consequences**: (+) reversible; (+) no downtime; (+) matches phased DB split; (−) temporary dual-schema window; (−) backfill volume on large tables needs batching.
 
 ---
 
 ## Step 6: Sync Downstream
 
-*[sync-update-artifacts — the database area now has two decided ADRs]*
+*(sync-update-artifacts — the database area now has two decided ADRs)*
 
 > "The database area now has two decisions. The C2 diagram needs a Settlement Service container, and the solution doc's `Database decomposition` section gains a schema-migration subsection. I'll refresh the solution document."
 

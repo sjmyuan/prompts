@@ -29,7 +29,7 @@
 
 ### Area 1: Database Selection
 
-*[Single task — still dispatched to a sub-agent to preserve the orchestrating agent's context; see `reference/multi-agent-orchestration.md`. The sub-agent applies `investigate-code`, adapted for greenfield.]*
+*(Single task — still dispatched to a sub-agent to preserve the orchestrating agent's context; see `reference/multi-agent-orchestration.md`. The sub-agent applies `investigate-code`, adapted for greenfield.)*
 
 > "Dispatching investigation of 1 area to a sub-agent."
 
@@ -49,7 +49,7 @@
 
 ## Completion Checkpoint
 
-*[Investigation complete — the assistant confirms the result before formalizing findings]*
+*(Investigation complete — confirm the result before formalizing findings)*
 
 ### Assistant
 
@@ -67,11 +67,11 @@
 
 ## Compile Findings Document
 
-*[compile-findings-doc applied — greenfield adaptation; no existing code to document]*
+*(compile-findings-doc applied — greenfield adaptation; no existing code to document)*
 
 ### Findings Document: `findings-analytics-database.md`
 
-*[write-solution-doc skill applied to current state, adapted for greenfield]*
+*(write-solution-doc applied to current state, adapted for greenfield)*
 
 **Current State**: No existing analytics service. The findings document captures the organizational and operational baseline that constrains the solution space.
 
@@ -93,7 +93,7 @@
 - ClickHouse widely adopted for clickstream analytics (CloudFlare, GitLab)
 - Amazon Timestream used by AWS-native teams for time-series
 
-> *Since this is greenfield, the findings document captures organizational and operational constraints rather than existing code architecture — the baseline evaluation compares options against.*
+> *Greenfield findings document — captures organizational and operational constraints rather than existing code architecture; evaluation compares options against it.*
 
 ---
 ## Draft Problem ADR — EVALUATE + DRAFT, SINGLE-TASK DISPATCH
@@ -120,7 +120,7 @@
 
 ### ADR: Database selection — pick the database
 
-*[Single task — dispatched to a sub-agent that loads `draft-adr` and produces the ADR; the orchestrator reviews the result. Saved as `adr-database-selection-01-pick-database.md`, tagged `Area: Database selection`.]*
+*(Single task — dispatched to a sub-agent that loads `draft-adr` and produces the ADR; the orchestrator reviews the result. Saved as `adr-database-selection-01-pick-database.md`, tagged `Area: Database selection`.)*
 
 > "Dispatching ADR drafting for 1 problem to a sub-agent."
 
@@ -150,7 +150,7 @@
 
 ## Compile Solution Doc
 
-*[write-solution-doc skill applied]*
+*(write-solution-doc applied)*
 
 ### Final Output Bundle
 

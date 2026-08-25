@@ -15,7 +15,7 @@
 
 ### Assistant Output
 
-*[Assistant reviews the provided notes, then works through scope definition]*
+*(Reviews the provided notes, then works through scope definition)*
 
 **Spike Goal**: Define a caching strategy for the product catalog service to reduce database load and improve response times.
 
@@ -36,11 +36,11 @@
 
 ## Compile Findings Document
 
-*[compile-findings-doc applied to formalize the user's pre-existing investigation notes]*
+*(compile-findings-doc applied to formalize the user's pre-existing investigation notes)*
 
 ### Findings Document: `findings-caching-strategy.md`
 
-*[write-solution-doc skill applied to current state, seeded with user's provided findings]*
+*(write-solution-doc applied to current state, seeded with the user's provided findings)*
 
 **C2 Container Diagram (Current State)**: Product Catalog Service → PostgreSQL (no caching layer). 10K reads/sec, 50 writes/sec. DB CPU regularly exceeds 80%.
 
@@ -70,7 +70,7 @@
 
 ## Draft Problem ADRs — Evaluate + Draft
 
-*[Per problem, an ADR-writer sub-agent runs the full `draft-adr` flow — drivers → options → **evaluate-options** → compile-adr — interactively with the user, seeded from the provided notes. The evaluation tables below are the evaluate stage of each drafting session.]*
+*(Per problem, an ADR-writer sub-agent runs the full `draft-adr` flow — drivers → options → **evaluate-options** → compile-adr — interactively with the user, seeded from the provided notes. The evaluation tables below are the evaluate stage of each drafting session.)*
 
 ### Area 1: Cache Topology
 
@@ -96,7 +96,7 @@
 
 ### ADR: Cache topology — position caches
 
-*[draft-adr skill applied — full ADR produced; saved as `adr-cache-topology-01-position-caches.md`]*
+*(draft-adr applied — full ADR produced; saved as `adr-cache-topology-01-position-caches.md`)*
 
 **Title**: Adopt Two-Tier Caching (In-Memory + Redis) for Product Catalog
 
@@ -112,7 +112,7 @@
 
 ### ADR: Cache invalidation — keep cached data consistent
 
-*[draft-adr skill applied — full ADR produced; saved as `adr-cache-invalidation-01-invalidate-cached-data.md`]*
+*(draft-adr applied — full ADR produced; saved as `adr-cache-invalidation-01-invalidate-cached-data.md`)*
 
 **Title**: Use CDC-Based Cache Invalidation for Product Catalog
 
@@ -124,7 +124,7 @@
 
 ## Compile Solution Doc
 
-*[write-solution-doc skill applied]*
+*(write-solution-doc applied)*
 
 ### Final Output Bundle
 

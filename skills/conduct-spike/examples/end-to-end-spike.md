@@ -32,14 +32,14 @@
 
 ### Area 1: Service Decomposition Boundaries
 
-*[investigate-code skill applied]*
+*(investigate-code applied)*
 
 **Current State**: package-by-layer (`controller/`, `service/`, `repository/`, `domain/`); three intermingled domains — CreditCardPayment (40%), BankTransferPayment (30%), WalletPayment (25%), Shared (5%); `PaymentOrchestrator` (1200 lines) coordinates all payment types; credit card service imports bank-transfer domain objects.
 **Constraints & Pain Points**: whole-app redeploy on any payment-type change; wallet cannot scale independently; 3 teams step on each other's code.
 
 ### Areas 2–4 (same pattern, abbreviated)
 
-*[investigate-code skill applied per area]*
+*(investigate-code applied per area)*
 
 | Area | Current State | Key Constraint |
 |---|---|---|
@@ -51,7 +51,7 @@
 
 ## Completion Checkpoint
 
-*[Investigation complete — the assistant confirms the result before formalizing findings]*
+*(Investigation complete — confirm the result before formalizing findings)*
 
 ### Assistant → User
 
@@ -62,11 +62,11 @@
 
 ## Compile Findings Documents
 
-*[compile-findings-doc applied — producing one consolidated findings document for 4 tightly-coupled areas]*
+*(compile-findings-doc applied — one consolidated findings document for 4 tightly-coupled areas)*
 
 ### Findings Document: `findings-payment-migration.md`
 
-*[write-solution-doc skill applied to current state, adapted with constraints & pain points replacing RAID/RACI]*
+*(write-solution-doc applied to current state, adapted with constraints & pain points replacing RAID/RACI)*
 
 **C2 Container Diagram (Current State)**: Single Spring Boot monolith → PostgreSQL database, with all payment types sharing the same app and DB.
 
@@ -128,29 +128,21 @@
 
 ### ADR: Service decomposition — split the monolith
 
-*[draft-adr skill applied — full ADR produced; saved as `adr-service-decomposition-01-split-monolith.md`, tagged `Area: Service decomposition`]*
+*(draft-adr applied — full ADR produced; saved as `adr-service-decomposition-01-split-monolith.md`, tagged `Area: Service decomposition`)*
 
-**Title**: Decompose Payment Monolith into Payment-Type Microservices
-
-**Status**: Draft
-
-**Problem**: The payment monolith couples three independent payment domains, preventing independent deployment and scaling, and causing team contention.
-
-**Decision Drivers**:
-- Hard: Must maintain existing SLA (99.9% uptime); Must not lose payment data during migration
-- Soft: Prefer alignment with existing team structure; Prefer incremental migration
-
-**Considered Options**: (A) Payment-type services, (B) Domain-driven services, (C) Strangler extraction
-
-**Chosen Option**: A — Payment-type services (Wallet, Bank Transfer, Credit Card) with a shared utility library
-
-**Consequences**: (+) independent deploy/scale per payment type; (+) incremental Strangler extraction; (−) shared lib coupling risk — version and treat as an API; (−) duplicated cross-cutting concerns (auth, logging).
+- **Title**: Decompose Payment Monolith into Payment-Type Microservices
+- **Status**: Draft
+- **Problem**: The payment monolith couples three independent payment domains, preventing independent deployment and scaling, and causing team contention.
+- **Decision Drivers**: Hard — must maintain existing SLA (99.9% uptime); must not lose payment data during migration. Soft — prefer alignment with existing team structure; prefer incremental migration.
+- **Considered Options**: (A) Payment-type services, (B) Domain-driven services, (C) Strangler extraction
+- **Chosen Option**: A — Payment-type services (Wallet, Bank Transfer, Credit Card) with a shared utility library
+- **Consequences**: (+) independent deploy/scale per payment type; (+) incremental Strangler extraction; (−) shared lib coupling risk — version and treat as an API; (−) duplicated cross-cutting concerns (auth, logging).
 
 ---
 
 ## Compile Solution Doc
 
-*[write-solution-doc skill applied]*
+*(write-solution-doc applied)*
 
 ### Final Output Bundle
 
