@@ -20,7 +20,7 @@ Use this agent when the user wants to:
 
 Do NOT use this agent for:
 - **Quick answers or informal recommendations** — use a regular conversation instead
-- **Already-decided problems that only need implementation** — use the **coding-assistant** agent instead
+- **Already-decided problems that only need implementation** — use the **planner** / **executor** agents instead
 - **Trivial scope** with no architectural impact — a spike would be overkill
 </agent-scope>
 

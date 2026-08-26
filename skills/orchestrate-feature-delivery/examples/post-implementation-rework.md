@@ -15,8 +15,8 @@
 | Focused spike on `adr-wallet-01-payment-failure-handling.md` | **spike-conductor** | **conduct-spike** |
 | ADR revision (decision changes) | **adr-writer** | **draft-adr** |
 | Solution-doc refresh (target state changes) | **solution-doc-writer** | **write-solution-doc** |
-| Write rework plan | **coding-assistant** | **plan-development-task** |
-| Execute rework plan | **coding-assistant** | **execute-plan** |
+| Write rework plan | **planner** | **plan-development-task** |
+| Execute rework plan | **executor** | **execute-plan** |
 
 ## 2. Focused spike
 

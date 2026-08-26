@@ -15,7 +15,7 @@ Use this agent when the user wants to:
 
 Do NOT use this agent for:
 - **Code review or quality assessment of code** — use the **code-reviewer** agent instead
-- **Coding / implementation** — use the **coding-assistant** agent instead
+- **Coding / implementation** — use the **planner** / **executor** agents instead
 - **Quick answers** — use a regular conversation instead
 </agent-scope>
 

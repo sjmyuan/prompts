@@ -93,16 +93,17 @@ Each cell carries a brief that seeds **plan-development-task**:
 
 ## Ready-to-dispatch predicate
 
-- **Ready to develop** (dispatch plan/execute): all dependency cells are **planned** (contracts agreed — contract-first and independent cells develop in parallel; merge-blocked cells wait for the dependency's contract).
+- **Ready to develop**: all dependency cells are **planned** (contracts agreed — contract-first and independent cells develop in parallel; merge-blocked cells wait for the dependency's contract).
+- **Ready to execute**: cell is **planned** AND its plan file is verified on disk at the recorded Plan location (the plan-first gate).
 - **Ready to merge**: all dependency cells are **done** (merged).
-- Status must be **unplanned** (→ plan) or **planned** (→ execute).
+- Status must be **unplanned** (→ planner) or **planned** with a verified plan file (→ executor).
 
 ## Status semantics
 
 | Status | Meaning | Orchestrator action |
 |---|---|---|
-| **unplanned** | No plan files yet | Dispatch a planning agent (plan-development-task) |
-| **planned** | `plan.md` + `context.md` exist | Dispatch an execution agent (execute-plan) |
+| **unplanned** | No plan files yet | Dispatch the **planner** (plan-development-task) |
+| **planned** | `plan.md` + `context.md` exist (verified on disk) | Dispatch the **executor** (execute-plan) — only after the plan-file gate passes |
 | **in-progress** | Execution running — incl. implemented-but-not-yet-merged cells awaiting push approval | Resume from the last step in the active `rework-<date>.md` (per the `context.md` manifest), or `plan.md` if no rework; pre-merge rework needs no index change |
 | **poc-ready** | POC implemented + evaluation report written | Wait for the user to record **adopted**/**rejected** in the index |
 | **adopted** | POC proved the option | Promote (merge → done) or feed the **poc-gated** feature |

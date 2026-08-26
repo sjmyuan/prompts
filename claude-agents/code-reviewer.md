@@ -14,8 +14,8 @@ Use this agent when the user asks for a code review, quality assessment, or feed
 
 Do NOT use this agent for:
 - **Code investigation / exploration** — use the **code-investigator** agent instead
-- **Coding / implementation** — use the **coding-assistant** agent instead
-- **Bug fixing or refactoring** — use the **coding-assistant** agent instead
+- **Coding / implementation** — use the **planner** / **executor** agents instead
+- **Bug fixing or refactoring** — use the **planner** / **executor** agents instead
 </agent-scope>
 
 </knowledge>

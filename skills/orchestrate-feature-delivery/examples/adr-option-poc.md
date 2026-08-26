@@ -16,8 +16,8 @@ Decomposition marks two POC cells (Wave 0, parallel) and one **poc-gated** imple
 
 ## 2. Dispatch (POC mode, parallel)
 
-- **Agent A** (coding-assistant) → plan + execute `F5a` (**plan-development-task** `plan-poc` / **execute-plan** POC mode) — brief carries `type: poc`, `adr-caching-01-cache-option.md`, option Redis, success criteria.
-- **Agent B** (coding-assistant) → plan + execute `F5b` (in-process) in parallel — same repo ⇒ serialize execution waves or split to different repos when possible.
+- **Planner A** → plan `F5a` (plan-development-task `plan-poc`) — brief carries `type: poc`, `adr-caching-01-cache-option.md`, option Redis, success criteria; then **Executor A** runs the POC plan (execute-plan POC mode) after the gate verifies the plan file.
+- **Planner B** → plan `F5b` (in-process) in parallel, then **Executor B** runs it — same repo ⇒ serialize execution waves or split to different repos when possible.
 
 ## 3. Decision gate (user-recorded)
 

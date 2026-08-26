@@ -25,7 +25,7 @@
 
 ## 3. Dispatch
 
-- **Agent A** (coding-assistant) → resume `order-service/F2` from step 4 (execute-plan) — works from plan.md + context.md (spike references embedded); reloads `adr-wallet-01-payment-failure-handling.md` / solution-doc from the index's Spike References if a step needs more detail
+- **Executor A** → resume `order-service/F2` from step 4 (execute-plan) — works from plan.md + context.md (spike references embedded); reloads `adr-wallet-01-payment-failure-handling.md` / solution-doc from the index's Spike References if a step needs more detail
 - **Agent C** (solution-doc-writer / adr-writer) → update solution-doc §Wallet and `adr-wallet-01-payment-failure-handling.md` if F2's execution surfaces artifact changes — the orchestrator never edits them itself
 - F3 pending user decision; both F4 cells wait
 
@@ -33,8 +33,8 @@
 
 | Cell | Branch | PR | Commit | Status | Agent | Location |
 |---|---|---|---|---|---|---|
-| shared-contracts/F1 | 1234-f1-contracts | #1 | a1b2c3d | done | agent-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
-| order-service/F2 | 1234-f2-wallet | — | d4e5f6a | in-progress (step 4 🔄) | agent-A | deliveries/payment-migration/order-service/wallet-service/ |
+| shared-contracts/F1 | 1234-f1-contracts | #1 | a1b2c3d | done | executor-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
+| order-service/F2 | 1234-f2-wallet | — | d4e5f6a | in-progress (step 4 🔄) | executor-A | deliveries/payment-migration/order-service/wallet-service/ |
 | api-gateway/F3 | 1234-f3-gateway | — | — | failed (pending) | — | — |
 | order-service/F4 | — | — | — | unplanned (blocked-by F2/F3) | — | — |
 | api-gateway/F4 | — | — | — | unplanned (blocked-by F2/F3) | — | — |

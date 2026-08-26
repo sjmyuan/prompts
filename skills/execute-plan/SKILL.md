@@ -76,7 +76,7 @@ All prose written into `plan.md` / `context.md` follows **reference/writing-styl
 </concise-writing>
 
 <orchestrator-handoff>
-When executed inside a dispatched agent (e.g., by **orchestrate-feature-delivery** via the **coding-assistant** agent), hand back the final status list and commit hashes so the orchestrator can update its delivery index; a POC's completion routes to the decision gate.
+When executed inside a dispatched agent (e.g., by **orchestrate-feature-delivery** via the **executor** agent), hand back the final status list and commit hashes so the orchestrator can update its delivery index; a POC's completion routes to the decision gate.
 </orchestrator-handoff>
 
 <context-loading-guide>

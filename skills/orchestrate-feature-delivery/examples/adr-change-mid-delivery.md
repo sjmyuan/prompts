@@ -19,9 +19,10 @@
 
 ## 3. Dispatch
 
-- **Agent A** (coding-assistant) → re-plan `api-gateway/F3` (**plan-development-task**) against the revised decision.
-- **Agent B** (coding-assistant) → write + execute the pre-merge rework for `order-service/F4` (**plan-development-task** → **execute-plan**), sibling `rework-2026-08-24.md`, original steps never modified.
-- **F2-r1** (post-merge): the ADR + solution doc are already revised — write + execute the rework file.
+- **Planner A** → re-plan `api-gateway/F3` (plan-development-task) against the revised decision.
+- **Planner B** → write the pre-merge rework for `order-service/F4` (plan-development-task), sibling `rework-2026-08-24.md`, original steps never modified.
+- **Executor B** → execute only `rework-2026-08-24.md` (execute-plan) on the unmerged work.
+- **F2-r1** (post-merge): the ADR + solution doc are already revised — a **planner** writes the rework file, then an **executor** runs it.
 - No in-flight POC cells here — otherwise surface them to the user (the change may invalidate success criteria).
 
 ## 4. Update the index
@@ -30,8 +31,8 @@
 |---|---|---|---|---|---|---|
 | order-service/F2 | 1234-f2-wallet | #42 (merged) | e5f6a7b | done | — | deliveries/payment-migration/order-service/wallet-service/ |
 | order-service/F2-r1 (Rework of F2) | — | — | — | unplanned | — | deliveries/payment-migration/order-service/wallet-service/rework-2026-08-24.md |
-| api-gateway/F3 | 1234-f3-gateway | — | — | planned → re-planning | agent-A | deliveries/payment-migration/api-gateway/wallet-api-gateway/ |
-| order-service/F4 | 1234-f4 | — | d4e5f6a | in-progress (rework) | agent-B | deliveries/payment-migration/order-service/order-wallet-integration/ |
+| api-gateway/F3 | 1234-f3-gateway | — | — | planned → re-planning | planner-A | deliveries/payment-migration/api-gateway/wallet-api-gateway/ |
+| order-service/F4 | 1234-f4 | — | d4e5f6a | in-progress (rework) | executor-B | deliveries/payment-migration/order-service/order-wallet-integration/ |
 
 Recorded per **update-delivery-index**: F3 → re-planning, F4 keeps **in-progress** (sibling rework file is the record), `F2-r1` added in a new wave — then **rewrite-concise**.
 

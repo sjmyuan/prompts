@@ -21,6 +21,8 @@ description: Orchestrate spiked-epic delivery via dispatched agents and a tracki
 <knowledge>
 <orchestrator-role>
 Persistent orchestrator for **one spiked epic**; input is always the **delivery index** plus the spike output (change summary, solution doc, ADRs). Change summaries come from `summarize-change-scope`; solution doc and ADRs from `write-solution-doc` and `draft-adr`. It decomposes, sequences, dispatches, and tracks — it never plans, codes, or edits artifacts itself (delegation map in **agent-dispatch**). The index is the single source of truth.
+
+**Non-negotiable mandate** — never perform any delivery task yourself; every investigate / plan / execute / artifact update is a separate dispatched agent. **Plan-first gate** — never dispatch an executor until the cell's plan file exists on disk (verified). **Never back-fill** — a plan is always written before execution, never appended after it.
 </orchestrator-role>
 <feature-definition>
 A feature is a coherent, independently valuable deliverable spanning one or more repos.
@@ -61,8 +63,8 @@ Wave computation + intra-feature merge order: **reference/dependency-ordering-gu
 Each cell follows **unplanned → planned → in-progress → done**, plus recoverable **failed** / **blocked**; **in-progress** covers implemented-but-not-yet-merged cells awaiting push approval. POC cells fork: **poc-ready** (evaluation report written) → **adopted** (promote → merge → **done**) or **rejected** (closed); a replaced cell is **superseded**. A cell is **develop-ready** when its dependencies are **planned**; **merge-ready** only when dependencies are **done**. The user records POC **adopted**/**rejected** in the index — the orchestrator never decides. Transitions: **reference/orchestration-guide.md**; rework: **rework-modes**.
 </delivery-state-machine>
 <agent-dispatch>
-Every delivery task is delegated — the orchestrator never performs it. Map task → agent → skill: spike → **spike-conductor** (**conduct-spike**) · plan/execute → **coding-assistant** (**plan-development-task** / **execute-plan**) · solution-doc → **solution-doc-writer** (**write-solution-doc**) · ADR → **adr-writer** (**draft-adr**).
-Dispatch one agent per task in parallel, subject to **develop-gating** (see **delivery-state-machine**) and **no-conflict** (never run conflicting cells on the same repo simultaneously). Each brief carries the cell's scope brief **plus spike references** (change-summary items, ADR files, solution-doc section). When plan/execution surfaces solution-doc / ADR changes, dispatch the owning agent — never edit artifacts directly. Detect the platform's agent mechanism. Full rules: **reference/orchestration-guide.md**.
+Every delivery task is delegated — the orchestrator never performs it. Map task → agent → skill: investigate → **spike-conductor** (**conduct-spike**) · plan → **planner** (**plan-development-task**) · execute → **executor** (**execute-plan**) · solution-doc → **solution-doc-writer** (**write-solution-doc**) · ADR → **adr-writer** (**draft-adr**). Plan and execute are always separate agent sessions — never one agent doing both for the same cell, never execute before a verified plan file (see **plan-first gate** in **orchestrator-role**).
+Dispatch one agent per task in parallel, subject to **develop-gating** (see **delivery-state-machine**) and **no-conflict** (never run conflicting cells on the same repo simultaneously). Each brief carries the cell's scope brief **plus spike references** (change-summary items, ADR files, solution-doc section). When plan/execution surfaces solution-doc / ADR changes, dispatch the owning agent — never edit artifacts directly. Detect the platform's agent mechanism (planner / executor / spike-conductor / adr-writer / solution-doc-writer). Full rules: **reference/orchestration-guide.md**.
 </agent-dispatch>
 <branch-and-push-conventions>
 Execution agents commit locally and small-step; pushing or opening PRs happens only after user confirmation.
@@ -143,27 +145,29 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 1. After every agent result, update the cell's status per the **delivery-state-machine**: unplanned → planned, planned → in-progress, in-progress → done, plus failed or blocked with the reason.
 2. When an agent result looks inconsistent (status vs plan files, claimed merge vs branch state), verify it.
 3. Re-read the artifacts or dispatch a fresh check before recording.
-4. When the user records a POC decision (**poc-ready → adopted/rejected**), record it in the index.
-5. Dispatch the POC follow-ups per **reference/poc-lifecycle.md**: the ADR agent (**adr-writer**) records the outcome in the ADR.
-6. On **adopted** — **POC-as-implementation**: ask before promoting/merging the branch, then mark the `replaces` cell **superseded**.
-7. On **adopted** — **POC-as-decision-input**: dispatch the **poc-gated** feature with the decided option.
-8. On **rejected**: close the cell — archive or discard the branch (ask the user).
-9. When a cell's PR merges, confirm the recorded head commit is in the merged PR before marking **done** (see **branch-and-push-conventions**); then re-check downstream cells — any now develop-ready (dependencies planned) or merge-ready (dependencies done) become dispatchable.
-10. Record the agent assignment, plan location, branch name, and the **head commit** from the execution handoff for each cell; record the PR reference (number/URL) once a PR is opened (per **branch-and-push-conventions**).
-11. Keep the index as the single source of truth; never leave status changes only in conversation.
-12. Verify the updated index against **reference/delivery-index-format.md** — status values, readiness, recorded branches — then apply **rewrite-concise**.
+4. Apply the **plan-first gate**: mark **planned** only when the planner's plan file exists on disk at the recorded Plan location; never set a cell to **in-progress** without a verified plan file — a missing file is **failed** (reason: no plan file).
+5. When the user records a POC decision (**poc-ready → adopted/rejected**), record it in the index.
+6. Dispatch the POC follow-ups per **reference/poc-lifecycle.md**: the ADR agent (**adr-writer**) records the outcome in the ADR.
+7. On **adopted** — **POC-as-implementation**: ask before promoting/merging the branch, then mark the `replaces` cell **superseded**.
+8. On **adopted** — **POC-as-decision-input**: dispatch the **poc-gated** feature with the decided option.
+9. On **rejected**: close the cell — archive or discard the branch (ask the user).
+10. When a cell's PR merges, confirm the recorded head commit is in the merged PR before marking **done** (see **branch-and-push-conventions**); then re-check downstream cells — any now develop-ready (dependencies planned) or merge-ready (dependencies done) become dispatchable.
+11. Record the agent assignment, plan location, branch name, and the **head commit** from the execution handoff for each cell; record the PR reference (number/URL) once a PR is opened (per **branch-and-push-conventions**).
+12. Keep the index as the single source of truth; never leave status changes only in conversation.
+13. Verify the updated index against **reference/delivery-index-format.md** — status values, readiness, recorded branches — then apply **rewrite-concise**.
 </update-delivery-index>
 <orchestrate-delivery>
 1. Load the delivery index — or create it first via **decompose-change-into-features** → **map-features-to-repos** → **order-feature-delivery** → **produce-delivery-index** if it does not exist.
 2. Assess current state from the index: per-cell statuses, completed waves, ready cells, blocked cells.
-3. Select ready cells per **reference/orchestration-guide.md** (unplanned → **plan**, planned → **execute**).
-4. Dispatch parallel agents, one per cell, respecting develop-gating and no-conflict rules (**reference/orchestration-guide.md**).
-5. Gate merges on dependencies **done**.
-6. Brief each agent with its scope, **spike references**, and **branch name**.
-7. When plan or execution surfaces solution-doc / ADR changes, dispatch the owning agent (see **agent-dispatch**) — never edit artifacts yourself.
-8. Collect results and apply **update-delivery-index**.
-9. When a cell is ready to integrate, ask the user before pushing its branch or opening a PR (per **branch-and-push-conventions**); never push automatically.
-10. Re-assess and report next actions; repeat until all cells are done or the user pauses.
+3. **Phase 1 — plan**: select unplanned, develop-ready cells and dispatch the **planner** agent to each, one per cell — no executor is dispatched in this phase (see **agent-dispatch**).
+4. **Verify the plan-first gate**: after each planner returns, confirm its plan file (`plan.md` or `rework-<date>.md`) exists on disk at the recorded Plan location before the cell may advance.
+5. **Phase 2 — execute**: select **planned** cells whose plan file is verified and dispatch the **executor** agent to each, respecting develop-gating and no-conflict rules (**reference/orchestration-guide.md**).
+6. Gate merges on dependencies **done**.
+7. Brief each agent with its scope, **spike references**, and **branch name**.
+8. When plan or execution surfaces solution-doc / ADR changes, dispatch the owning agent (see **agent-dispatch**) — never edit artifacts yourself.
+9. Collect results and apply **update-delivery-index**.
+10. When a cell is ready to integrate, ask the user before pushing its branch or opening a PR (per **branch-and-push-conventions**); never push automatically.
+11. Re-assess and report next actions; repeat until all cells are done or the user pauses.
 </orchestrate-delivery>
 <resume-delivery>
 1. Load the existing delivery index plus the spike output.
@@ -176,8 +180,8 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 1. Identify the affected cell, its governing ADR, and its status — **done** (merged/verified) or **in-progress** (implemented, not pushed/merged).
 2. Scope investigation narrowly to that decision — never the whole epic.
 3. Present the routing for user confirmation — **append-only in both modes** (per **rework-modes**):
-   - **Plan**: dispatch **coding-assistant** (plan-development-task) to write a sibling `rework-<date>.md` — implemented steps never modified.
-   - **Execute**: dispatch **coding-assistant** (execute-plan) to run only the rework file's steps.
+   - **Plan**: dispatch the **planner** agent (plan-development-task) to write a sibling `rework-<date>.md` — implemented steps never modified.
+   - **Execute**: dispatch the **executor** agent (execute-plan) to run only the rework file's steps.
    - **Investigate**: dispatch **spike-conductor** (conduct-spike) + **adr-writer** (draft-adr) / **solution-doc-writer** (write-solution-doc) updates for post-merge; pre-merge only if the issue challenges the governing ADR decision.
 4. Apply **update-delivery-index** — post-merge adds a new rework feature (e.g. `F2-r1`, `Rework of: F2`) in a new wave; the original cell's status stays **done**.
 5. For pre-merge, keep the rework on the same cell (no new feature/wave) — no index change; the sibling `rework-<date>.md` is the record.
@@ -215,7 +219,9 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 <rule> When spike output exists but no delivery index, apply **decompose-change-into-features** → **map-features-to-repos** → **order-feature-delivery** → **produce-delivery-index**. </rule>
 <rule> When a delivery index exists and the user wants to drive or continue delivery, apply **orchestrate-delivery**; apply **resume-delivery** when continuing an epic interrupted in a previous session. </rule>
 <rule> After any agent reports a result, always apply **update-delivery-index** before dispatching further agents. </rule>
-<rule> When dispatching any delivery task (plan, execute, solution-doc update, or ADR update), always dispatch the owning agent per **agent-dispatch** — never perform the task directly. </rule>
+<rule> When dispatching any delivery task (investigate, plan, execute, solution-doc update, or ADR update), always dispatch the owning agent per **agent-dispatch** — never perform the task directly. </rule>
+<rule> Never dispatch an executor for a cell until its plan file is verified on disk (the **plan-first gate**); never write or append a plan after execution — a plan is always written before its steps run. </rule>
+<rule> Never let a single agent plan and execute the same cell in one session — plan and execute are separate agent dispatches, always in that order. </rule>
 <rule> When the user asks about a single cell's plan or status, read the delivery index and route the cell to **plan-development-task** or **execute-plan** — do not re-run the whole orchestration. </rule>
 <rule> When an issue surfaces after a feature was implemented (a cell is **done** or **in-progress** — implemented but not pushed/merged), apply **handle-post-implementation-issue** — never re-run **decompose-change-into-features** on the whole epic. </rule>
 <rule> When the user reports an ADR change or an **adr-writer** agent returns a revision, apply **handle-adr-change** — never dispatch a planned cell on a stale decision. </rule>

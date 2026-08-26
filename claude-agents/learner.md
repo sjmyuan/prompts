@@ -25,7 +25,7 @@ Do NOT use this agent for:
 - **ADR drafting** — use the **adr-writer** agent instead
 - **Solution documentation** — use the **solution-doc-writer** agent instead
 - **Spike investigations** — use the **spike-conductor** agent instead
-- **Code changes or bug fixes** — use the **coding-assistant** agent instead
+- **Code changes or bug fixes** — use the **planner** / **executor** agents instead
 - **Quick questions about how code works** — use a regular conversation instead
 </agent-scope>
 
