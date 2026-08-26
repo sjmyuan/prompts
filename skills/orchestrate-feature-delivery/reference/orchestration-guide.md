@@ -24,7 +24,7 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
   - **Merge-gating**: a cell merges only after its dependency cells are **done** (merged).
   - **No conflict in parallel**: never run two cells that touch the same repo with a conflict edge at the same time — serialize them.
   - **Capacity**: match the number of parallel agents to what the platform supports; ask the user when unsure.
-- Use the platform's agent/sub-agent mechanism — detect what is available (e.g., planner / executor agents) and dispatch accordingly.
+- Use the platform's agent/sub-agent mechanism — detect what is available (e.g., planner / executor agents) and dispatch accordingly. If no agent mechanism exists, ask the user how to proceed — never fall back to doing the work yourself.
 - **Branches**: one branch per repo per cell, named to match the **repo's branch convention** (detect from existing branches / git config / team docs, or ask the user — never assume a prefix); the branch is recorded in the delivery index and included in the agent brief (the PR reference is recorded once opened); execution agents create the branch during their Prepare Environment step and commit small-step locally (see **branch-and-push-conventions**). The **head commit** from each execution handoff is recorded in the index (a pointer, like Branch/PR).
 - **Push gating**: never push a branch or open a PR automatically — after a cell's work is complete and ready to integrate, ask the user for confirmation first.
 
@@ -41,6 +41,7 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 ## Status updates
 
 - After every agent result, update the cell status; record the **head commit** from each execution handoff; when a PR is opened, record its reference; when it merges, confirm the recorded head commit is in the merged PR before marking **done**, then re-check downstream cells for develop/merge-readiness.
+- When a returned result looks inconsistent (status vs plan files, claimed merge vs branch state), verify it with a NEW same-type agent — never the original instance — before recording.
 - Never let conversation text be the source of truth — the delivery index is.
 
 ## ADR changes

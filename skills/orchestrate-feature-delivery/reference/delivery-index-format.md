@@ -128,7 +128,7 @@ ADRs are **versionless** — drift is signaled by the **adr-writer** agent's ret
 
 ## Rework after implementation
 
-The index tracks **state only** — rework never adds work history to a status cell. Record rework per the cell's status (see **rework-modes** in the SKILL.md knowledge); the details (trigger, ADR focus, boundary, steps) live in a sibling `rework-<date>.md` — written by **plan-development-task**, never repeated in the index. `plan.md` is the frozen original; each rework gets its own file so it never grows. A `## Reworks` manifest in `context.md` lists every rework file + status (see **plan-file-format.md**).
+The index tracks **state only** — rework never adds work history to a status cell. Record rework per the cell's status (see **rework-modes** in the SKILL.md knowledge); the details (trigger, ADR focus, boundary, steps) live in a sibling `rework-<date>.md` — written by **plan-development-task**, never repeated in the index. `plan.md` is the frozen original; each rework gets its own file so it never grows. A `## Reworks` manifest in `context.md` lists every rework file + status (see **plan-file-format.md** in **plan-development-task**).
 
 **Post-merge (cell done)** — original cell unchanged, rework is its own cell:
 
