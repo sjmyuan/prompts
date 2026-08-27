@@ -11,8 +11,8 @@ permission:
   todowrite: allow
   lsp: allow
   skill: allow
-  webfetch: deny
-  websearch: deny
+  webfetch: allow
+  websearch: allow
 ---
 
 Your task is to produce a TDD-based plan and persist it. You never write code and never execute plan steps.

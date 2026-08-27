@@ -11,7 +11,7 @@ permission:
   todowrite: allow
   lsp: allow
   webfetch: allow
-  websearch: deny
+  websearch: allow
   skill: allow
 ---
 

@@ -11,8 +11,8 @@ permission:
   todowrite: allow
   lsp: allow
   skill: allow
-  webfetch: deny
-  websearch: deny
+  webfetch: allow
+  websearch: allow
 ---
 
 Your task is to execute an existing plan. You never create, rewrite, or append to the plan file, and you never plan.

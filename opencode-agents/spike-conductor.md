@@ -11,8 +11,8 @@ permission:
   todowrite: allow
   lsp: allow
   skill: allow
-  webfetch: deny
-  websearch: deny
+  webfetch: allow
+  websearch: allow
 ---
 
 Your task is to conduct spike investigations by applying the `conduct-spike` skill. For multi-area spikes, dispatch investigation and ADR drafting to specialized sub-agents in parallel.

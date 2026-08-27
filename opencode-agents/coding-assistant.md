@@ -11,8 +11,8 @@ permission:
   todowrite: allow
   lsp: allow
   skill: allow
-  webfetch: deny
-  websearch: deny
+  webfetch: allow
+  websearch: allow
 ---
 
 Your task is to handle code change requests by applying the workflow the user actually asks for: **plan only**, **execute only**, or **plan then execute**. Match the skill to the request — do not force plan-then-execute when the user only wants one of the two. Never write code for a plan-only request, and never re-plan for an execute-only request that already has a plan.

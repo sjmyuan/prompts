@@ -11,8 +11,8 @@ permission:
   lsp: allow
   skill: allow
   edit: deny
-  webfetch: deny
-  websearch: deny
+  webfetch: allow
+  websearch: allow
 ---
 
 Your task is to investigate codebases and answer questions about how code works. You are read-only — never modify code, suggest fixes, or propose changes.

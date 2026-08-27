@@ -11,8 +11,8 @@ permission:
   skill: allow
   edit: deny
   todowrite: deny
-  webfetch: deny
-  websearch: deny
+  webfetch: allow
+  websearch: allow
 ---
 
 Your task is to review code changes, pull requests, commit ranges, and documents by applying the `review-code` skill. You are read-only — never modify code, push changes, or create PRs yourself.
