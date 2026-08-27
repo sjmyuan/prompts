@@ -22,6 +22,12 @@ description: Investigate codebases to answer questions about functionality, arch
 | **Semantic search** | Conceptual queries, high-level patterns |
 | **Grep search** | Exact strings, function/class names, identifiers |
 | **File search** | Partial file names, known directory structures |
+
+**Detect available tools first — never assume a search tool exists.**
+- Check for semantic-search capabilities: MCP tools, a CLI (e.g., `semble`), or built-in IDE search.
+- Check the grep engine: prefer `rg` (ripgrep) when available; fall back to `grep`.
+- Use the strongest available strategy: semantic search when present; else grep/file search with keyword variants.
+- When no semantic tool exists, report reduced recall as a ❓ Gap.
 </search-strategies>
 <multi-repo-discovery>
 Discover cross-repo dependencies:
@@ -94,12 +100,12 @@ All investigation prose and reports follow BLUF (conclusion first), hard caps, a
 
 <investigate-codebase>
 1. **Clarify the question**: If ambiguous or broad (e.g., "How does auth work?"), ask the user to specify system, scope, or depth. For simple direct questions (e.g., "Where is `UserService` defined?"), skip to step 2.
-2. **Discover relevant code**: Use semantic search, grep, and file search (see search-strategies) to locate entry points, key classes, and configuration.
+2. **Discover relevant code**: Detect available search tools first (see search-strategies) — use semantic search when a tool exists, else grep/file search with keyword variants. Locate entry points, key classes, and configuration. Tag reduced recall from a missing semantic tool as ❓ Gap.
 3. **Trace control and data flow**: Follow entry points through the call chain — identify each component's role, how data transforms at each step, and how errors are handled.
 4. **Analyze dependencies**: List external libraries, internal module dependencies, service integrations, and configuration dependencies.
 5. **Extract structural fingerprint**: Note the feature's layer chain (e.g., Controller → Orchestrator → Service → Adapter), stereotypes, and external interactions. This feeds into discover-implementation-patterns.
 6. **Synthesize findings**: Present a coherent narrative — direct answer first, then supporting evidence with file:line references, key design decisions, and areas needing deeper investigation. Then apply present-findings-with-confidence to tag each finding as verified/inferred/assumed, report gaps, and raise inconsistencies.
-7. **Validate**: Verify that all file:line references are accurate by checking the workspace, that the narrative answers the original question directly, that every finding carries a confidence tag with no gap silently omitted, and that prose follows **concise-writing** (answer first, ≤20-word sentences, no banned phrases).
+7. **Validate**: Verify that all file:line references are accurate by checking the workspace, that the narrative answers the original question directly, that search-tool availability was detected rather than assumed, that every finding carries a confidence tag with no gap silently omitted, and that prose follows **concise-writing** (answer first, ≤20-word sentences, no banned phrases).
 </investigate-codebase>
 
 <analyze-cross-repo-dependencies>
