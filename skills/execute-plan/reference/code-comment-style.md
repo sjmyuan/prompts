@@ -2,11 +2,16 @@
 
 Generated code must follow the repo's comment convention and stay minimal. Comments explain *why*; the code explains *what*.
 
+## Default posture
+- **Zero comments is the default.** Write the code first with no comments; add why-comments only on a second pass, and only where the allowlist below applies.
+- Before commenting, ask: would a better name or an extracted helper say this? If yes, fix the code and drop the comment.
+- Restate the plan note's policy + exemplar before writing code (**execute-step**).
+
 ## Detect the repo's convention
 1. Sample 3–5 recently modified files in the same module or language.
 2. Check `.editorconfig`, CONTRIBUTING docs, or language style guides when present.
 3. Note the density: no comments / terse why-comments / rich docstrings.
-4. Record a one-line note in the plan file during **verify-prerequisites** (e.g., `Comment convention: sparse, why-only, no docstrings`).
+4. Record a one-line policy + one exemplar comment in the plan file during **verify-prerequisites** (e.g., `Policy: sparse, why-only, no docstrings · Exemplar: "// keep-alive: pooling beats TLS re-handshake"`).
 5. If the repo is mixed, follow the dominant style of the files you are changing; ask the user only if genuinely split.
 
 ## Comment when (allowlist)
@@ -32,11 +37,11 @@ Generated code must follow the repo's comment convention and stay minimal. Comme
 | Rich docstrings | Docstrings on public API only, following the repo template; none on private/internal |
 
 ## Caps
-- Line comment: ≤ 15 words, one line. If it needs more, rename the symbol or extract a helper instead.
+- Line comment: ≤ 15 words, one line. If one is needed at all — or it needs more — rename the symbol or extract a helper instead.
 - Docstring: 1–3 sentences per the repo template; skip entirely if the repo has none.
 
 ## Pre-commit self-check (commit-step)
-Run this scan on the staged diff before committing:
+Run a deterministic pattern scan on the staged diff before committing — grep for `// ====`, `// step N`, `// added|generated|fixed`, and AI/tool names; any hit blocks that file. Then verify:
 - [ ] No comment restates the code it sits on.
 - [ ] No narration markers (plan steps, "added/generated", banners, AI/tool names).
 - [ ] Density matches the repo's sampled style.

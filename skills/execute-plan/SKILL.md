@@ -47,11 +47,13 @@ Small-step commit rules (frequency, size, message format/content, staging, push 
 
 <code-comment-conventions>
 Generated code must match the repo's comment style (rubric: **reference/code-comment-style.md**):
+- Default is **zero comments** — write code first, add why-comments only on a second pass
 - Comments explain **why** — non-obvious intent, workarounds, invariants, edge cases — never restate the **what**
+- Before commenting, rename the symbol or extract a helper instead
 - No process narration: plan-step references, "added/generated" markers, section banners, AI/tool mentions
 - Match the repo's density — sparse repo gets sparse comments; docstrings only where the repo uses them (public API only)
 - Line comments ≤ 15 words
-- Detected during **verify-prerequisites**; enforced in **commit-step**
+- Detected during **verify-prerequisites** (policy + one exemplar recorded in the plan note); enforced at write time in **execute-step** and as a deterministic pattern scan in **commit-step**
 </code-comment-conventions>
 
 <test-placement>
@@ -86,7 +88,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 |---|---|---|
 | Executing any step that writes or modifies code | Code comment doctrine: why-not-what, banned patterns, density matching, pre-commit self-check | [reference/code-comment-style.md](reference/code-comment-style.md) |
 | A step writes or modifies tests for new logic | Output model: locating existing tests and extending them instead of creating a new file | [examples/extend-existing-tests.md](examples/extend-existing-tests.md) |
-| Generating code that needs to match the repo's comment style before committing | Output model: convention detection + pre-commit comment scan in action | [examples/comment-hygiene.md](examples/comment-hygiene.md) |
+| Generating code that needs to match the repo's comment style before committing | Output model: policy+exemplar detection, write-time zero-comment default, deterministic pattern-scan gate | [examples/comment-hygiene.md](examples/comment-hygiene.md) |
 | Executing a small, focused plan (single component or focused task) | Output model: detailed progress updates for a simple focused execution | [examples/single-component-refactor.md](examples/single-component-refactor.md) |
 | Executing a plan that spans multiple files and architectural layers | Output model: execution tracking across multiple files and layers | [examples/multi-file-implementation.md](examples/multi-file-implementation.md) |
 | Executing a plan that should validate after each change and at milestones | Output model: incremental validation checkpoints across a plan | [examples/validation-checkpoints.md](examples/validation-checkpoints.md) |
@@ -122,11 +124,12 @@ Load only the example most relevant to the current execution scenario to minimiz
 <execute-step>
 1. Before starting a step, mark it as 🔄 in-progress in the plan file and briefly explain your approach. Apply **check-scope-boundary** — if the step's required changes exceed the plan's scope boundary, refuse and ask instead of adapting.
 2. Execute the step fully — no partial implementations.
-3. If the step writes or modifies tests, apply **place-tests** before writing any test code — locate existing tests and prefer extending them over creating new files.
-4. After completing the step, validate the outcome meets the step's objectives.
-5. Mark the step as ✅ completed; document files changed, implementation details, and validation results in the plan file.
-6. Confirm the prerequisite step is fully ✅ completed before starting a step that depends on it.
-7. Display the full updated step list with current statuses after each completion.
+3. When writing or modifying code, restate the repo's comment policy + exemplar from the plan note (see **code-comment-conventions**), then write comment-minimal: default to zero comments, prefer renaming/extracting over commenting, add why-comments only on a second pass (≤ 15 words each).
+4. If the step writes or modifies tests, apply **place-tests** before writing any test code — locate existing tests and prefer extending them over creating new files.
+5. After completing the step, validate the outcome meets the step's objectives.
+6. Mark the step as ✅ completed; document files changed, implementation details, and validation results in the plan file.
+7. Confirm the prerequisite step is fully ✅ completed before starting a step that depends on it.
+8. Display the full updated step list with current statuses after each completion.
 </execute-step>
 
 <handle-errors>
@@ -180,7 +183,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 <verify-prerequisites>
 1. Verify the correct feature branch is checked out; create it if the plan requires one and the user confirms the branch name and base, naming it per the repo's branch convention (detect from existing branches / git config / team docs, or ask; never assume a prefix).
 2. Verify the working tree has no unrelated uncommitted changes; verify dependencies and toolchain are available; verify baseline tests/lint pass.
-3. Detect the repo's comment style per **code-comment-conventions** (sample recently modified files, `.editorconfig`, CONTRIBUTING docs) and record a one-line convention note in the plan file.
+3. Detect the repo's comment style per **code-comment-conventions** (sample recently modified files, `.editorconfig`, CONTRIBUTING docs) and record a one-line policy + one exemplar comment in the plan note (e.g., `Policy: sparse, why-only, no docstrings · Exemplar: "// keep-alive: pooling beats TLS re-handshake"`).
 4. If anything is missing or failing, STOP and raise it to the user: state exactly what is not ready, what is needed to proceed, and ask how to proceed; do not start executing steps until it is resolved.
 5. Record the outcome (ready or blockers) in the plan file before execution begins.
 </verify-prerequisites>
@@ -188,8 +191,8 @@ Load only the example most relevant to the current execution scenario to minimiz
 <commit-step>
 1. After a step is validated and marked ✅, run `git status` and `git diff` to identify the files changed by this step.
 2. Stage only those files — never unrelated or pre-existing changes.
-3. Scan the staged diff against **code-comment-conventions**.
-4. Remove or shorten restating comments, process-narration markers (plan-step references, "added/generated" notes, section banners, AI mentions), and comments that exceed the repo's density; re-stage after trimming.
+3. Scan the staged diff against **code-comment-conventions** — grep for known narration/restatement patterns (`// ====`, `// step N`, `// added|generated|fixed`, AI/tool names) and treat any hit as a blocker for that file.
+4. Remove or shorten every flagged comment, any restating comment, and comments exceeding the repo's density; re-stage after trimming.
 5. Write a small commit message following **reference/commit-conventions.md**: repo convention if known, else `type(scope): summary`, describing the change neutrally.
 6. Scan the message for AI-related words (see **reference/commit-conventions.md**) and rewrite until none remain.
 7. Commit locally; report the commit hash and message. Never push.
