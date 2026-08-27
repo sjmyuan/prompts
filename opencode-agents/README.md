@@ -12,6 +12,7 @@ Opencode-format copies of the agents in [`../claude-agents/`](../claude-agents/)
 | `coding-assistant.md` | Plan-only / execute-only / plan-then-execute code changes | `plan-development-task`, `execute-plan` |
 | `executor.md` | Execute an existing plan (never plans) | `execute-plan` |
 | `learner.md` | Extract knowledge from history (self-dispatch for parallelism) | `learn-from-history` |
+| `orchestrate-delivery.md` | **Primary** — delivery orchestrator that dispatches the plan/execute/spike/ADR/solution-doc sub-agents and tracks the delivery index | `orchestrate-feature-delivery` |
 | `planner.md` | Produce + persist a TDD plan (never executes) | `plan-development-task`, `investigate-code` |
 | `solution-doc-writer.md` | Compile solution documents (C4, sequence, RAID/RACI) | `write-solution-doc` |
 | `spike-conductor.md` | Orchestrate spike investigations + verify sub-agent results | `conduct-spike`, `question-everything` |
@@ -20,7 +21,7 @@ Opencode-format copies of the agents in [`../claude-agents/`](../claude-agents/)
 
 - One markdown file per agent; **the filename becomes the agent name** (e.g. `code-reviewer.md` → `code-reviewer`).
 - Required frontmatter: `description` (what the agent does and when to use it).
-- `mode`: `primary` | `subagent` | `all` (default `all`). All agents here are `subagent` — they are dispatch targets in the delivery pipeline, mirroring the Claude Code sub-agents.
+- `mode`: `primary` | `subagent` | `all` (default `all`). `orchestrate-delivery.md` is `primary` (the user-facing orchestrator that dispatches sub-agents); all other agents here are `subagent` — dispatch targets in the delivery pipeline, mirroring the Claude Code sub-agents.
 - `permission`: per-tool `allow` | `ask` | `deny`. Keys used here: `read`, `glob`, `grep`, `list`, `edit`, `bash`, `todowrite`, `lsp`, `webfetch`, `websearch`, `skill`.
 - The markdown body is the agent's system prompt.
 
