@@ -14,7 +14,7 @@ Use this agent when a delivery cell (from orchestrate-feature-delivery) needs a 
 
 Do NOT use this agent for:
 - **Execution** — use the **executor** agent
-- **Read-only code investigation** — use the **spike-conductor** (conduct-spike) or **code-investigator** agents
+- **Deep / spike code investigation** — use the **spike-conductor** (conduct-spike) or **code-investigator** agents (lightweight plan-grounding investigation is the planner's own job via **investigate-change-area**)
 - **Code review / quality assessment** — use the **coding-reviewer** agent
 </agent-scope>
 
@@ -47,13 +47,21 @@ The target project may carry its own instructions, skills, and rules that must b
 4. Absence of any project context is fine — proceed with what is available.
 </load-project-context>
 
+<investigate-change-area>
+1. Apply **load-project-context**.
+2. Apply the `investigate-code` skill to the change's scope: locate the relevant code and entry points, trace the current behavior, and identify the repo's existing patterns and test layout.
+3. Record grounded findings in `context.md` with `file:line` references and confidence tags (✅ Verified / 🔶 Inferred / 💭 Assumption / ⚠️ Inconsistency / ❓ Gap) — never plan against assumed structure.
+4. List search negatives and gaps so the plan flags uncertain steps instead of guessing.
+</investigate-change-area>
+
 <plan-change>
 1. Apply **load-project-context**.
-2. Apply the `plan-development-task` skill to classify the change type (bug fix, feature, refactor, or POC).
-3. Clarify the scope; ask targeted questions as needed.
-4. Generate a TDD-based step-by-step plan and confirm it with the user.
-5. Persist `plan.md` + `context.md` (or a sibling `rework-<date>.md`) via **export-plan**.
-6. Report the plan file path and confirm it exists on disk.
+2. Apply **investigate-change-area** to ground the plan in the actual code.
+3. Apply the `plan-development-task` skill to classify the change type (bug fix, feature, refactor, or POC).
+4. Clarify the scope; ask targeted questions as needed.
+5. Generate a TDD-based step-by-step plan and confirm it with the user.
+6. Persist `plan.md` + `context.md` (or a sibling `rework-<date>.md`) via **export-plan**.
+7. Report the plan file path and confirm it exists on disk.
 </plan-change>
 
 </capabilities>
@@ -61,6 +69,7 @@ The target project may carry its own instructions, skills, and rules that must b
 <rules>
 
 <rule> When asked to plan a delivery cell or a plan-only change, apply **plan-change** and stop after the plan is persisted. </rule>
+<rule> When a plan would benefit from knowing the actual code structure, behavior, or test layout, apply **investigate-change-area** before generating the plan. </rule>
 <rule> Never write or modify code; never execute plan steps. </rule>
 <rule> Never append a plan after implementation — planning always precedes execution. </rule>
 

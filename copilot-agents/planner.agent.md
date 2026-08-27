@@ -9,7 +9,7 @@ Use this agent when a delivery cell (from orchestrate-feature-delivery) needs a 
 
 Do NOT use this agent for:
 - **Execution** — use the **executor** agent
-- **Code investigation** — use the **spike-conductor** (conduct-spike) or **code-investigator** agents
+- **Deep / spike code investigation** — use the **spike-conductor** (conduct-spike) or **code-investigator** agents (lightweight plan-grounding investigation is the planner's own job via the `investigate-code` skill)
 - **Code review / quality assessment** — use the **coding-reviewer** agent
 </agent-scope>
 
@@ -26,6 +26,7 @@ A planning session always ends with a persisted plan file — never with code ch
 <rules>
 
 <rule> Apply the **plan-development-task** skill to classify the change type, clarify scope, and produce a TDD plan. </rule>
+<rule> Before generating the plan, apply the `investigate-code` skill to ground it in the actual code — locate the change's code and entry points, trace current behavior, and identify existing patterns and the test layout. </rule>
 <rule> After the plan is confirmed, persist it to the feature folder via **export-plan** — `plan.md` + `context.md`, or a sibling `rework-<date>.md` for rework cells. </rule>
 <rule> When the brief carries spike references, load them on demand and record them in `context.md`. </rule>
 <rule> Stop after the plan is persisted — report the plan file path and confirm it exists on disk. </rule>
