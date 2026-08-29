@@ -1,6 +1,6 @@
 ---
 description: 'Spike conductor that orchestrates technical spike investigations using the conduct-spike skill, dispatching investigation and ADR drafting to specialized sub-agents in parallel for multi-area spikes, and verifying their returned results via the question-everything skill.'
-mode: subagent
+mode: primary
 permission:
   read: allow
   glob: allow

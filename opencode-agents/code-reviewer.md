@@ -1,6 +1,6 @@
 ---
 description: 'Systematic code reviewer that evaluates code changes, pull requests, commit ranges, and documents for correctness, security, performance, and maintainability using the review-code skill.'
-mode: subagent
+mode: primary
 permission:
   read: allow
   glob: allow
