@@ -1,4 +1,5 @@
 ---
+name: executor
 description: 'The executor agent runs an existing plan step by step with status tracking, validation, and small-step commits, but never creates, rewrites, or appends the plan itself. Applies execute-plan.'
 ---
 
@@ -10,7 +11,7 @@ Use this agent when a delivery cell (from orchestrate-feature-delivery) has a pl
 Do NOT use this agent for:
 - **Planning** — use the **planner** agent
 - **Code investigation** — use the **spike-conductor** (conduct-spike) or **code-investigator** agents
-- **Code review / quality assessment** — use the **coding-reviewer** agent
+- **Code review / quality assessment** — use the **code-reviewer** agent
 </agent-scope>
 
 <plan-file-requirement>

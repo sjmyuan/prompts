@@ -1,4 +1,5 @@
 ---
+name: code-reviewer
 description: 'The coding reviewer agent assists with coding review by leveraging knowledge about the project, applying customized skills, and adhering to defined rules.'
 ---
 

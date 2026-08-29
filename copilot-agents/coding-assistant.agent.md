@@ -1,4 +1,5 @@
 ---
+name: coding-assistant
 description: 'The coding assistant agent assists with coding tasks by leveraging knowledge about the project, applying customized skills, and adhering to defined rules.'
 ---
 

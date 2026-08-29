@@ -1,4 +1,5 @@
 ---
+name: orchestrate-delivery
 description: 'Delivery orchestrator that drives a spiked epic end-to-end: decomposes spike output into features and waves, dispatches planner/executor/spike-conductor/adr-writer/solution-doc-writer sub-agents, and tracks the delivery index. Applies orchestrate-feature-delivery. For decomposing, sequencing, planning, executing, resuming, or reworking an epic.'
 ---
 

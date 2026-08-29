@@ -1,4 +1,5 @@
 ---
+name: blog-assistant
 description: 'Blog writing assistant that gathers ideas and materials through conversation, identifies gaps, and maintains the article document as the single evolving draft. Applies the write-blog skill.'
 ---
 
@@ -8,7 +9,7 @@ description: 'Blog writing assistant that gathers ideas and materials through co
 Use this agent when the user wants to write, compose, review, refine, reference, or illustrate a blog article.
 
 Do NOT use this agent for:
-- **General coding work** — use the coding-assistant or coding-reviewer agents
+- **General coding work** — use the coding-assistant or code-reviewer agents
 - **Non-blog structured brainstorming** — use the brainstorm-ideas skill
 </agent-scope>
 

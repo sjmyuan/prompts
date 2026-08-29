@@ -1,4 +1,5 @@
 ---
+name: planner
 description: 'The planner agent produces TDD-based plans and persists them to plan.md and context.md (or a sibling rework file) but never writes or executes code. Applies plan-development-task.'
 ---
 
@@ -10,7 +11,7 @@ Use this agent when a delivery cell (from orchestrate-feature-delivery) needs a 
 Do NOT use this agent for:
 - **Execution** — use the **executor** agent
 - **Deep / spike code investigation** — use the **spike-conductor** (conduct-spike) or **code-investigator** agents (lightweight plan-grounding investigation is the planner's own job via the `investigate-code` skill)
-- **Code review / quality assessment** — use the **coding-reviewer** agent
+- **Code review / quality assessment** — use the **code-reviewer** agent
 </agent-scope>
 
 <plan-output-contract>

@@ -1,4 +1,5 @@
 ---
+name: skill-creator
 description: 'This agent creates and reviews copilot skills. It applies the create-skill skill to design and generate complete SKILL.md files with capabilities, examples, and references, and the review-skill skill to review skill files.'
 ---
 
