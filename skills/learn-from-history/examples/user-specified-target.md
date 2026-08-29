@@ -57,7 +57,7 @@ User: Now learn from this session.
 
 ---
 
-## Step 3: generate-provision-plan
+## Step 3: provision-lessons (plan phase)
 
 | # | Lesson Summary | Signal Type | Target File | Section | Content to Add |
 |---|---|---|---|---|---|
@@ -67,7 +67,7 @@ User: Now learn from this session.
 
 ---
 
-## Step 4: review-and-apply
+## Step 4: provision-lessons (review & apply)
 
 Present to user:
 

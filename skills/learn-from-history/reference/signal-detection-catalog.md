@@ -98,22 +98,20 @@ New team members consistently ask the same setup, access, or process questions:
 
 ## Procedural Sources (Any Source Type)
 
-Procedural signals capture step-by-step knowledge about how to accomplish recurring tasks. Unlike rules (single directives) or knowledge (facts), procedures are ordered sequences of actions. They come in two forms:
+Procedural signals capture ordered sequences of actions for recurring tasks. They come in two forms:
 - **Described procedures** (signal #12): Steps explicitly described in text — a Slack message, a document, a chat session. The procedure is read, not inferred.
 - **Implementation recipes** (signal #13): Steps inferred from code changes — which files were touched in a PR and in what order. The procedure is deduced, not read.
 
 Both yield structured capabilities (multi-step, parameterized procedures) after going through **extract-and-refine-capability**.
 
 ### 12. Described procedure
-A sequence of steps describing how to accomplish a recurring task is explicitly shared in text form (chat, transcripts, documents). The steps exist in the text — no inference from code is needed:
+Steps explicitly shared in text (chat, transcripts, documents); no inference from code needed:
 - A team member explains "here's how you deploy a hotfix" in Slack with numbered steps
 - Someone shares a checklist-style guide in a Teams channel: "To onboard a new service: 1) create repo, 2) add CI config, 3) register in service catalog…"
 - During a chat session, the user walks through their workflow step by step and says "this is how we always do it"
 - A PR description includes a detailed "how to test" section that reveals a non-obvious testing procedure
 - An ADR or design doc describes a multi-step process that was decided on but never distilled into a capability
 - **Signal strength**: High — uncodified procedures create inconsistency and slow down newcomers
-
-**Distinction from signal #13 (implementation recipe)**: This signal captures procedures **described in words** — someone said or wrote the steps. Signal #13 captures procedures **inferred from code changes** — the steps are deduced from which files were changed and in what order. Both yield multi-step capabilities, but the extraction path differs.
 
 **What to look for** (in text):
 - Ordered language: "first", "then", "next", "finally", "after that", "step 1/2/3"
@@ -130,13 +128,11 @@ A sequence of steps describing how to accomplish a recurring task is explicitly 
 - Personal workflow preferences that aren't team conventions ("I like to open VS Code first, then terminal")
 
 ### 13. Implementation recipe
-A task's PR(s) reveal a sequence of which repos, components, and changes are involved — indicating an unwritten procedure that must be **inferred from code changes** rather than read from text. A single task can suggest a tentative recipe; confidence increases as more instances confirm it. When a task spans multiple repos, the recipe works at two levels: per-repo change patterns and cross-repo orchestration:
+A task's PR(s) reveal a change sequence — an unwritten procedure **inferred from code changes**. A single task gives a tentative recipe; more instances confirm it. Multi-repo tasks work at two levels: per-repo patterns and cross-repo orchestration:
 - A single task with PRs in 3 repos (API, frontend, infra) reveals both per-repo steps and the cross-repo order — both are worth capturing (confidence: tentative)
 - Multiple tasks of the same type follow the same multi-repo pattern — the full recipe is confirmed at both levels (confidence: high)
 - A code review comment says "follow the same pattern as the X feature" — the pattern exists but isn't captured anywhere
 - **Signal strength**: Medium for single instance (tentative recipe), High for 2+ instances (confirmed recipe)
-
-**Distinction from signal #12 (described procedure)**: This signal captures procedures **inferred from code changes** — you deduce the steps by examining which files were touched and in what order. Signal #12 captures procedures **explicitly described in text** — someone wrote or said the steps. Both yield multi-step capabilities, but the extraction path differs: recipes need the code path (analyze-code-changes flags them, extract-and-refine-capability's code path structures them), while described procedures use the text path.
 
 **What to look for**:
 - **Repo map**: Which repos are touched? Single repo or multiple? If multiple, what's the dependency order between them?
@@ -174,12 +170,3 @@ A task's PR(s) reveal a sequence of which repos, components, and changes are inv
 - Information already captured in existing documentation, runbooks, or ADRs
 - Vague complaints without a concrete solution or action
 - Personal discussions unrelated to project work
-
-### From procedural sources:
-- Generic advice without concrete steps ("you should test more thoroughly" — not a procedure)
-- Single-step actions ("run `npm install`" — a command, not a procedure; capture as knowledge or a rule)
-- Procedures already documented in the target (check existing skills, project notes, runbooks before extracting)
-- Personal workflow preferences that aren't team conventions ("I like to open VS Code first, then terminal")
-- PRs that follow a framework's standard scaffolding (Rails generators, NestJS CLI) — not team conventions
-- Procedures that are generic industry knowledge ("write tests before code") — must encode team-specific conventions
-- A PR with no discernible structural pattern (ad-hoc changes) — if you can't articulate a sequence, it's not a recipe

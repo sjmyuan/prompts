@@ -58,7 +58,7 @@ Later, user says: "Learn from this session and save what's worth keeping."
 
 ---
 
-## Step 3: generate-provision-plan
+## Step 3: provision-lessons (plan phase)
 
 | # | Lesson Summary | Signal Type | Target File | Section | Content to Add |
 |---|---|---|---|---|---|
@@ -68,7 +68,7 @@ Later, user says: "Learn from this session and save what's worth keeping."
 
 ---
 
-## Step 4: review-and-apply
+## Step 4: provision-lessons (review & apply)
 
 Present to user:
 

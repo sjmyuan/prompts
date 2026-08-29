@@ -59,11 +59,11 @@ User says: "Learn from this Slack transcript and save what's worth keeping."
 | Non-duplication | ✅ Pass | Alice explicitly says "we never wrote it down" — confirmed absent from context |
 | Specificity | ✅ Pass | Specific enough to follow step-by-step; general enough to apply to any hotfix |
 
-**Verdict**: ACCEPT — but this is a multi-step procedure, not a single rule or fact. Route to **extract-capability**.
+**Verdict**: ACCEPT — but this is a multi-step procedure, not a single rule or fact. Route to **extract-and-refine-capability** (extract phase).
 
 ---
 
-## Step 2: extract-capability
+## Step 2: extract-and-refine-capability (extract phase)
 
 ### Identify the procedure
 Alice's message is a numbered, ordered list of 5 steps with imperative language ("always branch", "ping the on-call person", "stay in #alerts").
@@ -126,7 +126,7 @@ Constants: always branch from release tag (not main), always ping on-call, alway
 
 ---
 
-## Step 3: determine-provision-target
+## Step 3: provision-lessons (classify phase)
 
 **Classification**: Multi-step procedure, team-specific, operational → project-level persistent notes (no domain skill covers deployments).
 
@@ -136,7 +136,7 @@ Constants: always branch from release tag (not main), always ping on-call, alway
 
 ---
 
-## Step 4: generate-provision-plan
+## Step 4: provision-lessons (plan phase)
 
 | # | Lesson Summary | Signal Type | Target File | Section | Content |
 |---|---|---|---|---|---|
@@ -180,7 +180,7 @@ User says: "Learn from this too and update the deployment docs."
 
 ---
 
-## Step 6: extract-capability (second session)
+## Step 6: extract-and-refine-capability (extract phase, second session)
 
 ### Identify the procedure
 5 steps, described in relation to the existing hotfix procedure.
@@ -217,9 +217,9 @@ But this overlaps heavily with the existing `<deploy-hotfix>` capability in proj
 
 ---
 
-## Step 7: abstract-capability
+## Step 7: extract-and-refine-capability (refine phase)
 
-Rule triggers: "When a candidate capability overlaps with an existing capability → apply **abstract-capability**"
+Rule triggers: "When a candidate capability overlaps with an existing capability → apply **extract-and-refine-capability** (refine phase)"
 
 ### Load existing context
 Read project conventions → find existing `<deploy-hotfix>` capability.
@@ -278,7 +278,7 @@ What varies: branch source, merge type, tag format, review urgency, monitoring r
 
 ---
 
-## Step 8: determine-provision-target
+## Step 8: provision-lessons (classify phase)
 
 **Classification**: Refined capability replacing an existing one → same target as the original.
 
@@ -286,7 +286,7 @@ What varies: branch source, merge type, tag format, review urgency, monitoring r
 
 ---
 
-## Step 9: generate-provision-plan
+## Step 9: provision-lessons (plan phase)
 
 | # | Lesson Summary | Signal Type | Target File | Section | Content |
 |---|---|---|---|---|---|

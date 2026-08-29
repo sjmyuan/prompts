@@ -125,7 +125,7 @@ Components handling large lists get `useMemo`/`React.memo` added after performan
 
 ---
 
-## Step 3: determine-provision-target
+## Step 3: provision-lessons (classify phase)
 
 All four candidates are project-wide conventions discovered through git history → project-level persistent notes.
 
@@ -138,7 +138,7 @@ All four candidates are project-wide conventions discovered through git history 
 
 ---
 
-## Step 4: generate-provision-plan
+## Step 4: provision-lessons (plan phase)
 
 | # | Lesson Summary | Signal Type | Target File | Section | Content to Add |
 |---|---|---|---|---|---|
@@ -151,7 +151,7 @@ All four candidates are project-wide conventions discovered through git history 
 
 ---
 
-## Step 5: review-and-apply
+## Step 5: provision-lessons (review & apply)
 
 Present to user:
 

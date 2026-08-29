@@ -107,7 +107,7 @@ Files changed reveal the story didn't capture:
 
 ---
 
-## Step 3: determine-provision-target
+## Step 3: provision-lessons (classify phase)
 
 **Candidate 1 (bulk endpoints)**: Project-wide architectural rule → project-level persistent notes, "API Design" section.
 
@@ -119,7 +119,7 @@ All three are project-scoped, not skill-specific or personal.
 
 ---
 
-## Step 4: generate-provision-plan
+## Step 4: provision-lessons (plan phase)
 
 | # | Lesson Summary | Signal Type | Target File | Section | Content to Add |
 |---|---|---|---|---|---|
@@ -131,7 +131,7 @@ All three are project-scoped, not skill-specific or personal.
 
 ---
 
-## Step 5: review-and-apply
+## Step 5: provision-lessons (review & apply)
 
 Present to user:
 

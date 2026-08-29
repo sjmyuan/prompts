@@ -21,7 +21,7 @@ PR #342: Bulk delete users (2026-04-12)
 
 ---
 
-### Step 1: analyze-code-change-history
+### Step 1: analyze-code-changes
 
 **Single PR analysis** — extract the change pattern:
 
@@ -66,7 +66,7 @@ PR #342: Bulk delete users (2026-04-12)
 
 ---
 
-### Step 3: extract-capability
+### Step 3: extract-and-refine-capability (extract phase)
 
 ```markdown
 <add-bulk-operation>
@@ -98,7 +98,7 @@ PR #342: Bulk delete users (2026-04-12)
 
 ---
 
-### Step 4: determine-provision-target → review-and-apply
+### Step 4: provision-lessons (classify phase → review & apply)
 
 Target: Project conventions, "Implementation Recipes" section. Tagged as tentative. **Provisioned.**
 
@@ -119,7 +119,7 @@ PRs:
 
 ---
 
-### Step 5: analyze-code-change-history
+### Step 5: analyze-code-changes
 
 **Cross-PR comparison against the tentative recipe**:
 
@@ -142,7 +142,7 @@ PRs:
 
 ---
 
-### Step 6: extract-capability (refined)
+### Step 6: extract-and-refine-capability (extract phase, refined)
 
 Same steps, updated metadata:
 
@@ -177,7 +177,7 @@ PRs:
 
 ---
 
-### Step 7: analyze-code-change-history
+### Step 7: analyze-code-changes
 
 **Cross-PR comparison for export pattern**:
 
@@ -195,13 +195,13 @@ PRs:
 
 ---
 
-### Step 8: extract-capability (export recipe)
+### Step 8: extract-and-refine-capability (extract phase, export recipe)
 
-Export capability extracted. Rule triggers: overlaps with existing `<add-bulk-operation>` → route to **abstract-capability**.
+Export capability extracted. Rule triggers: overlaps with existing `<add-bulk-operation>` → route to **extract-and-refine-capability** (refine phase).
 
 ---
 
-### Step 9: abstract-capability
+### Step 9: extract-and-refine-capability (refine phase)
 
 **Load existing**: `<add-bulk-operation>` (confirmed, 5 PRs) from project conventions.
 
@@ -260,7 +260,7 @@ Export capability extracted. Rule triggers: overlaps with existing `<add-bulk-op
 
 ---
 
-### Step 10: generate-provision-plan
+### Step 10: provision-lessons (plan phase)
 
 | # | Lesson Summary | Signal Type | Target File | Section | Content |
 |---|---|---|---|---|---|
@@ -287,7 +287,7 @@ Repos and PRs:
 
 ---
 
-### Step 1: analyze-code-change-history
+### Step 1: analyze-code-changes
 
 **Repo map**: Two repos — `api-repo` (backend) and `web-repo` (frontend).
 
@@ -302,7 +302,7 @@ Repos and PRs:
 
 ---
 
-### Step 2: extract-capability (two levels)
+### Step 2: extract-and-refine-capability (extract phase, two levels)
 
 **Level 1 — Repo-level capabilities**:
 
@@ -374,5 +374,5 @@ Repos and PRs:
 When a second task (e.g., "bulk-archive posts") follows the same multi-repo pattern:
 - Each repo-level capability gets **confirmed** independently
 - The cross-repo orchestration gets **confirmed**
-- If a third task type (e.g., "export") is added that also spans the same two repos, `abstract-capability` merges the cross-repo capability into a general `<add-entity-list-operation-end-to-end>` — the same abstraction shown in Session 3, but now operating at the cross-repo level with repo-level sub-capabilities
+- If a third task type (e.g., "export") is added that also spans the same two repos, `extract-and-refine-capability` (refine phase) merges the cross-repo capability into a general `<add-entity-list-operation-end-to-end>` — the same abstraction shown in Session 3, but now operating at the cross-repo level with repo-level sub-capabilities
 

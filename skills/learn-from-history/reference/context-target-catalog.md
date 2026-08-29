@@ -119,7 +119,7 @@ before committing changes.
 - **Objective**: One sentence describing the goal
 - **Steps**: Numbered list, each starting with an imperative action verb
 - **Parameters** (optional): Table of what varies per instance
-- **Evolution note** (if refined via `abstract-capability`): What was merged and why
+- **Evolution note** (if refined via the refine phase of `extract-and-refine-capability`): What was merged and why
 
 **Example entry** (in capabilities section):
 ```markdown
