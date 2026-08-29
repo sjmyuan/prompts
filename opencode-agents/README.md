@@ -6,6 +6,7 @@ Opencode-format copies of the agents in [`../claude-agents/`](../claude-agents/)
 
 | Agent | Purpose | Applies skill(s) |
 |---|---|---|
+| `blog-assistant.md` | **Primary** — conversational blog-writing assistant that gathers ideas, fills gaps, and maintains the article document | `write-blog` |
 | `adr-writer.md` | Draft Architecture Decision Records | `draft-adr` |
 | `code-investigator.md` | Read-only codebase investigation | `investigate-code` |
 | `code-reviewer.md` | Read-only code review | `review-code` |
@@ -21,7 +22,7 @@ Opencode-format copies of the agents in [`../claude-agents/`](../claude-agents/)
 
 - One markdown file per agent; **the filename becomes the agent name** (e.g. `code-reviewer.md` → `code-reviewer`).
 - Required frontmatter: `description` (what the agent does and when to use it).
-- `mode`: `primary` | `subagent` | `all` (default `all`). `orchestrate-delivery.md` is `primary` (the user-facing orchestrator that dispatches sub-agents); all other agents here are `subagent` — dispatch targets in the delivery pipeline, mirroring the Claude Code sub-agents.
+- `mode`: `primary` | `subagent` | `all` (default `all`). `orchestrate-delivery.md` and `blog-assistant.md` are `primary` (user-facing: the delivery orchestrator that dispatches sub-agents, and the conversational blog-writing assistant); all other agents here are `subagent` — dispatch targets in the delivery pipeline, mirroring the Claude Code sub-agents.
 - `permission`: per-tool `allow` | `ask` | `deny`. Keys used here: `read`, `glob`, `grep`, `list`, `edit`, `bash`, `todowrite`, `lsp`, `webfetch`, `websearch`, `skill`.
 - The markdown body is the agent's system prompt.
 
@@ -49,5 +50,5 @@ Then invoke a subagent with `@name` (e.g. `@planner ...`) or let a primary agent
 
 ## Notes
 
-- The agents reference skills by name (`draft-adr`, `plan-development-task`, `execute-plan`, `investigate-code`, `review-code`, `write-solution-doc`, `conduct-spike`, `learn-from-history`, `question-everything`). For opencode to load them via the `skill` tool, the skills must be discoverable in `.opencode/skills/<name>/SKILL.md`, `.claude/skills/<name>/SKILL.md`, `.agents/skills/<name>/SKILL.md`, or the matching global config locations.
+- The agents reference skills by name (`write-blog`, `draft-adr`, `plan-development-task`, `execute-plan`, `investigate-code`, `review-code`, `write-solution-doc`, `conduct-spike`, `learn-from-history`, `question-everything`). For opencode to load them via the `skill` tool, the skills must be discoverable in `.opencode/skills/<name>/SKILL.md`, `.claude/skills/<name>/SKILL.md`, `.agents/skills/<name>/SKILL.md`, or the matching global config locations.
 - Subagent dispatch tables (in `spike-conductor.md` and `learner.md`) reference agents by name — those names resolve to the other files in this folder once installed.
