@@ -49,6 +49,7 @@ Each file follows the [opencode agents spec](https://opencode.ai/docs/agents/).
 | Agent | Purpose | Applies skill(s) |
 |---|---|---|
 | `blog-assistant.md` | **Primary** — conversational blog-writing assistant that gathers ideas, fills gaps, and maintains the article document | `write-blog` |
+| `skill-creator.md` | **Primary** — creates and reviews skills (SKILL.md) by applying the create-skill / review-skill workflows | `create-skill`, `review-skill` |
 | `adr-writer.md` | Draft Architecture Decision Records | `draft-adr` |
 | `code-investigator.md` | Read-only codebase investigation | `investigate-code` |
 | `code-reviewer.md` | Read-only code review | `review-code` |
@@ -64,7 +65,7 @@ Each file follows the [opencode agents spec](https://opencode.ai/docs/agents/).
 
 - One markdown file per agent; **the filename becomes the agent name** (e.g. `code-reviewer.md` → `code-reviewer`).
 - Required frontmatter: `description`.
-- `mode`: `primary` | `subagent` | `all` (default `all`). `orchestrate-delivery.md` and `blog-assistant.md` are `primary`; the rest are `subagent` (dispatch targets).
+- `mode`: `primary` | `subagent` | `all` (default `all`). `orchestrate-delivery.md`, `blog-assistant.md`, and `skill-creator.md` are `primary`; the rest are `subagent` (dispatch targets).
 - `permission`: per-tool `allow` | `ask` | `deny`.
 - The markdown body is the agent's system prompt.
 
