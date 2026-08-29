@@ -4,7 +4,7 @@ description: Orchestrate spiked-epic delivery via dispatched agents and a tracki
 ---
 
 <when-to-use-this-skill>
-- User finished a spike and wants to decompose its change summary / solution doc into features or phases (creates the delivery index)
+- User finished a spike and wants to decompose its solution doc / ADRs into features or phases (creates the delivery index)
 - User wants to prove an ADR option with a POC before deciding — define and gate POC cells (see **define-poc-scope**)
 - User wants to sequence which features run in parallel and which wait for another feature's PR to merge
 - User wants to dispatch parallel agents to plan (plan-development-task) or execute (execute-plan) feature × repo cells of an epic
@@ -13,14 +13,14 @@ description: Orchestrate spiked-epic delivery via dispatched agents and a tracki
 - User found an issue after a feature was implemented (a cell is done, or implemented but not yet pushed/merged) and wants rework — focused spike on the governing ADR, a sibling rework file, and its execution
 - User reports an ADR decision changed mid-delivery — re-route the cells governed by it (see **handle-adr-change**)
 - User wants suggestions for which skill handles each part of a rework (spike, ADR update, rework plan, execution)
-- Do NOT load before a spike's change summary / solution doc exists — let conduct-spike produce them first
+- Do NOT load before a spike's solution doc / ADRs exist — let conduct-spike produce them first
 - Do NOT load to plan or execute a single, already-scoped change — plan-development-task and execute-plan handle single cells
 - Do NOT load to run a standalone spike — conduct-spike runs spikes; this skill only triggers focused rework spikes
 </when-to-use-this-skill>
 
 <knowledge>
 <orchestrator-role>
-Persistent orchestrator for **one spiked epic**; input is always the **delivery index** plus the spike output (change summary, solution doc, ADRs). Change summaries come from `summarize-change-scope`; solution doc and ADRs from `write-solution-doc` and `draft-adr`. It decomposes, sequences, dispatches, and tracks — it never plans, codes, or edits artifacts itself (delegation map in **agent-dispatch**). The index is the single source of truth.
+Persistent orchestrator for **one spiked epic**; input is always the **delivery index** plus the spike output (solution doc, ADRs). Solution doc and ADRs come from `write-solution-doc` and `draft-adr`. It decomposes, sequences, dispatches, and tracks — it never plans, codes, or edits artifacts itself (delegation map in **agent-dispatch**). The index is the single source of truth.
 
 **Non-negotiable mandate** — never perform any delivery task yourself; every investigate / plan / execute / artifact update is a separate dispatched agent. **Plan-first gate** — never dispatch an executor until the cell's plan file exists on disk (verified). **Never back-fill** — a plan is always written before execution, never appended after it.
 </orchestrator-role>
@@ -64,7 +64,7 @@ Each cell follows **unplanned → planned → in-progress → done**, plus recov
 </delivery-state-machine>
 <agent-dispatch>
 Every delivery task is delegated — the orchestrator never performs it. Map task → agent → skill: investigate → **spike-conductor** (**conduct-spike**) · plan → **planner** (**plan-development-task**) · execute → **executor** (**execute-plan**) · solution-doc → **solution-doc-writer** (**write-solution-doc**) · ADR → **adr-writer** (**draft-adr**). Plan and execute are always separate agent sessions — never one agent doing both for the same cell, never execute before a verified plan file (see **plan-first gate** in **orchestrator-role**).
-Dispatch one agent per task in parallel, subject to **develop-gating** (see **delivery-state-machine**) and **no-conflict** (never run conflicting cells on the same repo simultaneously). Each brief carries the cell's scope brief **plus spike references** (change-summary items, ADR files, solution-doc section). When plan/execution surfaces solution-doc / ADR changes, dispatch the owning agent — never edit artifacts directly. Detect the platform's agent mechanism (planner / executor / spike-conductor / adr-writer / solution-doc-writer); if none exists, ask the user how to proceed — never do the work yourself. Full rules: **reference/orchestration-guide.md**.
+Dispatch one agent per task in parallel, subject to **develop-gating** (see **delivery-state-machine**) and **no-conflict** (never run conflicting cells on the same repo simultaneously). Each brief carries the cell's scope brief **plus spike references** (ADR files, solution-doc section). When plan/execution surfaces solution-doc / ADR changes, dispatch the owning agent — never edit artifacts directly. Detect the platform's agent mechanism (planner / executor / spike-conductor / adr-writer / solution-doc-writer); if none exists, ask the user how to proceed — never do the work yourself. Full rules: **reference/orchestration-guide.md**.
 </agent-dispatch>
 <branch-and-push-conventions>
 Execution agents commit locally and small-step; pushing or opening PRs happens only after user confirmation.
@@ -98,7 +98,7 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 | Writing or updating the delivery index | Index schema, per-cell briefs, status lifecycle | [reference/delivery-index-format.md](reference/delivery-index-format.md) |
 | Handling a post-merge rework (cell **done**) | Focused spike, sibling rework file, execution | [examples/post-implementation-rework.md](examples/post-implementation-rework.md) |
 | Handling a pre-merge rework (cell **in-progress** — implemented but not pushed/merged) | Sibling rework file on an unmerged cell | [examples/pre-merge-rework.md](examples/pre-merge-rework.md) |
-| Running a full end-to-end decomposition from change summary to index | End-to-end multi-repo example | [examples/multi-repo-feature-decomposition.md](examples/multi-repo-feature-decomposition.md) |
+| Running a full end-to-end decomposition from spike output to index | End-to-end multi-repo example | [examples/multi-repo-feature-decomposition.md](examples/multi-repo-feature-decomposition.md) |
 | Running one orchestration round with parallel agents | Dispatch + status-update walkthrough | [examples/orchestration-round.md](examples/orchestration-round.md) |
 | Continuing an interrupted epic | Resume walkthrough with mixed statuses | [examples/resume-after-interruption.md](examples/resume-after-interruption.md) |
 | Distinguishing parallel vs merge-blocked features | Dependency-ordering-focused example | [examples/parallel-vs-sequential-waves.md](examples/parallel-vs-sequential-waves.md) |
@@ -114,14 +114,14 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 
 <capabilities>
 <decompose-change-into-features>
-1. Load the spike artifacts: change summary (primary), solution doc, and ADRs.
-2. Group change items into coherent, independently valuable features by ADR traceability and target-state module boundaries.
+1. Load the spike artifacts: solution doc (primary), ADRs, and findings.
+2. Group the target-state changes into coherent, independently valuable features by ADR traceability and target-state module boundaries.
 3. Apply the **feature-definition** granularity rules.
 4. Assign each feature an ID (`F1`, `F2`, …) and a kebab-case name with a one-line description.
 5. Present the feature list to the user and confirm before proceeding.
 </decompose-change-into-features>
 <map-features-to-repos>
-1. For each feature, inventory the repos touched by its change items.
+1. For each feature, inventory the repos touched by its target-state changes.
 2. Build the feature × repo matrix; each cell represents one pull request (soft guideline — see **feature-definition**).
 3. Mark config / data / infra-only cells so their plans expect no code PR.
 4. Present the matrix and confirm the repo inventory with the user.
@@ -135,7 +135,7 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 </order-feature-delivery>
 <produce-delivery-index>
 1. Write the **delivery index** at `deliveries/<epic-name>/index.md` per **reference/delivery-index-format.md** — `<epic-name>` is the spiked epic's name (see **delivery-layout**).
-2. Include the **Spike References** block: change summary file, ADR files, solution-doc sections.
+2. Include the **Spike References** block: ADR files, solution-doc sections.
 3. Create per-repo plan folders in the **repo-first** layout: `deliveries/<epic-name>/{repo}/{feature-name}/plan.md` + `context.md` (see **delivery-layout**).
 4. Mark each cell's initial status **unplanned** and its plan location.
 5. Verify the index against **reference/delivery-index-format.md** — structure, status values, develop/merge readiness — then apply **rewrite-concise** as the final prose gate (see **concise-writing**).

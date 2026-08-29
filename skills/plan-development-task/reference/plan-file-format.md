@@ -16,4 +16,4 @@ Concise (see **concise-writing**): one bolded takeaway per section, tables for r
 - TDD rationale; boundary rationale (see **scope-boundary**); branch + base (see **plan-prerequisites**)
 - Constraints, assumptions, codebase references
 - `## Reworks` manifest: one table row per rework (date, mode, cell, trigger, file, status) so resume finds the active file
-- For an **orchestrate-feature-delivery** cell: the agent brief's spike references (change-summary items, ADR files, solution-doc sections)
+- For an **orchestrate-feature-delivery** cell: the agent brief's spike references (ADR files, solution-doc sections)

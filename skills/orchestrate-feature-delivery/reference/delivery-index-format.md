@@ -1,6 +1,6 @@
 # Delivery Index Format
 
-The delivery index is written at **`deliveries/<epic-name>/index.md`** — one folder per epic (no `docs/` prefix), named after the spiked epic (`<epic-name>` = spike name). The spike's own artifacts stay untouched in the spike folder (`spikes/<spike-name>/`; ADRs in `adrs/`, solution + change summary at the root, findings in `docs/`) and are referenced from the index via **Spike References**. The index is the epic's **single source of truth for state** — the orchestrator reads it to decide next actions, updates it as agents report, and uses its **Spike References** so every agent brief can point agents at the full spike output.
+The delivery index is written at **`deliveries/<epic-name>/index.md`** — one folder per epic (no `docs/` prefix), named after the spiked epic (`<epic-name>` = spike name). The spike's own artifacts stay untouched in the spike folder (`spikes/<spike-name>/`; ADRs in `adrs/`, solution doc at the root, findings in `docs/`) and are referenced from the index via **Spike References**. The index is the epic's **single source of truth for state** — the orchestrator reads it to decide next actions, updates it as agents report, and uses its **Spike References** so every agent brief can point agents at the full spike output.
 
 ## Concise writing
 
@@ -32,7 +32,6 @@ deliveries/<epic-name>/               # one folder per epic (no docs/ prefix)
 [N features · M repos · W waves · critical path: F_x → F_y]
 
 ## Spike References
-- **Change summary**: [path — the full change list]
 - **Solution doc**: [path — target-state section per feature]
 - **ADRs**: [paths — one per decision problem (area-prefixed)]
 
@@ -44,7 +43,6 @@ deliveries/<epic-name>/               # one folder per epic (no docs/ prefix)
 ### F1: [kebab-case-name] — Wave [n]
 - **Description**: [one line]
 - **ADRs**: [adr-<area>-<NN>-<problem>.md ...]
-- **Change summary items**: [item ids]
 - **Type**: `poc` (optional) — **ADR**: adr-<area>-<NN>-<problem>.md · **Option**: [option] · **Success criteria**: [measurable] · **Replaces**: F2 (optional) · **Compare**: F5 (optional, sibling POC)
 - **Rework of**: F2 (optional — rework cell that fixes a delivered feature; see **Rework after implementation**)
 - **Repos**: repo-a (PR) · repo-c (PR)
@@ -74,7 +72,7 @@ Each cell carries a brief that seeds **plan-development-task**:
 
 - **Feature**: ID + name + one-line description
 - **Repo**: repo name
-- **Scope**: change-summary items + ADR refs + target-state section
+- **Scope**: ADR refs + target-state section
 - **Spike references**: the file paths + section pointers (from **Spike References**) the agent should load for full context
 - **Dependency context**: what must be merged before this cell's PR (other repos / features)
 - **Constraints**: one PR per repo per feature (soft — may merge with other features when convenient)

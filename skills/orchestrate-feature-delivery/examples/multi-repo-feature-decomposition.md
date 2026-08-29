@@ -1,10 +1,10 @@
 # Example: Multi-Repo Feature Decomposition
 
-**Scenario**: A payment-migration spike just finished. Its change summary lists ~18 change items across `api-gateway`, `order-service`, and `shared-contracts`. The user asks: "Split the spiked work into features, align which can be done in parallel, and give me an index so agents can plan and execute in parallel."
+**Scenario**: A payment-migration spike just finished. Its solution doc defines ~18 target-state changes across `api-gateway`, `order-service`, and `shared-contracts`. The user asks: "Split the spiked work into features, align which can be done in parallel, and give me an index so agents can plan and execute in parallel."
 
 **Applies**: **decompose-change-into-features** → **map-features-to-repos** → **order-feature-delivery** → **produce-delivery-index**
 
-## Input (change summary highlights)
+## Input (target-state changes)
 
 - **New**: `WalletService` in `order-service`; token endpoint in `api-gateway`; shared wallet DTOs + envelope schema in `shared-contracts`
 - **Modified**: order flow in `order-service` consumes wallet; gateway route in `api-gateway`
@@ -47,7 +47,6 @@ Written to `deliveries/payment-migration/index.md` (see **delivery-layout**); pl
 4 features · 3 repos · 3 waves · critical path: F1 → F2/F3 → F4
 
 ## Spike References
-- **Change summary**: spikes/payment-migration/change-summary.md
 - **Solution doc**: spikes/payment-migration/solution.md
 - **ADRs**: spikes/payment-migration/adrs/adr-wallet-01-payment-failure-handling.md · adr-cutover-01-service-cutover.md
 

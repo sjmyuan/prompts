@@ -8,7 +8,7 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 
 | Task | Delegated agent (role → example) | Applies | Result |
 |---|---|---|---|
-| Investigate (incl. rework spike) | investigation agent → **spike-conductor** | **conduct-spike** | focused findings / ADR / solution-doc updates + change summary |
+| Investigate (incl. rework spike) | investigation agent → **spike-conductor** | **conduct-spike** | focused findings / ADR / solution-doc updates |
 | Plan a cell | planning agent → **planner** | **plan-development-task** | `plan.md` + `context.md` |
 | Execute a cell | execution agent → **executor** | **execute-plan** | code changes + commits |
 | Update solution doc | solution-doc agent → **solution-doc-writer** | **write-solution-doc** | revised sections, rewrite in place |
@@ -17,7 +17,7 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 - **One cell per agent.** Planning agents apply **plan-development-task** and write `deliveries/<epic-name>/{repo}/{feature-name}/plan.md` + `context.md` (feature folder named by the kebab-case feature name, e.g. `wallet-contracts`). Execution agents apply **execute-plan** and run the plan.
 - **Plan-first hard gate**: plan and execute are separate agents. Dispatch the **planner** first; verify its plan file exists on disk at the recorded Plan location; only then dispatch the **executor**. Never one agent for both plan and execute, never execute without a verified plan file, and never write or append a plan after execution.
 - **Artifact updates are delegated too.** When a plan or execution surfaces changes to the spike's solution doc or ADRs, dispatch a **solution-doc-writer** / **adr-writer** agent for the update — never edit those artifacts from the orchestrator.
-- **Full context in every brief.** Each agent brief carries the cell's scope brief plus its **spike references** (paths to the relevant change-summary items, ADR files, and solution-doc section). Agents load these on demand — do not inline entire solution docs into the brief.
+- **Full context in every brief.** Each agent brief carries the cell's scope brief plus its **spike references** (paths to the relevant ADR files and solution-doc section). Agents load these on demand — do not inline entire solution docs into the brief.
 - **Persist references to context.md.** Planning agents record the spike references in `context.md`, so execution and resume agents have durable distilled context and can load referenced artifacts when needed.
 - Dispatch agents **in parallel** across cells, subject to:
   - **Develop-gating**: dispatch cells whose dependency cells are **planned** (contracts agreed); contract-first and independent cells develop in parallel.
@@ -89,7 +89,7 @@ Two modes, chosen by the cell's status (see **rework-modes** in the SKILL.md kno
 **Post-merge** (cell **done** — merged/verified): history is shipped and preserved.
 
 1. **Focused spike**: dispatch the **spike-conductor** agent (conduct-spike), scoped narrowly to the affected decision — usually the feature's governing ADR. Do not re-open the whole epic.
-2. **Delegate artifact updates**: ADR changes → **adr-writer** (draft-adr); solution-doc changes → **solution-doc-writer** (write-solution-doc); change summary recomputed via conduct-spike.
+2. **Delegate artifact updates**: ADR changes → **adr-writer** (draft-adr); solution-doc changes → **solution-doc-writer** (write-solution-doc).
 3. **Update the index**: record only the rework cell (`F2-r1`, `Rework of: F2`) in a new wave + its plan-location pointer — the original cell stays **done**; spike focus, ADR revision, and rework steps live in the sibling `rework-<date>.md` / `context.md`.
 4. **Write the rework plan**: dispatch the **planner** (**plan-development-task**) to write a sibling `rework-<date>.md` in the feature folder — `plan.md` stays the frozen original, implemented steps never modified.
 5. **Execute the rework plan**: dispatch the **executor** (**execute-plan**) to run only the new rework steps.

@@ -1,6 +1,6 @@
 # Example: Parallel vs Sequential Waves
 
-**Scenario**: A notification-overhaul spike produced a change summary touching `message-bus`, `subscriber-service`, and `notifier-service`. The user asks: "Which features can run in parallel and which must wait for another feature's code to be merged first?"
+**Scenario**: A notification-overhaul spike produced a solution doc touching `message-bus`, `subscriber-service`, and `notifier-service`. The user asks: "Which features can run in parallel and which must wait for another feature's code to be merged first?"
 
 **Applies**: **order-feature-delivery**
 

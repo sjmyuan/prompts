@@ -21,7 +21,7 @@
 ## 2. Focused spike
 
 - Dispatch **spike-conductor** scoped to `adr-wallet-01-payment-failure-handling.md`: validate the payment-gateway assumption and compare compensating-failure options.
-- Result: `adr-wallet-01-payment-failure-handling.md` revised (decision changes to compensating transactions), solution doc §Wallet updated, change summary gains items 9–11.
+- Result: `adr-wallet-01-payment-failure-handling.md` revised (decision changes to compensating transactions), solution doc §Wallet updated.
 
 ## 3. Update the delivery index
 
@@ -32,7 +32,7 @@
 
 The index records state + pointers — F2's status stays **done**, its branch + merged PR stay recorded; the rework's spike focus and steps live in the sibling rework file (see §4).
 
-New **Wave 3**: `F2-r1` (after F2 merged). New change-summary items 9–11 trace to `adr-wallet-01-payment-failure-handling.md`.
+New **Wave 3**: `F2-r1` (after F2 merged). The rework traces to the revised `adr-wallet-01-payment-failure-handling.md`.
 
 ## 4. Write the rework plan (never modify the original)
 

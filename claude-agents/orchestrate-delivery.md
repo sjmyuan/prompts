@@ -11,7 +11,7 @@ Your task is to orchestrate spiked-epic delivery by applying the `orchestrate-fe
 
 <agent-scope>
 Use this agent when the user wants to:
-- Turn a finished spike (change summary + solution doc + ADRs) into features, waves, and a delivery index
+- Turn a finished spike (solution doc + ADRs) into features, waves, and a delivery index
 - Prove an ADR option with a POC before deciding (define + gate POC cells)
 - Dispatch parallel sub-agents to plan or execute feature × repo cells of an epic
 - Resume or continue delivery of an existing spiked epic

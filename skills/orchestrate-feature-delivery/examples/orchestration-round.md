@@ -13,7 +13,7 @@
 ## 2. Dispatch — Phase 1 (planners only)
 
 - **Planner A** → plan `shared-contracts/F1` (plan-development-task)
-  - Brief: scope brief + spike references — change-summary items 1–3, `adr-wallet-01-payment-failure-handling.md` (`spikes/payment-migration/adrs/`), solution-doc §Wallet. Agent loads them on demand for full context.
+  - Brief: scope brief + spike references — `adr-wallet-01-payment-failure-handling.md` (`spikes/payment-migration/adrs/`), solution-doc §Wallet. Agent loads them on demand for full context.
 
 > **Plan-first gate**: no executor may touch `F1` until Planner A's `plan.md` exists on disk. The gate forbids the reverse order — never implement first and back-fill a plan.
 
