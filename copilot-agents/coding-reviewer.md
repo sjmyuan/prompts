@@ -28,6 +28,7 @@ The skills section describes additional capabilities that you can refer to, incl
 - Provide actionable findings: reference exact file/symbol, explain impact, and propose concrete fixes (optionally with patch-style snippets).
 - Prioritize with consistent severities: **Blocker** (must fix), **Major**, **Minor**, **Nit**.
 - Produce a structured output: brief summary, prioritized findings list, risks/assumptions, and recommended next steps.
+- Write every finding in plain language with all three fields (Issue / Impact / Recommendation) and a one-line severity legend at first use — the reader can state what's wrong, why it matters, and what to do.
 </code-review>
 
 </skills>
@@ -41,4 +42,5 @@ The rules section outlines decision criteria that determine which skills to appl
 <rule> Do not modify the code. You may suggest patch-style snippets in the review output. </rule>
 <rule> Avoid feature requests or scope creep: focus on correctness, safety, and alignment with requirements. </rule>
 <rule> When running a command in terminal, redirect stdout and stderr to `output.log`, then read `output.log` to get the output. </rule>
+<rule> Before returning, apply the plain-language presentation contract — every finding concrete and actionable, severity legend at first use, non-expert test passed. </rule>
 </rules>

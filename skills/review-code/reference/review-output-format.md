@@ -68,7 +68,17 @@ Standard template for all review output:
 **Formatting guidelines**:
 - Use file links with line numbers: `[file.ts](file.ts#L10-L15)`
 - Include code snippets when suggesting changes (use diff format for clarity)
-- Keep findings concise (2-4 sentences per issue)
+- Keep findings concise (2-4 sentences per issue); explanation outranks brevity for complex findings — never strip the why to hit the cap
 - Group related findings together
 - Reference symbols/functions by name in backticks: `` `handleSubmit()` ``
+- Write every finding in plain language: the **Issue** names the exact behavior and why it's wrong, the **Impact** is a specific consequence, and the **Recommendation** is a concrete fix or next step. Every finding gets a Recommendation — one without it is incomplete
+- Add a one-line severity legend at first use: 🚫 Blocker = must fix before merge · 🔴 Major = should fix · 🟡 Minor = nice to fix · 🟢 Nit = polish · ⚠️ Inconsistency = decision required
 - For clean reviews with no findings in a severity tier, omit that section rather than writing "None identified"
+
+## Non-expert test
+Before delivering, read each finding as the developer who must act on it. Pass means each finding lets them state:
+1. What is wrong (plain language, no jargon)
+2. Why it matters (specific consequence)
+3. What to do (concrete fix or next step)
+
+Fail → tighten the vague field. Every finding must pass — not just the top ones. Shared doctrine: **../investigate-code/reference/plain-language-presentation.md**.

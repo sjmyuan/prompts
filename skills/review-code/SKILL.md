@@ -26,6 +26,7 @@ Load all resources on demand. **gathering-review-context** is demonstrated expli
 | Reviewing a performance optimization or slow-code change | Output structure example for performance-focused reviews | [examples/performance-improvement.md](examples/performance-improvement.md) |
 | Reviewing a document (README, ADR, design doc, specification, runbook) | Output structure example for document reviews | [examples/doc-review.md](examples/doc-review.md) |
 | Reviewing a PR that adds a migration, new service endpoint, or cache layer | Output structure example for observability and deployment safety reviews | [examples/deployment-safety-review.md](examples/deployment-safety-review.md) |
+| Writing or checking plain-language, actionable findings | Before/after example (terse → explained review findings) | [examples/plain-language-findings.md](examples/plain-language-findings.md) |
 </context-loading-guide>
 
 <review-efficiency-knowledge>
@@ -42,6 +43,10 @@ Strategies for maximizing review value while respecting time constraints:
 - **Scan for inconsistencies across the whole visible codebase**, not just the diff — look for places where similar problems are solved differently and surface them together
 - **Treat all code as suspect**: Existing code may be legacy, copy-pasted, or simply wrong. Never use "it matches the existing code" as a reason to approve something.
 </review-efficiency-knowledge>
+
+<plain-language-presentation>
+Every finding must be understandable and actionable without domain context — explanation outranks brevity. A review finding carries concrete plain-language fields: Issue (what's wrong + why), Impact (specific consequence), Recommendation (concrete fix or next step). Every finding gets all three; add a one-line severity legend at first use. Apply the non-expert test before returning (reader can state what's wrong, why it matters, what to do). Shared rules: **../investigate-code/reference/plain-language-presentation.md**.
+</plain-language-presentation>
 
 </knowledge>
 
@@ -112,11 +117,11 @@ git diff HEAD...<supplied-branch>
 
 **Steps**:
 1. Load [reference/review-dimensions.md](reference/review-dimensions.md) via the **context-loading-guide** and apply each of the 9 dimensions to the reviewed code. For each dimension, evaluate all relevant ✓ checklist items and note any violations. Apply **review-efficiency-knowledge** strategies throughout to prioritize findings by risk and impact.
-2. For each violation found, load [reference/severity-levels.md](reference/severity-levels.md) via the **context-loading-guide**, assign a severity level, and prepare a concise finding.
+2. For each violation found, load [reference/severity-levels.md](reference/severity-levels.md) via the **context-loading-guide**, assign a severity level, and prepare a finding with concrete plain-language Issue, Impact, and Recommendation fields per **plain-language-presentation**.
 3. For dimension 8 (Inconsistencies): capture every conflicting pattern with both variants and concrete file/line references; note trade-offs and flag for a user decision — do not silently pick one.
 4. Load [reference/review-output-format.md](reference/review-output-format.md) via the **context-loading-guide** and format all findings using the standard template.
 5. Load the appropriate example from the **context-loading-guide** table for output structure guidance.
-6. **Validate output**: Verify (a) every finding has a severity label, (b) Positive Highlights section is present, (c) no empty severity sections are included per formatting guidelines, (d) each inconsistency entry includes both variants and a decision request, (e) at least one recommendation is actionable.
+6. **Validate output**: Verify (a) every finding has a severity label, (b) Positive Highlights section is present, (c) no empty severity sections are included per formatting guidelines, (d) each inconsistency entry includes both variants and a decision request, (e) every finding carries an actionable Recommendation with concrete plain-language Issue and Impact, (f) each finding passes the non-expert test per **plain-language-presentation** — the reader can state what's wrong, why it matters, and what to do.
 </conducting-code-review>
 
 <reviewing-document>
@@ -139,4 +144,5 @@ git diff HEAD...<supplied-branch>
 <rule>When the user submits files, folders, diffs, or commits for review, first apply **gathering-review-context**, then **conducting-code-review**.</rule>
 <rule>When the user supplies one or two branch names for comparison, first apply **getting-branch-diff** to retrieve the full diff via git CLI, then apply **conducting-code-review**. Always review every changed file — never skip any.</rule>
 <rule>When the subject of review is a document (README, ADR, design doc, specification, runbook, etc.), use **reviewing-document** instead of **conducting-code-review**.</rule>
+<rule>When presenting review findings, apply plain-language-presentation — every finding concrete and actionable (Issue / Impact / Recommendation), one-line severity legend at first use, non-expert test passed.</rule>
 </rules>

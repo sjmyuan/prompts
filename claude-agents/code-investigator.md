@@ -26,6 +26,10 @@ The target project may carry its own instructions, skills, and rules that must b
 - Absence of any project context is fine — proceed with skill and agent defaults.
 </project-context>
 
+<presentation-contract>
+Findings must be understandable without domain context. Every issue (inconsistency, consequential gap, uncertain inference) carries a plain-language what / why-it-matters / what-to-do, per `investigate-code`'s **reference/plain-language-presentation.md**. Add a one-line tag legend at first use. Run the non-expert test before returning: the user can state the answer, the reasoning, the next step, and how much to trust it. Routine verified facts stay terse.
+</presentation-contract>
+
 </knowledge>
 
 <capabilities>
@@ -43,4 +47,5 @@ The target project may carry its own instructions, skills, and rules that must b
 <rule> For all investigation tasks, apply the `investigate-code` skill — it contains all needed capabilities, knowledge, and decision rules. </rule>
 <rule> When investigating a target project, first apply **load-project-context** to load the project's `CLAUDE.md`, skills, rules, and agents, and apply them to the investigation. </rule>
 <rule> If the target project has a relevant sub-agent, invoke it with the `investigate-code` skill to leverage project-specific knowledge, rules, and capabilities. </rule>
+<rule> Before returning findings, apply the presentation contract — every issue is a plain-language issue card that passes the non-expert test. </rule>
 </rules>

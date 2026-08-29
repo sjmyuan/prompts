@@ -11,11 +11,24 @@ The agent traced the charging branch, then re-checked for other `fee` usages and
 
 ### Findings
 
+> Tag legend: ✅ Verified = I read it in code · 🔶 Inferred = reasoned guess, check my logic · 💭 Assumption = taken for granted · ⚠️ Inconsistency = two sources disagree · ❓ Gap = not investigated
+
+**What I found** — two different "fee" concepts exist: charging (3%) and payout (flat + 1%).
+**The issue** — docs describe only the charging fee; the payout fee is undocumented.
+**What it means for you** — an engineer reading `docs/billing.md` would miss half the fee logic.
+
 **Charging branch** — ✅ Verified, `billing/ChargingService.java:42`:
 `fee = grossAmount * 0.03` when `customer.tier == STANDARD`.
 
 **Payout branch** — discovered on re-check, ✅ Verified, `billing/PayoutService.java:58`:
 a separate `fee` (`flat + 1%`) computed for payouts — a different `fee` than the charging one.
+
+#### ⚠️ Undocumented payout fee
+- **Problem**: `docs/billing.md` documents only the charging fee; the payout fee is undocumented.
+- **Evidence**: `billing/PayoutService.java:58` (flat + 1%) vs `docs/billing.md` (charging only)
+- **Why it matters**: payout pricing is a second source of truth with no contract.
+- **What to do**: add the payout formula to `docs/billing.md`.
+- **Confidence**: ⚠️ Inconsistency — both sides read directly.
 
 ### Confidence & Coverage
 

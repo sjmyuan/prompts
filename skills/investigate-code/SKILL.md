@@ -76,6 +76,9 @@ When invoked from the `conduct-spike` skill for a spike investigation, scope the
 <concise-writing>
 All investigation prose and reports follow BLUF (conclusion first), hard caps, atomic bullets, and tables-over-prose. Every section opens with a bolded one-line takeaway; no banned phrases; every sentence passes the "so what?" test. Load **reference/writing-style.md** for the full rules (caps table, banned-phrase list, sentence surgery).
 </concise-writing>
+<plain-language-presentation>
+Issues and uncertainty must be understandable without domain context — explanation outranks brevity for findings. Render every issue (⚠️ Inconsistency, ❓ Gap with consequences, 🔶 Inferred needing verification) as an issue card: Problem / Evidence / Why it matters / What to do / Confidence. Add a one-line tag legend at first use and a 3-line human TL;DR for multi-finding responses; routine ✅ Verified facts stay terse. Load **reference/plain-language-presentation.md** for the full rules (issue-card anatomy, tag legend, non-expert test).
+</plain-language-presentation>
 <context-loading-guide>
 | Load when | Provides | File |
 |---|---|---|
@@ -92,6 +95,8 @@ All investigation prose and reports follow BLUF (conclusion first), hard caps, a
 | Presenting findings with confidence tags, gaps, and inconsistencies | 5-category presentation format with phrasing examples | [reference/confidence-and-coverage-guide.md](reference/confidence-and-coverage-guide.md) |
 | Reporting a standalone confidence & coverage profile | Standalone example with all five categories | [examples/confidence-and-coverage.md](examples/confidence-and-coverage.md) |
 | Writing or reviewing any investigation prose or report | BLUF rules, sentence/paragraph caps, banned-phrase list, atomic bullets | [reference/writing-style.md](reference/writing-style.md) |
+| Presenting any issue or uncertainty in plain language | Issue-card anatomy, tag legend, human TL;DR, non-expert test | [reference/plain-language-presentation.md](reference/plain-language-presentation.md) |
+| Seeing a terse→explained before/after | Plain-language findings model | [examples/plain-language-findings.md](examples/plain-language-findings.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -105,7 +110,7 @@ All investigation prose and reports follow BLUF (conclusion first), hard caps, a
 4. **Analyze dependencies**: List external libraries, internal module dependencies, service integrations, and configuration dependencies.
 5. **Extract structural fingerprint**: Note the feature's layer chain (e.g., Controller → Orchestrator → Service → Adapter), stereotypes, and external interactions. This feeds into discover-implementation-patterns.
 6. **Synthesize findings**: Present a coherent narrative — direct answer first, then supporting evidence with file:line references, key design decisions, and areas needing deeper investigation. Then apply present-findings-with-confidence to tag each finding as verified/inferred/assumed, report gaps, and raise inconsistencies.
-7. **Validate**: Verify that all file:line references are accurate by checking the workspace, that the narrative answers the original question directly, that search-tool availability was detected rather than assumed, that every finding carries a confidence tag with no gap silently omitted, and that prose follows **concise-writing** (answer first, ≤20-word sentences, no banned phrases).
+7. **Validate**: Verify that all file:line references are accurate by checking the workspace, that the narrative answers the original question directly, that search-tool availability was detected rather than assumed, that every finding carries a confidence tag with no gap silently omitted, that every issue or uncertain finding passes the non-expert test per **plain-language-presentation**, and that prose follows **concise-writing** (answer first, ≤20-word sentences, no banned phrases).
 </investigate-codebase>
 
 <analyze-cross-repo-dependencies>
@@ -150,9 +155,9 @@ All investigation prose and reports follow BLUF (conclusion first), hard caps, a
 1. **Extract structural fingerprint**: From the already-investigated feature, capture: entry point type, layer chain, stereotypes, external interactions, error handling, and configuration.
 2. **Search for similar features**: Apply pattern-discovery-heuristics — start with naming conventions, then annotation/interface patterns, then structural similarity.
 3. **Compare each candidate**: Classify as match (same structure), variant (same layers, different tech/approach), or mismatch (different structure).
-4. **Synthesize findings**: If all match → present unified pattern with the current feature as canonical example. If variants exist → flag inconsistency explicitly: "⚠️ Inconsistency: N different patterns found." List each variant with structural differences and affected files. State search coverage (which heuristics were used, what differently-named features could have been missed) and assumptions (e.g., sibling packages imply the same pattern).
+4. **Synthesize findings**: If all match → present unified pattern with the current feature as canonical example. If variants exist → flag inconsistency explicitly: "⚠️ Inconsistency: N different patterns found." List each variant with structural differences and affected files. Explain what the inconsistency means in plain language, why it matters, and what to do (issue card per **plain-language-presentation**). State search coverage (which heuristics were used, what differently-named features could have been missed) and assumptions (e.g., sibling packages imply the same pattern).
 5. **Recommend**: If inconsistency found, suggest standardization. If unique pattern, state so.
-6. **Validate**: Verify that each comparison candidate's structural fingerprint is complete (all 6 dimensions: entry point, layer chain, stereotypes, external interactions, error handling, configuration), that inconsistency classifications (match/variant/mismatch) are justified by the evidence, and that search-coverage limits are reported as gaps.
+6. **Validate**: Verify that each comparison candidate's structural fingerprint is complete (all 6 dimensions: entry point, layer chain, stereotypes, external interactions, error handling, configuration), that inconsistency classifications (match/variant/mismatch) are justified by the evidence, that search-coverage limits are reported as gaps, and that every reported inconsistency carries an issue card per **plain-language-presentation**.
 </discover-implementation-patterns>
 
 <compile-markdown-report>
@@ -160,7 +165,7 @@ All investigation prose and reports follow BLUF (conclusion first), hard caps, a
 2. **Load example**: Load [examples/markdown-report.md](examples/markdown-report.md) for structure reference.
 3. **Assemble sections**: System overview (C2 + dependency matrix) → Component internals (C3 per container) → Interaction flows (sequence diagrams) → Method details (call stacks) → Key decisions → Edge cases → Confidence & Coverage (verified/inferred/assumptions/gaps/inconsistencies) → Next steps.
 4. **Embed diagrams**: Mermaid source blocks with brief text descriptions.
-5. **Validate**: Ensure all file paths and line numbers are accurate, every investigation level is represented, the Confidence & Coverage section lists verified/inferred/assumed findings, gaps, and inconsistencies, and prose follows **concise-writing** (1-line takeaway per section, ≤3 sentences per paragraph, no banned phrases).
+5. **Validate**: Ensure all file paths and line numbers are accurate, every investigation level is represented, the Confidence & Coverage section lists verified/inferred/assumed findings, gaps, and inconsistencies, every inconsistency/gap is explained in plain language (issue card + non-expert test per **plain-language-presentation**), and prose follows **concise-writing** (1-line takeaway per section, ≤3 sentences per paragraph, no banned phrases).
 </compile-markdown-report>
 
 <present-findings-with-confidence>
@@ -168,7 +173,7 @@ All investigation prose and reports follow BLUF (conclusion first), hard caps, a
 2. **Report gaps**: List searched negatives (searched but not found), untraced paths, and coverage limits (e.g., "searched by suffix match only — differently-named features may be missed").
 3. **Raise inconsistencies**: Surface every contradiction found — code vs code, code vs docs, code vs config — with locations of both sides. Classify severity per [reference/pattern-discovery-strategies.md](reference/pattern-discovery-strategies.md).
 4. **Summarize**: Close with a compact "Confidence & Coverage" block listing ✅ Verified / 🔶 Inferred / 💭 Assumptions / ❓ Gaps / ⚠️ Inconsistencies. Offer to close any gap on request.
-5. **Validate**: Check that verified/inferred/assumed are clearly separated, every gap is stated (not silently omitted), every inconsistency has both sides located, and the Confidence & Coverage block stays compact — one claim per line, ≤20 words.
+5. **Validate**: Check that verified/inferred/assumed are clearly separated, every gap is stated (not silently omitted), every inconsistency has both sides located, the Confidence & Coverage block stays compact — one claim per line, ≤20 words — and every issue finding is rendered as a plain-language issue card per **plain-language-presentation** that passes the non-expert test.
 </present-findings-with-confidence>
 
 </capabilities>
@@ -183,5 +188,6 @@ All investigation prose and reports follow BLUF (conclusion first), hard caps, a
 <rule> When the user asks how a type of feature works generally, or wants to know if similar features follow a consistent pattern, apply investigate-codebase on one example, then apply discover-implementation-patterns to find and compare all similar implementations. </rule>
 <rule> When the user asks for a document, report, or all findings compiled, apply compile-markdown-report after completing the relevant investigation capabilities. </rule>
 <rule> When presenting any investigation findings (narrative, diagram, trace, matrix, or report), apply present-findings-with-confidence to tag verified/inferred/assumed findings, report gaps, and raise inconsistencies. </rule>
+<rule> When presenting any issue or uncertain finding (inconsistency, consequential gap, or inference needing verification), apply plain-language-presentation — render an issue card with plain-language why-it-matters and what-to-do, and pass the non-expert test. </rule>
 </rules>
 

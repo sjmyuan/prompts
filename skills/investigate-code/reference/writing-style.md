@@ -15,13 +15,14 @@ Applies to all prose in investigation reports and development plans. Tables and 
 | Finding / claim | 1 sentence |
 | Plan step objective | 1 sentence |
 | Consequence / risk item | ≤10 words |
-| Bullet | 1 claim, no justification |
+| Bullet | 1 claim; issue findings add one plain why-clause |
 | Paragraph | ≤3 sentences |
 | Sentence | ≤20 words, one clause |
 
 ## Atomic bullets
 - Each bullet = one claim (fact or verdict), not a sentence with reasoning.
 - Reasoning goes in the table or the section takeaway — never inside bullets.
+- Exception: issue findings carry one plain why-clause — see **Findings override**.
 
 ## Tables over prose
 - Anything comparative (dependency matrix, plan steps, findings) is a table.
@@ -42,3 +43,10 @@ Applies to all prose in investigation reports and development plans. Tables and 
 ## The "So what?" test
 - Every sentence must add a new fact or answer "So what?" — otherwise delete it.
 - Run this check on the final output before presenting.
+
+## Findings override
+- Issues and uncertainty are explained in plain language per **plain-language-presentation.md** — this overrides the atomic-bullet rule.
+- An issue finding keeps ONE plain why-clause (≤15 words): what it is, why it matters, what to do.
+- Routine ✅ Verified facts stay terse — no justification added.
+- When a claim affects trust or action, explanation outranks brevity.
+- "So what?" still applies to routine prose; it never justifies dropping the why from an issue finding.

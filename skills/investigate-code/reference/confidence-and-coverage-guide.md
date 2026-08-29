@@ -1,6 +1,6 @@
 # Confidence & Coverage Guide
 
-Presentation format for reporting findings honestly: what is certain, what is not, and what was missed. Backs the `<present-findings-with-confidence>` capability and the `<finding-confidence-model>` knowledge entry.
+Presentation format for reporting findings honestly: what is certain, what is not, and what was missed. Backs the `<present-findings-with-confidence>` capability and the `<finding-confidence-model>` knowledge entry. Plain-language presentation (issue cards, tag legend, TL;DR, non-expert test) lives in **plain-language-presentation.md**.
 
 ## The Five Categories
 
@@ -36,6 +36,6 @@ Close every investigation with a compact block:
 ## Rules of Thumb
 
 - A stated gap is a finding; a hidden gap is a partial truth. Never present "what I found" without "what I did not find".
-- Inferred and Assumption findings must state *why*, so the user can verify the reasoning.
+- Inferred and Assumption findings must state *why*, so the user can verify the reasoning; render them as issue cards when consequential (per plain-language-presentation.md).
 - Inconsistencies must locate both sides; classify severity per `reference/pattern-discovery-strategies.md`.
 - When a gap is later closed, re-run the affected investigation step and update the profile.
