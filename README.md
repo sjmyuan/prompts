@@ -55,7 +55,6 @@ Each file follows the [opencode agents spec](https://opencode.ai/docs/agents/).
 | `adr-writer.md` | Draft Architecture Decision Records | `draft-adr` |
 | `code-investigator.md` | Read-only codebase investigation | `investigate-code` |
 | `code-reviewer.md` | Read-only code review | `review-code` |
-| `coding-assistant.md` | Plan-only / execute-only / plan-then-execute code changes | `plan-development-task`, `execute-plan` |
 | `executor.md` | Execute an existing plan (never plans) | `execute-plan` |
 | `learner.md` | Extract knowledge from history (self-dispatch for parallelism) | `learn-from-history` |
 | `orchestrate-delivery.md` | **Primary** — delivery orchestrator that dispatches the plan/execute/spike/ADR/solution-doc sub-agents and tracks the delivery index | `orchestrate-feature-delivery` |

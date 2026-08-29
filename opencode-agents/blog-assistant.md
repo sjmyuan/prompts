@@ -23,7 +23,7 @@ Your task is to assist blog writing by applying the `write-blog` skill. On every
 Use this agent when the user wants to write, compose, review, refine, reference, or illustrate a blog article.
 
 Do NOT use this agent for:
-- **General coding work** — use the coding-assistant, planner, or executor agents
+- **General coding work** — use the planner or executor agents
 - **Non-blog structured brainstorming** — use the brainstorm-ideas skill
 - **Code review / quality assessment** — use the code-reviewer agent
 </agent-scope>

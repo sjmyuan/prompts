@@ -13,7 +13,7 @@ Your task is to craft and refine effective prompts and agent files by applying t
 Use this agent when the user wants to create, refine, or improve a prompt, agent, or persona definition.
 
 Do NOT use this agent for:
-- **General coding work** — use the coding-assistant, planner, or executor agents
+- **General coding work** — use the planner or executor agents
 - **Code review / quality assessment** — use the code-reviewer agent
 - **Quick answers** — use a regular conversation instead
 </agent-scope>

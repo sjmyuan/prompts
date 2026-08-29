@@ -9,8 +9,8 @@
 ## Input (Conversation Excerpt)
 
 ```
-User: When I ask this coding assistant to create files, it should always confirm with
-      me before writing anything to the src/ directory. Add that to the coding-assistant
+User: When I ask the executor agent to create files, it should always confirm with
+      me before writing anything to the src/ directory. Add that to the executor
       agent instructions.
 
 AI: Got it. I'll note that for the review.
@@ -26,7 +26,7 @@ User: Now learn from this session.
 
 **Source type**: Chat session
 
-**Signal detected**: Explicit user feedback with target specification — user stated a rule ("always confirm before writing to src/") AND specified the target ("coding-assistant agent instructions").
+**Signal detected**: Explicit user feedback with target specification — user stated a rule ("always confirm before writing to src/") AND specified the target ("executor agent instructions").
 
 **Signal type**: Explicit user feedback (with target specified)
 
@@ -37,7 +37,7 @@ User: Now learn from this session.
 | Reusability | ✅ Pass | Applies to every file creation in src/ across all future sessions |
 | Non-obviousness | ✅ Pass | The default behavior may be to write without confirmation; this is a specific preference |
 | Actionability | ✅ Pass | Clear directive: "confirm before creating files in src/" |
-| Non-duplication | ✅ Pass | Not in the current coding-assistant agent instructions |
+| Non-duplication | ✅ Pass | Not in the current executor agent instructions |
 | Specificity | ✅ Pass | Specific: "src/ directory, file creation"; general: applies to all future sessions |
 
 **Verdict**: ACCEPT.
@@ -46,15 +46,14 @@ User: Now learn from this session.
 
 ## Step 2: provision-lessons (classify phase — user-directed)
 
-**User specified target**: "coding-assistant agent instructions"
+**User specified target**: "executor agent instructions"
 
-**Resolve target**: Look for agent files matching "coding-assistant":
-- Found: `prompts/copilot-agents/coding-assistant.agent.md`
-- Or: `prompts/copilot-agents/coding-assistant.md`
+**Resolve target**: Look for agent files matching "executor":
+- Found: `prompts/copilot-agents/executor.agent.md`
 
 **Validate target**: The file exists. It has a rules section. The rule belongs there.
 
-**Target confirmed**: `prompts/copilot-agents/coding-assistant.agent.md` → rules section.
+**Target confirmed**: `prompts/copilot-agents/executor.agent.md` → rules section.
 
 ---
 
@@ -62,9 +61,9 @@ User: Now learn from this session.
 
 | # | Lesson Summary | Signal Type | Target File | Section | Content to Add |
 |---|---|---|---|---|---|
-| 1 | Confirm with user before creating files in `src/` | User feedback (target specified) | `prompts/copilot-agents/coding-assistant.agent.md` | rules | `<rule>When creating or modifying files in the `src/` directory, always ask the user for confirmation before writing.</rule>` |
+| 1 | Confirm with user before creating files in `src/` | User feedback (target specified) | `prompts/copilot-agents/executor.agent.md` | rules | `<rule>When creating or modifying files in the `src/` directory, always ask the user for confirmation before writing.</rule>` |
 
-**Rationale**: User explicitly directed this rule to the coding-assistant agent. No classification needed — user intent is clear.
+**Rationale**: User explicitly directed this rule to the executor agent. No classification needed — user intent is clear.
 
 ---
 
@@ -76,7 +75,7 @@ Present to user:
 >
 > *Confirm with user before creating files in `src/`.*
 >
-> **Target** (user-specified): `prompts/copilot-agents/coding-assistant.agent.md` → rules
+> **Target** (user-specified): `prompts/copilot-agents/executor.agent.md` → rules
 >
 > **Content to add**:
 > ```markdown

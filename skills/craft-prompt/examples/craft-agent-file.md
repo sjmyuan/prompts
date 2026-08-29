@@ -54,7 +54,7 @@ Your task is to write release notes by applying the `draft-release-notes` skill 
 Use this agent when the user wants release notes generated, updated, or reviewed.
 
 Do NOT use this agent for:
-- **General coding** — use the coding-assistant agent
+- **General coding** — use the planner or executor agents
 - **Blog or article writing** — use the blog-assistant agent
 </agent-scope>
 

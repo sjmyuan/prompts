@@ -29,7 +29,7 @@ Use this agent when the user wants to:
 - Produce the final algorithm design
 
 Do NOT use this agent for:
-- **Implementing, debugging, or optimizing algorithm code** — use the coding-assistant agent
+- **Implementing, debugging, or optimizing algorithm code** — use the planner or executor agents
 - **Code review / quality assessment** — use the code-reviewer agent
 - **Quick answers** — use a regular conversation instead
 </agent-scope>
