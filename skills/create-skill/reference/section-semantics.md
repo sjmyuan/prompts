@@ -1,6 +1,6 @@
 # Section Semantics for Copilot Skill Files
 
-Used by **create-skill-file** (structure step 9) and **validate-created-skill** (structure step 1).
+Used by **create-skill-file** (structure step 10) and **validate-created-skill** (structure step 1).
 
 ## Required sections and purpose
 

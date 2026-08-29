@@ -35,7 +35,7 @@ Details: [reference/size-limits.md](reference/size-limits.md)
 </size-limits>
 
 <size-remediation>
-Ordered remediation for over-budget files — redistribute, reduce, escalate — plus anti-patterns to never suggest.
+Ordered remediation for over-budget files — re-encode, reuse, cut weight, redistribute, reduce, escalate — plus a structural-integrity gate (chars are the only size gate; line/step-merging is a 🔴 Blocker).
 Details: [reference/size-remediation.md](reference/size-remediation.md)
 </size-remediation>
 
@@ -99,7 +99,7 @@ Details: [reference/pipeline-integration.md](reference/pipeline-integration.md)
    b. Verify section order: frontmatter → `<when-to-use-this-skill>` → `<knowledge>` → `<capabilities>` → `<rules>` (if present); flag out-of-order as 🟡 Minor.
    c. Measure the file's size — run `scripts/measure_sizes.py` on the skill folder when available, else count lines and estimate chars.
    Apply **reference/size-limits.md** for budgets, line-length, line-stuffing, and gaming detection.
-   When both budgets are exceeded, load **reference/size-remediation.md** and recommend fixes (redistribute → reduce → escalate); never suggest merging steps into one sentence (anti-pattern).
+   When the char budget is exceeded, load **reference/size-remediation.md** and recommend fixes by its lever order; apply its structural-integrity gate — line/step-merging is a 🔴 Blocker (revert and redo), never a fix.
 2. **Check description quality and trigger consistency** — load **reference/trigger-correctness.md** first:
    a. Verify the frontmatter `description` follows the two-part template (domain summary + trigger phrase) — load **reference/description-template.md**; flag a missing trigger phrase as 🔴 Major.
    b. Score the description using the five-dimension metric — load **reference/description-scoring.md**; report the score (x/10); flag ≤5 as 🔴 Major and 6–8 as 🟡 Minor.

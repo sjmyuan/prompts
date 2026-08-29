@@ -1,6 +1,6 @@
 # Action-Verb Naming Convention
 
-Used by **collect-skill-requirements** (step 1), **create-skill-file** (steps 2 and 5), and **validate-created-skill** (step 3).
+Used by **collect-skill-requirements** (step 1), **create-skill-file** (steps 2 and 6), and **validate-created-skill** (step 3).
 
 ## Skill names (kebab-case)
 - Must start with an imperative action verb: `edit-svg`, `validate-data`, `generate-diagram`, `review-code`, `create-flowchart`

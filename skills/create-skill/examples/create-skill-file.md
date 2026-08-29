@@ -22,7 +22,7 @@ The user confirms this summary before creation proceeds.
 
 ## Post-Write Checks
 - Prose written per **writing-style** — directive voice, BLUF, hard caps, no banned phrases.
-- SKILL.md measured per **size-limits** (≤12,000 chars / 150 lines); over-budget drafts fixed per **size-remediation** (extract → dedupe → trim) before finalizing.
+- SKILL.md written within a per-section char budget, then measured per **size-limits** (≤12,000 chars / 150 lines); over-budget drafts fixed per **size-remediation** (lever order) before finalizing.
 
 ## Expected Output — `skills/write-commit-message/SKILL.md` (abridged)
 ```markdown

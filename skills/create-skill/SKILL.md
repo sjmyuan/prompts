@@ -4,8 +4,7 @@ description: Generate complete skill files (SKILL.md) with capabilities, example
 ---
 
 <when-to-use-this-skill>
-- User asks to create a new skill (SKILL.md)
-- User asks to author a new skill file from scratch
+- User asks to create or author a new skill (SKILL.md) from scratch
 - User asks to generate examples or references for a skill
 - User asks to build a complete skill with capabilities, knowledge, and rules
 - User provides existing materials (agent prompts, docs, code) to extract into a skill
@@ -46,7 +45,7 @@ Created skill prose must use directive voice, BLUF, hard caps, atomic bullets, t
 Budgets are character-based: SKILL.md and each `reference/` ≤12,000 / 150 lines; each `examples/` ≤9,000 / 150 lines; >120-char lines flagged. Measure via **../review-skill/scripts/measure_sizes.py**, else `wc -m`/line count. Full rules: **../review-skill/reference/size-limits.md**.
 </size-limits>
 <size-remediation>
-Fix over-budget files: redistribute → reduce → escalate. Never merge steps into one sentence or cut structural sections. Full rules: **../review-skill/reference/size-remediation.md**.
+Fix over-budget files via re-encode → reuse → cut weight → redistribute → reduce → escalate; chars are the only size gate — never merge steps or lines (structural-integrity gate, 🔴 Blocker). Full rules: **../review-skill/reference/size-remediation.md**.
 </size-remediation>
 <conciseness-check>
 Every element must justify its existence — one line = one idea. Cut anything the skill can lose without losing meaning. Full criteria: **../review-skill/reference/conciseness-check.md**.
@@ -87,15 +86,16 @@ Validation findings labeled Blocker 🚫 / Major 🔴 / Minor 🟡 / Nit 🟢 / 
 1. Create the directory structure `skills/<skill-name>/` with `examples/` and `reference/` subdirectories as needed.
 2. Write the frontmatter: `name` in kebab-case with an action verb; `description` per the two-part template — self-score it per **description-quality** (aim ≥ 9).
 3. Write `<when-to-use-this-skill>` as 3–7 bullet scenarios whose intent verbs appear in the `description` trigger phrase.
-4. Write the knowledge section: put reference data in tables/lists; extract large rubrics to `reference/` files, self-linked from their knowledge subsection and routed inline from the steps that use them.
-5. Write each capability with a unique action-verb name and numbered steps; never embed reference tables or constraint bullets inside capabilities.
-6. Write rules only when multiple capabilities exist — each answers "When [scenario] → use [capability]".
-7. Write all prose per **writing-style** — directive voice, BLUF, hard caps, atomic bullets, no banned phrases, no meta-narration.
-8. Write prose per **platform-agnostic-writing** — no platform tool names, no concrete context paths.
-9. Validate the draft against **section-semantics** (violations, section order, naming).
-10. If the skill is part of a multi-skill pipeline, verify the 4 integration points per **pipeline-integration**.
-11. Measure the SKILL.md per **size-limits** (script when available, else manual char/line count); if over budget, apply **size-remediation** (redistribute → reduce → escalate) — never merge steps.
-12. Write the final content to `skills/<skill-name>/SKILL.md`.
+4. Allocate a per-section char budget (when-to-use, knowledge, each capability, rules, guide) totaling ≤ **size-limits**; write each within its cap — prevention beats remediation.
+5. Write the knowledge section: put reference data in tables/lists; extract large rubrics to `reference/` files, self-linked from their knowledge subsection and routed inline from the steps that use them.
+6. Write each capability with a unique action-verb name and numbered steps; never embed reference tables or constraint bullets inside capabilities.
+7. Write rules only when multiple capabilities exist — each answers "When [scenario] → use [capability]".
+8. Write all prose per **writing-style** — directive voice, BLUF, hard caps, atomic bullets, no banned phrases, no meta-narration.
+9. Write prose per **platform-agnostic-writing** — no platform tool names, no concrete context paths.
+10. Validate the draft against **section-semantics** (violations, section order, naming).
+11. If the skill is part of a multi-skill pipeline, verify the 4 integration points per **pipeline-integration**.
+12. Measure the SKILL.md per **size-limits** (script when available, else manual count); if over budget, apply **size-remediation** (lever order + gate) — never merge steps/lines.
+13. Write the final content to `skills/<skill-name>/SKILL.md`.
 </create-skill-file>
 
 <create-skill-examples>
@@ -129,7 +129,7 @@ Validation findings labeled Blocker 🚫 / Major 🔴 / Minor 🟡 / Nit 🟢 / 
 4. Check knowledge: material placed correctly, large rubrics extracted, `<context-loading-guide>` condition-first.
 5. Check writing style per **writing-style**: directive voice, BLUF, hard caps, no banned phrases, no meta-narration.
 6. Check platform-agnostic writing per **platform-agnostic-writing**: no tool names, no concrete context paths.
-7. Measure all files per **size-limits**; for over-budget files, apply **size-remediation** (redistribute → reduce → escalate).
+7. Measure all files per **size-limits**; for over-budget files, apply **size-remediation** (lever order) + structural-integrity gate — line/step-merging fails as 🔴 Blocker.
 8. Check conciseness per **conciseness-check**: one line = one idea, nothing fails the "So what?" test.
 9. Check examples: coverage of every capability, quality per **example-standards**, traceability, no contradictions.
 10. Check rules: route "when → capability" without re-stating capability content.
