@@ -18,7 +18,10 @@
 #   --scope <scope>    what to install: agents | skills | all
 #                      (default: all)
 #   --dry-run          print what would be done without changing anything
-#   --force            replace existing non-symlink targets with symlinks
+#   --force            on install, replace foreign targets with our symlinks;
+#                      on uninstall, also remove foreign symlinks
+#   --uninstall        remove the symlinks this script created instead of
+#                      creating them (real directories are never deleted)
 #   -h, --help         show this help and exit
 #
 # Install locations (canonical for each tool):
@@ -39,6 +42,12 @@
 #   # Install only copilot skills into the current project
 #   ./install-agents-skills.sh workspace copilot --scope skills
 #
+#   # Uninstall (remove the symlinks) from the user profile
+#   ./install-agents-skills.sh user all --uninstall
+#
+#   # Uninstall just copilot agents from a specific project
+#   ./install-agents-skills.sh workspace copilot --uninstall --scope agents --project ~/work/my-app
+#
 # Notes:
 #   - Each whole source FOLDER is symlinked into place (never copied), so the
 #     repo remains the source of truth: `git pull` in this repo updates every
@@ -56,6 +65,8 @@
 #   - If a skill destination already points at the source (e.g. ~/.copilot/skills
 #     is a symlink to prompts/skills), skills are reported as already in sync
 #     and left untouched.
+#   - With --uninstall, only symlinks are removed; real directories holding
+#     unrelated files are never deleted (foreign symlinks need --force).
 #   - Agent folders must contain ONLY agent files (OpenCode registers every
 #     *.md in the agents dir as an agent; VS Code/Claude skip non-agent files).
 #     That is why opencode-agents/README.md was moved into README.md.
@@ -73,6 +84,7 @@ PROJECT=""
 SCOPE="all"
 DRY_RUN=0
 FORCE=0
+UNINSTALL=0
 
 # ---- helpers ---------------------------------------------------------------
 
@@ -112,7 +124,12 @@ is_our_link() {
 link_dir() {
   # Symlink the whole source directory <src> to <link>; idempotent — leaves our
   # own links alone, warns on foreign targets unless --force is set.
+  # In --uninstall mode, delegates to unlink_dir to remove the link instead.
   local src="$1" link="$2"
+  if [ "$UNINSTALL" -eq 1 ]; then
+    unlink_dir "$src" "$link"
+    return
+  fi
   if [ -e "$link" ] || [ -L "$link" ]; then
     if is_our_link "$src" "$link"; then
       printf '  already linked    %s -> %s\n' "$link" "$src"
@@ -127,6 +144,27 @@ link_dir() {
   fi
   run_cmd ln -s "$src" "$link"
   printf '  linked            %s -> %s\n' "$link" "$src"
+}
+
+unlink_dir() {
+  # Remove the symlink at <link>. Only our own links are removed by default;
+  # foreign symlinks require --force. Real directories are never deleted.
+  local src="$1" link="$2"
+  if [ -L "$link" ]; then
+    if is_our_link "$src" "$link"; then
+      run_cmd rm "$link"
+      printf '  removed           %s -> %s\n' "$link" "$src"
+    elif [ "$FORCE" -eq 1 ]; then
+      run_cmd rm "$link"
+      printf '  removed (forced)  %s\n' "$link"
+    else
+      warn "target '$link' is a symlink but not ours — skipped (use --force to remove)"
+    fi
+  elif [ -e "$link" ]; then
+    warn "target '$link' is a real directory, not a symlink — skipped (won't delete it)"
+  else
+    info "no link at $link — nothing to remove"
+  fi
 }
 
 # ---- source / destination mapping -----------------------------------------
@@ -185,7 +223,7 @@ install_agents_for() {
   dst="$(agents_dest "$platform" "$TARGET")"
   [ -d "$src" ] || { warn "no agent sources at $src"; return; }
 
-  run_cmd mkdir -p "$(dirname "$dst")"
+  [ "$UNINSTALL" -eq 1 ] || run_cmd mkdir -p "$(dirname "$dst")"
   link_dir "$src" "$dst"
 }
 
@@ -194,12 +232,15 @@ install_skills_for() {
   dst="$(skills_dest "$platform" "$TARGET")"
   [ -d "$SKILLS_SRC" ] || { warn "no skills source at $SKILLS_SRC"; return; }
 
-  if same_path "$SKILLS_SRC" "$dst"; then
+  # When uninstalling, still process dst even when it resolves to the source
+  # (e.g. ~/.copilot/skills symlinked directly to prompts/skills) so the link
+  # gets removed; the "already in sync" short-circuit only applies to installs.
+  if [ "$UNINSTALL" -eq 0 ] && same_path "$SKILLS_SRC" "$dst"; then
     info "skills for $platform already in sync ($dst points at $SKILLS_SRC) — skipping"
     return
   fi
 
-  run_cmd mkdir -p "$(dirname "$dst")"
+  [ "$UNINSTALL" -eq 1 ] || run_cmd mkdir -p "$(dirname "$dst")"
   link_dir "$SKILLS_SRC" "$dst"
 }
 
@@ -229,6 +270,9 @@ while [ "$#" -gt 0 ]; do
     --force)
       FORCE=1
       ;;
+    --uninstall)
+      UNINSTALL=1
+      ;;
     -h|--help)
       usage
       exit 0
@@ -250,11 +294,19 @@ esac
 if [ "$TARGET" = workspace ]; then
   [ -n "$PROJECT" ] || PROJECT="$PWD"
   if [ "$DRY_RUN" -eq 0 ] && [ ! -d "$PROJECT" ]; then
-    warn "project '$PROJECT' does not exist yet; directories will be created"
+    if [ "$UNINSTALL" -eq 1 ]; then
+      warn "project '$PROJECT' does not exist — nothing to uninstall there"
+    else
+      warn "project '$PROJECT' does not exist yet; directories will be created"
+    fi
   fi
 fi
 
-printf 'Installing into %s profile for: %s\n' "$TARGET" "$PLATFORM"
+if [ "$UNINSTALL" -eq 1 ]; then
+  printf 'Uninstalling from %s profile for: %s\n' "$TARGET" "$PLATFORM"
+else
+  printf 'Installing into %s profile for: %s\n' "$TARGET" "$PLATFORM"
+fi
 if [ "$DRY_RUN" -eq 1 ]; then
   printf 'Dry run — no files will be changed.\n'
 fi
