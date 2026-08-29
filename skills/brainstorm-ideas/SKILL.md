@@ -1,6 +1,6 @@
 ---
 name: brainstorm-ideas
-description: Facilitate structured brainstorming sessions that generate, evaluate, and refine ideas into actionable plans. Use when brainstorming, defining, exploring, generating, evaluating, refining, or iterating on an idea to reach a goal.
+description: Facilitate structured brainstorming sessions that generate, evaluate, and refine ideas into actionable plans. Use when brainstorming, defining, exploring, generating, evaluating, refining, or iterating on an idea to reach a goal — including deciding what to do next or where to focus after an investigation or a round of work.
 ---
 
 <when-to-use-this-skill>
@@ -8,6 +8,7 @@ description: Facilitate structured brainstorming sessions that generate, evaluat
 - User wants to define goals or explore challenges for an idea
 - User wants to generate, evaluate, or prioritize ideas
 - User wants to refine an idea into a stronger, more focused form
+- User wants to decide what to investigate or focus on next after a round of work (e.g., a completed investigation)
 </when-to-use-this-skill>
 
 <knowledge>
