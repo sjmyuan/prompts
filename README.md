@@ -48,6 +48,7 @@ Each file follows the [opencode agents spec](https://opencode.ai/docs/agents/).
 
 | Agent | Purpose | Applies skill(s) |
 |---|---|---|
+| `algorithm-assistant.md` | **Primary** — conversational algorithm design assistant that clarifies, explores cases, brainstorms, explains, and designs algorithms bilingually | `design-algorithm` |
 | `blog-assistant.md` | **Primary** — conversational blog-writing assistant that gathers ideas, fills gaps, and maintains the article document | `write-blog` |
 | `prompt-engineer.md` | **Primary** — crafts and refines effective prompts and agent files by applying the SKR framework | `craft-prompt` |
 | `skill-creator.md` | **Primary** — creates and reviews skills (SKILL.md) by applying the create-skill / review-skill workflows | `create-skill`, `review-skill` |
