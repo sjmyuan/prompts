@@ -2,7 +2,7 @@
 
 **Scenario**: A code-exploration sub-agent concluded "Service X syncs orders to the warehouse via Kafka topic `orders.warehouse`". The finding feeds an integration-design area, so the spike orchestrator runs the verification loop before embedding it in the findings doc.
 
-Applies **verify-sub-agent-results** (via `question-everything`) — the **question-the-result** → verify → compare → reinvestigate loop, repeated across two rounds.
+Applies **verify-sub-agent-results** — the **question-the-result** → verify → compare → reinvestigate loop, repeated across two rounds.
 
 ## Input / Context
 - **Original sub-agent result**: "Order sync to the warehouse uses Kafka topic `orders.warehouse`; latency ~2s."
@@ -10,9 +10,9 @@ Applies **verify-sub-agent-results** (via `question-everything`) — the **quest
 
 ## Round 1
 ### Questioning (question-the-result)
-- **C1 (Correctness, high)** — Is Kafka really the transport, or is there also/only a DB-polling path?
-- **C2 (Completeness, high)** — What happens when Kafka is down? Is there a fallback path?
-- **C3 (Ambiguity, medium)** — "syncs orders" — full order payloads or just notification events?
+- **C1 (Correctness, high)** — "Order sync uses Kafka topic `orders.warehouse`": Kafka may not be the transport, or a DB-polling path may also exist. Satisfactory answer: trace the actual transport from primary sources.
+- **C2 (Completeness, high)** — "Order sync is complete": what happens when Kafka is down, and is there a fallback path? Satisfactory answer: state the failure and fallback behavior.
+- **C3 (Ambiguity, medium)** — "syncs orders": unclear whether full order payloads or just notification events. Satisfactory answer: state the payload type.
 
 ### Verification (new same-type sub-agent)
 A NEW research agent (same type as the original, not the original instance) is dispatched and instructed to trace the actual sync path from primary sources.
@@ -22,7 +22,7 @@ A NEW research agent (same type as the original, not the original instance) is d
 - **C2** — AGREE: a DB fallback exists.
 - **C3** — AGREE: only notification events, not payloads.
 
-A material verdict DISAGREEs → a new research agent (same type, not the original instance) redoes the investigation with the corrected understanding.
+A material verdict is DISAGREE → a new research agent (same type, not the original instance) redoes the investigation with the corrected understanding.
 
 ## Round 2
 ### Re-investigation (new same-type agent)
@@ -30,8 +30,8 @@ A NEW research agent (same type as the original, never the original instance) re
 
 ### Questioning (question-the-result)
 Question the corrected result:
-- **C4 (Correctness, high)** — Does the poller batch or process one-by-one? Is the poll interval as stated?
-- **C5 (Completeness, medium)** — Are there other consumers of the same Kafka topic that would be affected?
+- **C4 (Correctness, high)** — "Order sync is DB polling based": unclear whether the poller batches or processes one-by-one, and the poll interval is unstated. Satisfactory answer: state the batch behavior and poll interval.
+- **C5 (Completeness, medium)** — "Kafka is notification-only": other consumers of the same topic may be affected. Satisfactory answer: enumerate the topic's consumers.
 
 ### Verification (new same-type sub-agent)
 Another NEW research agent (again not the original instance) verifies C4–C5.

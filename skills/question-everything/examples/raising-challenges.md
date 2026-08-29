@@ -18,5 +18,3 @@ Applies **question-the-result**.
 - **C1 (Correctness, high)** — `TokenCacheService.java:42` calls `cache.invalidate(userId)` on password change: the cited line must exist and be reachable from every password-change path; a wrong claim could mask a real token-leak. Satisfactory answer: confirm the line exists and trace the call from the password-change controller.
 - **C2 (Completeness, high)** — Password change invalidates cached tokens: only the `TokenCacheService` path is covered; if the refresh-token path skips this cache, invalidation is incomplete. Satisfactory answer: confirm the refresh flow also invalidates, or explain why it need not.
 - **C3 (Ambiguity, medium)** — "Invalidates cached tokens": unclear whether access and refresh tokens are both covered and whether the cache is keyed by `userId` or by token. Satisfactory answer: state the token types and cache keying.
-
-The output above passes validation (step 7): each challenge names one claim, its dimension, why it is suspect, and a satisfactory answer, ordered by impact.

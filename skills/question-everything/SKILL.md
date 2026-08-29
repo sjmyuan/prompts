@@ -10,8 +10,8 @@ description: Question and verify agent-reported information like a skeptic — r
 - A result will be consumed downstream (decision, commit, merge, release) and being wrong is costly
 - Two agents or sub-agents return conflicting results and a resolution is needed
 - User asks to validate the correctness, completeness, or clarity of a returned result
-- Inside a spike pipeline (via `conduct-spike`) — question and verify sub-agent investigation findings, ADR decisions, or findings/solution-doc compilations before acceptance
-- Do NOT load for plain ADR drafting, solution-doc writing, or code investigation — `draft-adr`, `write-solution-doc`, `investigate-code` handle those; load only when a returned result needs questioning or verification
+- Inside a spike pipeline (via `conduct-spike`) — question or verify sub-agent results before acceptance
+- Do NOT load for plain ADR drafting, solution-doc writing, or code investigation — use `draft-adr`, `write-solution-doc`, or `investigate-code` instead
 </when-to-use-this-skill>
 
 <knowledge>
@@ -31,8 +31,6 @@ Verification is the loop that decides whether a challenged result may be accepte
 <context-loading-guide>
 | Load when | Provides | File |
 |---|---|---|
-| About to generate challenges on a returned result | Six-dimension rubric, prioritization rules, and challenge output format | [reference/questioning-dimensions.md](reference/questioning-dimensions.md) |
-| About to run the verification loop on a returned result | Verification brief, comparison rules, traps | [reference/verification-protocol.md](reference/verification-protocol.md) |
 | Seeing a worked questioning pass on a returned result | End-to-end example of raising prioritized challenges only | [examples/raising-challenges.md](examples/raising-challenges.md) |
 | Seeing a worked verification round that accepts | Verification accept example | [examples/confirming-result.md](examples/confirming-result.md) |
 | Seeing a worked contradict + reinvestigate round | Verification contradict example (two rounds) | [examples/contradicting-result.md](examples/contradicting-result.md) |
@@ -45,23 +43,31 @@ Verification is the loop that decides whether a challenged result may be accepte
 <question-the-result>
 **Objective**: Apply a skeptic's lens to a returned result and produce concrete, prioritized challenges.
 
-1. Load [reference/questioning-dimensions.md](reference/questioning-dimensions.md) via the **context-loading-guide**.
+1. Load [reference/questioning-dimensions.md](reference/questioning-dimensions.md).
 2. Restate the result's key claims so each challenge targets one specific claim, never the result as a whole.
 3. Probe each claim against the six dimensions using the rubric's questions.
 4. Formulate each challenge using the rubric's output format — the claim questioned, the dimension, why it is suspect, and a satisfactory answer.
 5. Prioritize by impact — what breaks if the claim is wrong, and how plausible the error is.
-6. Output the ordered challenge list; if no challenge survives, state that the result passes initial questioning.
-7. Validate the output: each challenge names exactly one claim, states its dimension, explains why it is suspect, and defines a satisfactory answer; challenges are ordered by impact. Fix any failure before presenting.
+6. Output the challenge list ordered by priority.
+7. If no challenge survives, state that the result passes initial questioning.
+8. Validate the output: each challenge names exactly one claim, states its dimension, explains why it is suspect, and defines a satisfactory answer.
+9. Fix any validation failure before presenting.
 </question-the-result>
 
 <verify-sub-agent-results>
 **Objective**: Run the verification loop on a returned result — challenge, verify, and accept or re-investigate — so only verified results are handed back to the caller.
 
-1. Apply **question-the-result** to raise prioritized challenges on the returned result.
-2. Dispatch a NEW same-type sub-agent — never the original instance — to verify each challenge against primary sources; collect per-challenge verdicts (AGREE / DISAGREE / UNCERTAIN), each traceable to its challenge.
-3. Accept only if every material verdict is AGREE; if any is DISAGREE or UNCERTAIN, dispatch a NEW same-type sub-agent to redo the work with the corrected understanding, then loop to step 1.
-4. Loop until all AGREE or the 3-round cap; at the cap, present both versions to the user — never silently pick one.
-5. Hand the verified result back to the caller for synthesis only after verification. Full loop: **reference/verification-protocol.md**.
+1. Load [reference/verification-protocol.md](reference/verification-protocol.md).
+2. Apply **question-the-result** to raise prioritized challenges on the returned result.
+3. Dispatch a NEW same-type sub-agent — never the original instance — to verify each material challenge against primary sources.
+4. If no same-type sub-agent is available, verify each challenge directly against primary sources.
+5. Collect per-challenge verdicts (AGREE / DISAGREE / UNCERTAIN), each traceable to its challenge and citing its primary source.
+6. Apply the protocol's Traps list to the collected verdicts before comparing.
+7. Accept when every material verdict is AGREE.
+8. If any material verdict is DISAGREE or UNCERTAIN, dispatch a NEW same-type sub-agent to redo the work with the corrected understanding, then loop to step 2.
+9. Loop until all AGREE or the 3-round cap.
+10. At the cap, present both versions to the user — never silently pick one.
+11. Hand the verified result back to the caller for synthesis only after verification.
 </verify-sub-agent-results>
 
 </capabilities>

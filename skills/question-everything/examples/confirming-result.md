@@ -2,7 +2,7 @@
 
 **Scenario**: A code-exploration sub-agent reported that the auth token cache is invalidated on password change, citing `TokenCacheService.java:42`. The finding feeds a security-audit area, so the spike orchestrator runs the verification loop before embedding it in the findings doc.
 
-Applies **verify-sub-agent-results** (via `question-everything`) — the **question-the-result** → verify → compare → accept loop.
+Applies **verify-sub-agent-results** — the **question-the-result** → verify → compare → accept loop.
 
 ## Input / Context
 - **Original sub-agent result**: "Password change invalidates cached tokens — `TokenCacheService.java:42` calls `cache.invalidate(userId)`."
@@ -15,9 +15,9 @@ Applies **verify-sub-agent-results** (via `question-everything`) — the **quest
 4. **Evidence** — Is the call reachable from the password-change controller, or dead code?
 
 Prioritized challenges:
-- **C1 (Correctness, high)** — Verify `TokenCacheService.java:42` exists and is reachable from the password-change flow.
-- **C2 (Completeness, high)** — Verify whether the refresh-token path also checks the same cache; if not, the claim is incomplete.
-- **C3 (Ambiguity, medium)** — Clarify whether invalidation covers both access and refresh tokens.
+- **C1 (Correctness, high)** — `TokenCacheService.java:42` calls `cache.invalidate(userId)` on password change: the cited line must exist and be reachable from every password-change path. Satisfactory answer: confirm the line exists and trace the call from the password-change controller.
+- **C2 (Completeness, high)** — Password change invalidates cached tokens: only the `TokenCacheService` path is covered; if the refresh-token path skips this cache, invalidation is incomplete. Satisfactory answer: confirm the refresh flow also invalidates, or explain why it need not.
+- **C3 (Ambiguity, medium)** — "Invalidates cached tokens": unclear whether access and refresh tokens are both covered and whether the cache is keyed by `userId` or by token. Satisfactory answer: state the token types and cache keying.
 
 ## Verification (new same-type sub-agent)
 A NEW coding agent (same type as the original, not the original instance) is dispatched with the original claims plus C1–C3, instructed to answer from the codebase only.
