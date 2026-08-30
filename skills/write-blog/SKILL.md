@@ -22,9 +22,15 @@ Serve two reader groups: technical practitioners and team managers or tech leads
 - Default to Chinese; switch or provide bilingual drafts on request
 - Avoid translation-ese; write natural, fluent prose
 </language-rules>
+<markdown-formatting>
+Quotes nested inside a bold span break Markdown rendering. Never write `**"term"**`; keep the quoted term outside the bold span (`"**term**"`) or drop one of the markers.
+</markdown-formatting>
 <writing-styles>
 Four styles (deep analysis, narrative story, practical guide, opinion) plus the article structure. Details: [reference/writing-styles.md](reference/writing-styles.md)
 </writing-styles>
+<human-voice>
+Write like a person narrating real experience to a colleague, not like an essay generator. Avoid AI-flavor words (e.g. 阴险, 赋能, 综上所述), telegraph-style runs of short sentences, parallel flourishes, and summary endings. Rules, blacklist, rhythm guidance, and the pre-delivery Human-Voice Gate checklist: [reference/human-voice.md](reference/human-voice.md). Hand-written style exemplars with extracted rules: [reference/style-exemplars.md](reference/style-exemplars.md)
+</human-voice>
 <document-as-single-source>
 The article document is the only state carrier; HTML comments separate auxiliary content from the body. Every turn edits the document file in place and reports only the changes, not a full re-output. Details: [reference/document-as-single-source.md](reference/document-as-single-source.md)
 </document-as-single-source>
@@ -36,6 +42,8 @@ Suggest 2–4 image positions per article; generate SVG illustrations on request
 |---|---|---|
 | The marker blocks or document update loop is unclear | Document-as-single-source convention | [reference/document-as-single-source.md](reference/document-as-single-source.md) |
 | Choosing a style or structuring the article | Four styles with structure and fit | [reference/writing-styles.md](reference/writing-styles.md) |
+| Composing, reviewing, or refining any prose | Anti-AI-flavor rules, blacklist, rhythm, and the delivery gate | [reference/human-voice.md](reference/human-voice.md) |
+| Composing or refining to match a personal voice | Hand-written exemplars and extracted style rules | [reference/style-exemplars.md](reference/style-exemplars.md) |
 | Suggesting or generating an illustration | Image types, placement, naming, SVG rules | [reference/illustration-standards.md](reference/illustration-standards.md) |
 | User pastes content or shares scattered ideas | Walkthrough of ingest, collect, and gaps | [examples/ingest-and-collect.md](examples/ingest-and-collect.md) |
 | User asks to draft, review, or refine an article | Walkthrough of compose, reference, review, refine | [examples/compose-and-review.md](examples/compose-and-review.md) |
@@ -74,14 +82,17 @@ Suggest 2–4 image positions per article; generate SVG illustrations on request
 7. Apply the gap markers to the article document file; report only the gaps marked or filled, not the full document.
 </identify-gaps>
 <compose-blog>
-**Objective**: Turn collected material into a full draft.
-1. Recommend a writing style from reference/writing-styles.md; confirm with the user.
-2. Compose title candidates, summary candidates, intro, body sections, and conclusion.
-3. Put title and summary candidates in the title-and-summary block at the top.
-4. Add an assistant note per section: intent, weakness, and improvement.
-5. Write the draft into the article document file; output the title and summary candidates and a section outline in chat, not the full document; ask 3–4 targeted feedback questions.
-6. Verify title and summary candidates and per-section notes are present.
-7. Revise per feedback; refresh title and summary when core content changes.
+**Objective**: Turn collected material into a full draft that reads like a person wrote it.
+1. Read reference/style-exemplars.md; state 2–3 style rules from it ("像这个人一样写") before composing.
+2. Recommend a writing style from reference/writing-styles.md; confirm with the user.
+3. Compose the draft with the user's own spoken sentences and material as the backbone — preserve their phrasing where it exists; AI connects, reorders, and fills gaps instead of rewriting their voice. If material is thin, compose from what exists and mark the thin spots as gaps.
+4. Apply reference/human-voice.md while composing: plain words (no blacklisted AI-flavor words), varied rhythm (no 3+ consecutive short sentences), first-person and reader address, concrete anchors, no florification, no summary ending.
+5. Compose title candidates, summary candidates, intro, body sections, and conclusion per the style's structure.
+6. Put title and summary candidates in the title-and-summary block at the top.
+7. Add an assistant note per section: intent, weakness, and improvement.
+8. Write the draft into the article document file; output the title and summary candidates and a section outline in chat, not the full document; ask 3–4 targeted feedback questions.
+9. Verify title and summary candidates and per-section notes are present.
+10. Revise per feedback; refresh title and summary when core content changes.
 </compose-blog>
 <track-references>
 **Objective**: Embed shared sources as inline links.
@@ -109,13 +120,15 @@ Suggest 2–4 image positions per article; generate SVG illustrations on request
 6. Apply the edits to the article document file; report only the changes made, not the full document; list 2–3 concrete next directions.
 </review-draft>
 <refine-style>
-**Objective**: Make the prose natural, strong, and reader-adapted.
+**Objective**: Make the prose natural, strong, and reader-adapted — and free of AI flavor.
 1. Remove stiff transitions, repeated patterns, and translation-ese.
 2. Strengthen each section's opening line.
 3. Match depth to reader: detail for technical, meaning and value for managers.
 4. Check the reader journey from pain point to insight.
-5. Verify opening lines are strong and depth matches the reader.
-6. End with a conclusion, an action, or an open question.
+5. Apply reference/human-voice.md: replace blacklisted AI-flavor words, break up telegraph-style runs of short sentences, remove parallel flourishes and 总结腔.
+6. End with a conclusion, an action, or an open question — never a forced summary.
+7. Run the Human-Voice Gate checklist from reference/human-voice.md (blacklist, telegraph, florification, anchor, voice, ending); report pass / fixed / gap per check; only deliver when all checks pass or gaps are deferred with the user's consent.
+8. Verify opening lines are strong and depth matches the reader.
 </refine-style>
 <generate-illustrations>
 **Objective**: Produce a real illustration file from a suggestion.
@@ -139,4 +152,5 @@ Suggest 2–4 image positions per article; generate SVG illustrations on request
 <rule>When the user wants the prose polished, use **refine-style**.</rule>
 <rule>When the user asks for an actual illustration, use **generate-illustrations**.</rule>
 <rule>When composing or reviewing a draft, also use **suggest-images**.</rule>
+<rule>When composing or refining any prose, apply **human-voice** rules from reference/human-voice.md and the style exemplars; never deliver a draft without passing the Human-Voice Gate.</rule>
 </rules>
