@@ -26,7 +26,7 @@ Serve two reader groups: technical practitioners and team managers or tech leads
 Four styles (deep analysis, narrative story, practical guide, opinion) plus the article structure. Details: [reference/writing-styles.md](reference/writing-styles.md)
 </writing-styles>
 <document-as-single-source>
-The article document is the only state carrier; HTML comments separate auxiliary content from the body. Details: [reference/document-as-single-source.md](reference/document-as-single-source.md)
+The article document is the only state carrier; HTML comments separate auxiliary content from the body. Every turn edits the document file in place and reports only the changes, not a full re-output. Details: [reference/document-as-single-source.md](reference/document-as-single-source.md)
 </document-as-single-source>
 <illustration-conventions>
 Suggest 2–4 image positions per article; generate SVG illustrations on request. Details: [reference/illustration-standards.md](reference/illustration-standards.md)
@@ -52,7 +52,7 @@ Suggest 2–4 image positions per article; generate SVG illustrations on request
 4. Place formed paragraphs in the body with an assistant note; move drafts and notes to the materials block.
 5. Mark found gaps in the gaps block.
 6. Verify each part is classified and placed correctly.
-7. Output the full document; ask 2–3 guiding questions.
+7. Apply the edits to the article document file; report only the changes made, not the full document; ask 2–3 guiding questions.
 </ingest-existing-content>
 <collect-ideas>
 **Objective**: Develop the user's ideas through listening and questions.
@@ -61,7 +61,7 @@ Suggest 2–4 image positions per article; generate SVG illustrations on request
 3. Ask 1–2 deepening questions (triggering event, reader takeaway, real example).
 4. Append the points to the materials block.
 5. Verify the materials block captures the new points.
-6. Output the updated full document.
+6. Append the points to the article document file; report only the new points added, not the full document.
 </collect-ideas>
 <identify-gaps>
 **Objective**: Find missing evidence, logic, structure, or reader answers.
@@ -71,7 +71,7 @@ Suggest 2–4 image positions per article; generate SVG illustrations on request
 4. Mark each gap in the gaps block at its location.
 5. Remove gap markers once filled; integrate the content.
 6. Verify each listed gap is marked or filled.
-7. Output the updated full document.
+7. Apply the gap markers to the article document file; report only the gaps marked or filled, not the full document.
 </identify-gaps>
 <compose-blog>
 **Objective**: Turn collected material into a full draft.
@@ -79,7 +79,7 @@ Suggest 2–4 image positions per article; generate SVG illustrations on request
 2. Compose title candidates, summary candidates, intro, body sections, and conclusion.
 3. Put title and summary candidates in the title-and-summary block at the top.
 4. Add an assistant note per section: intent, weakness, and improvement.
-5. Output the draft; ask 3–4 targeted feedback questions.
+5. Write the draft into the article document file; output the title and summary candidates and a section outline in chat, not the full document; ask 3–4 targeted feedback questions.
 6. Verify title and summary candidates and per-section notes are present.
 7. Revise per feedback; refresh title and summary when core content changes.
 </compose-blog>
@@ -106,7 +106,7 @@ Suggest 2–4 image positions per article; generate SVG illustrations on request
 3. Add refreshed assistant notes at those spots; never repeat prior notes.
 4. Mark new gaps; update title and summary on substantive change.
 5. Verify notes are refreshed, not repeated from prior rounds.
-6. Output the full document; list 2–3 concrete next directions.
+6. Apply the edits to the article document file; report only the changes made, not the full document; list 2–3 concrete next directions.
 </review-draft>
 <refine-style>
 **Objective**: Make the prose natural, strong, and reader-adapted.

@@ -5,7 +5,7 @@ tools: Read, Write, Edit, Bash, Glob, Grep
 model: inherit
 ---
 
-Your task is to assist blog writing by applying the `write-blog` skill. On every turn, output the full updated article document and close with concrete next directions.
+Your task is to assist blog writing by applying the `write-blog` skill. Keep the article document as the single evolving draft: edit the document file in place with file-editing tools and report only the changes made each turn — never re-output the full document in chat unless the user explicitly asks for it. Close with concrete next directions.
 
 <knowledge>
 
