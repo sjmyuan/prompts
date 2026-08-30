@@ -11,6 +11,9 @@ Applies **create-scripted-diagram** and **modify-existing-svg** in the edit-svg 
 | Feedback (right→left) | right→left | `src_side='left', dst_side='right'` | SidePanel → Main |
 | Reverse upward | bottom→top | `src_side='top', dst_side='bottom'` | BottomNode → TopNode |
 | Cross-column upward | bottom→top | Corridor strategy via gap between columns | BottomRight → TopLeft |
+| **Simple straight flow (same-row/col)** | shared row/col center | None — bypass router | Hand-write 2-point waypoints: `[(x1, y_shared), (x2, y_shared)]` or `[(x_shared, y1), (x_shared, y2)]` |
+
+> **Micro-jog trap**: `route_all_edges()` allocates ports at fractional side positions and picks by proximity, so two **differently-sized** nodes on the same row/column produce tiny 6–8px zigzags (e.g., `[(410,192),(370,192),(370,186),(246,186)]`). For simple same-row/same-column flows, **hand-write straight 2-point waypoints with ports at the shared row/col center** — 0 turns, visually clean. Reserve the router for multi-edge port deconfliction, complex corridors, and obstacle cases.
 
 ## Standalone Script File Approach
 
@@ -40,6 +43,22 @@ After running the script, open the SVG in the browser and check:
 9. **Minimal turns**: Run `global_refine_pass()` after routing to minimize total turn count.
 
 Fix issues in script and re-run until all criteria are met.
+
+## Programmatic Validation (no visual review)
+
+When rendered previews are unavailable (e.g., the assistant model cannot view images), validate geometrically with a standalone `validate.py` that re-runs the diagram's layout and checks:
+
+1. **Node-node overlap**: pairwise bbox overlap area >1px → flag.
+2. **Edge-node intersection**: every edge segment vs every unrelated node bbox (`segment_rect_intersection`) → flag.
+3. **Entry segment length**: last waypoint segment ≥15px (also enforced by `endpoint_valid()`).
+4. **Arrow line-length audit**: every arrow-carrying segment ≥46px total (= `arrow_width × stroke_width` head + ~28px visible shaft; see [create-flowchart.md](create-flowchart.md) "Arrowhead-vs-gap rule"). Lines shorter than this look clipped.
+5. **ASCII layout dump**: print nodes as `#` and edges as `-`/`|` on a coarse grid (e.g., 10px per cell) to "see" composition, symmetry, and row/column alignment.
+
+Auditing notes:
+
+- **Multi-line node text lives in `<tspan>` elements** — a naive ElementTree `.text` dump misses it. Audit `<tspan>` content when checking for typos/overflow.
+- **SVG→PNG preview on macOS**: `cairosvg` requires the native cairo library (often absent); use `qlmanage -t -s N -o outdir file.svg` instead. The first global invocation is very slow — warm it up with one tiny single-file render first.
+- **Keep the generator script** (see "Standalone Script File Approach" above): any 改图/edit request = edit script → rerun → overwrite the same output filename.
 
 ## Validation API
 

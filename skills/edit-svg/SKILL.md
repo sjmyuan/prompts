@@ -30,7 +30,7 @@ description: Create SVG diagrams with professional PPT-quality layout, clear con
 
 **Text conventions**: `text-anchor="middle"` + `dominant-baseline="middle"` for single-line centered text. For multi-line CJK in `<tspan>`, use `dy`-based positioning (baseline offset ≈ 0.32×font_size). Color-code semantically: red=problems, green=success, blue=info, orange=warnings.
 
-**Column/Row centering**: Same-column nodes must share the same `center_x = col_left + max_width_in_col / 2`, with each node's `x = center_x - node_width / 2`. Same-row nodes must share the same `center_y`.
+**Column/Row centering**: Same-column nodes must share the same `center_x = col_left + max_width_in_col / 2`, with each node's `x = center_x - node_width / 2`. Same-row nodes must share the same `center_y`. For left-right fork/comparison layouts, mirror columns as `center ± D` around the fork and use uniform box widths (see [reference/design-standards.md](reference/design-standards.md)).
 
 **Scripts directory**: `skills/edit-svg/scripts/` — 7 Python modules. Dependencies: `pip install svgwrite networkx matplotlib`. See [reference/computation-snippets.md](reference/computation-snippets.md) for the full API reference.
 
@@ -59,7 +59,7 @@ Generate a PPT-quality diagram for script-based types (flowchart, architecture, 
 2. **Load references**: Load [reference/computation-snippets.md](reference/computation-snippets.md) for the script template, and the type-specific reference from `<context-loading-guide>`.
 3. **Create a standalone Python script** (e.g., `generate_diagram.py`) following the template in `computation-snippets.md`: import modules → define data → compute positions → route connections → validate → generate SVG → assemble and save.
 4. **Compute positions**: Use `dag_layout()` (pure DAG) or `assign_flow_layout()` (feedback loops marked `_topo_type='feedback'`). For manual layout, set `row`/`col` on nodes and use `flow_layout()` + `center_align_nodes()`. Center all nodes by column (`center_x`) and row (`center_y`).
-5. **Route connections**: Use `route_all_edges()` (auto-detects sides, allocates ports). For complex feedback edges, override paths manually via corridor strategy. Validate with `endpoint_valid()` and `detect_intersections()`.
+5. **Route connections**: Use `route_all_edges()` (auto-detects sides, allocates ports). For complex feedback edges, override paths manually via corridor strategy. **For simple same-row/same-column flows, bypass `route_all_edges` and hand-write straight 2-point waypoints with ports at the shared row/col center** (e.g., horizontal `[(src_right, y_shared), (dst_left, y_shared)]`) — the router allocates ports at fractional side positions, so differently-sized nodes produce micro-jogs on otherwise straight flows (see [reference/diagram-workflow.md](reference/diagram-workflow.md)). Validate with `endpoint_valid()` and `detect_intersections()`.
 6. **Generate SVG**: Call `generate_node_svg()`, `generate_edge_svg()`, `generate_label_svg()`, `generate_title_bar()`. Assemble via the SVG assembly pattern. For charts, use `chart_builder.render_*_chart()` instead.
 7. **Run and validate**: Run `python3 generate_diagram.py`. Open SVG in browser. Check: line-node overlap, parallel line collision, turning point clearance, connection sides, row/column alignment, column gap ≥140px, label overlap, approach segments ≥15px. Fix and re-run until clean.
 8. **Compute viewBox**: Use `compute_viewbox()` with `target_aspect=None` for tall diagrams (8+ rows, portrait). Return raw, valid SVG.
@@ -103,5 +103,6 @@ Modify, fix, or upgrade an existing SVG diagram. All new geometry MUST be comput
 <rule>**Side-entry avoidance**: Avoid entering wide nodes from LEFT/RIGHT (horizontal approach passes through node interior). Route above/below with a ≥15px vertical approach instead.</rule>
 <rule>**Column gap enforcement**: After layout, enforce minimum 140–160px inter-column gap for corridor-routed diagrams via `enforce_column_gap()`. Recompute `corridor_x` after shifting.</rule>
 <rule>**Manual label placement for complex edges**: For cross-column feedback and backward edges, prefer explicit label position assignment over automatic placement to avoid node overlap.</rule>
+<rule>**Arrowhead gap**: every arrow line must be ≥ `arrow_width × stroke_width` + ~28px visible shaft (≥46px at defaults). Set `node_gap`/band gaps so no arrow line is shorter, or the arrowhead consumes the whole line and it looks clipped. See [reference/create-flowchart.md](reference/create-flowchart.md) "Arrowhead-vs-gap rule".</rule>
 <rule>**API return types**: `connection_endpoints()` returns a 4-tuple `(start_pt, end_pt, src_side, dst_side)`, not a dict. `generate_label_svg()` uses `text_color` (not `color`). `generate_edge_svg()` hardcodes `marker-end="url(#arrow)"` — only one marker with `id="arrow"` in `<defs>`.</rule>
 </rules>

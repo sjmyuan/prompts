@@ -22,6 +22,7 @@ All SVG output must meet professional presentation standards for PPT/Keynote/Goo
 - **Line clearance**: Any line bend ≥25px away from any other element's edge.
 - **Sizing**: Same semantic type → uniform size. Compute via `svg_builder.get_shape_dimensions()`.
 - **Overlap avoidance**: Use `geometry.overlap()` / `geometry.find_overlapping()` — never manually check.
+- **Mirrored left-right layout** (fork/comparison diagrams): place column centers symmetrically as `center ± D` around the central node — NOT independent per-column centering (per-column max-width centering breaks symmetry when column widths differ). Use a **uniform box width across both columns** so left/right gaps are equal. Paired nodes (one per side, same row) must share identical `center_y` (e.g., a decision and its branch step both at `y=482`).
 
 ### Hand-crafted layout principles
 - **Canvas**: Variable viewBox (800–960 wide, 320–628 tall). Adjust aspect ratio to content.

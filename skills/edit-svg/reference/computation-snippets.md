@@ -339,3 +339,23 @@ Use the standalone script template for full diagrams. These snippets show indivi
 | Bar chart | `render_bar_chart(labels, values, title, ylabel)` → complete SVG | `chart_builder` |
 | Line chart | `render_line_chart(labels, series, title, ylabel)` → complete SVG | `chart_builder` |
 | Pie chart | `render_pie_chart(labels, values, title)` → complete SVG | `chart_builder` |
+
+---
+
+## Known Limitations & Gotchas
+
+### `compute_viewbox()` always returns `vx=0` — content is NOT centered
+
+`compute_viewbox()` discards the computed `vx = content_x - padding` and always returns `(0, 0, vw, vh)` (see `graph_layout.py`). For horizontally asymmetric content, the result is **left-anchored, not centered**. For centered output, compute the origin manually:
+
+```python
+vw, vh = 960, 700                      # target canvas
+xs_min = min(b[0] for b in bboxes)
+xs_max = max(b[0] + b[2] for b in bboxes)
+vx = int((xs_min + xs_max) / 2 - vw / 2)
+viewbox = (vx, 0, vw, vh)              # vy=0 keeps the title bar anchored at top
+```
+
+### Audit pitfall: the arrow `<marker>` also carries a `viewBox`
+
+`generate_arrow_marker()` emits `<marker id="arrow" viewBox="0 0 9 9">`. Naive regex/grep for `viewBox` or a text-extraction pass can grab the marker's viewBox instead of the root `<svg viewBox="x y w h">`. Anchor extraction on the **root `<svg ... viewBox=` tag** or match the full `viewBox="x y w h"` (4-number) pattern.

@@ -37,6 +37,9 @@ For left-to-right: use `graph_layout.flow_layout(nodes, 'left-to-right')`.
 | Start offset | (120, 140) |
 | Decision node | width = height, computed by `get_shape_dimensions` |
 | Minimum node width (short text) | 120px |
+| Minimum arrow line length | `arrow_width × stroke_width` + ~28px visible shaft → **≥46px** at defaults |
+
+> **Arrowhead-vs-gap rule**: the rendered arrowhead is `arrow_width × stroke_width` px long (defaults `arrow_width=9`, `stroke-width=2` → **18px**; see `generate_arrow_marker` in `svg_builder.py`). Any arrow line shorter than "head + ~28px visible shaft" looks broken or clipped — the head consumes the whole line. Set gaps so every edge length (or its vertical/horizontal span) clears this: vertical chains 48px+, start→fork 56px+, stack/band gaps 60px+. Audit every arrow: total line length must be ≥46px at defaults.
 
 ---
 
@@ -234,4 +237,5 @@ svg_fragments.append(
     f'font-size="11" fill="{color}" font-family="...">{label}</text>'
     f'</g>'
 )
+```
 

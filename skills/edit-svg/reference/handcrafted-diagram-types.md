@@ -173,6 +173,40 @@ Horizontal step boxes laid left-to-right with connecting arrows, optional back-l
 
 ---
 
+## Annotated Causal Chain
+
+A vertical chain of annotation pills beside stacked bands, with connectors into each band. Ideal for "root cause → intermediate → result" explanations (e.g., 概念没对齐 → 搜索范围跟着错 → 完整性无从谈起).
+
+| Element | Value |
+|---|---|
+| Pill width/height | ~120×30px, `rx=15` |
+| Pill column center-x | fixed (e.g., 830) |
+| Band→pill gap | 30–50px |
+| Pill-to-pill arrow | straight vertical, ≥46px long (see Arrowhead-vs-gap rule) |
+| Band connectors | straight horizontal at the **exact shared band-center y** |
+
+### Layout rules
+
+- **Pills in a single aligned column** (fixed center-x, even y spacing). Do **NOT** place pills at sampled points along a bezier/arc — sampled positions scatter x and look misaligned.
+- **Connectors must be horizontal at the exact band-center y** (a 1px mismatch reads as a tilt). Bottom pill aligns with the root band's center; top pill aligns with the result band's center; intermediate pills sit midway between band centers so pill-to-pill arrows stay ≥46px.
+- **Ordering**: root cause at the bottom, result at the top; arrows point upward (root cause "rises" to the surface).
+
+### Key SVG Elements
+
+```svg
+<!-- Pill (white bg, colored border) -->
+<rect x="770" y="419" width="120" height="30" rx="15" fill="#FFFFFF" stroke="#EA580C" stroke-width="1.5"/>
+<text x="830" y="434" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="600" fill="#9A3412">概念没对齐</text>
+
+<!-- Pill-to-pill up-arrow (straight vertical) -->
+<line x1="830" y1="419" x2="830" y2="373" stroke="#C2410C" stroke-width="2" marker-end="url(#arrow)"/>
+
+<!-- Band connector (straight horizontal at band-center y) -->
+<line x1="650" y1="434" x2="770" y2="434" stroke="#C2410C" stroke-width="2" marker-end="url(#arrow)"/>
+```
+
+---
+
 ## Container / Boundary Diagram
 
 A dashed-boundary container with items inside and external items around edges.
