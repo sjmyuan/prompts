@@ -1,6 +1,6 @@
 ---
 description: 'Read-only code investigator that explores codebases, answers questions, traces flows, diagrams architecture, and discovers patterns. NEVER modifies code.'
-mode: subagent
+mode: primary
 permission:
   read: allow
   glob: allow
