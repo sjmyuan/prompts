@@ -10,7 +10,7 @@ Each feature implementation lives in its own folder with two files:
 
 | Item | Rule |
 |---|---|
-| Location | For an **orchestrate-feature-delivery** cell use the epic's delivery folder `deliveries/<epic-name>/{repo}/{feature-name}/` (already created by the orchestrator); otherwise ask the user or default to `docs/feature-implementations/`. |
+| Location | For an **orchestrate-feature-delivery** cell use the epic's delivery folder `deliveries/<epic-name>/{repo}/{feature-name}/` (already created by the orchestrator); otherwise resolve the artifact base via `resolve-artifact-location` and use `{base}/feature-implementations/{feature-name}/`. |
 | Repo-first layout | When a plan belongs to a specific repo (a cell from **orchestrate-feature-delivery**), use `deliveries/<epic-name>/{repo}/{feature-name}/`; fall back to `{location}/{feature-name}/` when no repo applies. |
 | Feature name | Derive a short, descriptive kebab-case name from the plan's objective (e.g., `add-auth-system`, `refactor-validation-handler`, `fix-null-pointer-in-transformer`). |
 | Plan file | Contains the numbered step list with status emojis, updated in real-time as execution progresses. Serves as the live execution dashboard. |

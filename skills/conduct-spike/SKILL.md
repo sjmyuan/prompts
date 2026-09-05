@@ -38,7 +38,7 @@ spikes/<spike-name>/
 └── docs/                   # findings documents — findings-<area>.md each
 ```
 
-Artifacts cross-reference each other with relative paths inside the spike folder. All producing capabilities save into this layout; the folder path is asked or detected from an existing `spikes/<spike-name>/`, with `adrs/` and `docs/` created as needed.
+Artifacts cross-reference each other with relative paths inside the spike folder. All producing capabilities save into this layout, with `adrs/` and `docs/` created as needed. The spike folder lives under an artifact base root; when the user names no root and `scope.md` records none, resolve it via `resolve-artifact-location` and record `Artifact root:` at the top of `scope.md`.
 </spike-artifact-layout>
 
 <scope-map>
@@ -193,4 +193,5 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 <rule>When the user starts from existing material instead of a blank slate, apply **continue-prior-spike**.</rule>
 <rule>When a fact or decision changes after spike artifacts exist, apply **sync-update-artifacts**.</rule>
 <rule>When ADR discussion hinges on an unverified assumption, unknown feasibility, or missing evidence, apply **suggest-spike-on-adr-uncertainty** before finalizing the ADR.</rule>
+<rule>When the spike's artifact base root is unresolved (no user-named path and no recorded `Artifact root:`), apply `resolve-artifact-location` before the scope map is saved.</rule>
 </rules>

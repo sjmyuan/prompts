@@ -46,7 +46,7 @@ Sub-agent results — investigation findings from **code-investigator**, ADR dec
 </sub-agent-verification>
 
 <spike-artifact-layout>
-Spike artifacts are versioned in one per-spike folder: `scope.md` (canonical area → problem map) at the root, `adrs/` (one file per ADR — `adr-<area>-<NN>-<problem>.md`), `solution.md` at the root, `docs/` (findings docs per area). Confirm the folder path with the user when the spike starts.
+Spike artifacts are versioned in one per-spike folder: `scope.md` (canonical area → problem map) at the root, `adrs/` (one file per ADR — `adr-<area>-<NN>-<problem>.md`), `solution.md` at the root, `docs/` (findings docs per area). When the user names no folder, resolve the artifact base root via `resolve-artifact-location` and record `Artifact root:` at the top of `scope.md`.
 </spike-artifact-layout>
 
 </knowledge>

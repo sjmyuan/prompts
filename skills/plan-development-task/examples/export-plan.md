@@ -1,6 +1,6 @@
 # Example: Exporting a Confirmed Plan to Files
 
-**Scenario**: A simple bug-fix plan has been confirmed by the user. **export-plan** persists it to a feature folder as `plan.md` + `context.md` so **execute-plan** can carry it out.
+**Scenario**: A simple bug-fix plan has been confirmed by the user. **export-plan** persists it to a feature folder as `plan.md` + `context.md` so **execute-plan** can carry it out. The single-repo workspace has no docs home or convention, so `resolve-artifact-location` asks and the user confirms the repo root as the base.
 
 **Applies**: **export-plan**
 
@@ -12,7 +12,7 @@
 
 ## Feature Folder
 
-`docs/feature-implementations/fix-null-pointer-in-transformer/`
+`<repo-root>/feature-implementations/fix-null-pointer-in-transformer/` (base = repo root, confirmed via `resolve-artifact-location`)
 
 ## plan.md
 
@@ -54,4 +54,4 @@
 
 ## Save Location
 
-Saved to `docs/feature-implementations/fix-null-pointer-in-transformer/`; the user can now invoke **execute-plan** to run it.
+Saved to `<repo-root>/feature-implementations/fix-null-pointer-in-transformer/`; the user can now invoke **execute-plan** to run it.

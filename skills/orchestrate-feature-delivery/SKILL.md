@@ -42,6 +42,7 @@ deliveries/<epic-name>/               # one folder per epic (epic-name = spike n
 │   └── plan.md                       # TDD plan from plan-development-task
 └── index.md                          # delivery index (single source of truth)
 ```
+- **Base root**: `deliveries/` is a sibling of the spike's `spikes/` under the artifact base the spike recorded (`scope.md` `Artifact root:`) — inherited, never re-resolved; only a missing record triggers `resolve-artifact-location`.
 - **index.md** is the delivery index — it lives at the epic folder root (see **reference/delivery-index-format.md**).
 - **Feature folders are named by the feature's kebab-case name** (e.g. `wallet-contracts`), never its ID (`F1`) — IDs are reference shorthand only (waves, dependencies).
 - **context.md** carries the distilled spike context and the `## Reworks` manifest; **plan.md** is the original plan from **plan-development-task** — each rework is a sibling `rework-<date>.md` (per **rework-modes**), implemented steps never modified.
@@ -134,7 +135,7 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 5. Present the wave plan and confirm with the user.
 </order-feature-delivery>
 <produce-delivery-index>
-1. Write the **delivery index** at `deliveries/<epic-name>/index.md` per **reference/delivery-index-format.md** — `<epic-name>` is the spiked epic's name (see **delivery-layout**).
+1. Read the spike's recorded artifact base (`scope.md` `Artifact root:`); write the **delivery index** at `<base>/deliveries/<epic-name>/index.md` per **reference/delivery-index-format.md** — resolve the base via `resolve-artifact-location` only when the record is missing.
 2. Include the **Spike References** block: ADR files, solution-doc sections.
 3. Create per-repo plan folders in the **repo-first** layout: `deliveries/<epic-name>/{repo}/{feature-name}/plan.md` + `context.md` (see **delivery-layout**).
 4. Mark each cell's initial status **unplanned** and its plan location.
@@ -170,7 +171,7 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 11. Re-assess and report next actions; repeat until all cells are done or the user pauses.
 </orchestrate-delivery>
 <resume-delivery>
-1. Load the existing delivery index plus the spike output.
+1. Load the existing delivery index — locate it under the spike's recorded artifact base (`scope.md` `Artifact root:`, then `deliveries/<epic-name>/index.md`) — plus the spike output.
 2. Confirm ADR currency with the user — if any governing ADR changed since the last run, apply **handle-adr-change** first.
 3. Determine the current state: completed waves (skip), in-progress cells (resume from the last step in `plan.md`), failed cells (ask the user to re-plan or retry), blocked cells (wait for the blocker), unplanned cells (plan next).
 4. Apply **orchestrate-delivery** from that state — never redo completed work.

@@ -172,7 +172,7 @@ Load **[reference/plan-poc.md](reference/plan-poc.md)** and follow its steps.
 
 <export-plan>
 1. After the user confirms the plan, ask whether they would like to persist it to a feature folder for later execution by **execute-plan**.
-2. Determine the storage location: for an **orchestrate-feature-delivery** cell use `deliveries/<epic-name>/{repo}/{feature-name}/`; otherwise ask the user or default to `docs/feature-implementations/`.
+2. Determine the storage location: for an **orchestrate-feature-delivery** cell use `deliveries/<epic-name>/{repo}/{feature-name}/`; otherwise resolve the artifact base via `resolve-artifact-location` and use `{base}/feature-implementations/` (no silent default).
 3. Derive a short kebab-case feature name from the plan's objective (e.g., `fix-null-pointer-in-transformer`).
 4. Use the **repo-first** layout `{location}/{repo}/{feature-name}/` when a repo applies (the delivery folder already exists); else `{location}/{feature-name}/`.
 5. Write `plan.md` + `context.md` per **[reference/plan-file-format.md](reference/plan-file-format.md)**.

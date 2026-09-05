@@ -61,4 +61,5 @@ Area status (derived): `preparing` (findings doc missing) · `spiking` (a proble
 > "Saved the scope map to `scope.md`, all 4 findings docs to `docs/`, the 5 ADRs to `adrs/` (area-prefixed, one per problem), and the solution doc to `solution.md` with each area's ADR decisions grouped under its heading. Cross-references between artifacts use relative paths inside the spike folder."
 
 **Notes**:
-- The delivery index for this epic is written by **orchestrate-feature-delivery** at `deliveries/<epic-name>/index.md` — a separate top-level `deliveries/` folder, not the spike folder.
+- The spike folder sits under an artifact base root (resolved via `resolve-artifact-location` when unnamed) and records `Artifact root:` at the top of `scope.md`.
+- The delivery index for this epic is written by **orchestrate-feature-delivery** at the same base's `deliveries/<epic-name>/index.md` — a sibling of `spikes/`, not inside the spike folder.

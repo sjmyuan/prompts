@@ -1,6 +1,6 @@
 # Delivery Index Format
 
-The delivery index is written at **`deliveries/<epic-name>/index.md`** — one folder per epic (no `docs/` prefix), named after the spiked epic (`<epic-name>` = spike name). The spike's own artifacts stay untouched in the spike folder (`spikes/<spike-name>/`; ADRs in `adrs/`, solution doc at the root, findings in `docs/`) and are referenced from the index via **Spike References**. The index is the epic's **single source of truth for state** — the orchestrator reads it to decide next actions, updates it as agents report, and uses its **Spike References** so every agent brief can point agents at the full spike output.
+The delivery index is written at **`<base>/deliveries/<epic-name>/index.md`** — one folder per epic (no `docs/` prefix), named after the spiked epic (`<epic-name>` = spike name). The delivery base is the spike's recorded artifact base (`scope.md` `Artifact root:`), so `deliveries/` is a sibling of the spike's `spikes/`; it is inherited, never re-resolved, with `resolve-artifact-location` as fallback only when the record is missing. The spike's own artifacts stay untouched in the spike folder (`spikes/<spike-name>/`; ADRs in `adrs/`, solution doc at the root, findings in `docs/`) and are referenced from the index via **Spike References**. The index is the epic's **single source of truth for state** — the orchestrator reads it to decide next actions, updates it as agents report, and uses its **Spike References** so every agent brief can point agents at the full spike output.
 
 ## Concise writing
 
