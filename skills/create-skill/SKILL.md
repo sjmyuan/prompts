@@ -1,6 +1,6 @@
 ---
 name: create-skill
-description: Generate complete skill files (SKILL.md) with capabilities, examples, and references that meet reviewer standards. Use when creating, authoring, generating, building, extracting, or validating a new skill.
+description: Author, edit, and validate skill files (SKILL.md) with capabilities, examples, and references that meet reviewer standards. Use when creating, authoring, generating, building, extracting, editing, improving, revising, or validating a skill.
 ---
 
 <when-to-use-this-skill>
@@ -8,8 +8,9 @@ description: Generate complete skill files (SKILL.md) with capabilities, example
 - User asks to generate examples or references for a skill
 - User asks to build a complete skill with capabilities, knowledge, and rules
 - User provides existing materials (agent prompts, docs, code) to extract into a skill
-- User asks to validate a newly created skill before delivery
-- Do NOT load for reviewing an existing skill file — use `review-skill` instead
+- User asks to edit, improve, or revise an existing skill
+- User asks to validate a newly created or edited skill before delivery
+- Do NOT load for a read-only review — use `review-skill` (its findings feed **edit-skill**)
 </when-to-use-this-skill>
 
 <knowledge>
@@ -56,6 +57,9 @@ Each capability must include a validation or checklist step so output is verifia
 <severity-levels>
 Validation findings labeled Blocker 🚫 / Major 🔴 / Minor 🟡 / Nit 🟢 / Inconsistency ⚠️. Table: **../review-skill/reference/severity-levels.md**.
 </severity-levels>
+<edit-existing-skill>
+Editing an existing skill reuses the create-* capabilities in existing-file mode — review-first for open "improve", change-type routing, ripple on rename/remove, validate-after-each. Details: **reference/edit-skill-procedure.md**.
+</edit-existing-skill>
 <same-name-live-copy-ban>
 Never read, compare, or edit a live/loaded skill with the same name in claude/opencode/copilot dirs. The user-provided file(s) are the only source and target — if the user gives no location, ask; never auto-fetch a same-named installed skill.
 </same-name-live-copy-ban>
@@ -68,6 +72,7 @@ Never read, compare, or edit a live/loaded skill with the same name in claude/op
 | Extracting an existing agent prompt or doc into a skill | Extraction walkthrough | [examples/extract-from-agent.md](examples/extract-from-agent.md) |
 | Adding examples and references to a drafted skill | Examples + references walkthrough | [examples/create-examples-and-references.md](examples/create-examples-and-references.md) |
 | Validating a newly created skill before delivery | Validation-report walkthrough | [examples/validate-new-skill.md](examples/validate-new-skill.md) |
+| Editing an existing skill (review findings + rename ripple) | Edit walkthrough | [examples/editing-existing-skill.md](examples/editing-existing-skill.md) |
 
 </context-loading-guide>
 
@@ -102,7 +107,7 @@ Never read, compare, or edit a live/loaded skill with the same name in claude/op
 </create-skill-file>
 
 <create-skill-examples>
-**Objective**: Create example files demonstrating each capability.
+**Objective**: Create or update example files demonstrating each capability.
 
 1. Determine one realistic scenario per capability per **example-standards**.
 2. Create one `.md` file per scenario under `examples/`.
@@ -114,7 +119,7 @@ Never read, compare, or edit a live/loaded skill with the same name in claude/op
 </create-skill-examples>
 
 <create-skill-references>
-**Objective**: Create reference files for large rubrics and detailed criteria.
+**Objective**: Create or update reference files for large rubrics and detailed criteria.
 
 1. Identify knowledge entries that are large rubrics, scoring matrices, or comprehensive criteria that would bloat SKILL.md.
 2. Create a dedicated `.md` file per topic under `reference/` with a clear title, full content, and cross-references to the relevant capability.
@@ -124,7 +129,7 @@ Never read, compare, or edit a live/loaded skill with the same name in claude/op
 </create-skill-references>
 
 <validate-created-skill>
-**Objective**: Validate the created skill file, examples, and references before delivery.
+**Objective**: Validate the created or edited skill file, examples, and references before delivery.
 
 1. Apply **same-name-live-copy-ban**: validate only the created/user-provided files — never a same-named live copy. Then verify all required sections exist in order: frontmatter, `<when-to-use-this-skill>`, `<knowledge>`, `<capabilities>`, optional `<rules>`.
 2. Score the description per **description-quality** (target ≥ 9) and check bidirectional trigger coverage.
@@ -141,14 +146,28 @@ Never read, compare, or edit a live/loaded skill with the same name in claude/op
 13. Report results with severity labels per **severity-levels** and fixes; if issues exist, return to the relevant creation capability, fix, and re-validate.
 </validate-created-skill>
 
+<edit-skill>
+**Objective**: Edit or improve an existing skill's files (SKILL.md, examples, references) by reusing the create-* capabilities in existing-file mode.
+
+1. Apply **same-name-live-copy-ban** — target only the user-provided existing files.
+2. Read and inventory the skill: sections, capabilities, knowledge, rules, guide rows, examples, references.
+3. Triage per **reference/edit-skill-procedure.md** — an open-ended "improve" runs `review-skill`'s **review-skill-file** (read-only) and applies its findings; a concrete request proceeds directly.
+4. Classify each change per the change-type table in **reference/edit-skill-procedure.md** (add, remove, rename, restructure, apply findings, size-reduce).
+5. Route each change to **create-skill-file** / **create-skill-examples** / **create-skill-references** in existing-file mode per **reference/edit-skill-procedure.md**.
+6. Run the ripple checklist after renames or removals per **reference/edit-skill-procedure.md**.
+7. Run **validate-created-skill** after each change; revert on a Blocker 🔴 and redo.
+8. Re-measure changed files per **size-limits** and report per **severity-levels**.
+</edit-skill>
+
 </capabilities>
 
 <rules>
 <rule>When the user requests to create a new skill, use **collect-skill-requirements** to gather name, description, scenarios, capabilities, knowledge, and example needs.</rule>
 <rule>After requirements are confirmed, use **create-skill-file** to generate SKILL.md, and **create-skill-examples** plus **create-skill-references** in parallel as needed.</rule>
 <rule>When the user provides existing source materials, use **collect-skill-requirements** step 3 to incorporate them into the knowledge section rather than embedding them in capabilities.</rule>
-<rule>After creating all files, use **validate-created-skill** before presenting the result.</rule>
+<rule>After creating or editing all files, use **validate-created-skill** before presenting the result.</rule>
 <rule>When validation reveals issues, return to the relevant creation capability to fix them, then re-validate.</rule>
 <rule>When creating or validating a skill, operate only on the user-provided files per **same-name-live-copy-ban** — never read, compare, or edit a live/loaded skill with the same name.</rule>
-<rule>When the user asks to review an existing skill file, do not use this skill — delegate to the `review-skill` skill instead.</rule>
+<rule>When the user asks to edit, improve, or revise an existing skill, use **edit-skill**; run an open-ended "improve" through `review-skill` first per **reference/edit-skill-procedure.md**.</rule>
+<rule>When the user asks for a read-only review of an existing skill file, delegate to the `review-skill` skill instead.</rule>
 </rules>

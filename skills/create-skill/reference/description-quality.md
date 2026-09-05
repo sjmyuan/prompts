@@ -11,7 +11,7 @@ Use when [intent-verb₁] / [intent-verb₂] / [intent-verb₃] [object/scope].
 - Part 2 (trigger phrase): lists intent verbs matching the `<when-to-use-this-skill>` bullets.
 
 Example:
-> Review SKILL.md files for correct structure, section-purpose compliance, and absence of duplication. Use when reviewing, improving, fixing, or diagnosing trigger failures in a copilot skill file.
+> Review SKILL.md files for correct structure, section-purpose compliance, and absence of duplication. Use when reviewing, checking, or diagnosing trigger failures in a copilot skill file.
 
 ## Five-dimension scoring (0–2 each, total /10)
 

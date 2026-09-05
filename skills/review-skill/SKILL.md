@@ -1,11 +1,11 @@
 ---
 name: review-skill
-description: Review SKILL.md files for correct structure, section-purpose compliance, naming conventions, and duplication. Use when reviewing, fixing, improving, or checking trigger correctness of a copilot skill file.
+description: Review SKILL.md files for correct structure, section-purpose compliance, naming conventions, and duplication. Use when reviewing, diagnosing, or checking the structure, triggers, naming, or quality of a copilot skill file.
 ---
 
 <when-to-use-this-skill>
 - User asks to review a skill file (SKILL.md)
-- User asks to improve or fix a skill file (SKILL.md)
+- User asks to diagnose or get feedback on a skill file before improving it (review-only — edits are applied via `create-skill`)
 - User asks whether a SKILL.md is correctly structured
 - User asks for feedback on section placement, duplication, or capability format in a skill file
 - User asks whether a skill will trigger or activate correctly
@@ -146,6 +146,7 @@ Review only the user-provided skill file(s). Never read, compare, or review a li
 
 <rules>
 <rule>When reviewing a skill file, review only the user-provided file per **same-name-live-copy-ban** — never read, compare, or review a live/loaded skill with the same name in claude/opencode/copilot dirs.</rule>
-<rule>When the user submits a SKILL.md file for review or asks to improve or fix a skill file, use **review-skill-file**.</rule>
+<rule>When the user submits a SKILL.md file for review or asks to diagnose what to fix in it, use **review-skill-file** — review and suggest only, never edit the file.</rule>
+<rule>When the user wants an existing skill file edited or improved (not just diagnosed), do not apply edits here — route to `create-skill`'s **edit-skill**.</rule>
 <rule>When the user asks whether a skill will trigger or activate correctly, or whether its description matches its scenarios, use **review-skill-file** and focus on step 2.</rule>
 </rules>
