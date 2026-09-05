@@ -68,6 +68,9 @@ Details: [reference/platform-agnostic-writing.md](reference/platform-agnostic-wr
 Integration checklist for skill↔skill pipelines (handoff, shared schema, awareness, guard clauses) and skill↔sub-agent integration (dispatch briefs, output contracts, verification, fallback).
 Details: [reference/pipeline-integration.md](reference/pipeline-integration.md)
 </pipeline-integration-review>
+<same-name-live-copy-ban>
+Review only the user-provided skill file(s). Never read, compare, or review a live/loaded skill with the same name in claude/opencode/copilot dirs — the submitted file is the sole subject. To review an installed copy, the user must provide its exact path.
+</same-name-live-copy-ban>
 
 <context-loading-guide>
 
@@ -94,7 +97,7 @@ Details: [reference/pipeline-integration.md](reference/pipeline-integration.md)
 **Note**: Do not modify the skill file during review; suggest changes as descriptions or patch snippets.
 
 **Steps**:
-1. Read the full skill file to understand its domain and all sections — apply **reference/section-semantics.md** for the section-purpose table and violation list.
+1. Apply **same-name-live-copy-ban**: the submitted file is the sole subject — never fetch a live/loaded same-named copy. Read the full skill file to understand its domain and all sections — apply **reference/section-semantics.md** for the section-purpose table and violation list.
    a. Verify all expected top-level sections are present: frontmatter YAML, `<when-to-use-this-skill>`, `<knowledge>`, `<capabilities>`; flag any missing as 🔴 Major.
    b. Verify section order: frontmatter → `<when-to-use-this-skill>` → `<knowledge>` → `<capabilities>` → `<rules>` (if present); flag out-of-order as 🟡 Minor.
    c. Measure the file's size — run `scripts/measure_sizes.py` on the skill folder when available, else count lines and estimate chars.
@@ -135,13 +138,14 @@ Details: [reference/pipeline-integration.md](reference/pipeline-integration.md)
 13. Include a **Positive Highlights** section that acknowledges at least one well-structured aspect of the skill.
 14. Include a **Risks & Assumptions** section that states any assumptions made about the intended skill format (e.g., four-section semantics) and notes that no runtime evaluation was performed.
 15. Format findings with severity levels (see **reference/severity-levels.md**) and load **examples/skill-file-review.md** for output structure guidance.
-16. **Check integration**: If the skill references another skill or dispatches (or is loaded by) sub-agents, load **reference/pipeline-integration.md** and verify the applicable axes and points. Flag gaps; skip if neither applies.
+16. **Check integration**: If the skill references another skill or dispatches (or is loaded by) sub-agents, load **reference/pipeline-integration.md** and verify the applicable axes and points — using only relationships the reviewed file itself declares; never fetch other skills. Flag gaps; skip if neither applies.
 17. Verify output completeness: every finding has a severity label, **Positive Highlights** and **Risks & Assumptions** sections are present, and all recommendations are actionable (not vague).
 </review-skill-file>
 
 </capabilities>
 
 <rules>
+<rule>When reviewing a skill file, review only the user-provided file per **same-name-live-copy-ban** — never read, compare, or review a live/loaded skill with the same name in claude/opencode/copilot dirs.</rule>
 <rule>When the user submits a SKILL.md file for review or asks to improve or fix a skill file, use **review-skill-file**.</rule>
 <rule>When the user asks whether a skill will trigger or activate correctly, or whether its description matches its scenarios, use **review-skill-file** and focus on step 2.</rule>
 </rules>

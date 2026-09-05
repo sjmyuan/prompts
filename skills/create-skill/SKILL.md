@@ -56,6 +56,9 @@ Each capability must include a validation or checklist step so output is verifia
 <severity-levels>
 Validation findings labeled Blocker 🚫 / Major 🔴 / Minor 🟡 / Nit 🟢 / Inconsistency ⚠️. Table: **../review-skill/reference/severity-levels.md**.
 </severity-levels>
+<same-name-live-copy-ban>
+Never read, compare, or edit a live/loaded skill with the same name in claude/opencode/copilot dirs. The user-provided file(s) are the only source and target — if the user gives no location, ask; never auto-fetch a same-named installed skill.
+</same-name-live-copy-ban>
 
 <context-loading-guide>
 
@@ -77,13 +80,13 @@ Validation findings labeled Blocker 🚫 / Major 🔴 / Minor 🟡 / Nit 🟢 / 
 
 1. Ask the user targeted questions to understand: **skill name** (kebab-case, imperative verb per **naming-conventions**), **description** (domain + trigger phrase), **when-to-use scenarios** (3–7), **core capabilities** (each named with an imperative action verb), **knowledge requirements** (tables, layouts, constraints), **rules** (when → capability routing), **example scenarios** (≥1 per capability), and **reference needs** (large rubrics to extract).
 2. Present a structured summary of the collected information and request confirmation or refinements.
-3. If the user provides existing source materials (agent prompts, code, docs), read and analyze them to extract accurate knowledge entries instead of asking from scratch.
+3. If the user provides existing source materials (agent prompts, code, docs), read and analyze them to extract accurate knowledge entries instead of asking from scratch — never fetch a live/loaded skill with the same name (per **same-name-live-copy-ban**).
 </collect-skill-requirements>
 
 <create-skill-file>
 **Objective**: Generate a complete SKILL.md that meets reviewer quality requirements.
 
-1. Create the directory structure `skills/<skill-name>/` with `examples/` and `reference/` subdirectories as needed.
+1. Create the directory structure under the user-provided target location (confirmed in **collect-skill-requirements**) with `examples/` and `reference/` subdirectories as needed.
 2. Write the frontmatter: `name` in kebab-case with an action verb; `description` per the two-part template — self-score it per **description-quality** (aim ≥ 9).
 3. Write `<when-to-use-this-skill>` as 3–7 bullet scenarios whose intent verbs appear in the `description` trigger phrase.
 4. Allocate a per-section char budget (when-to-use, knowledge, each capability, rules, guide) totaling ≤ **size-limits**; write each within its cap — prevention beats remediation.
@@ -93,9 +96,9 @@ Validation findings labeled Blocker 🚫 / Major 🔴 / Minor 🟡 / Nit 🟢 / 
 8. Write all prose per **writing-style** — directive voice, BLUF, hard caps, atomic bullets, no banned phrases, no meta-narration.
 9. Write prose per **platform-agnostic-writing** — no platform tool names, no concrete context paths.
 10. Validate the draft against **section-semantics** (violations, section order, naming).
-11. If the skill is part of a multi-skill pipeline, verify the 4 integration points per **pipeline-integration**.
+11. If the skill is part of a multi-skill pipeline, verify the 4 integration points per **pipeline-integration** from the created files' own self-declared relationships — never fetch sibling skills.
 12. Measure the SKILL.md per **size-limits** (script when available, else manual count); if over budget, apply **size-remediation** (lever order + gate) — never merge steps/lines.
-13. Write the final content to `skills/<skill-name>/SKILL.md`.
+13. Write the final content to the user-provided `<target>/SKILL.md` (per **same-name-live-copy-ban**).
 </create-skill-file>
 
 <create-skill-examples>
@@ -123,7 +126,7 @@ Validation findings labeled Blocker 🚫 / Major 🔴 / Minor 🟡 / Nit 🟢 / 
 <validate-created-skill>
 **Objective**: Validate the created skill file, examples, and references before delivery.
 
-1. Verify all required sections exist in order: frontmatter, `<when-to-use-this-skill>`, `<knowledge>`, `<capabilities>`, optional `<rules>`.
+1. Apply **same-name-live-copy-ban**: validate only the created/user-provided files — never a same-named live copy. Then verify all required sections exist in order: frontmatter, `<when-to-use-this-skill>`, `<knowledge>`, `<capabilities>`, optional `<rules>`.
 2. Score the description per **description-quality** (target ≥ 9) and check bidirectional trigger coverage.
 3. Check capabilities: action-verb names, ordered steps, no embedded reference data.
 4. Check knowledge: material placed correctly, large rubrics extracted, `<context-loading-guide>` condition-first.
@@ -134,7 +137,7 @@ Validation findings labeled Blocker 🚫 / Major 🔴 / Minor 🟡 / Nit 🟢 / 
 9. Check examples: coverage of every capability, quality per **example-standards**, traceability, no contradictions.
 10. Check rules: route "when → capability" without re-stating capability content.
 11. Check each capability has a validation/checklist step per **evaluation-process**; flag absence per its severity.
-12. If the skill references another skill or is loaded by sub-agents, verify integration per **pipeline-integration**.
+12. If the skill references another skill or is loaded by sub-agents, verify integration per **pipeline-integration** from the created files' own self-declared relationships only — never fetch other skills.
 13. Report results with severity labels per **severity-levels** and fixes; if issues exist, return to the relevant creation capability, fix, and re-validate.
 </validate-created-skill>
 
@@ -146,5 +149,6 @@ Validation findings labeled Blocker 🚫 / Major 🔴 / Minor 🟡 / Nit 🟢 / 
 <rule>When the user provides existing source materials, use **collect-skill-requirements** step 3 to incorporate them into the knowledge section rather than embedding them in capabilities.</rule>
 <rule>After creating all files, use **validate-created-skill** before presenting the result.</rule>
 <rule>When validation reveals issues, return to the relevant creation capability to fix them, then re-validate.</rule>
+<rule>When creating or validating a skill, operate only on the user-provided files per **same-name-live-copy-ban** — never read, compare, or edit a live/loaded skill with the same name.</rule>
 <rule>When the user asks to review an existing skill file, do not use this skill — delegate to the `review-skill` skill instead.</rule>
 </rules>
