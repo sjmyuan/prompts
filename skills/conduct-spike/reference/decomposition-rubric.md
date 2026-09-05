@@ -27,7 +27,7 @@ When grouping the spike problem into investigation areas, apply:
 | **Team/owner boundaries** | Areas owned by different teams split naturally | "Auth service changes" vs. "Payment service changes" |
 | **Technology domains** | Different tech stacks or domains split naturally | "Mobile client" vs. "Backend services" vs. "Infrastructure" |
 
-Target 2–5 areas. Fewer than 2 means the problem may not need a spike; more than 5 suggests the scope may be too broad and should be narrowed.
+Target 2–5 areas — a single area is valid when the whole spike shares one subject. More than 5 suggests the scope may be too broad and should be narrowed.
 
 ## Problem heuristics (decision units)
 
@@ -99,7 +99,7 @@ Area: Data pipeline (Kafka/Spark)    └── How to …?
 ## Edge Cases
 
 ### Single-Area Spike
-If the problem truly has one subject (e.g., "Should we migrate from MySQL to PostgreSQL?"), a single-area spike is valid. It still holds one or more problems: one subject, one problem → one ADR; one subject, two problems → two ADRs (e.g., engine choice + schema migration). The workflow produces the same artifacts — findings doc + ADR(s) + solution doc — just simpler.
+If the spike truly has one subject (e.g., "Should we migrate from MySQL to PostgreSQL?"), it is a single-area spike: one area in the scope map, holding one or more problems — one subject, one problem → one ADR; one subject, two problems → two ADRs (e.g., engine choice + schema migration). It runs the identical workflow and produces the identical artifact set in the identical layout: `scope.md` (one area row), exactly one `docs/findings-<area>.md`, one `adrs/adr-<area>-<NN>-<problem>.md` per problem, and `solution.md`. Nothing is added or omitted because the spike is small.
 
 ### Too Many Areas (>5) or Too Many Problems (>~8)
 The spike scope is likely too broad. Options:

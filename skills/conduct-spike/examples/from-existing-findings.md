@@ -34,11 +34,11 @@
 
 ---
 
-## Compile Findings Document
+## Compile Findings Documents
 
-*(compile-findings-doc applied to formalize the user's pre-existing investigation notes)*
+*(compile-findings-doc applied to formalize the user's pre-existing investigation notes — one findings doc per area, always: `docs/findings-<area>.md`. Two areas → two docs.)*
 
-### Findings Document: `findings-caching-strategy.md`
+### Findings Document: `docs/findings-cache-topology.md`
 
 *(write-solution-doc applied to current state, seeded with the user's provided findings)*
 
@@ -64,7 +64,17 @@
 - P99 latency: 450ms (target: <100ms for cache hits)
 - Write latency: ~50ms (acceptable)
 
-> *Findings formalized from your pre-existing notes. This document is the current-state baseline. Evaluation will compare solution options against these constraints. No re-investigation was needed.*
+### Findings Document: `docs/findings-cache-invalidation.md`
+
+*(write-solution-doc applied to current state — the invalidation-relevant facts; cross-references the topology doc for the shared baseline)*
+
+**Current Architecture Summary** (formalized from user's notes):
+- All writes (~50/sec) go to the single source of truth (PostgreSQL); no secondary stores exist to invalidate today
+- No caching tier exists, so no invalidation mechanism (TTL, write-through, or event-based) is present in the codebase
+- No existing Redis/CDC infrastructure to build on (see also `docs/findings-cache-topology.md`)
+- Read-to-write ratio of 200:1 means read paths dominate — invalidation must not add write-path latency
+
+> *Findings formalized from your pre-existing notes. These are the current-state baseline per area. Evaluation will compare solution options against each area's constraints. No re-investigation was needed.*
 
 ---
 

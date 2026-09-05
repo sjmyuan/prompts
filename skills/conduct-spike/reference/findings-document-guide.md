@@ -10,12 +10,11 @@ Most of the time, the current implementation *is* a solution — just the existi
 - ADRs have a precise, structured baseline to compare options against: "The current architecture (see Findings Doc §3, C2 diagram) couples payment types via shared tables..."
 - Reviewers can diff the findings doc against the solution doc to see exactly what changes are proposed.
 
-## One per area or one consolidated?
+## One per area — always
 
-Either approach is valid:
+Findings docs are always **one per investigation area** — `docs/findings-<area>.md` — for every spike, regardless of size or coupling. A single-area spike yields exactly one findings doc. Each findings doc holds one subsection per problem in its area and embeds the area's shared evidence map, keeping it focused and independently updatable.
 
-- **Per-area findings docs** (recommended for multi-area spikes): Each investigation area gets its own findings document — one subsection per problem in the area, sharing the area's evidence map. This keeps each doc focused and independently updatable. Best when areas are loosely coupled.
-- **One consolidated findings doc**: All areas in a single document with per-area sections and cross-area observations. Best when areas are tightly coupled and cross-cutting concerns are significant.
+**Cross-area constraints** (relevant when areas are tightly coupled) travel as cross-references between the affected findings docs — each notes the constraint and points to the other area's doc. There is no consolidated findings doc; areas come together only in the solution doc.
 
 ## Document format
 

@@ -62,19 +62,39 @@
 
 ## Compile Findings Documents
 
-*(compile-findings-doc applied — one consolidated findings document for 4 tightly-coupled areas)*
+*(compile-findings-doc applied — one findings doc per area, always: `docs/findings-<area>.md`. Four areas → four docs, compiled concurrently, each embedding its area's evidence map inline per `reference/findings-document-guide.md`.)*
 
-### Findings Document: `findings-payment-migration.md`
+### Findings Document: `docs/findings-service-decomposition.md`
 
-*(write-solution-doc applied to current state, adapted with constraints & pain points replacing RAID/RACI)*
+*(write-solution-doc applied to current state for this area, adapted with constraints & pain points replacing RAID/RACI)*
 
 **C2 Container Diagram (Current State)**: Single Spring Boot monolith → PostgreSQL database, with all payment types sharing the same app and DB.
 
-**Current Architecture Summary**: monolithic Spring Boot app (~200K LOC), package-by-layer, three intermingled domains coordinated by `PaymentOrchestrator` (1200 lines); all communication in-process; single PostgreSQL (~80 tables) with `transactions`/`accounts`/`audit_log` as cross-domain hotspots; 12 settlement stored procedures (2000+ lines); deployed on Kubernetes (3 replicas) behind Kong API Gateway; no message broker, feature flags, or traffic splitting.
+**Current Architecture Summary**: monolithic Spring Boot app (~200K LOC), package-by-layer; three intermingled domains — CreditCardPayment (40%), BankTransferPayment (30%), WalletPayment (25%), Shared (5%) — coordinated by `PaymentOrchestrator` (1200 lines); the credit-card service imports bank-transfer domain objects.
 
-**Constraints & Raw Data**: full redeploy for any payment-type change; wallet cannot scale; three teams contend on the same code; no circuit breaker; no async experience; SOAP legacy must be maintained · ~200K LOC · ~80 tables · 12 stored procedures · 3 replicas · 3 protocols (REST, gRPC, SOAP).
+**Constraints & Pain Points**: whole-app redeploy on any payment-type change; wallet cannot scale independently; 3 teams step on each other's code.
 
-> *Findings = current-state baseline; evaluation compares options against it; ADRs cite its evidence; the solution doc evolves these diagrams as-is → to-be.*
+### Findings Document: `docs/findings-communication.md`
+
+**Current Architecture Summary**: all service calls in-process inside the monolith; external integrations over REST, gRPC, and SOAP; no message broker; no circuit breaker.
+
+**Constraints & Pain Points**: no async experience on the team; the SOAP contract must be maintained.
+
+### Findings Document: `docs/findings-database.md`
+
+**Current Architecture Summary**: single PostgreSQL (~80 tables); `transactions`, `accounts`, and `audit_log` shared across payment types; 12 settlement stored procedures (2000+ lines).
+
+**Constraints & Pain Points**: no per-type access control; stored procedures block schema decomposition.
+
+### Findings Document: `docs/findings-migration.md`
+
+**Current Architecture Summary**: deployed on Kubernetes (3 replicas) behind Kong API Gateway; GitHub Actions canary CI/CD; Kong routes `/api/payments/*`.
+
+**Constraints & Pain Points**: no feature flags or traffic splitting to route between old and new services.
+
+**Cross-area constraints** (cross-referenced between the affected docs): `findings-database.md` ↔ `findings-service-decomposition.md` — both depend on the shared `transactions`/`accounts`/`audit_log` tables; `findings-communication.md` ↔ `findings-migration.md` — no async or traffic-split infra means migration must start synchronous.
+
+> *Findings = current-state baseline per area; evaluation compares options against each area's doc; ADRs cite their area's findings doc; the solution doc evolves these diagrams as-is → to-be.*
 
 ---
 
@@ -163,4 +183,4 @@
 
 ### Wrap-Up (conversation level — not written into any artifact)
 
-> All five assumed solutions are adopted into the solution doc, mirrored **grouped by area** per `scope.md`. If an ADR decision changes during review, the corresponding area section is rewritten in place. Artifacts version together in `spikes/payment-migration/` — scope map at the root, ADRs in `adrs/` (area-prefixed), solution doc at the root, findings in `docs/` (see `examples/spike-artifact-layout.md`).
+> All five assumed solutions are adopted into the solution doc, mirrored **grouped by area** per `scope.md`. If an ADR decision changes during review, the corresponding area section is rewritten in place. Artifacts version together in `spikes/payment-migration/` — scope map at the root, ADRs in `adrs/` (area-prefixed), solution doc at the root, one findings doc per area in `docs/` (see `examples/spike-artifact-layout.md`).

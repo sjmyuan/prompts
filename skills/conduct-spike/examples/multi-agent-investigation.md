@@ -59,42 +59,58 @@ The orchestrator prepares 4 self-contained briefs, one per area — area descrip
 
 ### Orchestrator: Synthesize
 
-> All 4 sub-agents returned. Cross-area consistency: A + C both flagged tight coupling; B + D both noted missing migration infrastructure; no contradictions. The orchestrator embeds each returned per-area evidence map into the consolidated findings doc below (see `reference/findings-document-guide.md`).
+> All 4 sub-agents returned. Cross-area consistency: A + C both flagged tight coupling; B + D both noted missing migration infrastructure; no contradictions. The orchestrator hands each area's verified evidence map to `compile-findings-doc`, which embeds it into its own area's findings doc below (see `reference/findings-document-guide.md`).
 
 ---
 
 ## Compile Findings Documents
 
-*(compile-findings-doc — one consolidated findings document synthesized from all 4 sub-agent investigations)*
+*(compile-findings-doc — one findings doc per area, always: `docs/findings-<area>.md`. Four areas → four docs, dispatched concurrently, each embedding its area's evidence map inline.)*
 
-### Findings Document: `findings-payment-migration.md`
+### Findings Document: `docs/findings-service-decomposition.md`
 
-*(write-solution-doc applied to current state; evidence maps embedded inline per `reference/findings-document-guide.md`)*
+*(write-solution-doc applied to current state for this area; evidence map embedded per `reference/findings-document-guide.md`)*
 
-**C2 Container Diagram (Current State)**: Monolithic Spring Boot app on Kubernetes → single PostgreSQL, behind Kong API Gateway.
+**Current State**: single Spring Boot app, package-by-layer; three intermingled domains — CreditCard / BankTransfer / Wallet; `PaymentOrchestrator` (1200 lines) coordinates all payment types.
+**Constraints**: redeploy on any payment-type change; wallet can't scale; 3 teams contend on the same code.
 
-**Current Architecture (synthesized from 4 sub-agent investigations)**:
+### Findings Document: `docs/findings-communication.md`
 
-| Area | Current State | Key Constraint |
-|---|---|---|
-| Service decomposition | Single app, package-by-layer, 3 intermingled domains | `PaymentOrchestrator` (1200 lines) couples all types |
-| Inter-service communication | In-process calls; external REST/gRPC/SOAP | No async messaging experience on team |
-| Database decomposition | Single PostgreSQL ~80 tables, shared `transactions`/`accounts` | 12 stored procedures (2000+ lines) block migration |
-| Migration strategy | K8s + Kong API Gateway + GitHub Actions CI/CD | No traffic splitting or feature flags |
+**Current State**: all calls in-process; external REST/gRPC/SOAP; no message broker; no circuit breaker.
+**Constraints**: no async experience on team; SOAP contract must stay.
 
-**Cross-Area Observations**: Area 1 + 3 couple via the shared `transactions` table — both must be addressed together; Area 2 + 4 lack async/traffic-split infra — migration must start synchronous.
-
-**Evidence & Verification** (per-area evidence maps embedded inline):
+**Evidence & Verification**:
 
 | Claim / Question | Verdict | Evidence (`file:line`) | Confidence |
 |---|---|---|---|
 | Circuit breaker around external calls? | No | `grep "CircuitBreaker\|Resilience4j\|fallback"` across `payment-service` — no matches | Verified (negative) |
 | All internal calls in-process? | Yes | `service/PaymentOrchestrator.java:88` — no internal HTTP client found | Verified |
+
+**Searched-Negatives**: `grep -ri "kafka\|rabbit\|mq"` in `payment-service` — no broker usage.
+
+### Findings Document: `docs/findings-database.md`
+
+**Current State**: single PostgreSQL ~80 tables; `transactions`/`accounts`/`audit_log` shared across payment types; 12 settlement stored procedures (2000+ lines).
+**Constraints**: stored procedures block schema decomposition; cross-type queries rely on the shared tables.
+
+**Cross-area constraint** → cross-referenced from `docs/findings-service-decomposition.md`: service and database decomposition both depend on the shared `transactions`/`accounts`/`audit_log` tables.
+
+### Findings Document: `docs/findings-migration.md`
+
+**Current State**: Kubernetes (EKS, 3 replicas); Kong routes `/api/payments/*`; GitHub Actions canary CI/CD.
+**Constraints**: no traffic splitting; canaries untested for routing.
+
+**Evidence & Verification**:
+
+| Claim / Question | Verdict | Evidence (`file:line`) | Confidence |
+|---|---|---|---|
 | Can Kong split traffic? | Unknown | `kong/kong.yml:34` — single upstream, no weighted upstreams | Inferred |
 
-**Searched-Negatives**: `grep -ri "kafka\|rabbit\|mq"` in `payment-service` — no broker usage; `grep -ri "featureflag\|trafficsplit"` in `infra-configs` — none found.
+**Searched-Negatives**: `grep -ri "featureflag\|trafficsplit"` in `infra-configs` — none found.
 
-> *Entry points (`file:line`) annotate the C2/sequence diagrams. Findings consolidated from 4 parallel sub-agents; cross-area consistency verified, no contradictions. This is the current-state baseline and evidence home.*
+**Cross-area constraint** → cross-referenced from `docs/findings-communication.md`: no async or traffic-split infra means migration must start synchronous.
+
+> *Each area's evidence map lives in its own findings doc; cross-area observations are noted as cross-references between docs, never merged into one. These are the current-state baseline and evidence home per area.*
 
 ---
 
@@ -121,7 +137,7 @@ Produce ADR for problem: How to split the monolith? (Area: Service Decomposition
 Decision drivers: 99.9% SLA; no data loss; align with existing teams
 Options: A) Payment-type services — clear ownership, independent scaling; shared-lib coupling. B) Domain-driven services — cleaner dependencies; team restructuring. C) Strangler extraction — lowest risk; temporary hybrid complexity.
 Assumed solution: Option A (Payment-type services)
-Findings doc: findings-payment-migration.md — Evidence & Verification section (key locations, ledger, coupling); cite evidence without re-scanning
+Findings doc: docs/findings-service-decomposition.md — Evidence & Verification section (key locations, ledger, coupling); cite evidence without re-scanning
 Load draft-adr skill and produce a complete ADR tagged Area: Service Decomposition.
 ```
 
@@ -152,11 +168,11 @@ Load draft-adr skill and produce a complete ADR tagged Area: Service Decompositi
 
 ## Compile Solution Doc — SINGLE-TASK DISPATCH
 
-*(The solution doc is one unit synthesizing all ADRs, so it dispatches as a single task — context preservation, not parallelism. Brief: business context, findings doc, 4 assumed solutions; load `write-solution-doc`, produce the target-state doc.)*
+*(The solution doc is one unit synthesizing all ADRs, so it dispatches as a single task — context preservation, not parallelism. Brief: business context, the 4 findings docs (one per area), 4 assumed solutions; load `write-solution-doc`, produce the target-state doc.)*
 
 > "Dispatching solution-doc compilation to a sub-agent."
 
-**Final Output Bundle**: `scope.md` (area → problem map) · `findings-payment-migration.md` (current-state + evidence maps) · `solution.md` (C4, API contracts, RAID, RACI — decision-only, ADR decisions grouped by area) · the 4 area-prefixed ADRs in `adrs/`.
+**Final Output Bundle**: `scope.md` (area → problem map) · `docs/findings-<area>.md` (one per area — service-decomposition, communication, database, migration — current-state + evidence maps) · `solution.md` (C4, API contracts, RAID, RACI — decision-only, ADR decisions grouped by area) · the 4 area-prefixed ADRs in `adrs/`.
 
 ---
 

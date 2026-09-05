@@ -59,7 +59,7 @@ The spike's **evidence home** — captures **current-state architecture** (via `
 - Evidence ledger — claim → verdict → confidence (5-tag model)
 - Searched-negatives
 
-ADRs and sub-agents cite it without re-scanning. Details: **reference/findings-document-guide.md**.
+Cross-area constraints (tightly-coupled areas) travel as cross-references between the affected findings docs. ADRs and sub-agents cite their area's doc without re-scanning. Details: **reference/findings-document-guide.md**.
 </findings-document>
 
 <continuation-mode>
@@ -85,7 +85,7 @@ Every dispatched result (investigation, findings, ADRs, solution doc) is verifie
 </sub-agent-verification>
 
 <problem-decomposition-guide>
-Decompose into **areas** (shared-subject groupings, target 2–5), each holding **problems** ("How to …?" decisions, target 1–3 per area; one ADR each). <2 areas may not need a spike; >5 areas or >~8 total problems → narrow or split. Full rubric: **reference/decomposition-rubric.md**.
+Decompose into **areas** (shared-subject groupings, target 2–5 — a single area is valid and runs the identical flow), each holding **problems** ("How to …?" decisions, target 1–3 per area; one ADR each). >5 areas or >~8 total problems → narrow or split. Full rubric: **reference/decomposition-rubric.md**.
 </problem-decomposition-guide>
 
 <adr-uncertainty-signals>
@@ -113,7 +113,6 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 | Load when | Provides | File |
 |---|---|---|
 | Full end-to-end spike (scope → solution doc) | End-to-end walkthrough | [examples/end-to-end-spike.md](examples/end-to-end-spike.md) |
-| Single-area spike, narrow scope | Single-area workflow | [examples/single-area-spike.md](examples/single-area-spike.md) |
 | Starting from pre-existing findings | Workflow without re-investigation | [examples/from-existing-findings.md](examples/from-existing-findings.md) |
 | Decomposing a complex problem into areas and problems | Decomposition rubric + edge cases | [reference/decomposition-rubric.md](reference/decomposition-rubric.md) |
 | Defining the spike scope | Scope-definition procedure | [reference/define-spike-scope-procedure.md](reference/define-spike-scope-procedure.md) |
@@ -174,7 +173,7 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 </compile-solution-doc>
 
 <compile-findings-doc>
-1. Apply the findings-doc compilation procedure per **reference/findings-doc-compilation.md**: confirm strategy → dispatch → verify → validate → save (mark the area `spiking` in `scope.md` per **scope-map-status**).
+1. Apply the findings-doc compilation procedure per **reference/findings-doc-compilation.md** — one findings doc per area, always: dispatch → verify → validate → save (mark each area `spiking` in `scope.md` per **scope-map-status**).
 </compile-findings-doc>
 
 <sync-update-artifacts>
