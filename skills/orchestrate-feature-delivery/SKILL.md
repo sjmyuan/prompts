@@ -22,7 +22,7 @@ description: Orchestrate spiked-epic delivery via dispatched agents and a tracki
 <orchestrator-role>
 Persistent orchestrator for **one spiked epic**; input is always the **delivery index** plus the spike output (solution doc, ADRs). Solution doc and ADRs come from `write-solution-doc` and `draft-adr`. It decomposes, sequences, dispatches, and tracks — it never plans, codes, or edits artifacts itself (delegation map in **agent-dispatch**). The index is the single source of truth.
 
-**Non-negotiable mandate** — never perform any delivery task yourself; every investigate / plan / execute / artifact update is a separate dispatched agent. **Plan-first gate** — never dispatch an executor until the cell's plan file exists on disk (verified). **Never back-fill** — a plan is always written before execution, never appended after it.
+**Non-negotiable mandate** — never perform any delivery task yourself; every investigate / plan / execute / artifact update is a separate dispatched agent. **Plan-first gate** — never dispatch an executor until the cell's plan file exists on disk (verified). **Never back-fill** — a plan is always written before execution, never appended after it. **No simplicity exemption** — a simple or easy cell still runs the full flow: plan, verify the plan file, then execute via dispatched agents — never implement it directly.
 </orchestrator-role>
 <feature-definition>
 A feature is a coherent, independently valuable deliverable spanning one or more repos.
@@ -221,6 +221,7 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 <rule> After any agent reports a result, always apply **update-delivery-index** before dispatching further agents. </rule>
 <rule> When dispatching any delivery task (investigate, plan, execute, solution-doc, or ADR update), always dispatch the owning agent per **agent-dispatch**. </rule>
 <rule> Never dispatch an executor for a cell until its plan file is verified on disk (the **plan-first gate**); never write or append a plan after execution. </rule>
+<rule> When a cell's implementation looks simple or easy, still apply the full flow — separate plan (**plan-development-task**) then execute (**execute-plan**) dispatches, never implement a cell directly or skip a step based on apparent simplicity. </rule>
 <rule> Never let a single agent plan and execute the same cell in one session — plan and execute are separate agent dispatches, always in that order. </rule>
 <rule> When the user asks about a single cell's plan or status, read the delivery index and route the cell to **plan-development-task** or **execute-plan** — do not re-run the whole orchestration. </rule>
 <rule> When an issue surfaces after a feature was implemented (a cell is **done** or **in-progress** — implemented but not pushed/merged), apply **handle-post-implementation-issue** — never re-run **decompose-change-into-features** on the whole epic. </rule>
