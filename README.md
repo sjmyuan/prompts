@@ -50,23 +50,24 @@ Each file follows the [opencode agents spec](https://opencode.ai/docs/agents/).
 |---|---|---|
 | `algorithm-assistant.md` | **Primary** — conversational algorithm design assistant that clarifies, explores cases, brainstorms, explains, and designs algorithms bilingually | `design-algorithm` |
 | `blog-assistant.md` | **Primary** — conversational blog-writing assistant that gathers ideas, fills gaps, and maintains the article document | `write-blog` |
+| `user-story-writer.md` | **Primary** — conversational user-story writer that drafts, refines, and updates user stories (incl. Jira/Azure DevOps) | `draft-user-story` |
 | `prompt-engineer.md` | **Primary** — crafts and refines effective prompts and agent files by applying the SKR framework | `craft-prompt` |
 | `skill-creator.md` | **Primary** — creates, edits, and reviews skills (SKILL.md) by applying the create-skill / review-skill workflows | `create-skill`, `review-skill` |
 | `adr-writer.md` | Draft Architecture Decision Records | `draft-adr` |
-| `code-investigator.md` | Read-only codebase investigation | `investigate-code` |
-| `code-reviewer.md` | Read-only code review | `review-code` |
+| `code-investigator.md` | **Primary** — read-only codebase investigation | `investigate-code` |
+| `code-reviewer.md` | **Primary** — read-only code review | `review-code` |
 | `executor.md` | Execute an existing plan (never plans) | `execute-plan` |
 | `learner.md` | Extract knowledge from history (self-dispatch for parallelism) | `learn-from-history` |
 | `orchestrate-delivery.md` | **Primary** — delivery orchestrator that dispatches the plan/execute/spike/ADR/solution-doc sub-agents and tracks the delivery index | `orchestrate-feature-delivery` |
 | `planner.md` | Produce + persist a TDD plan (never executes) | `plan-development-task`, `investigate-code` |
 | `solution-doc-writer.md` | Compile solution documents (C4, sequence, RAID/RACI) | `write-solution-doc` |
-| `spike-conductor.md` | Orchestrate spike investigations + verify sub-agent results | `conduct-spike`, `question-everything` |
+| `spike-conductor.md` | **Primary** — orchestrate spike investigations + verify sub-agent results | `conduct-spike`, `question-everything` |
 
 ### Opencode agent spec (summary)
 
 - One markdown file per agent; **the filename becomes the agent name** (e.g. `code-reviewer.md` → `code-reviewer`).
 - Required frontmatter: `description`.
-- `mode`: `primary` | `subagent` | `all` (default `all`). `orchestrate-delivery.md`, `blog-assistant.md`, and `skill-creator.md` are `primary`; the rest are `subagent` (dispatch targets).
+- `mode`: `primary` | `subagent` | `all` (default `all`). `algorithm-assistant.md`, `blog-assistant.md`, `code-investigator.md`, `code-reviewer.md`, `orchestrate-delivery.md`, `prompt-engineer.md`, `skill-creator.md`, `spike-conductor.md`, and `user-story-writer.md` are `primary`; the rest are `subagent` (dispatch targets).
 - `permission`: per-tool `allow` | `ask` | `deny`.
 - The markdown body is the agent's system prompt.
 
