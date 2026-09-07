@@ -8,7 +8,7 @@ description: Dispatch several independent, similar sub-tasks to parallel copies 
 - The agent wants to parallelize a broad investigation or review by dispatching parallel copies of itself, then merging the reports
 - Mid-task the agent notices several independent things it can do in parallel and fans out on its own, without being asked
 - The agent merges the returned reports of several same-type sub-agents into one coherent answer
-- Do NOT load when the sub-tasks are genuinely serial — each result feeds the next — or too small to justify fan-out; run them directly
+- Do NOT load when the sub-tasks are genuinely serial, each result feeds the next, or too small to justify fan-out — run them directly
 - Do NOT load when another pipeline owns orchestration (e.g. `conduct-spike` per-area dispatch, `orchestrate-feature-delivery` waves) — those orchestrate already
 </when-to-use-this-skill>
 
