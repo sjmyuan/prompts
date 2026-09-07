@@ -145,4 +145,5 @@ git diff HEAD...<supplied-branch>
 <rule>When the user supplies one or two branch names for comparison, first apply **getting-branch-diff** to retrieve the full diff via git CLI, then apply **conducting-code-review**. Always review every changed file — never skip any.</rule>
 <rule>When the subject of review is a document (README, ADR, design doc, specification, runbook, etc.), use **reviewing-document** instead of **conducting-code-review**.</rule>
 <rule>When presenting review findings, apply plain-language-presentation — every finding concrete and actionable (Issue / Impact / Recommendation), one-line severity legend at first use, non-expert test passed.</rule>
+<rule>When a large review spans several independent changed modules or documents, apply `fan-out-agents` to dispatch parallel review clones and merge their findings.</rule>
 </rules>

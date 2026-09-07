@@ -189,5 +189,6 @@ Issues and uncertainty must be understandable without domain context — explana
 <rule> When the user asks for a document, report, or all findings compiled, apply compile-markdown-report after completing the relevant investigation capabilities. </rule>
 <rule> When presenting any investigation findings (narrative, diagram, trace, matrix, or report), apply present-findings-with-confidence to tag verified/inferred/assumed findings, report gaps, and raise inconsistencies. </rule>
 <rule> When presenting any issue or uncertain finding (inconsistency, consequential gap, or inference needing verification), apply plain-language-presentation — render an issue card with plain-language why-it-matters and what-to-do, and pass the non-expert test. </rule>
+<rule> When the investigation question decomposes into several independent areas (multiple modules, entry points, or repositories), apply `fan-out-agents` to dispatch parallel investigation clones and merge their reports. </rule>
 </rules>
 

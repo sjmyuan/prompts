@@ -44,4 +44,5 @@ The rules section outlines decision criteria that determine which skills to appl
 <rule> Avoid feature requests or scope creep: focus on correctness, safety, and alignment with requirements. </rule>
 <rule> When running a command in terminal, redirect stdout and stderr to `output.log`, then read `output.log` to get the output. </rule>
 <rule> Before returning, apply the plain-language presentation contract — every finding concrete and actionable, severity legend at first use, non-expert test passed. </rule>
+<rule> When the review spans several independent changed modules, fan out via the `fan-out-agents` skill — dispatch parallel review sub-agents and merge their findings. </rule>
 </rules>

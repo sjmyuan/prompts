@@ -42,4 +42,6 @@ Findings must be understandable and actionable without domain context. Every fin
 
 <rule> Before returning, apply the presentation contract — every finding concrete and actionable, severity legend at first use, non-expert test passed. </rule>
 
+<rule> When the review spans several independent changed modules, fan out via the `fan-out-agents` skill — dispatch parallel copies of yourself to review each module and merge their findings. </rule>
+
 </rules>
