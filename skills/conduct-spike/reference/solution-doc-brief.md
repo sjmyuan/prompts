@@ -24,6 +24,7 @@ You are the `solution-doc-writer`. Deliver: the spike's target-state solution do
 - Solution doc: target-state architecture, decision-only, ADR decisions grouped by area (per `write-solution-doc` structure).
 
 ## 6. Constraints
+- Write only `<spike-folder>/solution.md`; never modify code or any file outside the spike folder.
 - Never include code references — decision-only.
 - Never alter an ADR decision.
 

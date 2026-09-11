@@ -64,7 +64,7 @@ Reading skills: `continue-prior-spike` and `orchestrate-feature-delivery` read t
 5. Auto-select only a sole unambiguous top-tier winner and state the assumption in one line.
 6. Otherwise present the ranked shortlist (≤4: path, reason, marked default) and ask the user to confirm or pick.
 7. Return the confirmed base root and direct the caller to record it per the **durable-record-contract**.
-8. Validate the choice — not excluded, matches the user's confirmation, and exists or is creatable.
+8. Validate the choice — not excluded, matches the user's confirmation, and exists or is creatable; for a spike, the resolved folder is `<base>/spikes/<spike-name>/` (the `spikes/` segment anchors the spike write boundary).
 </resolve-root>
 
 </capabilities>

@@ -6,11 +6,18 @@ permission:
   glob: allow
   grep: allow
   list: allow
-  edit: allow
+  edit:
+    "*": deny
+    "**/spikes/**": allow
   bash: allow
   todowrite: allow
   lsp: allow
   skill: allow
+  task:
+    "*": deny
+    "code-investigator": allow
+    "adr-writer": allow
+    "solution-doc-writer": allow
   webfetch: allow
   websearch: allow
 ---
@@ -56,8 +63,12 @@ Sub-agent results — investigation findings from **code-investigator**, ADR dec
 </sub-agent-verification>
 
 <spike-artifact-layout>
-Spike artifacts are versioned in one per-spike folder: `scope.md` (canonical area → problem map) at the root, `adrs/` (one file per ADR — `adr-<area>-<NN>-<problem>.md`), `solution.md` at the root, `docs/` (findings docs per area). When the user names no folder, resolve the artifact base root via `resolve-artifact-location` and record `Artifact root:` at the top of `scope.md`.
+Spike artifacts are versioned in one per-spike folder: `scope.md` (canonical area → problem map) at the root, `adrs/` (one file per ADR — `adr-<area>-<NN>-<problem>.md`), `solution.md` at the root, `docs/` (findings docs per area). The folder always carries a `spikes/` segment (`<base>/spikes/<spike-name>/`), which anchors the write boundary. When the user names no folder, resolve the artifact base root via `resolve-artifact-location` and record `Artifact root:` at the top of `scope.md`.
 </spike-artifact-layout>
+
+<write-boundary>
+Writes are confined to the spike folder (`**/spikes/**`) — the `edit` permission denies everything else. Never modify code, config, tests, or files outside it, and never build prototypes or proof-of-concept code (those belong to `orchestrate-feature-delivery`). After each write capability, apply the spike write-boundary check from the `conduct-spike` skill. Record implementation needs as an out-of-scope note in `scope.md` / `solution.md`; the user runs `orchestrate-feature-delivery` to touch code.
+</write-boundary>
 
 </knowledge>
 
@@ -92,5 +103,11 @@ When a sub-agent returns a result (investigation findings, an ADR decision, or a
 <rule> When a sub-agent returns a result (investigation findings or ADR decision), apply `question-everything`'s **verify-sub-agent-results** before accepting it into a findings doc or ADR. </rule>
 
 <rule> If required sub-agents are not available, fall back to sequential execution within this agent. The spike workflow proceeds normally. </rule>
+
+<rule> Confine every write to the spike folder (`**/spikes/**`); never modify code, config, tests, or any file outside it. </rule>
+
+<rule> Never build prototypes or proof-of-concept code; `orchestrate-feature-delivery` delivers any POC or implementation. </rule>
+
+<rule> After each write capability, run the spike write-boundary check from the `conduct-spike` skill; stop and report on any out-of-folder change. </rule>
 
 </rules>

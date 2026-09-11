@@ -38,8 +38,12 @@ spikes/<spike-name>/
 └── docs/                   # findings documents — findings-<area>.md each
 ```
 
-Artifacts cross-reference each other with relative paths inside the spike folder. All producing capabilities save into this layout, with `adrs/` and `docs/` created as needed. The spike folder lives under an artifact base root; when the user names no root and `scope.md` records none, resolve it via `resolve-artifact-location` and record `Artifact root:` at the top of `scope.md`.
+Artifacts cross-reference each other with relative paths inside the spike folder. All producing capabilities save into this layout, with `adrs/` and `docs/` created as needed. The spike folder always contains a `spikes/` path segment (`<base>/spikes/<spike-name>/`), anchoring the write boundary. It lives under an artifact base root; when the user names no root and `scope.md` records none, resolve it via `resolve-artifact-location` and record `Artifact root:` at the top of `scope.md`.
 </spike-artifact-layout>
+
+<write-boundary>
+Spike writes are confined to the spike folder (`**/spikes/**`) — never code, config, tests, infrastructure, or any file outside it; spikes produce documented decisions, never production code. Never build prototypes or POCs — `orchestrate-feature-delivery` delivers them. Record implementation needs as an out-of-scope note in `scope.md` / `solution.md`; the user starts `orchestrate-feature-delivery` (planner → executor) to touch code. On opencode the `edit` permission enforces the path boundary; elsewhere the doctrine and rules alone apply. Full layers, boundary check, and out-of-scope note: **reference/write-boundary-guide.md**.
+</write-boundary>
 
 <scope-map>
 `scope.md` is the spike's **canonical area → problem map** — single source of truth for grouping and a live **status dashboard** (see **scope-map-status**). Each problem maps to one ADR; each ADR carries its `Area:` tag; `solution.md` renders the map grouped by area. Record it at **define-spike-scope**; confirm and edit it at **continue-prior-spike**.
@@ -50,7 +54,7 @@ Artifacts cross-reference each other with relative paths inside the spike folder
 </scope-map-status>
 
 <inappropriate-scenarios>
-Do NOT use for: quick answers without formal documentation, already-decided problems needing only implementation, trivial scope with no architectural impact, or immediate prototyping — spikes produce decisions, not production code.
+Do NOT use for: quick answers without formal documentation, already-decided problems needing only implementation, trivial scope with no architectural impact, or immediate prototyping / POC implementation — spikes produce decisions, not production code.
 </inappropriate-scenarios>
 
 <findings-document>
@@ -73,7 +77,7 @@ See **examples/continue-prior-spike.md**.
 </continuation-mode>
 
 <greenfield-scenarios>
-No existing implementation: research industry approaches and similar systems, study operational constraints (cloud, team, compliance), build proof-of-concept prototypes instead of tracing code; remaining workflow unchanged.
+No existing implementation: research industry approaches and similar systems and study operational constraints (cloud, team, compliance) instead of tracing code; remaining workflow unchanged. Never build proof-of-concept prototypes — any POC is delivered by `orchestrate-feature-delivery`, not the spike.
 </greenfield-scenarios>
 
 <multi-agent-orchestration>
@@ -133,6 +137,7 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 | ADR discussion hinging on unverified assumptions | Uncertainty-spike suggestion example | [examples/adr-uncertainty-spike-suggestion.md](examples/adr-uncertainty-spike-suggestion.md) |
 | Fact/decision change propagated through artifacts | Sync walkthrough | [examples/sync-update-across-artifacts.md](examples/sync-update-across-artifacts.md) |
 | Placing artifacts into the spike folder | Layout example | [examples/spike-artifact-layout.md](examples/spike-artifact-layout.md) |
+| Confining spike writes / running the boundary check | Allowed vs forbidden writes, enforcement layers, boundary-check procedure, out-of-scope note | [reference/write-boundary-guide.md](reference/write-boundary-guide.md) |
 
 </context-loading-guide>
 
@@ -194,4 +199,7 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 <rule>When a fact or decision changes after spike artifacts exist, apply **sync-update-artifacts**.</rule>
 <rule>When ADR discussion hinges on an unverified assumption, unknown feasibility, or missing evidence, apply **suggest-spike-on-adr-uncertainty** before finalizing the ADR.</rule>
 <rule>When the spike's artifact base root is unresolved (no user-named path and no recorded `Artifact root:`), apply `resolve-artifact-location` before the scope map is saved.</rule>
+<rule>Confine every spike write to the spike folder (`**/spikes/**`); never modify code, config, tests, or any file outside it.</rule>
+<rule>Never build prototypes or proof-of-concept code; `orchestrate-feature-delivery` delivers any POC or implementation.</rule>
+<rule>After each write capability, run the write-boundary check per **reference/write-boundary-guide.md**; stop and report on any out-of-folder change.</rule>
 </rules>

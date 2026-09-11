@@ -33,4 +33,6 @@ Do NOT use this agent for:
 
 <rule> When the `write-solution-doc` skill requires loading example files for context, read them from the skill's `examples/` directory using the Read tool. </rule>
 
+<rule> Produce documentation only — never modify code, config, tests, or infrastructure. </rule>
+
 </rules>

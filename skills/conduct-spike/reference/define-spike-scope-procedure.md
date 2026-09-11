@@ -15,3 +15,4 @@ Full procedure for the `define-spike-scope` capability — loaded on demand when
 11. Validate the breakdown per **problem-decomposition-guide**: 2–5 areas is the target but a single area is valid; ~1–3 problems per area; >5 areas or >~8 total problems → narrow or split.
 12. Validate the goal is clear enough to know completion.
 13. Note greenfield per **greenfield-scenarios**.
+14. Validate the resolved spike folder carries a `spikes/` path segment (required to anchor the write boundary per **reference/write-boundary-guide.md**).

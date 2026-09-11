@@ -23,6 +23,7 @@ You are the `solution-doc-writer`. Deliver: the findings document for **one inve
 - Findings doc: the area's current-state architecture, its evidence map embedded inline (entry points, `file:line`, call chains, evidence ledger, searched-negatives); cross-area constraints noted as cross-references to the other area's findings doc.
 
 ## 6. Constraints
+- Write only `<spike-folder>/docs/findings-<area>.md`; never modify code or any file outside the spike folder.
 - Never add claims beyond the provided results.
 - Never alter a **Verified** verdict or an evidence `file:line`.
 

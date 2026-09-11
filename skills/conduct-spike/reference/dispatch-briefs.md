@@ -22,7 +22,7 @@ Every dispatch brief follows the same 7-section skeleton so a filled brief is se
 | 3 | Inputs | Paths to load + how to use each |
 | 4 | Tasks | Ordered actions to perform |
 | 5 | Output contract | Exactly what to return and its format |
-| 6 | Constraints | Guardrails — what never to do |
+| 6 | Constraints | Guardrails — what never to do, including the write boundary |
 | 7 | Report back | What to flag to the orchestrator |
 
 ## Evidence map in every brief
@@ -34,3 +34,7 @@ The evidence map (embedded in findings docs) is the input/output contract every 
 - **Searched-negatives travel with the findings doc**: a documented "not found" tells the next sub-agent not to repeat the scan.
 - **ADR-drafting briefs** include the area's findings doc (evidence sections) so ADRs can cite evidence locations without re-reading code.
 - **First pass is the seed**: when no findings doc exists yet, briefs omit the input but still require the evidence-map output — the first investigation builds the map the findings doc embeds.
+
+## Write boundary in every brief
+
+Every brief's **Constraints** section carries the same boundary: writes are confined to the spike folder (`**/spikes/**`); never modify code, config, tests, or any file outside it. A sub-agent that finds implementation work needed flags it in **Report back** instead of making the change. Full doctrine and boundary check: **reference/write-boundary-guide.md**.

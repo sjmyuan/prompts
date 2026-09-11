@@ -26,6 +26,7 @@ You are the `adr-writer`. Deliver: one ADR per problem for **[area]**, evaluated
 - One ADR per problem, standalone-readable, citing findings-doc evidence locations (per `draft-adr`'s compile-adr checklist).
 
 ## 6. Constraints
+- Write only `<spike-folder>/adrs/adr-<area>-<NN>-<problem>.md`; never modify code or any file outside the spike folder.
 - Never hand-edit ADR content outside `draft-adr`.
 - Never cite evidence the findings doc does not support.
 

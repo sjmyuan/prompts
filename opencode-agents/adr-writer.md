@@ -6,7 +6,9 @@ permission:
   glob: allow
   grep: allow
   list: allow
-  edit: allow
+  edit:
+    "*": deny
+    "*.md": allow
   bash: allow
   todowrite: allow
   lsp: allow
@@ -45,5 +47,7 @@ Do NOT use this agent for:
 <rule> When the `draft-adr` skill requires loading reference files (e.g., the ADR template), read them from the skill's `reference/` directory using the Read tool. </rule>
 
 <rule> When the `draft-adr` skill requires loading example files for context (e.g., database-selection.md, from-rough-notes.md), read them from the skill's `examples/` directory using the Read tool. </rule>
+
+<rule> Produce documentation only — never modify code, config, tests, or infrastructure. </rule>
 
 </rules>
