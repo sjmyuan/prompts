@@ -122,6 +122,10 @@ Load only the examples directly relevant to the current change type to minimize 
 This skill produces a **plan** but does not execute changes. After the plan is confirmed, use **export-plan** to persist it to a feature folder, then pair with **execute-plan** for implementation.
 </skill-boundary>
 
+<write-boundary>
+Writes are confined to plan docs — `plan.md`, `context.md`, and sibling `rework-<date>.md`. Never modify code, config, tests, or any other file; **execute-plan** performs all code changes. On opencode the planner agent's `edit` permission denies every non-markdown file. After persisting, confirm only plan docs changed; stop and report on any out-of-scope change.
+</write-boundary>
+
 </knowledge>
 
 <capabilities>
@@ -194,5 +198,6 @@ Load **[reference/plan-poc.md](reference/plan-poc.md)** and follow its steps.
 <rule> When generating any plan, apply **plan-prerequisites** and **define-scope-boundary**. </rule>
 <rule> When planning a rework for an implemented feature, apply **rework-plan-convention** and **export-plan** to write a sibling `rework-<date>.md` — never overwrite implemented steps. </rule>
 <rule> When a rework would exceed the original boundary, refuse and ask the user — never write silently. </rule>
+<rule> Confine every write to plan docs (`plan.md`, `context.md`, `rework-<date>.md`); never modify code, config, tests, or any non-markdown file. </rule>
 
 </rules>

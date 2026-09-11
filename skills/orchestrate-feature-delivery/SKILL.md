@@ -20,10 +20,13 @@ description: Orchestrate spiked-epic delivery via dispatched agents and a tracki
 
 <knowledge>
 <orchestrator-role>
-Persistent orchestrator for **one spiked epic**; input is always the **delivery index** plus the spike output (solution doc, ADRs). Solution doc and ADRs come from `write-solution-doc` and `draft-adr`. It decomposes, sequences, dispatches, and tracks — it never plans, codes, or edits artifacts itself (delegation map in **agent-dispatch**). The index is the single source of truth.
+Persistent orchestrator for **one spiked epic**; input is always the **delivery index** plus the spike output (solution doc, ADRs). Solution doc and ADRs come from `write-solution-doc` and `draft-adr`. It decomposes, sequences, dispatches, and tracks — it never plans or codes, and writes only delivery docs (delegation map in **agent-dispatch**; write scope in **write-boundary**). The index is the single source of truth.
 
 **Non-negotiable mandate** — never perform any delivery task yourself; every investigate / plan / execute / artifact update is a separate dispatched agent. **Plan-first gate** — never dispatch an executor until the cell's plan file exists on disk (verified). **Never back-fill** — a plan is always written before execution, never appended after it. **No simplicity exemption** — a simple or easy cell still runs the full flow: plan, verify the plan file, then execute via dispatched agents — never implement it directly.
 </orchestrator-role>
+<write-boundary>
+Orchestrator writes are confined to the delivery folder (`**/deliveries/**`) — never code, config, tests, infrastructure, or any file outside it. Code changes are produced only by a dispatched **executor**; planning only by a dispatched **planner**. On opencode the `edit` permission enforces the path boundary and the `task` allowlist limits dispatchable agents; elsewhere the doctrine and rules alone apply. After every index write, run the delivery write-boundary check. Full layers, check, and delegation rules: **reference/write-boundary-guide.md**.
+</write-boundary>
 <feature-definition>
 A feature is a coherent, independently valuable deliverable spanning one or more repos.
 - **One PR per repo per feature** is a **soft** guideline; split a feature if its repo slice would exceed one reviewable PR.
@@ -42,7 +45,7 @@ deliveries/<epic-name>/               # one folder per epic (epic-name = spike n
 │   └── plan.md                       # TDD plan from plan-development-task
 └── index.md                          # delivery index (single source of truth)
 ```
-- **Base root**: `deliveries/` is a sibling of the spike's `spikes/` under the artifact base the spike recorded (`scope.md` `Artifact root:`) — inherited, never re-resolved; only a missing record triggers `resolve-artifact-location`.
+- **Base root**: `deliveries/` is a sibling of the spike's `spikes/` under the artifact base the spike recorded (`scope.md` `Artifact root:`) — inherited, never re-resolved; only a missing record triggers `resolve-artifact-location`. The epic folder always carries a `deliveries/` path segment (`<base>/deliveries/<epic-name>/`), anchoring the write boundary.
 - **index.md** is the delivery index — it lives at the epic folder root (see **reference/delivery-index-format.md**).
 - **Feature folders are named by the feature's kebab-case name** (e.g. `wallet-contracts`), never its ID (`F1`) — IDs are reference shorthand only (waves, dependencies).
 - **context.md** carries the distilled spike context and the `## Reworks` manifest; **plan.md** is the original plan from **plan-development-task** — each rework is a sibling `rework-<date>.md` (per **rework-modes**), implemented steps never modified.
@@ -109,6 +112,7 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 | Rewriting wordy index prose to its shortest faithful form | Move-then-shorten walkthrough, before/after model | [examples/concise-rewrite.md](examples/concise-rewrite.md) |
 | Handling an ADR change mid-delivery (cells at any status) | ADR-change routing + resume currency check | [reference/orchestration-guide.md](reference/orchestration-guide.md) |
 | ADR change mid-delivery with mixed statuses | done / planned / in-progress walkthrough | [examples/adr-change-mid-delivery.md](examples/adr-change-mid-delivery.md) |
+| Confining orchestrator writes / running the boundary check | Allowed vs forbidden writes, enforcement layers, boundary-check procedure, delegation | [reference/write-boundary-guide.md](reference/write-boundary-guide.md) |
 </context-loading-guide>
 
 </knowledge>
@@ -139,7 +143,7 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 2. Include the **Spike References** block: ADR files, solution-doc sections.
 3. Create per-repo plan folders in the **repo-first** layout: `deliveries/<epic-name>/{repo}/{feature-name}/plan.md` + `context.md` (see **delivery-layout**).
 4. Mark each cell's initial status **unplanned** and its plan location.
-5. Verify the index against **reference/delivery-index-format.md** — structure, status values, develop/merge readiness — then apply **rewrite-concise** as the final prose gate (see **concise-writing**).
+5. Verify the index against **reference/delivery-index-format.md** — structure, status values, develop/merge readiness — then apply **rewrite-concise** as the final prose gate (see **concise-writing**); run the delivery write-boundary check.
 6. Confirm the index location with the user — from here the epic is driven by **orchestrate-delivery**.
 </produce-delivery-index>
 <update-delivery-index>
@@ -155,7 +159,7 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 10. When a cell's PR merges, confirm the recorded head commit is in the merged PR before marking **done** (see **branch-and-push-conventions**); then re-check downstream cells — any now develop-ready (dependencies planned) or merge-ready (dependencies done) become dispatchable.
 11. Record the agent assignment, plan location, branch name, and the **head commit** from the execution handoff for each cell; record the PR reference (number/URL) once a PR is opened (per **branch-and-push-conventions**).
 12. Keep the index as the single source of truth; never leave status changes only in conversation.
-13. Verify the updated index against **reference/delivery-index-format.md** — status values, readiness, recorded branches — then apply **rewrite-concise**.
+13. Verify the updated index against **reference/delivery-index-format.md** — status values, readiness, recorded branches — then apply **rewrite-concise**; run the delivery write-boundary check.
 </update-delivery-index>
 <orchestrate-delivery>
 1. Load the delivery index — or create it first via **decompose-change-into-features** → **map-features-to-repos** → **order-feature-delivery** → **produce-delivery-index** if it does not exist.
@@ -231,5 +235,7 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 <rule> When a POC cell reaches **poc-ready**, do not evaluate or decide — wait for the user to record **adopted**/**rejected** directly in the index. </rule>
 <rule> When the user records a POC decision (**adopted**/**rejected**) in the index, apply **update-delivery-index** to record it and dispatch the follow-ups (ADR update, branch promotion, **poc-gated** feature). </rule>
 <rule> When presenting or confirming any delivery index (new or updated), apply **rewrite-concise** as the final gate — never present a draft that fails a **writing-style.md** cap. </rule>
+<rule> Confine every orchestrator write to the delivery folder (`**/deliveries/**`); never modify code, config, tests, or any file outside it. </rule>
+<rule> After every index write, run the delivery write-boundary check per **reference/write-boundary-guide.md**; stop and report on any out-of-folder change. </rule>
 
 </rules>

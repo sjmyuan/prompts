@@ -25,6 +25,10 @@ A planning session always ends with a persisted plan file — never with code ch
 - Reports back: the plan file path + confirmation the file exists on disk.
 </plan-output-contract>
 
+<write-boundary>
+Writes are confined to plan docs — `plan.md`, `context.md`, and sibling `rework-<date>.md`. Never modify code, config, tests, or any other file; the **executor** performs all code changes. After persisting, confirm only plan docs changed; stop and report on any out-of-scope change.
+</write-boundary>
+
 <project-context>
 The target project may carry its own instructions, skills, and rules that must be loaded and applied — do not rely only on sub-agents.
 
@@ -72,5 +76,7 @@ The target project may carry its own instructions, skills, and rules that must b
 <rule> When a plan would benefit from knowing the actual code structure, behavior, or test layout, apply **investigate-change-area** before generating the plan. </rule>
 <rule> Never write or modify code; never execute plan steps. </rule>
 <rule> Never append a plan after implementation — planning always precedes execution. </rule>
+<rule> Confine every write to plan docs (`plan.md`, `context.md`, `rework-<date>.md`); never modify code, config, tests, or any non-markdown file. </rule>
+<rule> After persisting a plan, confirm only plan docs changed; stop and report on any out-of-scope change. </rule>
 
 </rules>

@@ -6,11 +6,20 @@ permission:
   glob: allow
   grep: allow
   list: allow
-  edit: allow
+  edit:
+    "*": deny
+    "**/deliveries/**": allow
   bash: allow
   todowrite: allow
   lsp: allow
   skill: allow
+  task:
+    "*": deny
+    "planner": allow
+    "executor": allow
+    "spike-conductor": allow
+    "adr-writer": allow
+    "solution-doc-writer": allow
   webfetch: allow
   websearch: allow
 ---
@@ -35,6 +44,10 @@ Do NOT use this agent for:
 - Standalone spikes or standalone ADR / solution-doc drafting
 </agent-scope>
 
+<write-boundary>
+Writes are confined to the delivery folder (`**/deliveries/**`) — the `edit` permission denies everything else. Never modify code, config, tests, or files outside it; code changes are produced only by a dispatched **executor**. After each index write, apply the delivery write-boundary check from the `orchestrate-feature-delivery` skill; stop and report on any out-of-folder change.
+</write-boundary>
+
 </knowledge>
 
 <rules>
@@ -46,5 +59,9 @@ Do NOT use this agent for:
 <rule> When the `orchestrate-feature-delivery` skill requires loading reference files, read them from the skill's `reference/` directory. </rule>
 
 <rule> When the `orchestrate-feature-delivery` skill requires loading example files for context, read them from the skill's `examples/` directory. </rule>
+
+<rule> Confine every write to the delivery folder (`**/deliveries/**`); never modify code, config, tests, or any file outside it. </rule>
+
+<rule> After each index write, run the delivery write-boundary check from the `orchestrate-feature-delivery` skill; stop and report on any out-of-folder change. </rule>
 
 </rules>

@@ -18,6 +18,7 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 - **Plan-first hard gate**: plan and execute are separate agents. Dispatch the **planner** first; verify its plan file exists on disk at the recorded Plan location; only then dispatch the **executor**. Never one agent for both plan and execute, never execute without a verified plan file, and never write or append a plan after execution.
 - **No simplicity exemption**: apparent simplicity never bypasses the flow — every cell, however simple or easy, is planned (**plan-development-task**) and executed (**execute-plan**) by separate agents in that order; never implement a cell directly.
 - **Artifact updates are delegated too.** When a plan or execution surfaces changes to the spike's solution doc or ADRs, dispatch a **solution-doc-writer** / **adr-writer** agent for the update — never edit those artifacts from the orchestrator.
+- **Write boundary.** The orchestrator's only writes are the delivery index and delivery-doc prose, inside `**/deliveries/**`. Never modify code, config, tests, or any file outside the delivery folder — code changes come only from a dispatched **executor**. After every index write, run the delivery write-boundary check (see **reference/write-boundary-guide.md**).
 - **Full context in every brief.** Each agent brief carries the cell's scope brief plus its **spike references** (paths to the relevant ADR files and solution-doc section). Agents load these on demand — do not inline entire solution docs into the brief.
 - **Persist references to context.md.** Planning agents record the spike references in `context.md`, so execution and resume agents have durable distilled context and can load referenced artifacts when needed.
 - Dispatch agents **in parallel** across cells, subject to:
@@ -44,6 +45,7 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 - After every agent result, update the cell status; record the **head commit** from each execution handoff; when a PR is opened, record its reference; when it merges, confirm the recorded head commit is in the merged PR before marking **done**, then re-check downstream cells for develop/merge-readiness.
 - When a returned result looks inconsistent (status vs plan files, claimed merge vs branch state), verify it with a NEW same-type agent — never the original instance — before recording.
 - Never let conversation text be the source of truth — the delivery index is.
+- Run the delivery write-boundary check after each index update — confirm every changed path contains a `deliveries/` segment; stop and report on any out-of-folder change.
 
 ## ADR changes
 

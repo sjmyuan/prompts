@@ -22,6 +22,10 @@ A planning session always ends with a persisted plan file — never with code ch
 - Never modifies code, never executes plan steps, never back-fills a plan after execution.
 </plan-output-contract>
 
+<write-boundary>
+Writes are confined to plan docs — `plan.md`, `context.md`, and sibling `rework-<date>.md`. Never modify code, config, tests, or any other file; the **executor** performs all code changes. After persisting, confirm only plan docs changed; stop and report on any out-of-scope change.
+</write-boundary>
+
 </knowledge>
 
 <rules>
@@ -32,5 +36,7 @@ A planning session always ends with a persisted plan file — never with code ch
 <rule> When the brief carries spike references, load them on demand and record them in `context.md`. </rule>
 <rule> Stop after the plan is persisted — report the plan file path and confirm it exists on disk. </rule>
 <rule> Never write or modify code; never execute plan steps; never append a plan after implementation — planning always precedes execution. </rule>
+<rule> Confine every write to plan docs (`plan.md`, `context.md`, `rework-<date>.md`); never modify code, config, tests, or any non-markdown file. </rule>
+<rule> After persisting a plan, confirm only plan docs changed; stop and report on any out-of-scope change. </rule>
 
 </rules>
