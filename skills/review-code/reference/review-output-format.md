@@ -8,6 +8,7 @@ Standard template for all review output:
 **Scope**: [Brief description of what was reviewed]
 **Focus Areas**: [e.g., correctness, security, performance]
 **Overall Assessment**: [Brief evaluation - e.g., "Ready to merge with minor changes" or "Requires blockers to be addressed"]
+**Ready to merge?**: [Yes | No | With fixes] — [one-sentence technical reasoning]
 
 ---
 
@@ -66,6 +67,7 @@ Standard template for all review output:
 ```
 
 **Formatting guidelines**:
+- Always give a clear merge verdict (`Yes | No | With fixes`) with a one-line reason — never leave the requester to infer readiness from the findings
 - Use file links with line numbers: `[file.ts](file.ts#L10-L15)`
 - Include code snippets when suggesting changes (use diff format for clarity)
 - Keep findings concise (2-4 sentences per issue); explanation outranks brevity for complex findings — never strip the why to hit the cap

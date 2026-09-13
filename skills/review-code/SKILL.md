@@ -4,7 +4,7 @@ description: Systematic code and document reviews across files, diffs, commits, 
 ---
 
 <when-to-use-this-skill>
-- User explicitly requests a code review
+- A user or another agent requests a code review
 - User submits files, folders, diffs, commits, or pull requests for review
 - User asks for feedback on code quality, security, performance, or maintainability
 - User supplies one branch name (diff against current branch) or two branch names (diff between them)
@@ -18,6 +18,7 @@ Load all resources on demand. **gathering-review-context** is demonstrated expli
 
 | Load when | Provides | File |
 |---|---|---|
+| Before starting a review | Reviewer conduct rules — read-only, evidence-based findings, calibration, plan alignment, self-contained context | [reference/reviewer-conduct.md](reference/reviewer-conduct.md) |
 | About to apply review dimensions to code | Full 9-dimension checklist (Correctness, Maintainability, Performance, Security, APIs, Tests, Architecture, Inconsistencies, Observability & Deployment Safety) with ✓ items | [reference/review-dimensions.md](reference/review-dimensions.md) |
 | About to categorize findings by severity | Severity rubric (🚫 Blocker, 🔴 Major, 🟡 Minor, 🟢 Nit, ⚠️ Inconsistency) with criteria for each level | [reference/severity-levels.md](reference/severity-levels.md) |
 | About to write review output | Standard review output template (Summary, Findings, Positive Highlights, Risks & Assumptions, Next Steps) and formatting guidelines | [reference/review-output-format.md](reference/review-output-format.md) |
@@ -121,7 +122,7 @@ git diff HEAD...<supplied-branch>
 3. For dimension 8 (Inconsistencies): capture every conflicting pattern with both variants and concrete file/line references; note trade-offs and flag for a user decision — do not silently pick one.
 4. Load [reference/review-output-format.md](reference/review-output-format.md) via the **context-loading-guide** and format all findings using the standard template.
 5. Load the appropriate example from the **context-loading-guide** table for output structure guidance.
-6. **Validate output**: Verify (a) every finding has a severity label, (b) Positive Highlights section is present, (c) no empty severity sections are included per formatting guidelines, (d) each inconsistency entry includes both variants and a decision request, (e) every finding carries an actionable Recommendation with concrete plain-language Issue and Impact, (f) each finding passes the non-expert test per **plain-language-presentation** — the reader can state what's wrong, why it matters, and what to do.
+6. **Validate output**: Verify (a) every finding has a severity label, (b) Positive Highlights section is present, (c) no empty severity sections are included per formatting guidelines, (d) each inconsistency entry includes both variants and a decision request, (e) every finding carries an actionable Recommendation with concrete plain-language Issue and Impact, (f) each finding passes the non-expert test per **plain-language-presentation** — the reader can state what's wrong, why it matters, and what to do; (g) the merge verdict is present.
 </conducting-code-review>
 
 <reviewing-document>
