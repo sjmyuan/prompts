@@ -81,7 +81,7 @@ No existing implementation: research industry approaches and similar systems and
 </greenfield-scenarios>
 
 <multi-agent-orchestration>
-Dispatch investigation, findings-doc compilation, ADR drafting (including option evaluation via `draft-adr`), and solution-doc compilation to sub-agents — **including single-task spikes**; a sub-agent is always available. Goal: keep the orchestrating agent's context small; parallel speed secondary. Details: **reference/multi-agent-orchestration.md**.
+Dispatch investigation, findings-doc compilation, ADR drafting (including option evaluation via `draft-adr`), and solution-doc compilation to sub-agents — **including single-task spikes**; dispatch is the default path. Goal: keep the orchestrating agent's context small; parallel speed secondary. Details: **reference/multi-agent-orchestration.md**; model routing, waiting, no worker-spawned sub-agents, and the availability fallback: **reference/dispatch-discipline.md**.
 </multi-agent-orchestration>
 
 <sub-agent-verification>
@@ -127,6 +127,7 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 | Suggesting a spike on ADR uncertainty | Uncertainty-spike procedure | [reference/suggest-spike-on-adr-uncertainty-procedure.md](reference/suggest-spike-on-adr-uncertainty-procedure.md) |
 | Continuing a spike into unresolved areas | Continuation walkthrough (revise-in-place) | [examples/continue-prior-spike.md](examples/continue-prior-spike.md) |
 | Dispatching workflow steps to sub-agents | Dispatch pattern | [reference/multi-agent-orchestration.md](reference/multi-agent-orchestration.md) |
+| Choosing a model, waiting on sub-agents, availability fallback | Dispatch discipline + common rationalizations | [reference/dispatch-discipline.md](reference/dispatch-discipline.md) |
 | Preparing a dispatch brief | Brief index + structured brief shape + evidence-map contract | [reference/dispatch-briefs.md](reference/dispatch-briefs.md) |
 | Compiling the findings doc | Full compile-findings-doc procedure | [reference/findings-doc-compilation.md](reference/findings-doc-compilation.md) |
 | Compiling the solution doc | Full compile-solution-doc procedure | [reference/solution-doc-compilation.md](reference/solution-doc-compilation.md) |
@@ -156,8 +157,9 @@ Propagation stops at the first artifact a change does not affect. Full protocol:
 4. Validate changed problems are independently decidable and unchanged decisions are preserved; update the scope map.
 5. Run the standard workflow in revise-in-place mode per **continuation-mode**: apply **investigate-per-area** (seeded with existing evidence maps), **compile-findings-doc**, **draft-problem-adrs**, then **sync-update-artifacts**.
 6. Update `scope.md` statuses as each step completes.
-7. Ask whether to continue with another round or conclude.
-8. Apply **define-spike-scope** when continuing, adopting the continuation as the new scope.
+7. Run the **final consistency review** — cross-check findings → ADRs → solution doc and cross-area constraints; surface inconsistencies before concluding.
+8. Ask whether to continue with another round or conclude.
+9. Apply **define-spike-scope** when continuing, adopting the continuation as the new scope.
 </continue-prior-spike>
 
 <define-spike-scope>

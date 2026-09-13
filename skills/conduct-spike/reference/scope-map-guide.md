@@ -30,6 +30,10 @@ Area status is derived from its problems + findings link — never stored separa
 - A `done` problem has its ADR present.
 - An area is never `done` with an open problem.
 
+## In-flight units (recovery)
+
+Statuses track **saved artifacts**, not in-flight dispatches. When a spike pauses mid-unit, record a one-line in-flight note in `scope.md` — unit (area / problem), stage (`investigating` / `verifying` / `re-investigating`), verification round, and open challenges. Clear it when the unit's artifact is saved. On resume, read it first so the verification loop continues instead of re-dispatching a completed unit.
+
 ## Usage
 
 - **define-spike-scope**: record the goal (1 sentence) and each area (`preparing`, empty findings link) with its problems (`investigating`).

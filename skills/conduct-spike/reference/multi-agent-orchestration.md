@@ -21,7 +21,7 @@ Each capability's brief template lives in its own reference file (see the table 
 
 1. Identify independent work units (one per investigation area, or one per problem/ADR — batching a whole area's problems into one brief when they share its evidence; including a single unit).
 2. For each unit, fill the capability's ready-to-fill brief (see the table above) per the **structured brief shape** — substitute the `[bracketed]` fields; the shared evidence-map input/output contract lives in **reference/dispatch-briefs.md**.
-3. Dispatch the briefs — all units concurrently when there are multiple, or the single unit on its own when there is one. Sub-agents operate independently and do not communicate with each other.
+3. Dispatch the briefs — all units concurrently when there are multiple, or the single unit on its own when there is one. Sub-agents operate independently and do not communicate with each other. Apply **reference/dispatch-discipline.md** — explicit model per brief, bounded waits, and no worker-spawned sub-agents.
 4. Collect results from all sub-agents when they complete.
 5. Verify each collected result via `question-everything`'s **verify-sub-agent-results** — dispatch NEW same-type sub-agents per the verification protocol. Review the accepted results for completeness and consistency across areas, then hand each area's verified evidence map to `compile-findings-doc`, which embeds it into its own `docs/findings-<area>.md` (see **reference/findings-document-guide.md**).
 6. **Document-compilation briefs** (findings and solution docs) carry the full synthesis context per **reference/findings-doc-brief.md** / **reference/solution-doc-brief.md** — the orchestrator still reviews, validates, and presents the returned doc.

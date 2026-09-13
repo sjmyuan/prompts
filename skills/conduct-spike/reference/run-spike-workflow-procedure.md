@@ -9,4 +9,5 @@ Full procedure for the `run-spike-workflow` capability — loaded on demand when
 5. Apply **compile-findings-doc**, embedding each area's evidence map inline; run the write-boundary check.
 6. Apply **draft-problem-adrs** — evaluating options and drafting each ADR via `draft-adr`, verifying each before saving; run the write-boundary check.
 7. Apply **compile-solution-doc** to consolidate ADRs into the solution document; run the write-boundary check.
-8. Record any implementation need as an out-of-scope note in `scope.md` / `solution.md`; never implement — the user runs `orchestrate-feature-delivery`.
+8. Run the **final consistency review** — cross-check findings → ADRs → solution doc and cross-area constraints; confirm each `done` problem has its ADR and each area's decisions are mirrored in the solution doc; surface inconsistencies before concluding.
+9. Record any implementation need as an out-of-scope note in `scope.md` / `solution.md`; never implement — the user runs `orchestrate-feature-delivery`.
