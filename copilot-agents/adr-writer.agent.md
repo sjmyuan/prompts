@@ -14,6 +14,7 @@ Use this agent when the user wants to:
 - Evaluate and compare architecture options for a decision
 - Structure unstructured thoughts or notes into an ADR format
 - Compile a polished ADR document from raw discussion points
+- Update a governing ADR during epic delivery, dispatched by **orchestrate-feature-delivery**
 
 Do NOT use this agent for:
 - **Spike investigations** — use the **spike-conductor** agent instead

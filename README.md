@@ -74,10 +74,34 @@ Each file follows the [opencode agents spec](https://opencode.ai/docs/agents/).
 ### How the conversion was done
 
 - `name:` / `tools:` / `model: inherit` (Claude frontmatter) → `mode: subagent` + `permission:` (opencode frontmatter).
-- Claude tool list → opencode permissions: `Glob/Grep/Read/List/LSP` → read-family, `Write/Edit` → `edit`, `Bash/KillShell/BashOutput` → `bash`, `TodoWrite` → `todowrite`, `Fetch` → `webfetch`; `skill: allow` everywhere, `websearch: deny` everywhere; read-only agents add `edit: deny`.
+- Claude tool list → opencode permissions: `Glob/Grep/Read/List/LSP` → read-family, `Write/Edit` → `edit`, `Bash/KillShell/BashOutput` → `bash`, `TodoWrite` → `todowrite`, `WebFetch` → `webfetch`; `skill: allow` everywhere, `websearch: deny` everywhere; read-only agents add `edit: deny`.
 - Claude paths → opencode: `CLAUDE.md` → `AGENTS.md`, `.claude/agents/` → `.opencode/agents/`, `.claude/skills/` → `.opencode/skills/`.
 
 ### Notes
 
 - Skills must be discoverable by opencode (`.opencode/skills/<name>/SKILL.md`, `.claude/skills/`, `.agents/skills/`, or the matching global locations) for the `skill` tool to load them.
 - Subagent dispatch tables (in `spike-conductor.md` and `learner.md`) reference agents by name — those names resolve to the other files in this folder once installed.
+
+## Agent dispatch per platform
+
+An agent that dispatches sub-agents must declare the capability in its frontmatter, or the dispatch silently fails on that platform:
+
+| Platform | Mechanism | Declaration |
+|---|---|---|
+| opencode | `task` permission allowlist | `task: { "*": deny, "<agent>": allow }` |
+| Claude Code | `Task` tool (renamed `Agent`; `Task` remains an alias) | include `Task` (or `Agent`) in the comma-separated `tools:` list |
+| VS Code Copilot | `agents` list + the `agent` tool | `agents: ['planner', ...]` (omit `tools` to keep all tools) |
+
+Dispatching agents and their targets:
+
+| Agent | Dispatches |
+|---|---|
+| `orchestrate-delivery` | planner, executor, code-reviewer, spike-conductor, adr-writer, solution-doc-writer |
+| `spike-conductor` | code-investigator, adr-writer, solution-doc-writer |
+| `learner` | learner (self-dispatch) |
+| `code-reviewer` | code-reviewer (fan-out) |
+| `code-investigator` | code-investigator (fan-out) |
+
+- **Self-dispatch / fan-out**: opencode and Claude allow an agent to invoke itself by default; VS Code Copilot requires the `chat.subagents.allowInvocationsFromSubagents` setting for a self-referential `agents` entry.
+- opencode defaults unspecified tools to `allow`; the explicit `task` allowlists above exist only where dispatch is restricted.
+

@@ -9,10 +9,10 @@
 - `deliveries/payment-migration/order-service/wallet-service/plan.md` — every step ✅, each with its commit.
 - `context.md` `## Execution` — `DONE_WITH_CONCERNS` · range `a1b2c3d..d4e5f6a` · tests `18/18 passing, output pristine` · `review-code` clean (2 Blocker/Major fixed) · concern: "retry cap hard-coded".
 
-## 2. Dispatch a fresh reviewer
+## 2. Dispatch a fresh code-reviewer
 
-- **Reviewer A** (**review-code**) — inputs: `plan.md`, `context.md`, recorded range `a1b2c3d..d4e5f6a`, `adr-wallet-01-payment-failure-handling.md`, solution-doc §Wallet, global constraints.
-- Reviewer A fetches the diff from git over the range — no diff file, and the output never enters the orchestrator's context.
+- **code-reviewer A** (**review-code**) — inputs: `plan.md`, `context.md`, recorded range `a1b2c3d..d4e5f6a`, `adr-wallet-01-payment-failure-handling.md`, solution-doc §Wallet, global constraints.
+- code-reviewer A fetches the diff from git over the range — no diff file, and the output never enters the orchestrator's context.
 - Not executor-B, the agent that produced the work.
 
 ## 3. Verdicts
@@ -40,11 +40,11 @@
 
 | Cell | Branch | PR | Commit | Status | Agent | Location |
 |---|---|---|---|---|---|---|
-| order-service/F2 | 1234-f2-wallet | — | d4e5f6a | **verified** | reviewer-A | deliveries/payment-migration/order-service/wallet-service/ |
+| order-service/F2 | 1234-f2-wallet | — | d4e5f6a | **verified** | code-reviewer-A | deliveries/payment-migration/order-service/wallet-service/ |
 
 - F2 awaits merge; with F1 **done**, F2 is now merge-ready.
 - Push/PR still waits for user approval per **branch-and-push-conventions**.
 
 ## 6. Fix-round variant
 
-Had the reviewer found a Missing requirement or a Critical finding, the orchestrator would dispatch the **planner** immediately with the findings to write a sibling `rework-<date>.md`, then the **executor** to run it, then a scoped re-review — capped at 3 rounds, escalating any unresolved finding to the user (see **reference/verification-gate.md**). The cell stays **in-progress**; the rework file is the record. A cell never reaches **verified** with an unresolved spec gap.
+Had the code-reviewer found a Missing requirement or a Critical finding, the orchestrator would dispatch the **planner** immediately with the findings to write a sibling `rework-<date>.md`, then the **executor** to run it, then a scoped re-review — capped at 3 rounds, escalating any unresolved finding to the user (see **reference/verification-gate.md**). The cell stays **in-progress**; the rework file is the record. A cell never reaches **verified** with an unresolved spec gap.

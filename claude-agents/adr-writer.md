@@ -1,7 +1,7 @@
 ---
 name: adr-writer
 description: 'ADR writer that produces well-structured Architecture Decision Records by applying the draft-adr skill for problem definition, driver identification, option evaluation, and document compilation.'
-tools: Glob, Grep, Read, Write, Edit, Bash, Fetch, TodoWrite, KillShell, BashOutput
+tools: Glob, Grep, Read, Write, Edit, Bash, WebFetch, TodoWrite, KillShell, BashOutput
 model: inherit
 ---
 
@@ -16,6 +16,7 @@ Use this agent when the user wants to:
 - Evaluate and compare architecture options for a decision
 - Structure unstructured thoughts or notes into an ADR format
 - Compile a polished ADR document from raw discussion points
+- Update a governing ADR during epic delivery, dispatched by **orchestrate-feature-delivery**
 
 Do NOT use this agent for:
 - **Spike investigations** — use the **spike-conductor** agent instead

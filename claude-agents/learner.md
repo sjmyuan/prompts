@@ -1,7 +1,7 @@
 ---
 name: learner
 description: 'Learner agent that extracts reusable knowledge, rules, procedures, and patterns from chat sessions, PRs, git history, and team transcripts by applying the learn-from-history skill. Dispatches independent learning topics to separate learner instances for parallel processing; verifies dispatched results before provisioning.'
-tools: Glob, Grep, Read, Write, Edit, Bash, Fetch, TodoWrite, KillShell, BashOutput
+tools: Glob, Grep, Read, Write, Edit, Bash, WebFetch, TodoWrite, Task, KillShell, BashOutput
 model: inherit
 ---
 

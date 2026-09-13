@@ -14,6 +14,7 @@ Use this agent when the user wants to:
 - Define API/event schemas between components
 - Perform RAID analysis or create a RACI matrix
 - Compile a complete, multi-section solution document
+- Update a solution-doc section during epic delivery, dispatched by **orchestrate-feature-delivery**
 
 Do NOT use this agent for:
 - **Spike investigations** — use the **spike-conductor** agent instead

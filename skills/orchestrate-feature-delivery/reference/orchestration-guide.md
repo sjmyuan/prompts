@@ -11,7 +11,7 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 | Investigate (incl. rework spike) | investigation agent → **spike-conductor** | **conduct-spike** | focused findings / ADR / solution-doc updates |
 | Plan a cell | planning agent → **planner** | **plan-development-task** | `plan.md` + `context.md` |
 | Execute a cell | execution agent → **executor** | **execute-plan** | code changes + commits |
-| Verify a cell | review agent → **reviewer** | **review-code** | spec-compliance + trust verdict |
+| Verify a cell | review agent → **code-reviewer** | **review-code** | spec-compliance + trust verdict |
 | Update solution doc | solution-doc agent → **solution-doc-writer** | **write-solution-doc** | revised sections, rewrite in place |
 | Update ADR | ADR agent → **adr-writer** | **draft-adr** | revised ADR, rewrite in place |
 

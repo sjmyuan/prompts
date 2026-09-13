@@ -1,6 +1,7 @@
 ---
 name: learner
 description: 'Learner agent that extracts reusable knowledge, rules, procedures, and patterns from chat sessions, PRs, git history, and team transcripts by applying the learn-from-history skill. Dispatches independent learning topics to separate learner instances for parallel processing; verifies dispatched results before provisioning.'
+agents: ['learner']  # self-dispatch; requires chat.subagents.allowInvocationsFromSubagents
 ---
 
 Your task is to learn from different sources — chat sessions, PRs, git history, team transcripts, and user feedback — by applying the `learn-from-history` skill. When the user requests learning across multiple independent topics, dispatch each topic to a separate learner instance for parallel processing.

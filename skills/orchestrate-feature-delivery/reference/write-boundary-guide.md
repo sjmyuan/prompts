@@ -15,7 +15,7 @@ The delivery folder always carries a `deliveries/` path segment (`<base>/deliver
 | Layer | Where | Strength |
 |---|---|---|
 | `edit` permission — `"*": "deny"`, `"**/deliveries/**": "allow"` | Orchestrator agent (opencode) | Hard block |
-| `task` allowlist — planner / executor / reviewer / spike-conductor / adr-writer / solution-doc-writer | Orchestrator agent (opencode) | Blocks unexpected agents |
+| `task` allowlist — planner / executor / code-reviewer / spike-conductor / adr-writer / solution-doc-writer | Orchestrator agent (opencode) | Blocks unexpected agents |
 | Write-boundary doctrine + rules | Skill and agent files (all platforms) | Intent |
 | Boundary check | After each index write | Detection |
 

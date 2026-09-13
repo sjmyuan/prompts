@@ -23,7 +23,7 @@ deliveries/<epic-name>/               # one folder per epic (no docs/ prefix)
 └── index.md                          # delivery index (single source of truth)
 ```
 
-The verification gate reuses these docs: `plan.md` step statuses and `context.md` `## Execution` (executor handoff); the reviewer fetches the diff from git, and findings go straight to the planner as a `rework-<date>.md` (see **reference/verification-gate.md**).
+The verification gate reuses these docs: `plan.md` step statuses and `context.md` `## Execution` (executor handoff); the code-reviewer fetches the diff from git, and findings go straight to the planner as a `rework-<date>.md` (see **reference/verification-gate.md**).
 
 ## Structure
 
@@ -63,7 +63,7 @@ The verification gate reuses these docs: `plan.md` step statuses and `context.md
 |---|---|---|---|---|---|---|
 | repo-a/F1 | 1234-f1-api | — | — | planned | agent-A | deliveries/<epic-name>/repo-a/wallet-contracts/ |
 | repo-b/F2 | f2-schema | #42 | e5f6a7b | in-progress | agent-B | deliveries/<epic-name>/repo-b/wallet-service/ |
-| repo-c/F3 | 1234-f3-gateway | #43 | c7d8e9f | verified | reviewer-A | deliveries/<epic-name>/repo-c/wallet-api-gateway/ |
+| repo-c/F3 | 1234-f3-gateway | #43 | c7d8e9f | verified | code-reviewer-A | deliveries/<epic-name>/repo-c/wallet-api-gateway/ |
 | repo-c/F4 | — | — | — | unplanned | — | — |
 ```
 
@@ -87,6 +87,8 @@ Each cell carries a brief that seeds **plan-development-task**:
 
 ## Status lifecycle
 
+Canonical transitions and readiness predicates: **reference/state-machine.md**.
+
 - **unplanned** → **planned**: a planning agent wrote `plan.md` + `context.md`
 - **planned** → **in-progress**: an execution agent started
 - **in-progress** → **verified**: the independent verification gate passed (**verify-cell**)
@@ -99,9 +101,9 @@ Each cell carries a brief that seeds **plan-development-task**:
 
 - **Ready to develop**: all dependency cells are **planned** (contracts agreed — contract-first and independent cells develop in parallel; merge-blocked cells wait for the dependency's contract).
 - **Ready to execute**: cell is **planned** AND its plan file is verified on disk at the recorded Plan location (the plan-first gate).
-- **Ready to verify**: cell is **in-progress** AND `plan.md` shows every step ✅ with the `## Execution` handoff recorded in `context.md` (→ reviewer).
+- **Ready to verify**: cell is **in-progress** AND `plan.md` shows every step ✅ with the `## Execution` handoff recorded in `context.md` (→ code-reviewer).
 - **Ready to merge**: cell is **verified** AND all dependency cells are **done** (merged).
-- Status must be **unplanned** (→ planner), **planned** with a verified plan file (→ executor), or **in-progress** with the recorded execution handoff (→ reviewer).
+- Status must be **unplanned** (→ planner), **planned** with a verified plan file (→ executor), or **in-progress** with the recorded execution handoff (→ code-reviewer).
 
 ## Status semantics
 

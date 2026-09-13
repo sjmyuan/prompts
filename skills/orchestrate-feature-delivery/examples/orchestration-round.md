@@ -35,15 +35,17 @@ F2 and F3 become develop-ready (F1 planned; contract-first allows planning in pa
 
 > **Delegation rule in action**: when any agent's plan or execution surfaces a solution-doc or ADR change, the orchestrator dispatches a **solution-doc-writer** / **adr-writer** agent for the update — it never edits artifacts itself.
 
-## 5. Push approval + merge
+## 5. Verify the gate
 
-F1's execution completes. Per **branch-and-push-conventions**, the branch is pushed and the PR opened only after user approval — F1 becomes **done** only after the PR merges / the user verifies the code.
+F1's execution completes → the orchestrator applies **verify-cell**: a fresh **code-reviewer** gets the recorded commit range plus `plan.md`, `context.md`, and the governing ADR, and returns spec-compliance + trust verdicts. F1 advances to **verified** (see **examples/cell-verification-gate.md**). Never mark a cell **done** without this gate.
 
-## 6. Collect + update index
+## 6. Push approval + merge + update index
+
+Per **branch-and-push-conventions**, the branch is pushed and the PR opened only after user approval — F1 becomes **done** only after the PR merges with the recorded head commit.
 
 | Cell | Branch | PR | Commit | Status | Agent | Location |
 |---|---|---|---|---|---|---|
-| shared-contracts/F1 | 1234-f1-contracts | #1 | a1b2c3d | **done** (PR merged after approval) | executor-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
+| shared-contracts/F1 | 1234-f1-contracts | #1 | a1b2c3d | **done** (verified, then PR merged) | code-reviewer-A | deliveries/payment-migration/shared-contracts/wallet-contracts/ |
 | order-service/F2 | 1234-f2-wallet | — | — | **planned** | planner-B | deliveries/payment-migration/order-service/wallet-service/ |
 | api-gateway/F3 | 1234-f3-gateway | — | — | **planned** | planner-C | deliveries/payment-migration/api-gateway/wallet-api-gateway/ |
 | order-service/F4 | — | — | — | unplanned | — | — |
@@ -51,4 +53,4 @@ F1's execution completes. Per **branch-and-push-conventions**, the branch is pus
 
 ## 7. Next actions
 
-Verify F2 + F3 plan files, then execute both in parallel (develop-ready, no conflict); with F1 **done**, F2 and F3 are now merge-ready. F4 cells remain wave-2 until F2 + F3 merge. All status changes landed in the index before the next round was dispatched.
+Verify F2 + F3 plan files, then execute both in parallel (develop-ready, no conflict); apply **verify-cell** to each on completion. With F1 **done**, F2 and F3 are now merge-ready. F4 cells remain wave-2 until F2 + F3 merge. All status changes landed in the index before the next round was dispatched.
