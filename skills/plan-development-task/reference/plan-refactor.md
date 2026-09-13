@@ -4,17 +4,17 @@
 2. Break down the refactor request into specific, measurable objectives and clearly defined constraints.
 3. **Define Scope Boundary**: Apply **define-scope-boundary** — derive the **In scope**/**Out of scope** lists from the refactor scope and the governing ADR (for **orchestrate-feature-delivery** cells); behavior change stays **Out of scope**; present to the user for ratification.
 4. Identify and map dependencies between objectives to establish an efficient and logical refactoring sequence.
-5. **Consolidate Steps**: Group related objectives together when they share context or can be tested together, reducing the total step count while maintaining clarity. Consolidation strategies: (a) merge test-and-refactor steps for simple extractions or renames into a single step, (b) combine Clean Up Unused Code + Clean Up Tests + Verify Cleanup into one cleanup step when changes are small, (c) group Validate Linting, Formatting and Type Checking across multiple objectives into one final quality gate step.
-6. Load **reference/tdd-approach-selection.md** to select the appropriate TDD variant for each objective. Document the rationale.
+5. **Consolidate Steps**: Group related objectives together when they share context or can be tested together, reducing the total step count while maintaining clarity. Consolidation strategies: (a) merge coverage-confirmation and refactor steps for simple extractions or renames into a single step, (b) combine Clean Up Unused Code + Clean Up Tests + Verify Cleanup into one cleanup step when changes are small, (c) group Validate Linting, Formatting and Type Checking across multiple objectives into one final quality gate step.
+6. Load **reference/tdd-approach-selection.md** to select the appropriate TDD variant for each objective; existing tests stay green throughout. Document the rationale.
 7. Create a detailed step-by-step refactor plan (starting with the ratified `## Scope Boundary` block). For each objective, include the following steps:
-   1. **Write Focused Tests**: Create precise unit tests targeting the specific refactoring objective, ensuring comprehensive coverage of all scenarios, edge cases, and invalid inputs.
-   2. **Confirm Test Failure**: Execute the tests to verify they fail initially, validating that the tests correctly identify the current code behavior before refactoring begins.
-   3. **Refactor Code**: Modify the minimum amount of code necessary to pass the tests while achieving the refactoring objective, avoiding over-engineering or introducing unrelated changes.
-   4. **Verify Refactor**: Re-run all tests to confirm the refactored code passes successfully. Debug and refine as necessary to ensure correctness.
-   5. **Clean Up Unused Code**: Remove any obsolete or redundant code that is no longer needed after the refactor.
-   6. **Clean Up Tests**: Update or remove tests that are no longer relevant due to the refactor, ensuring the test suite remains accurate and effective.
-   7. **Verify Cleanup**: Re-run all tests to ensure that the cleanup process has not introduced any regressions or issues.
-   8. **Validate Linting, Formatting and Type Checking**: Run linting, formatting and type checking tools to ensure code quality and adherence to coding standards.
+   1. **Confirm Existing Coverage**: Verify existing tests cover the behavior being restructured; add characterization tests (which pass immediately) only where coverage is missing.
+   2. **Refactor in Small Steps**: Apply one structural change at a time without changing behavior.
+   3. **Verify Green**: Re-run all tests after each step; any failure means behavior changed — revert it.
+   4. **Clean Up Unused Code**: Remove obsolete or redundant code left by the restructure.
+   5. **Clean Up Tests**: Update or remove tests made irrelevant by the restructure.
+   6. **Verify Cleanup**: Re-run all tests to confirm the cleanup introduced no regressions.
+   7. **Validate Linting, Formatting and Type Checking**: Run linting, formatting and type checking tools to ensure code quality and adherence to coding standards.
+   A refactor never introduces a failing test; a failing test means new behavior — move it to a feature plan.
 8. Ensure the total number of steps in the plan is manageable and does not exceed 20 steps.
-9. **Validate Plan Quality**: Load **reference/plan-quality-checklist.md** and verify — every objective has tests defined, dependency ordering is correct, step count ≤ 20, and TDD variants are documented. Revise any failing items before presenting to the user.
+9. **Validate Plan Quality**: Load **reference/plan-quality-checklist.md** and verify — every objective has existing coverage or characterization tests defined, no step introduces a failing test, dependency ordering is correct, step count ≤ 20, and TDD variants are documented. Revise any failing items before presenting to the user.
 10. Summarize the complete plan to the user.

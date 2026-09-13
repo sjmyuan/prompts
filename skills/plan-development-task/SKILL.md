@@ -43,6 +43,14 @@ When unsure, ask the user: "Is the goal to fix something that's broken (bug), ad
 TDD variant is selected by change type and sub-type — table in **[reference/tdd-approach-selection.md](reference/tdd-approach-selection.md)**. The plan documents the chosen variant with rationale.
 </tdd-approach-selection>
 
+<test-quality>
+Every planned test names the production change it catches and exercises real behavior, not mocks. Full rubric: **[reference/test-quality.md](reference/test-quality.md)**.
+</test-quality>
+
+<tdd-guardrails>
+No behavior change without a failing test first; only non-behavioral changes may skip test creation, with a recorded justification. Hard-to-test work is a design smell — refactor first. Full rubric: **[reference/tdd-guardrails.md](reference/tdd-guardrails.md)**.
+</tdd-guardrails>
+
 <plan-prerequisites>
 Every plan starts with a **Prepare Environment** step (Step 1) that covers:
 
@@ -100,6 +108,8 @@ Load only the examples directly relevant to the current change type to minimize 
 | Load when | Provides | File |
 |---|---|---|
 | Selecting TDD variant per sub-type | 15-row TDD approach selection table | [reference/tdd-approach-selection.md](reference/tdd-approach-selection.md) |
+| Writing or validating test steps | Test-quality rules and the mutation check | [reference/test-quality.md](reference/test-quality.md) |
+| Choosing a streamlined path or hitting testability problems | Iron Law, rationalizations to reject, red flags, design signals | [reference/tdd-guardrails.md](reference/tdd-guardrails.md) |
 | Generating bug fix plan | Detailed steps for plan-bug-fix | [reference/plan-bug-fix.md](reference/plan-bug-fix.md) |
 | Generating feature implementation plan | Detailed steps for plan-feature-implementation | [reference/plan-feature-implementation.md](reference/plan-feature-implementation.md) |
 | Generating refactor plan | Detailed steps for plan-refactor | [reference/plan-refactor.md](reference/plan-refactor.md) |
@@ -198,6 +208,9 @@ Load **[reference/plan-poc.md](reference/plan-poc.md)** and follow its steps.
 <rule> When generating any plan, apply **plan-prerequisites** and **define-scope-boundary**. </rule>
 <rule> When planning a rework for an implemented feature, apply **rework-plan-convention** and **export-plan** to write a sibling `rework-<date>.md` — never overwrite implemented steps. </rule>
 <rule> When a rework would exceed the original boundary, refuse and ask the user — never write silently. </rule>
+<rule> When writing or validating any test step, apply **test-quality** — each test names the break it catches and exercises real behavior. </rule>
+<rule> When a plan uses a streamlined or test-skipping path, confirm the change is non-behavioral and record the justification in `context.md`. </rule>
+<rule> When testability blocks planning, apply **plan-refactor** before **plan-feature-implementation**. </rule>
 <rule> Confine every write to plan docs (`plan.md`, `context.md`, `rework-<date>.md`); never modify code, config, tests, or any non-markdown file. </rule>
 
 </rules>

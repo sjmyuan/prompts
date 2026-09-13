@@ -45,7 +45,7 @@ Applies **plan-refactor**.
 **Out of scope**: behavior change, other modules
 **Rule**: no step may change anything beyond **In scope**
 
-**TDD Approach**: Adapted — interface extraction doesn't change behavior; existing tests validate correctness
+**TDD Approach**: Green-to-green — interface extraction doesn't change behavior; existing tests validate correctness
 
 **Steps:**
 - Step 1: Prepare Environment (run tests, linting, type-checking)
@@ -59,8 +59,8 @@ Applies **plan-refactor**.
 ## Key Characteristics
 
 - **Complexity**: Simple — interface extraction without behavior change
-- **TDD Approach**: Adapted — focus on validation rather than test-first
+- **TDD Approach**: Green-to-green — validation through existing tests
 - **Focus**: Abstraction, dependency injection, testability
 - **Testing Strategy**: Rely on existing tests to ensure behavior is preserved
 - **Total Steps**: 7
-- **Rationale**: Interface extraction doesn't change behavior, so full TDD cycle is not necessary. Existing tests validate that the refactoring is safe.
+- **Rationale**: Interface extraction doesn't change behavior, so no failing test is introduced. Existing tests validate that the refactoring is safe.

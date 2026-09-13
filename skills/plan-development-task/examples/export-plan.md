@@ -25,7 +25,7 @@
 
 1. **Prepare Environment** — branch `fix-null-pointer` off `main`; clean tree; deps installed; baseline tests pass
 2. **Write tests** for null-safety in `DataImportedHandler`
-3. **Confirm test failure**
+3. **Confirm test failure (RED)** — fails, not errors, for the expected reason
 4. **Fix code** — guard the null pointer on missing payload
 5. **Verify fix** — all tests pass
 6. **Clean up** unused code and tests

@@ -7,8 +7,8 @@
 5. **Consolidate Steps**: Group related issues together when they share context or can be tested together, reducing the total step count while maintaining clarity.
 6. Load **reference/tdd-approach-selection.md** to select the appropriate TDD variant for each issue. Document the rationale.
 7. Create a detailed step-by-step bug-fixing plan (starting with the ratified `## Scope Boundary` block). For each issue, include the following steps:
-   1. **Write Focused Tests**: Create precise unit tests targeting the specific bug issue, ensuring comprehensive coverage of all scenarios, edge cases, and invalid inputs.
-   2. **Confirm Test Failure**: Execute the tests to verify they fail initially, validating that the tests correctly identify the current code behavior before fixing begins.
+   1. **Write Focused Tests**: Create precise tests for one bug issue that name the break they catch and assert real behavior — see **reference/test-quality.md**.
+   2. **Confirm Test Failure (RED)**: Run the tests and confirm each **fails** — not errors — for the expected reason because the behavior is missing. A test that passes immediately tests existing behavior: rewrite it. A test that errors: fix it and re-run until it fails correctly.
    3. **Fix Code**: Modify the minimum amount of code necessary to pass the tests while addressing the bug, avoiding over-engineering or introducing unrelated changes.
    4. **Verify Fix**: Re-run all tests to confirm the fix works successfully. Debug and refine as necessary to ensure correctness.
    5. **Clean Up Unused Code**: Remove any obsolete or redundant code that is no longer needed after the bug fix.

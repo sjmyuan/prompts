@@ -20,4 +20,4 @@ Select the appropriate TDD variant based on the change type and sub-type:
 | **Refactor** | Code organization (file moves, renames) | Existing tests should pass unchanged |
 | **Refactor** | Complex logic changes | Always follow full TDD cycle for safety |
 
-Always ensure existing tests pass before and after changes. Document the rationale for the chosen TDD variant in the plan.
+Always ensure existing tests pass before and after changes. Document the rationale for the chosen TDD variant in the plan. Streamlined means consolidated steps, not skipped test-first; only non-behavioral changes may skip test creation (see **[tdd-guardrails.md](tdd-guardrails.md)**).

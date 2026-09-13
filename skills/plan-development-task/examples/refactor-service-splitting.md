@@ -31,7 +31,7 @@ Applies **define-scope** (refactor).
 > Spring beans, injected. Pure orchestrator. Yes, existing tests must pass. Follow `<Domain>Service` naming.
 
 **Agent confirms refactor scope:**
-> Extract `CategoryMappingService` and `PriceTransformationService` from `DataImportedHandler`. The handler becomes a pure orchestrator delegating to these services. All existing handler tests must remain green. Each extraction follows a full TDD cycle.
+> Extract `CategoryMappingService` and `PriceTransformationService` from `DataImportedHandler`. The handler becomes a pure orchestrator delegating to these services. All existing handler tests must remain green. Each extraction keeps tests green; characterization tests are added only where coverage is missing.
 
 *User confirms: ✅*
 
@@ -46,31 +46,29 @@ Applies **plan-refactor**.
 **Out of scope**: behavior change, other handlers
 **Rule**: no step may change anything beyond **In scope**
 
-**TDD Approach**: Full TDD cycle for each service extraction — preserving existing behavior requires thorough test coverage
+**TDD Approach**: Green-to-green for each service extraction — existing tests stay green throughout; characterization tests added only where coverage is missing
 
 **Steps:**
 - Step 1: Prepare Environment (run tests, mvn spotless:check, mvn checkstyle:check, mvn compile)
-- Step 2: Write Tests for CategoryMappingService
-- Step 3: Confirm Test Failure
-- Step 4: Extract CategoryMappingService from DataImportedHandler
-- Step 5: Verify Tests Pass
-- Step 6: Clean Up unused code in DataImportedHandler
-- Step 7: Clean Up Tests
-- Step 8: Verify Cleanup
-- Step 9: Validate Linting, Formatting and Type Checking
-- Step 10: Write Tests for PriceTransformationService
-- Step 11: Confirm Test Failure
-- Step 12: Extract PriceTransformationService from DataImportedHandler
-- Step 13: Verify Tests Pass
-- Step 14: Clean Up unused code in DataImportedHandler
-- Step 15: Clean Up Tests
-- Step 16: Verify Cleanup
-- Step 17: Validate Linting, Formatting and Type Checking
+- Step 2: Confirm existing handler tests cover category mapping; add characterization tests if missing
+- Step 3: Extract CategoryMappingService from DataImportedHandler
+- Step 4: Verify all tests stay green
+- Step 5: Clean Up unused code in DataImportedHandler
+- Step 6: Clean Up Tests
+- Step 7: Verify Cleanup
+- Step 8: Validate Linting, Formatting and Type Checking
+- Step 9: Confirm existing handler tests cover price transformation; add characterization tests if missing
+- Step 10: Extract PriceTransformationService from DataImportedHandler
+- Step 11: Verify all tests stay green
+- Step 12: Clean Up unused code in DataImportedHandler
+- Step 13: Clean Up Tests
+- Step 14: Verify Cleanup
+- Step 15: Validate Linting, Formatting and Type Checking
 
 ## Key Characteristics
 
 - **Complexity**: Medium — involves extracting business logic into new services
-- **TDD Approach**: Full cycle for each service extraction
+- **TDD Approach**: Green-to-green for each service extraction
 - **Focus**: Single Responsibility Principle, service layer separation
-- **Testing Strategy**: Independent test cycles per extracted service; existing handler tests stay green throughout
-- **Total Steps**: 17
+- **Testing Strategy**: Existing handler tests stay green throughout; characterization tests added only where coverage is missing
+- **Total Steps**: 15

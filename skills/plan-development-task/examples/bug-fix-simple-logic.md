@@ -53,7 +53,7 @@ Applies **plan-bug-fix**.
 **Steps:**
 - **Step 1**: Prepare Environment (run tests, Spotless, Checkstyle)
 - **Step 2**: Write Tests for correct ID handling in DataImportedHandler
-- **Step 3**: Confirm Test Failure
+- **Step 3**: Confirm Test Failure (RED) — fails, not errors, for the expected reason
 - **Step 4**: Fix ID mapping logic in DataImportedHandler
 - **Step 5**: Verify Tests Pass
 - **Step 6**: Clean Up Unused Code

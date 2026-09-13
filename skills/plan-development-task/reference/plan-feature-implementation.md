@@ -7,8 +7,8 @@
 5. **Consolidate Steps**: Group related functionalities together when they share context or can be tested together, reducing the total step count while maintaining clarity. Consolidation strategies: (a) merge test-and-implement steps for simple getters/setters or config properties into a single step, (b) combine Clean Up Unused Code + Clean Up Tests + Verify Cleanup into one cleanup step when changes are small, (c) group Validate Linting, Formatting and Type Checking across multiple functionalities into one final quality gate step.
 6. Load **reference/tdd-approach-selection.md** to select the appropriate TDD variant for each functionality. Document the rationale.
 7. Create a detailed step-by-step implementation plan (starting with the ratified `## Scope Boundary` block). For each functionality, include the following steps:
-   1. **Write Focused Tests**: Create precise unit tests for a single functionality, task or requirement, ensuring coverage of all possible scenarios, edge cases, and invalid inputs.
-   2. **Confirm Test Failure**: Execute the tests to verify they fail initially, confirming their validity before implementation begins.
+   1. **Write Focused Tests**: Create precise tests for a single functionality that name the break they catch and assert real behavior — see **reference/test-quality.md**.
+   2. **Confirm Test Failure (RED)**: Run the tests and confirm each **fails** — not errors — for the expected reason because the behavior is missing. A test that passes immediately tests existing behavior: rewrite it. A test that errors: fix it and re-run until it fails correctly.
    3. **Implement Minimal Code**: Write the simplest code required to pass the tests, avoiding over-engineering or adding features not directly related to the current test cases.
    4. **Verify Implementation**: Re-run the tests to confirm that the implemented code passes all test cases successfully. Debug and refine as necessary.
    5. **Refactor**: Improve the code's structure, readability, and performance while maintaining functionality, ensuring no tests break during the process.
