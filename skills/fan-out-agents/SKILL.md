@@ -15,7 +15,7 @@ description: Dispatch several independent, similar sub-tasks to parallel copies 
 <knowledge>
 
 <fan-out-model>
-A **fan-out** runs several independent, similar units of work as parallel copies of the host agent, then merges the reports into one answer. It is not heterogeneous orchestration: cross-role pipelines (spike per-area dispatch, feature-delivery waves) own their dispatch and never route here. Fan-out leaves no artifacts, index, or tracking file. One level deep — clones are leaf tasks and never re-fan-out.
+A **fan-out** runs several independent, similar units of work as parallel copies of the host agent, then merges the reports into one answer. It is not heterogeneous orchestration: cross-role pipelines (spike per-area dispatch, feature-delivery waves) own their dispatch and never route here. Fan-out is **read-only / report-producing** — clones never mutate shared files or state; work that writes shared targets runs directly or in a pipeline that owns conflict handling. Fan-out leaves no artifacts, index, or tracking file. One level deep — clones are leaf tasks and never re-fan-out.
 </fan-out-model>
 
 <trigger-signals>
@@ -27,15 +27,15 @@ Splitting is fully automatic — never ask the user to pre-decompose or confirm 
 </auto-split-principle>
 
 <inline-brief-contract>
-The host authors each clone's brief inline from generic invariants — no fixed template file. Every brief states the area's scope boundary (in/out), the sub-question, the return contract per the host's own reporting doctrine, and a leaf instruction. Briefs are the only deconfliction between clones, which never see each other.
+The host authors each clone's brief inline from generic invariants — no fixed template file. Every brief is **self-contained** — clones inherit neither the host's session history nor each other's context; the brief carries every fact a clone needs. Each states the area's scope boundary (in/out), the sub-question, the return contract per the host's own reporting doctrine, and a leaf instruction. Briefs are the only deconfliction between clones, which never see each other.
 </inline-brief-contract>
 
 <merge-discipline>
-Merging is where quality is won or lost. The host reads short reports and never redoes a clone's reads. Deduplicate overlapping claims, reconcile shared boundaries with a direct spot-check, and surface conflicts rather than hiding them. Never present a coherent whole that papers over a contradiction. Presentation stays in the host's own doctrine — this skill imposes none.
+Merging is where quality is won or lost. The host reads short reports and never redoes a clone's reads. Deduplicate overlapping claims, reconcile shared boundaries with a direct spot-check, and spot-check at least one claim per area against primary sources — clones can make systematic errors, not just boundary overlaps. Surface conflicts rather than hiding them; never present a coherent whole that papers over a contradiction. Presentation stays in the host's own doctrine — this skill imposes none.
 </merge-discipline>
 
 <platform-dispatch>
-Detect whether the platform lets the host spawn copies of itself as sub-agents. When it does, dispatch all clones concurrently. When it does not, run the same split serially — still better than an unplanned sweep. Fallback detail: **reference/fan-out-guide.md**.
+Detect whether the platform lets the host spawn copies of itself as sub-agents. When it does, dispatch all clones **in one response** — multiple dispatches in a single turn run in parallel; one per turn runs sequentially. When it does not, run the same split serially — still better than an unplanned sweep. Fallback detail: **reference/fan-out-guide.md**.
 </platform-dispatch>
 
 <context-loading-guide>
@@ -59,8 +59,8 @@ Detect whether the platform lets the host spawn copies of itself as sub-agents. 
 2. Run the task directly when signals fail, dispatch is unavailable, or a safe split is impossible.
 3. Split the task into disjoint covering areas per **auto-split-principle**, sanity-checking disjointness and coverage.
 4. Compose one inline brief per area per **inline-brief-contract**.
-5. Dispatch all clones concurrently per **platform-dispatch**.
-6. Collect each clone's report as it returns.
+5. Dispatch all clones concurrently per **platform-dispatch** — all dispatches in one response.
+6. Collect each clone's report as it returns; wait in bounded stretches and chase any clone that finishes without reporting.
 7. Merge and reconcile the reports per **merge-discipline**.
 8. Present the single merged answer using the host's reporting doctrine, with a coverage summary listing unresolved cross-area conflicts.
 9. Validate: areas were disjoint and covering, every report was used, conflicts surfaced, and the answer answers the original task directly.
