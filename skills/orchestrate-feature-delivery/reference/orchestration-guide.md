@@ -11,6 +11,7 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 | Investigate (incl. rework spike) | investigation agent → **spike-conductor** | **conduct-spike** | focused findings / ADR / solution-doc updates |
 | Plan a cell | planning agent → **planner** | **plan-development-task** | `plan.md` + `context.md` |
 | Execute a cell | execution agent → **executor** | **execute-plan** | code changes + commits |
+| Verify a cell | review agent → **reviewer** | **review-code** | spec-compliance + trust verdict |
 | Update solution doc | solution-doc agent → **solution-doc-writer** | **write-solution-doc** | revised sections, rewrite in place |
 | Update ADR | ADR agent → **adr-writer** | **draft-adr** | revised ADR, rewrite in place |
 
@@ -37,12 +38,15 @@ Rules for **orchestrate-delivery**, **resume-delivery**, and **update-delivery-i
 3. Phase 1 — dispatch the **planner** to each unplanned, develop-ready cell (skip done; note blocked).
 4. Verify the **plan-first gate** — confirm each planner's plan file exists on disk before the cell advances.
 5. Phase 2 — dispatch the **executor** to each planned cell whose plan file is verified.
-6. Collect results; apply **update-delivery-index**.
+6. Collect results; apply **verify-cell** (spec compliance + trust) to each completed execution, then apply **update-delivery-index**.
 7. Re-assess and repeat until all cells are done or the user pauses.
+8. When all cells are **done**, run the epic integration review — one cross-cell review + integration test pass, deferred-Minor triage (see **reference/verification-gate.md**).
 
 ## Status updates
 
 - After every agent result, update the cell status; record the **head commit** from each execution handoff; when a PR is opened, record its reference; when it merges, confirm the recorded head commit is in the merged PR before marking **done**, then re-check downstream cells for develop/merge-readiness.
+- A completed execution advances to **verified** only after **verify-cell** passes — never mark a cell **done** or **poc-ready** without the gate (see **reference/verification-gate.md**).
+- Dispatch each gate finding straight to the planner — a fix is a pre-merge rework planned (**plan-development-task**, sibling `rework-<date>.md`) then executed (**execute-plan**), never a direct executor edit; the index tracks status only.
 - When a returned result looks inconsistent (status vs plan files, claimed merge vs branch state), verify it with a NEW same-type agent — never the original instance — before recording.
 - Never let conversation text be the source of truth — the delivery index is.
 - Run the delivery write-boundary check after each index update — confirm every changed path contains a `deliveries/` segment; stop and report on any out-of-folder change.

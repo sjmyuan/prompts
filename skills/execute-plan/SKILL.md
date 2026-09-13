@@ -34,7 +34,7 @@ Record each step in `plan.md` with the `### Step N: [Title] [emoji]` block (Obje
 </step-tracking-format>
 
 <feature-folder-structure>
-Each feature lives in its own folder with `plan.md` (live step tracking) + `context.md` (background material); both are a permanent record — never deleted. Layout, naming, and repo-first rules: **reference/feature-folder-structure.md**.
+Each feature lives in its own folder with `plan.md` (live step tracking) + `context.md` (background material + execution handoff); POC plans add `evaluation-report.md`. The core files are a permanent record — never deleted. Layout, naming, and repo-first rules: **reference/feature-folder-structure.md**.
 </feature-folder-structure>
 
 <plan-input-schema>
@@ -78,7 +78,7 @@ All prose written into `plan.md` / `context.md` follows **reference/writing-styl
 </concise-writing>
 
 <orchestrator-handoff>
-When executed inside a dispatched agent (e.g., by **orchestrate-feature-delivery** via the **executor** agent), hand back the final status list and commit hashes so the orchestrator can update its delivery index; a POC's completion routes to the decision gate.
+When executed inside a dispatched agent (e.g., by **orchestrate-feature-delivery** via the **executor** agent), append the execution handoff to `context.md` `## Execution` — return status (`DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT`), commit range (`base7..head7`; base is the branch point on first execution, the previous head for a rework), test evidence, the `review-code` outcome, and concerns — so the orchestrator's verification gate can read it. Append each fix round to the same section. A POC's completion routes to the decision gate.
 </orchestrator-handoff>
 
 <context-loading-guide>
@@ -238,6 +238,7 @@ Load only the example most relevant to the current execution scenario to minimiz
 <rule> **After Each ✅ Step**: Apply **commit-step**. </rule>
 <rule> **Before Any Push**: Apply **request-push-approval** — never push without user confirmation. </rule>
 <rule> **When the Folder Contains a Rework Plan**: Apply **track-plan** and **execute-step** to the active `rework-<date>.md` steps only. </rule>
+<rule> **When Executed as a Dispatched Agent** (orchestrate-feature-delivery): Apply **orchestrator-handoff** — append the `## Execution` handoff to `context.md` before reporting. </rule>
 <rule> **When the Plan is a POC** (type: poc): Apply **track-plan** and **execute-step**; never merge before the decision gate. </rule>
 <rule> **After the Final Evaluation Step of a POC**: Apply **produce-poc-report** and route to the decision gate. </rule>
 <rule> **When a Step, Recovery Fix, or Review Fix Exceeds the Boundary, or When Deviating from the Plan**: Apply **check-scope-boundary** — refuse and ask with options. </rule>

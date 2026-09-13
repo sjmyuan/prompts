@@ -6,16 +6,16 @@ Backs the **write-boundary** knowledge entry and the delivery write-boundary che
 
 | May write — inside the delivery folder (`**/deliveries/**`) | Never write |
 |---|---|
-| `index.md`, delivery-doc prose | code, config, tests, infrastructure, scripts, any file outside the delivery folder |
+| `index.md` | code, config, tests, infrastructure, scripts, `plan.md` / `context.md` / `rework-<date>.md`, any file outside the delivery folder |
 
-The delivery folder always carries a `deliveries/` path segment (`<base>/deliveries/<epic-name>/`), which anchors the boundary. The `plan.md` / `context.md` / `rework-<date>.md` files inside it are written by the dispatched **planner**, not the orchestrator.
+The delivery folder always carries a `deliveries/` path segment (`<base>/deliveries/<epic-name>/`), which anchors the boundary. The `plan.md` / `context.md` / `rework-<date>.md` files inside it are owned by the dispatched **planner** and **executor** — the orchestrator never writes them; gate findings go straight to the planner and the index tracks status only.
 
 ## Enforcement layers
 
 | Layer | Where | Strength |
 |---|---|---|
 | `edit` permission — `"*": "deny"`, `"**/deliveries/**": "allow"` | Orchestrator agent (opencode) | Hard block |
-| `task` allowlist — planner / executor / spike-conductor / adr-writer / solution-doc-writer | Orchestrator agent (opencode) | Blocks unexpected agents |
+| `task` allowlist — planner / executor / reviewer / spike-conductor / adr-writer / solution-doc-writer | Orchestrator agent (opencode) | Blocks unexpected agents |
 | Write-boundary doctrine + rules | Skill and agent files (all platforms) | Intent |
 | Boundary check | After each index write | Detection |
 

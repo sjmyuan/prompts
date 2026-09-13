@@ -15,9 +15,9 @@ Rules for POC cells in `orchestrate-feature-delivery` (**define-poc-scope**).
 
 ## Status transitions
 
-`unplanned → planned → in-progress → poc-ready → adopted | rejected` (plus `failed`/`blocked`). A replaced feature is marked **superseded**.
+`unplanned → planned → in-progress → verified → poc-ready → adopted | rejected` (plus `failed`/`blocked`). The independent verification gate (**verify-cell**) passes before **poc-ready**. A replaced feature is marked **superseded**.
 
-- **poc-ready**: execution finished the evaluation report; no merge yet — awaits the user's recorded decision.
+- **poc-ready**: execution finished the evaluation report and passed the gate; no merge yet — awaits the user's recorded decision.
 - **adopted**: user/team chose the option → **POC-as-implementation** (promote → merge → done) or **POC-as-decision-input** (dispatch the **poc-gated** feature).
 - **rejected**: option not proven → close the cell, archive/discard the branch, proceed on the other option.
 

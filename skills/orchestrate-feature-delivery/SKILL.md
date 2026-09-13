@@ -1,6 +1,6 @@
 ---
 name: orchestrate-feature-delivery
-description: Orchestrate spiked-epic delivery via dispatched agents and a tracking index. Use when decomposing, sequencing, planning, executing, resuming, tracking, reworking, or proving an ADR option with a POC.
+description: Orchestrate spiked-epic delivery via dispatched agents and a tracking index. Use when decomposing, sequencing, planning, executing, verifying, resuming, tracking, reworking, or proving an ADR option with a POC.
 ---
 
 <when-to-use-this-skill>
@@ -9,7 +9,8 @@ description: Orchestrate spiked-epic delivery via dispatched agents and a tracki
 - User wants to sequence which features run in parallel and which wait for another feature's PR to merge
 - User wants to dispatch parallel agents to plan (plan-development-task) or execute (execute-plan) feature × repo cells of an epic
 - User wants to resume or continue delivery of an existing spiked epic — load the index and derive next actions from its status
-- User wants to review or update the delivery index status (cells planned / in-progress / done / failed / blocked)
+- User wants a completed cell independently verified for spec compliance and report trust before it is marked done
+- User wants to review or update the delivery index status (cells planned / in-progress / verified / done / failed / blocked)
 - User found an issue after a feature was implemented (a cell is done, or implemented but not yet pushed/merged) and wants rework — focused spike on the governing ADR, a sibling rework file, and its execution
 - User reports an ADR decision changed mid-delivery — re-route the cells governed by it (see **handle-adr-change**)
 - User wants suggestions for which skill handles each part of a rework (spike, ADR update, rework plan, execution)
@@ -45,6 +46,7 @@ deliveries/<epic-name>/               # one folder per epic (epic-name = spike n
 │   └── plan.md                       # TDD plan from plan-development-task
 └── index.md                          # delivery index (single source of truth)
 ```
+- **Handoff**: the verification gate reuses these docs — `plan.md` step statuses and `context.md` `## Execution` (executor handoff); the reviewer fetches the diff from git, and findings go straight to the planner as a `rework-<date>.md` (see **reference/verification-gate.md**).
 - **Base root**: `deliveries/` is a sibling of the spike's `spikes/` under the artifact base the spike recorded (`scope.md` `Artifact root:`) — inherited, never re-resolved; only a missing record triggers `resolve-artifact-location`. The epic folder always carries a `deliveries/` path segment (`<base>/deliveries/<epic-name>/`), anchoring the write boundary.
 - **index.md** is the delivery index — it lives at the epic folder root (see **reference/delivery-index-format.md**).
 - **Feature folders are named by the feature's kebab-case name** (e.g. `wallet-contracts`), never its ID (`F1`) — IDs are reference shorthand only (waves, dependencies).
@@ -64,11 +66,14 @@ Classify each feature pair (A → B) by edge type:
 Wave computation + intra-feature merge order: **reference/dependency-ordering-guide.md**.
 </dependency-edge-types>
 <delivery-state-machine>
-Each cell follows **unplanned → planned → in-progress → done**, plus recoverable **failed** / **blocked**; **in-progress** covers implemented-but-not-yet-merged cells awaiting push approval. POC cells fork: **poc-ready** (evaluation report written) → **adopted** (promote → merge → **done**) or **rejected** (closed); a replaced cell is **superseded**. A cell is **develop-ready** when its dependencies are **planned**; **merge-ready** only when dependencies are **done**. The user records POC **adopted**/**rejected** in the index — the orchestrator never decides. Transitions: **reference/orchestration-guide.md**; rework: **rework-modes**.
+Each cell follows **unplanned → planned → in-progress → verified → done**, plus recoverable **failed** / **blocked**; **in-progress** covers execution running or complete, not yet verified; **verified** means the independent verification gate passed (see **verify-cell**) and the cell awaits merge. POC cells fork: **poc-ready** (evaluation report written, gate passed) → **adopted** (promote → merge → **done**) or **rejected** (closed); a replaced cell is **superseded**. A cell is **develop-ready** when its dependencies are **planned**; **merge-ready** only when dependencies are **done**. The user records POC **adopted**/**rejected** in the index — the orchestrator never decides. Transitions: **reference/orchestration-guide.md**; rework: **rework-modes**.
 </delivery-state-machine>
+<verification-gate>
+A cell reaches **verified** (and only then **done** or **poc-ready**) after an independent gate — spec compliance + trust verification — passes. Quality review stays with **execute-plan**'s `review-post-execution`; the gate never duplicates it. Handoff contract, gate inputs, verdicts, fix-loop cap, breaker, and the epic integration review: **reference/verification-gate.md**.
+</verification-gate>
 <agent-dispatch>
-Every delivery task is delegated — the orchestrator never performs it. Map task → agent → skill: investigate → **spike-conductor** (**conduct-spike**) · plan → **planner** (**plan-development-task**) · execute → **executor** (**execute-plan**) · solution-doc → **solution-doc-writer** (**write-solution-doc**) · ADR → **adr-writer** (**draft-adr**). Plan and execute are always separate agent sessions — never one agent doing both for the same cell, never execute before a verified plan file (see **plan-first gate** in **orchestrator-role**).
-Dispatch one agent per task in parallel, subject to **develop-gating** (see **delivery-state-machine**) and **no-conflict** (never run conflicting cells on the same repo simultaneously). Each brief carries the cell's scope brief **plus spike references** (ADR files, solution-doc section). When plan/execution surfaces solution-doc / ADR changes, dispatch the owning agent — never edit artifacts directly. Detect the platform's agent mechanism (planner / executor / spike-conductor / adr-writer / solution-doc-writer); if none exists, ask the user how to proceed — never do the work yourself. Full rules: **reference/orchestration-guide.md**.
+Every delivery task is delegated — the orchestrator never performs it. Map task → agent → skill: investigate → **spike-conductor** (**conduct-spike**) · plan → **planner** (**plan-development-task**) · execute → **executor** (**execute-plan**) · verify → **reviewer** (**review-code**) · solution-doc → **solution-doc-writer** (**write-solution-doc**) · ADR → **adr-writer** (**draft-adr**). Plan and execute are always separate agent sessions — never one agent doing both for the same cell, never execute before a verified plan file (see **plan-first gate** in **orchestrator-role**).
+Dispatch one agent per task in parallel, subject to **develop-gating** (see **delivery-state-machine**) and **no-conflict** (never run conflicting cells on the same repo simultaneously). Each brief carries the cell's scope brief **plus spike references** (ADR files, solution-doc section). When plan/execution surfaces solution-doc / ADR changes, dispatch the owning agent — never edit artifacts directly. Detect the platform's agent mechanism (planner / executor / reviewer / spike-conductor / adr-writer / solution-doc-writer); if none exists, ask the user how to proceed — never do the work yourself. Full rules: **reference/orchestration-guide.md**.
 </agent-dispatch>
 <branch-and-push-conventions>
 Execution agents commit locally and small-step; pushing or opening PRs happens only after user confirmation.
@@ -87,6 +92,7 @@ Rework is **always append-only** — implemented steps never change; scoped to t
 | **Pre-merge** | cell **in-progress** (implemented, not pushed/merged) | spike + ADR / solution-doc updates only if the issue challenges the ADR decision; rework stays on the same cell — rework steps merge with the original work |
 
 - **Rework lineage**: `F2-r1` reworks `F2`; `F2-r2` reworks `F2-r1` (latest delivered state); `Rework of:` names it. Rework files key by date — same-day collision suffix `-2`, `-3`. The `## Reworks` manifest is the canonical chain.
+- A verification-gate finding (**verify-cell**) is a **pre-merge** rework trigger while the cell is **in-progress**; the planner writes the sibling `rework-<date>.md` — the index tracks status only.
 </rework-modes>
 <adr-drift>
 ADRs are **versionless** — drift is signaled by the **adr-writer** agent's return or the user's report, never by diffing the ADR file. Route governed cells by status per the **ADR changes** section in **reference/orchestration-guide.md**.
@@ -104,6 +110,8 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 | Handling a pre-merge rework (cell **in-progress** — implemented but not pushed/merged) | Sibling rework file on an unmerged cell | [examples/pre-merge-rework.md](examples/pre-merge-rework.md) |
 | Running a full end-to-end decomposition from spike output to index | End-to-end multi-repo example | [examples/multi-repo-feature-decomposition.md](examples/multi-repo-feature-decomposition.md) |
 | Running one orchestration round with parallel agents | Dispatch + status-update walkthrough | [examples/orchestration-round.md](examples/orchestration-round.md) |
+| Running the independent verification gate on a completed cell | Handoff contract, gate verdicts, fix-loop cap, breaker | [reference/verification-gate.md](reference/verification-gate.md) |
+| Verifying a completed cell (executor report → independent spec review → fix round → verified) | Gate walkthrough | [examples/cell-verification-gate.md](examples/cell-verification-gate.md) |
 | Continuing an interrupted epic | Resume walkthrough with mixed statuses | [examples/resume-after-interruption.md](examples/resume-after-interruption.md) |
 | Distinguishing parallel vs merge-blocked features | Dependency-ordering-focused example | [examples/parallel-vs-sequential-waves.md](examples/parallel-vs-sequential-waves.md) |
 | Marking, sequencing, or gating POC cells, or handling a user-recorded POC decision | POC definition, lifecycle, adoption models | [reference/poc-lifecycle.md](reference/poc-lifecycle.md) |
@@ -170,10 +178,24 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 6. Gate merges on dependencies **done**.
 7. Brief each agent with its scope, **spike references**, and **branch name**.
 8. When plan or execution surfaces solution-doc / ADR changes, dispatch the owning agent (see **agent-dispatch**) — never edit artifacts yourself.
-9. Collect results and apply **update-delivery-index**.
+9. Collect results; apply **verify-cell** to each completed execution, then apply **update-delivery-index**.
 10. When a cell is ready to integrate, ask the user before pushing its branch or opening a PR (per **branch-and-push-conventions**); never push automatically.
 11. Re-assess and report next actions; repeat until all cells are done or the user pauses.
+12. When all cells are **done**, run the epic integration review — one cross-cell review + integration test pass; triage deferred Minors and surface residual load-bearing findings to the user (see **reference/verification-gate.md**).
 </orchestrate-delivery>
+<verify-cell>
+**Objective**: Independently verify a completed cell — spec compliance and report trust — before it advances to **verified**.
+
+**Note**: Quality review stays with **execute-plan**'s `review-post-execution`; never duplicate it.
+
+1. Require the executor's handoff per **reference/verification-gate.md**: `<feature-folder>/plan.md` shows every step ✅, and `context.md` `## Execution` holds the return status (`DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT`), commit range (`base7..head7`), test evidence, and concerns.
+2. Dispatch a **fresh reviewer** agent (**review-code**) with the recorded `base7..head7`, `plan.md`, `context.md`, the governing ADR, the solution-doc section, and global constraints — the reviewer fetches the diff from git; never the executor instance that produced the work.
+3. Require two verdicts: **spec compliance** (Missing / Extra / Misunderstood vs brief + ADR) and a **trust check** of the executor's claimed review outcome and test evidence against the diff (sample the claimed Blocker/Major fixes; do not re-run the suite).
+4. Pass → mark the cell **verified** via **update-delivery-index**.
+5. Spec gap or Critical/Important finding → dispatch the **planner** (**plan-development-task**) immediately with the findings to write a sibling `rework-<date>.md`; then the **executor** (**execute-plan**); then a scoped re-review.
+6. Cap the loop at 3 rounds; at the cap, stop and escalate to the user — never silently discard a finding.
+7. The cell stays **in-progress** through the rework; the rework file is the record (not the index). Roll deferred Minors into the epic integration review.
+</verify-cell>
 <resume-delivery>
 1. Load the existing delivery index — locate it under the spike's recorded artifact base (`scope.md` `Artifact root:`, then `deliveries/<epic-name>/index.md`) — plus the spike output.
 2. Confirm ADR currency with the user — if any governing ADR changed since the last run, apply **handle-adr-change** first.
@@ -224,10 +246,15 @@ All prose in the delivery index follows **reference/writing-style.md** — table
 <rule> When spike output exists but no delivery index, apply **decompose-change-into-features** → **map-features-to-repos** → **order-feature-delivery** → **produce-delivery-index**. </rule>
 <rule> When a delivery index exists and the user wants to drive or continue delivery, apply **orchestrate-delivery**; apply **resume-delivery** when continuing an epic interrupted in a previous session. </rule>
 <rule> After any agent reports a result, always apply **update-delivery-index** before dispatching further agents. </rule>
-<rule> When dispatching any delivery task (investigate, plan, execute, solution-doc, or ADR update), always dispatch the owning agent per **agent-dispatch**. </rule>
+<rule> When dispatching any delivery task (investigate, plan, execute, verify, solution-doc, or ADR update), always dispatch the owning agent per **agent-dispatch**. </rule>
 <rule> Never dispatch an executor for a cell until its plan file is verified on disk (the **plan-first gate**); never write or append a plan after execution. </rule>
 <rule> When a cell's implementation looks simple or easy, still apply the full flow — separate plan (**plan-development-task**) then execute (**execute-plan**) dispatches, never implement a cell directly or skip a step based on apparent simplicity. </rule>
 <rule> Never let a single agent plan and execute the same cell in one session — plan and execute are separate agent dispatches, always in that order. </rule>
+<rule> When a cell's execution completes, apply **verify-cell** before **update-delivery-index** advances it — never mark a cell **done** or **poc-ready** without a passing verification gate. </rule>
+<rule> The verification gate checks spec compliance and report trust only — never duplicate **execute-plan**'s quality review. </rule>
+<rule> At the verification fix-loop cap, stop and escalate to the user — never silently discard a finding. </rule>
+<rule> Never write `plan.md` / `context.md` / `rework-<date>.md` from the orchestrator — the planner and executor own them; dispatch gate findings straight to the planner and track status only in the index. </rule>
+<rule> When all cells are **done**, run the epic integration review before declaring the epic delivered (see **reference/verification-gate.md**). </rule>
 <rule> When the user asks about a single cell's plan or status, read the delivery index and route the cell to **plan-development-task** or **execute-plan** — do not re-run the whole orchestration. </rule>
 <rule> When an issue surfaces after a feature was implemented (a cell is **done** or **in-progress** — implemented but not pushed/merged), apply **handle-post-implementation-issue** — never re-run **decompose-change-into-features** on the whole epic. </rule>
 <rule> When the user reports an ADR change or an **adr-writer** agent returns a revision, apply **handle-adr-change** — never dispatch a planned cell on a stale decision. </rule>
