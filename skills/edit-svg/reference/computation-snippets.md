@@ -32,7 +32,7 @@ import sys
 import os
 
 # Add the skill scripts directory to the import path
-sys.path.insert(0, '/Users/ganggang/work/prompts/skills/edit-svg/scripts')
+sys.path.insert(0, '/Users/ganggang/work/gg-daily-workbench/skills/edit-svg/scripts')
 
 from graph_layout import flow_layout, compute_viewbox
 from routing import orthogonal_path, connection_endpoints, path_to_svg_d, endpoint_valid, detect_intersections, route_with_port_allocation

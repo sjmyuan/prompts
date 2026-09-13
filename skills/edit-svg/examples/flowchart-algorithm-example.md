@@ -24,7 +24,7 @@ The script follows the topological sort approach to auto-assign rows, then appli
 
 ```python
 import sys
-sys.path.insert(0, '/Users/ganggang/work/prompts/skills/edit-svg/scripts')
+sys.path.insert(0, '/Users/ganggang/work/gg-daily-workbench/skills/edit-svg/scripts')
 
 from graph_layout import flow_layout, compute_viewbox
 from routing import (

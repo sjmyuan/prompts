@@ -1,5 +1,5 @@
-# prompts
-A collection of prompts used in my daily work
+# gg-daily-workbench
+A collection of agents and skills used in my daily work
 
 ## Installing agents & skills
 

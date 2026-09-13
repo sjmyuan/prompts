@@ -2,7 +2,7 @@
 #
 # install-agents-skills.sh
 #
-# Install the agents and skills from this `prompts` repo into a workspace or
+# Install the agents and skills from this `gg-daily-workbench` repo into a workspace or
 # the current user profile for GitHub Copilot (VS Code), OpenCode, and/or
 # Claude Code.
 #
@@ -52,18 +52,18 @@
 #   - Each whole source FOLDER is symlinked into place (never copied), so the
 #     repo remains the source of truth: `git pull` in this repo updates every
 #     installed agent and skill automatically. One symlink per destination:
-#       <project>/.github/agents    -> prompts/copilot-agents
-#       <project>/.github/skills    -> prompts/skills
-#       <project>/.opencode/agents  -> prompts/opencode-agents
-#       <project>/.opencode/skills  -> prompts/skills
-#       <project>/.claude/agents    -> prompts/claude-agents
-#       <project>/.claude/skills    -> prompts/skills
+#       <project>/.github/agents    -> gg-daily-workbench/copilot-agents
+#       <project>/.github/skills    -> gg-daily-workbench/skills
+#       <project>/.opencode/agents  -> gg-daily-workbench/opencode-agents
+#       <project>/.opencode/skills  -> gg-daily-workbench/skills
+#       <project>/.claude/agents    -> gg-daily-workbench/claude-agents
+#       <project>/.claude/skills    -> gg-daily-workbench/skills
 #   - Existing targets already linked to this repo are left alone (idempotent).
 #   - If a target exists but is not one of our symlinks (e.g. an earlier
 #     per-file install, or a directory holding unrelated files), it is skipped
 #     with a warning; pass --force to replace it (the old target is deleted).
 #   - If a skill destination already points at the source (e.g. ~/.copilot/skills
-#     is a symlink to prompts/skills), skills are reported as already in sync
+#     is a symlink to gg-daily-workbench/skills), skills are reported as already in sync
 #     and left untouched.
 #   - With --uninstall, only symlinks are removed; real directories holding
 #     unrelated files are never deleted (foreign symlinks need --force).
@@ -233,7 +233,7 @@ install_skills_for() {
   [ -d "$SKILLS_SRC" ] || { warn "no skills source at $SKILLS_SRC"; return; }
 
   # When uninstalling, still process dst even when it resolves to the source
-  # (e.g. ~/.copilot/skills symlinked directly to prompts/skills) so the link
+  # (e.g. ~/.copilot/skills symlinked directly to gg-daily-workbench/skills) so the link
   # gets removed; the "already in sync" short-circuit only applies to installs.
   if [ "$UNINSTALL" -eq 0 ] && same_path "$SKILLS_SRC" "$dst"; then
     info "skills for $platform already in sync ($dst points at $SKILLS_SRC) — skipping"
