@@ -1,10 +1,10 @@
 # Example: End-to-End Spike — Payment Service Migration
 
-**Scenario**: The user wants to spike migrating a legacy payment processing service from a monolithic architecture to microservices. The spike should produce ADRs for each key decision problem (grouped by area) and a consolidated solution document.
+**Scenario**: The user wants to spike migrating a legacy payment processing service from a monolith to microservices, producing ADRs per decision problem and a consolidated solution document.
 
 **Applies**: All capabilities in sequence — `define-spike-scope` → `investigate-per-area` → `compile-findings-doc` → `draft-problem-adrs` (option evaluation via `draft-adr`) → `compile-solution-doc`
 
-**What makes this distinct**: Full multi-area brownfield spike demonstrating the complete workflow end to end (see `examples/multi-agent-investigation.md` for the parallel-dispatch variant).
+**What makes this distinct**: Full multi-area brownfield spike, end to end (see `examples/multi-agent-investigation.md` for the parallel-dispatch variant).
 
 ---
 
@@ -21,39 +21,25 @@
 
 | # | Area | Problems ("How to …?") |
 |---|---|---|
-| 1 | Service decomposition boundaries | How to split the monolith? What are the bounded contexts and service boundaries? |
-| 2 | Inter-service communication | How to handle service-to-service communication (sync vs. async, protocol, message format)? |
+| 1 | Service decomposition boundaries | How to split the monolith? |
+| 2 | Inter-service communication | How to handle service-to-service communication? |
 | 3 | Database decomposition strategy | How to break up the monolithic database? · How to migrate the schema safely? |
-| 4 | Migration strategy | How to transition from monolith to microservices with zero downtime? Strangler fig, parallel run, or big-bang? |
+| 4 | Migration strategy | How to transition with zero downtime? |
 
 ---
 
 ## Investigate Per Area
 
-### Area 1: Service Decomposition Boundaries
-
-*(investigate-code applied)*
-
-**Current State**: package-by-layer (`controller/`, `service/`, `repository/`, `domain/`); three intermingled domains — CreditCardPayment (40%), BankTransferPayment (30%), WalletPayment (25%), Shared (5%); `PaymentOrchestrator` (1200 lines) coordinates all payment types; credit card service imports bank-transfer domain objects.
-**Constraints & Pain Points**: whole-app redeploy on any payment-type change; wallet cannot scale independently; 3 teams step on each other's code.
-
-### Areas 2–4 (same pattern, abbreviated)
-
-*(investigate-code applied per area)*
+*(investigate-code applied per area; evidence maps recorded)*
 
 | Area | Current State | Key Constraint |
 |---|---|---|
-| 2. Inter-service communication | All in-process calls; external REST/gRPC/SOAP; no broker; no circuit breaker | No async experience; SOAP must be maintained |
-| 3. Database decomposition | Single PostgreSQL ~80 tables; `transactions`/`accounts`/`audit_log` shared; 12 settlement stored procedures (2000+ lines) | No per-type access control |
+| 1. Service decomposition | Package-by-layer; CreditCard 40% / BankTransfer 30% / Wallet 25%; `PaymentOrchestrator` (1200 lines) couples all types | Redeploy on any change; wallet can't scale; 3 teams contend |
+| 2. Inter-service communication | All in-process; external REST/gRPC/SOAP; no broker; no circuit breaker | No async experience; SOAP must stay |
+| 3. Database decomposition | Single PostgreSQL ~80 tables; `transactions`/`accounts`/`audit_log` shared; 12 settlement stored procedures (2000+ lines) | No per-type access control; procs block decomposition |
 | 4. Migration strategy | K8s (3 replicas); Kong routes `/api/payments/*`; GitHub Actions canary CI/CD | No feature flags or traffic splitting |
 
----
-
-## Completion Checkpoint
-
-*(Investigation complete — confirm the result before formalizing findings)*
-
-### Assistant → User
+### Completion Checkpoint
 
 > "Investigation complete — is this sufficient, or should we investigate further before formalizing?"
 > User: "It's sufficient — let's formalize. We can dig into the orchestrator call graph after the first round of ADRs."
@@ -62,125 +48,57 @@
 
 ## Compile Findings Documents
 
-*(compile-findings-doc applied — one findings doc per area, always: `docs/findings-<area>.md`. Four areas → four docs, compiled concurrently, each embedding its area's evidence map inline per `reference/findings-document-guide.md`.)*
+*(one findings doc per area, always: `docs/findings-<area>.md`; four areas → four docs, compiled concurrently, each embedding its area's evidence map inline.)*
 
-### Findings Document: `docs/findings-service-decomposition.md`
+| Findings doc | Current Architecture Summary | Constraints & Pain Points |
+|---|---|---|
+| `findings-service-decomposition.md` | Monolithic Spring Boot app (~200K LOC), package-by-layer; `PaymentOrchestrator` (1200 lines) couples all types | Redeploy on any change; wallet can't scale; 3 teams contend |
+| `findings-communication.md` | All calls in-process; external REST/gRPC/SOAP; no broker; no circuit breaker | No async experience; SOAP must be maintained |
+| `findings-database.md` | Single PostgreSQL (~80 tables); `transactions`/`accounts`/`audit_log` shared; 12 settlement procedures | No per-type access control; procedures block decomposition |
+| `findings-migration.md` | K8s (3 replicas) behind Kong; GitHub Actions canary CI/CD; routes `/api/payments/*` | No feature flags or traffic splitting |
 
-*(write-solution-doc applied to current state for this area, adapted with constraints & pain points replacing RAID/RACI)*
+**Cross-area constraints**: `findings-database.md` ↔ `findings-service-decomposition.md` (shared tables); `findings-communication.md` ↔ `findings-migration.md` (no async/traffic-split infra → migration starts synchronous).
 
-**C2 Container Diagram (Current State)**: Single Spring Boot monolith → PostgreSQL database, with all payment types sharing the same app and DB.
-
-**Current Architecture Summary**: monolithic Spring Boot app (~200K LOC), package-by-layer; three intermingled domains — CreditCardPayment (40%), BankTransferPayment (30%), WalletPayment (25%), Shared (5%) — coordinated by `PaymentOrchestrator` (1200 lines); the credit-card service imports bank-transfer domain objects.
-
-**Constraints & Pain Points**: whole-app redeploy on any payment-type change; wallet cannot scale independently; 3 teams step on each other's code.
-
-### Findings Document: `docs/findings-communication.md`
-
-**Current Architecture Summary**: all service calls in-process inside the monolith; external integrations over REST, gRPC, and SOAP; no message broker; no circuit breaker.
-
-**Constraints & Pain Points**: no async experience on the team; the SOAP contract must be maintained.
-
-### Findings Document: `docs/findings-database.md`
-
-**Current Architecture Summary**: single PostgreSQL (~80 tables); `transactions`, `accounts`, and `audit_log` shared across payment types; 12 settlement stored procedures (2000+ lines).
-
-**Constraints & Pain Points**: no per-type access control; stored procedures block schema decomposition.
-
-### Findings Document: `docs/findings-migration.md`
-
-**Current Architecture Summary**: deployed on Kubernetes (3 replicas) behind Kong API Gateway; GitHub Actions canary CI/CD; Kong routes `/api/payments/*`.
-
-**Constraints & Pain Points**: no feature flags or traffic splitting to route between old and new services.
-
-**Cross-area constraints** (cross-referenced between the affected docs): `findings-database.md` ↔ `findings-service-decomposition.md` — both depend on the shared `transactions`/`accounts`/`audit_log` tables; `findings-communication.md` ↔ `findings-migration.md` — no async or traffic-split infra means migration must start synchronous.
-
-> *Findings = current-state baseline per area; evaluation compares options against each area's doc; ADRs cite their area's findings doc; the solution doc evolves these diagrams as-is → to-be.*
+> *Findings = current-state baseline per area; ADRs cite their area's doc; the solution doc evolves these diagrams as-is → to-be.*
 
 ---
 
 ## Draft Problem ADRs — Evaluate + Draft
 
-*(Per problem, an `adr-writer` sub-agent runs the full `draft-adr` flow — decision drivers → options → **evaluate-options** → compile-adr — interactively with the user; a whole area's problems share one brief when evidence is shared. The evaluation tables below are the evaluate stage of each drafting session.)*
+*(Per problem, an `adr-writer` sub-agent runs the `draft-adr` flow headlessly from the drivers and findings carried in the brief; the orchestrator confirms each proposed chosen option. A whole area's problems share one brief when evidence is shared.)*
 
-### Area 1: Service Decomposition — problem: How to split the monolith?
+| Area → Problem | Options evaluated | Chosen Option |
+|---|---|---|
+| Service decomposition → split the monolith | A payment-type services · B domain-driven services · C strangler extraction | A — payment-type services + shared lib |
+| Communication → service communication | A synchronous REST · B async events (Kafka) · C hybrid | C — REST for queries, Kafka for commands |
+| Database → break up the database | A DB per service · B shared DB + views · C event-driven sync | A — DB per service, phased from Wallet |
+| Database → migrate the schema safely | A expand-contract · B central tool · C shared DB + views | A — expand-contract migrations |
+| Migration → zero-downtime migration | A strangler fig · B parallel run · C big-bang | A — strangler fig, Wallet first |
 
-| Option | Description | Pros | Cons |
-|---|---|---|---|
-| **A: Payment-type services** | One per payment type + shared lib | Clear ownership; independent scaling | Shared-lib coupling; duplicated concerns |
-| **B: Domain-driven services** | Initiation, Processing, Settlement, Reconciliation | Aligned with business process | More services; team restructuring |
-| **C: Strangler extraction** | Extract one payment type at a time | Lowest risk; incremental | Temporary hybrid complexity |
+**ADR output** (`adrs/`, each tagged with its `Area:`): `adr-service-decomposition-01-split-monolith.md`, `adr-communication-01-service-communication.md`, `adr-database-01-break-up-database.md`, `adr-database-02-schema-migration.md`, `adr-migration-01-zero-downtime-migration.md`.
 
-**Assumed Solution**: Option A (Payment-type services) — aligns with existing team structure, minimizes organizational change, and allows independent scaling.
-
-### Area 2: Inter-service Communication
-
-| Option | Description | Pros | Cons |
-|---|---|---|---|
-| **A: Synchronous REST** | Services call via REST | Simple; team familiar | Tight coupling; cascading failures |
-| **B: Async events (Kafka)** | Event streams | Loose coupling; resilience | Learning curve; eventual consistency |
-| **C: Hybrid** | REST for queries, events for commands | Best of both worlds | More infra; two patterns |
-
-**Assumed Solution**: Option C (Hybrid) — synchronous REST for real-time payment status queries, async Kafka events for payment processing commands and settlement.
-
-### Area 3: Database Decomposition Strategy
-
-| Option | Description | Pros | Cons |
-|---|---|---|---|
-| **A: Database per service** | Each service owns its DB | True decoupling; independent scaling | Complex migration; hard cross-service queries |
-| **B: Shared DB + views** | Schema-level separation via views | Simpler migration; SQL preserved | Not true decoupling |
-| **C: Event-driven sync** | DB per service, CDC events | Eventual consistency + audit trail | Complex to operate |
-
-**Assumed Solution**: Option A (Database per service) — phased implementation starting with the least-coupled payment type (Wallet), using the Strangler Fig pattern.
-
-**Second problem — How to migrate the schema safely?** (→ `adr-database-02-schema-migration.md`): Options — (A) expand-contract migrations shipped with each service (**chosen**), (B) central schema-migration tool (single choke point), (C) shared DB with views during transition (deferred). **Assumed solution**: Option A.
-
-### Area 4: Migration Strategy
-
-| Option | Description | Pros | Cons |
-|---|---|---|---|
-| **A: Strangler Fig** | Incrementally replace parts | Low risk; reversible; incremental value | Takes longer; routing complexity |
-| **B: Parallel run** | Run old and new side by side | Highest correctness confidence | Double operational cost |
-| **C: Big-bang cutover** | Build everything, switch at once | Clean cut; no transition complexity | High risk; no rollback |
-
-**Assumed Solution**: Option A (Strangler Fig) — extract Wallet payments first (simplest domain), then Bank Transfer, then Credit Card. Use API Gateway for traffic routing.
-
----
-
-### ADR: Service decomposition — split the monolith
-
-*(draft-adr applied — full ADR produced; saved as `adr-service-decomposition-01-split-monolith.md`, tagged `Area: Service decomposition`)*
-
+Example — `adr-service-decomposition-01-split-monolith.md`:
 - **Title**: Decompose Payment Monolith into Payment-Type Microservices
 - **Status**: Draft
-- **Problem**: The payment monolith couples three independent payment domains, preventing independent deployment and scaling, and causing team contention.
-- **Decision Drivers**: Hard — must maintain existing SLA (99.9% uptime); must not lose payment data during migration. Soft — prefer alignment with existing team structure; prefer incremental migration.
-- **Considered Options**: (A) Payment-type services, (B) Domain-driven services, (C) Strangler extraction
-- **Chosen Option**: A — Payment-type services (Wallet, Bank Transfer, Credit Card) with a shared utility library
-- **Consequences**: (+) independent deploy/scale per payment type; (+) incremental Strangler extraction; (−) shared lib coupling risk — version and treat as an API; (−) duplicated cross-cutting concerns (auth, logging).
+- **Problem**: The monolith couples three independent payment domains, preventing independent deployment and scaling.
+- **Decision Drivers**: Hard — maintain 99.9% SLA; no payment-data loss. Soft — align with existing teams; prefer incremental.
+- **Chosen Option**: A — payment-type services (Wallet, Bank Transfer, Credit Card) with a shared utility library.
+- **Consequences**: (+) independent deploy/scale; (+) incremental strangler extraction; (−) shared-lib coupling risk; (−) duplicated cross-cutting concerns.
 
 ---
 
 ## Compile Solution Doc
 
-*(write-solution-doc applied)*
-
-### Final Output Bundle
+*(write-solution-doc applied — target-state, decision-only, ADR decisions grouped by area.)*
 
 **Solution Document**: `solution.md`
-- Business context: migrate payment monolith to microservices
-- C2 Container Diagram: API Gateway → Wallet, Bank Transfer, Credit Card services, each with own DB; Kafka event bus
-- C3 Component + Sequence Diagrams: per service (as-is → to-be), payment initiation/settlement/migration flows
-- API Contracts: REST endpoints for queries, Kafka topic schemas for events
-- RAID: risks (data consistency), assumptions (Kafka adoption), issues (SOAP legacy)
-- RACI: ownership per service and cross-cutting concerns
+- C2: API Gateway → Wallet, Bank Transfer, Credit Card services, each with own DB; Kafka event bus
+- C3 + sequence diagrams per service (as-is → to-be); payment initiation/settlement/migration flows
+- API contracts: REST endpoints for queries, Kafka topic schemas for events
+- RAID: risks (data consistency), assumptions (Kafka adoption), issues (SOAP legacy); RACI per service
 
-**ADRs** (one per problem, area-prefixed in `adrs/`):
-- `adr-service-decomposition-01-split-monolith.md` — Payment-type services
-- `adr-communication-01-service-communication.md` — Hybrid sync/async
-- `adr-database-01-break-up-database.md` — Database per service
-- `adr-database-02-schema-migration.md` — Expand-contract migrations
-- `adr-migration-01-zero-downtime-migration.md` — Strangler Fig
+**Final bundle**: `scope.md` · `adrs/` (5 area-prefixed ADRs) · `solution.md` · `docs/findings-<area>.md` (4).
 
 ### Wrap-Up (conversation level — not written into any artifact)
 
-> All five assumed solutions are adopted into the solution doc, mirrored **grouped by area** per `scope.md`. If an ADR decision changes during review, the corresponding area section is rewritten in place. Artifacts version together in `spikes/payment-migration/` — scope map at the root, ADRs in `adrs/` (area-prefixed), solution doc at the root, one findings doc per area in `docs/` (see `examples/spike-artifact-layout.md`).
+> All five chosen options are adopted into the solution doc, mirrored **grouped by area** per `scope.md`. If an ADR decision changes during review, the corresponding area section is rewritten in place. Artifacts version together in `spikes/payment-migration/` (see `examples/spike-artifact-layout.md`).

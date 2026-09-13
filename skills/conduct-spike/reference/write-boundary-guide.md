@@ -15,13 +15,13 @@ The spike folder always carries a `spikes/` path segment (`<base>/spikes/<spike-
 
 | Layer | Where | Strength |
 |---|---|---|
-| `edit` permission — `"*": "deny"`, `"**/spikes/**": "allow"` | Spike-conductor agent (opencode) | Hard block |
-| `edit` permission — `"*": "deny"`, `"*.md": "allow"` | ADR/findings/solution writers (opencode) | Hard block on non-docs |
-| Write-boundary doctrine + rules | Skill and agent files (all platforms) | Intent |
+| Path-scoped `edit` permission (allow `**/spikes/**`, deny the rest) | Spike-conductor agent | Hard block |
+| Doc-scoped `edit` permission (allow `*.md`, deny the rest) | ADR/findings/solution writers | Hard block on non-docs |
+| Write-boundary doctrine + rules | Skill and agent files | Intent |
 | Brief Constraints + Report-back | Every dispatch brief | Intent, per dispatch |
 | Boundary check | After each write capability | Detection |
 
-Copilot and Claude agent files have no permission layer — the doctrine and rules carry the boundary there.
+Platforms without an agent permission layer rely on the doctrine and rules alone.
 
 ## Boundary check (after every write capability)
 

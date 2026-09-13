@@ -14,9 +14,9 @@
 
 **Areas → problems**: (1) service boundaries → split the monolith, (2) communication mechanism → service-to-service communication, (3) data consistency → keep data consistent.
 
-**Step**: `draft-problem-adrs` — `adr-communication-01-service-communication.md` is being reviewed. The assumed solution is AWS EventBridge with an `OrderReceived` event, chosen because it is already present in the codebase.
+**Step**: `draft-problem-adrs` — `adr-communication-01-service-communication.md` is being reviewed. The proposed chosen option is AWS EventBridge with an `OrderReceived` event, chosen because it is already present in the codebase.
 
-**User's hesitation**: "I'm not sure about committing to EventBridge as the assumed solution. It's already in the codebase, but I don't actually know if it can handle our peak of 10K orders/sec — or whether we'd be better off with a Kafka-style bus for replay."
+**User's hesitation**: "I'm not sure about committing to EventBridge as the chosen option. It's already in the codebase, but I don't actually know if it can handle our peak of 10K orders/sec — or whether we'd be better off with a Kafka-style bus for replay."
 
 ---
 

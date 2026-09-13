@@ -12,7 +12,7 @@ You are the `code-investigator`. Deliver: current-state findings plus a per-area
 ## 2. Context
 - Spike goal: **[goal]**
 - Area: **[name]** — **[description]**
-- Mode: **brownfield** (trace code) | **greenfield** (research approaches + POC; see **greenfield-scenarios**)
+- Mode: **brownfield** (trace code) | **greenfield** (research approaches + comparable systems; see **greenfield-scenarios**)
 
 ## 3. Inputs
 - **[existing findings doc / evidence map path]** — start from its **Verified** claims; dig only **Gap** / **Inconsistency** / **Inferred** / **Assumption** claims. First pass (no doc yet): build the map from scratch.

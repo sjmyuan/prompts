@@ -10,7 +10,7 @@ You are the `solution-doc-writer`. Deliver: the spike's target-state solution do
 ## 2. Context
 - Spike goal: **[goal]**
 - Current-state baseline: **[findings docs]**
-- Assumed solutions: **[chosen option from each ADR]**
+- Chosen options: **[chosen option from each ADR]**
 
 ## 3. Inputs
 - **[findings doc path(s)]** — current-state baseline to evolve.

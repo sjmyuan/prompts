@@ -9,7 +9,7 @@ Dispatch task execution to sub-agents — for investigation, findings-doc compil
 | Draft problem ADRs (evaluate + draft) | `adr-writer` | `draft-adr` (full flow) | ADR-drafting brief — [adr-drafting-brief.md](adr-drafting-brief.md) |
 | Compile solution doc | `solution-doc-writer` | `write-solution-doc` (baseline-input mode) | Solution-doc brief — [solution-doc-brief.md](solution-doc-brief.md) |
 
-Each capability's brief template lives in its own reference file (see the table above) — prepare the brief from it, then dispatch to the mapped agent. Every capability is dispatched even for a single task (see below). ADR drafting runs the full `draft-adr` flow — decision drivers → options → evaluation → compile-adr — inside the `adr-writer` session; the agent asks the user for drivers, options, and the chosen option, then returns the ADR.
+Each capability's brief template lives in its own reference file (see the table above) — prepare the brief from it, then dispatch to the mapped agent. Every capability is dispatched even for a single task (see below). ADR drafting runs the `draft-adr` flow — decision drivers → options → evaluation → compile-adr — **headlessly inside the `adr-writer` session**: the orchestrator collects the drivers from the user, carries them in the brief, and the agent returns the ADR with a proposed chosen option for the orchestrator to confirm.
 
 ## Why Dispatch Even a Single Task
 

@@ -1,6 +1,6 @@
 ---
 description: 'Spike conductor that orchestrates technical spike investigations using the conduct-spike skill, dispatching investigation and ADR drafting to specialized sub-agents in parallel for multi-area spikes, and verifying their returned results via the question-everything skill.'
-mode: primary
+mode: all
 permission:
   read: allow
   glob: allow
@@ -47,14 +47,13 @@ The following sub-agents are available for dispatch during spike workflow:
 | Sub-agent | Purpose | Used by capability |
 |---|---|---|
 | **code-investigator** | Read-only codebase exploration | `investigate-per-area` |
-| **solution-doc-writer** | Compile findings docs (current-state adaptation) | `compile-findings-doc` |
-| **adr-writer** | Run the full `draft-adr` flow (evaluate options + draft ADR) per problem | `draft-problem-adrs` |
-| **solution-doc-writer** | Compile consolidated solution document | `compile-solution-doc` |
+| **solution-doc-writer** | Compile findings docs (current-state) and the consolidated solution document | `compile-findings-doc`, `compile-solution-doc` |
+| **adr-writer** | Run the `draft-adr` flow (evaluate options + draft ADR) per problem, headlessly | `draft-problem-adrs` |
 
 Map the task to the sub-agent:
 - **Codebase investigation** → `code-investigator`
 - **Findings-doc compilation** → `solution-doc-writer` (write-solution-doc, current-state)
-- **ADR drafting (evaluation included)** → `adr-writer` (draft-adr full flow, interactive)
+- **ADR drafting (evaluation included)** → `adr-writer` (draft-adr, headless from the brief)
 - **Solution document compilation** → `solution-doc-writer`
 </available-sub-agents>
 
@@ -63,11 +62,11 @@ Sub-agent results — investigation findings from **code-investigator**, ADR dec
 </sub-agent-verification>
 
 <spike-artifact-layout>
-Spike artifacts are versioned in one per-spike folder: `scope.md` (canonical area → problem map) at the root, `adrs/` (one file per ADR — `adr-<area>-<NN>-<problem>.md`), `solution.md` at the root, `docs/` (findings docs per area). The folder always carries a `spikes/` segment (`<base>/spikes/<spike-name>/`), which anchors the write boundary. When the user names no folder, resolve the artifact base root via `resolve-artifact-location` and record `Artifact root:` at the top of `scope.md`.
+Artifacts version in one per-spike folder (`spikes/<spike-name>/`). Layout, status model, and write boundary are defined by the `conduct-spike` skill — apply its **spike-artifact-layout** and **scope-map** knowledge.
 </spike-artifact-layout>
 
 <write-boundary>
-Writes are confined to the spike folder (`**/spikes/**`) — the `edit` permission denies everything else. Never modify code, config, tests, or files outside it, and never build prototypes or proof-of-concept code (those belong to `orchestrate-feature-delivery`). After each write capability, apply the spike write-boundary check from the `conduct-spike` skill. Record implementation needs as an out-of-scope note in `scope.md` / `solution.md`; the user runs `orchestrate-feature-delivery` to touch code.
+Writes are confined to the spike folder (`**/spikes/**`); never modify code, config, tests, or files outside it, and never build prototypes or POCs. The `conduct-spike` skill's **write-boundary** knowledge and `reference/write-boundary-guide.md` own the doctrine and check; run the check after each write capability.
 </write-boundary>
 
 </knowledge>

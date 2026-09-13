@@ -1,10 +1,10 @@
 # Example: Continue a Prior Spike — Database Decomposition Round 2
 
-**Scenario**: The user completed a spike on migrating a payment monolith to microservices. Four ADRs were drafted, but database decomposition was left unresolved. Now they ask to dig into that one area to reach a conclusion.
+**Scenario**: A completed payment-migration spike left database decomposition unresolved. The user asks to dig into that area and add a schema-migration problem.
 
-**Applies**: `continue-prior-spike` → `investigate-per-area` → `compile-findings-doc` → `draft-problem-adrs` (option evaluation via `draft-adr`) → `sync-update-artifacts`
+**Applies**: `continue-prior-spike` → `investigate-per-area` → `compile-findings-doc` → `draft-problem-adrs` (evaluation via `draft-adr`) → `sync-update-artifacts`
 
-**What makes this distinct**: Not a full spike (scope already defined, other ADRs exist), not "from existing findings" (the area needs new investigation), and not a plain ADR revision (the problem was never resolved). It shows a continuation round: one area revisited **plus a new problem added under it** — the scope-map delta drives which ADRs change and how `solution.md`'s area section grows.
+**What makes this distinct**: A continuation round — one area revisited **plus a new problem added** under it. The scope-map delta drives which ADRs change and how `solution.md`'s area section grows.
 
 ---
 
@@ -16,27 +16,17 @@
 
 ### Assistant Output
 
-**Loaded existing artifacts** (incl. the scope map `scope.md`):
+**Loaded existing artifacts** (incl. `scope.md`): service-decomposition, communication, and migration ADRs `done`; `adr-database-01-break-up-database.md` unresolved (options surfaced, no decision); solution doc draft — "database strategy TBD"; `scope.md` Database area `spiking` (db-01 `deciding`, schema-migration `investigating`).
 
-| Item | Status |
-|---|---|
-| Spike goal | Target architecture for decomposing the payment monolith into microservices |
-| `adr-service-decomposition-01-split-monolith.md` | ✅ Drafted |
-| `adr-communication-01-service-communication.md` | ✅ Drafted |
-| `adr-database-01-break-up-database.md` | ❌ Unresolved — options identified, no decision |
-| `adr-migration-01-zero-downtime-migration.md` | ✅ Drafted |
-| Solution doc | Draft — "database strategy TBD" |
-| `scope.md` (status dashboard) | Service/Communication/Migration areas `done`; Database `spiking` (db-01 `deciding`, schema-migration `investigating`) |
+**`adr-database-01` prior context**: single PostgreSQL, ~80 tables; `transactions`/`accounts`/`audit_log` shared across payment types; 2000+ lines of settlement procedures.
 
-**`adr-database-01` prior context**: single PostgreSQL, ~80 tables; `transactions`/`accounts`/`audit_log` shared across payment types; 2000+ lines of settlement procedures; two options surfaced, not evaluated.
-
-**Scope-map delta requested**: add a new problem under `Database decomposition` — "How to migrate the schema safely?" → would become `adr-database-02-schema-migration.md`.
+**Scope-map delta requested**: add a new problem under `Database decomposition` — "How to migrate the schema safely?" → `adr-database-02-schema-migration.md`.
 
 ---
 
 ## Step 2: Confirm Continuation Scope (against the scope map)
 
-> "You want to revisit **`adr-database-01-break-up-database.md`** and **add a new problem** — schema migration — under the same area. The decomposition/communication/migration ADRs stand as-is. Open questions: (1) one DB per service, shared DB with views, or a third option? (2) how to migrate the schema safely given the stored procedures?"
+> "You want to revisit `adr-database-01-break-up-database.md` and add a new problem — schema migration — under the same area. The other ADRs stand as-is. Open questions: (1) one DB per service, shared DB with views, or a third option? (2) how to migrate the schema safely given the stored procedures?"
 
 ### User
 
@@ -45,8 +35,8 @@
 ### Assistant validates
 
 - **Independently decidable**: yes — the other ADRs are decided, providing constraints only.
-- **Narrow enough**: yes — answer "can we split the DB without breaking settlement?" and "how to migrate the schema safely?", not re-open the spike.
-- **Scope map updated**: `scope.md` gains the new problem under `Database decomposition` → `adr-database-02-schema-migration.md` (`investigating`).
+- **Narrow enough**: yes — answer the DB-split and schema-migration questions, not re-open the spike.
+- **Scope map updated**: `scope.md` gains the new problem → `adr-database-02-schema-migration.md` (`investigating`).
 
 ---
 
@@ -58,14 +48,14 @@
 
 **NEW findings** (not covered in the original spike):
 
-- **Stored-procedure dependency graph**: 12 procedures traced — 8 payment-type-specific (isolable); 4 span types (`settle_cross_type()`, `reconcile_daily()`, …) joining `transactions` across all types.
+- **Stored-procedure dependency graph**: 12 procedures — 8 payment-type-specific (isolable); 4 span types (`settle_cross_type()`, `reconcile_daily()`) joining `transactions` across all types.
 - **Table-level access**: `credit_card_auths`/`bank_transfer_refs` single-type → safe to isolate; `transactions` read/written by ALL types (core conflict); `accounts` read by all, written only by the settlement batch.
-- **Settlement batch profiling**: single nightly stored-procedure call, ~500K transactions in 45 min; the cross-type procedures are the bottleneck (full-table scans).
-- **Prototype assessment**: cross-type procedures could become a standalone settlement service owning `transactions` + `accounts`, with payment-type services writing via async events (aligns with the Kafka decision).
+- **Settlement profiling**: nightly call, ~500K transactions in 45 min; cross-type procedures are the bottleneck.
+- **Extraction assessment**: cross-type procedures could become a standalone settlement service owning `transactions` + `accounts`, with payment services writing via async events (reuses Kafka).
 
-**Already known** (not re-investigated): single PostgreSQL, ~80 tables, 2000+ lines of procedures, no DB-level access control, strong PostgreSQL expertise.
+**Already known** (not re-investigated): single PostgreSQL, ~80 tables, 2000+ lines of procedures, no DB-level access control.
 
-**Findings doc updated in place**: new facts recorded in the Evidence & Verification section with `file:line` + confidence tags (per `reference/findings-document-guide.md`).
+**Findings doc updated in place**: new facts recorded in the Evidence & Verification section with `file:line` + confidence tags.
 
 ---
 
@@ -90,47 +80,37 @@
 
 > "Option C makes sense — a clear path without a big-bang split. Let's go with that."
 
-**Assumed solution**: Option C — keep shared PostgreSQL initially; extract settlement into its own service owning `transactions` + `accounts`; payment services publish events to Kafka.
-
 **Problem 2 — migrate the schema safely** (new problem under the same area):
 
 | Option | Verdict |
 |---|---|
-| A: Expand-contract (additive columns → backfill → drop) | **Chosen** — reversible per service; aligns with phased Option C |
-| B: Copy-and-switch per table | Rejected — downtime during switch; risky with cross-type procedures |
-| C: Big-bang migration | Rejected — contradicts the incremental DB strategy |
+| A: Expand-contract (additive → backfill → drop) | **Chosen** — reversible per service; aligns with phased Option C |
+| B: Copy-and-switch per table | Rejected — downtime; risky with cross-type procedures |
+| C: Big-bang migration | Rejected — contradicts the incremental strategy |
 
-**Assumed solution**: Option A — expand-contract migrations shipped with each service.
+### ADRs written (rewritten in place — old drafts deleted, no version markers; see `reference/artifact-maintenance-guide.md`)
 
----
+**`adr-database-01-break-up-database.md` — Gradual Database Decomposition with Settlement Extraction** (revised)
+- **Problem**: Single PostgreSQL DB (~80 tables) shared across all payment types; the nightly settlement batch (45 min, 500K transactions) is the critical coupling point.
+- **Chosen Option**: Phase 1 — payment-type services own type-specific tables; settlement service owns `transactions` + `accounts`; events via Kafka. Phase 2 — further decompose.
+- **Consequences**: (+) incremental; (+) settlement scales independently; (+) reuses Kafka; (−) settlement is a critical runtime dependency; (−) eventual consistency needs monitoring.
 
-**`adr-database-01-break-up-database.md`: Gradual Database Decomposition with Settlement Extraction** *(rewritten in place — old unresolved draft deleted, no version markers; see `reference/artifact-maintenance-guide.md`)*
-
-- **Problem**: The payment monolith uses a single PostgreSQL DB (~80 tables) shared across all payment types; the nightly settlement batch (45 min, 500K transactions) is the critical coupling point — its procedures span all types.
-- **Decision Drivers**: Hard — must not break the settlement batch (45-min SLA); must keep payment-capture consistency. Soft — prefer incremental over big-bang; prefer solutions that leverage the Kafka decision.
-- **Considered Options**: A (one DB per service) — rejected: full rewrite of settlement logic; B (shared DB + views) — rejected: keeps the bottleneck; C (shared DB + settlement extraction) — **chosen**: incremental, settlement scales independently, reuses Kafka; D (event sourcing + CQRS) — rejected: paradigm shift beyond team expertise.
-- **Chosen Option**: Phase 1 — payment-type services own type-specific tables; settlement service owns `transactions` + `accounts`; payment services publish events to Kafka. Phase 2 — further decompose or move to per-service databases.
-- **Consequences**: (+) incremental; (+) settlement scales independently; (+) reuses Kafka; (−) settlement becomes a critical runtime dependency; (−) eventual consistency needs monitoring.
-
-**`adr-database-02-schema-migration.md`: Schema Migration via Expand-Contract** (new — added problem under the same area)
-
-- **Problem**: Splitting the monolithic database needs a schema-migration approach that keeps the 2000+ line stored procedures working during the phased transition.
-- **Decision Drivers**: Hard — no downtime; must not break the nightly settlement batch. Soft — prefer migrations shipped with each service; prefer reversible steps.
-- **Considered Options**: A (expand-contract) — **chosen**: additive, reversible per service, aligns with Option C's phasing; B (copy-and-switch) — rejected: downtime during switch, risky with cross-type procedures; C (big-bang) — rejected: contradicts the incremental strategy.
-- **Chosen Option**: Expand-contract — additive columns first, backfill, then drop; each migration ships with its owning service.
-- **Consequences**: (+) reversible; (+) no downtime; (+) matches phased DB split; (−) temporary dual-schema window; (−) backfill volume on large tables needs batching.
+**`adr-database-02-schema-migration.md` — Schema Migration via Expand-Contract** (new)
+- **Problem**: Splitting the DB needs a schema-migration approach that keeps the 2000+ line stored procedures working during the phased transition.
+- **Chosen Option**: Expand-contract — additive columns, backfill, then drop; each migration ships with its owning service.
+- **Consequences**: (+) reversible; (+) no downtime; (+) matches the phased split; (−) temporary dual-schema window; (−) backfill volume needs batching.
 
 ---
 
-## Step 6: Sync Downstream
+## Step 5: Sync Downstream
 
 *(sync-update-artifacts — the database area now has two decided ADRs)*
 
 > "The database area now has two decisions. The C2 diagram needs a Settlement Service container, and the solution doc's `Database decomposition` section gains a schema-migration subsection. I'll refresh the solution document."
 
 **Solution doc** (via `write-solution-doc`, rewritten in place):
-- `Database decomposition` area section: settlement-extraction decision + new schema-migration decision (grouped under the same area per `scope.md`).
-- C2: Settlement Service container — inbound events from Kafka, owns `transactions` + `accounts`.
+- `Database decomposition` section: settlement-extraction + schema-migration decisions (grouped by area per `scope.md`).
+- C2: Settlement Service container (inbound Kafka events; owns `transactions` + `accounts`).
 - Sequence (nightly settlement): Payment Services → Kafka → Settlement Service → PostgreSQL.
 - RAID: Risk — Settlement Service is a critical dependency; Assumption — Kafka topic partitioning aligns with payment types.
 
@@ -138,7 +118,7 @@
 
 ---
 
-## Step 7: Present Results + Next Round
+## Step 6: Present Results + Next Round
 
 **Revised**: `adr-database-01-break-up-database.md` (resolved — Option C). **Added**: `adr-database-02-schema-migration.md` (expand-contract). **Updated**: `scope.md` (new problem), solution doc's database area section. **Unchanged**: the other three ADRs.
 

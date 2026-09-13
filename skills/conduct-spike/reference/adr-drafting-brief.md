@@ -16,14 +16,16 @@ You are the `adr-writer`. Deliver: one ADR per problem for **[area]**, evaluated
 
 ## 3. Inputs
 - The area's findings doc (evidence sections) — cite evidence locations; do not re-read code.
+- Decision drivers / constraints: **[drivers the orchestrator collected from the user]**.
 
 ## 4. Tasks
-1. Load `draft-adr` and run the full flow — **define-decision-drivers** → **define-considered-options** → **evaluate-options** (apply **detail-options-tech** when tech details are needed) → **compile-adr**.
-2. Run the user dialog (drivers, options, chosen option) inside this session.
-3. Tag each ADR with its **Area:**.
+1. Load `draft-adr` and run the flow headlessly — **define-decision-drivers** → **define-considered-options** → **evaluate-options** (apply **detail-options-tech** when tech details are needed) → **compile-adr**.
+2. Use the drivers carried in this brief; derive and evaluate options from the findings doc, and propose the chosen option.
+3. Never prompt the user — the orchestrator owns the confirmation dialog.
+4. Tag each ADR with its **Area:**.
 
 ## 5. Output contract
-- One ADR per problem, standalone-readable, citing findings-doc evidence locations (per `draft-adr`'s compile-adr checklist).
+- One ADR per problem, standalone-readable, carrying its proposed chosen option and evaluation, citing findings-doc evidence locations (per `draft-adr`'s compile-adr checklist).
 
 ## 6. Constraints
 - Write only `<spike-folder>/adrs/adr-<area>-<NN>-<problem>.md`; never modify code or any file outside the spike folder.

@@ -4,7 +4,7 @@
 
 **Applies**: `define-spike-scope` → `compile-findings-doc` → `draft-problem-adrs` (option evaluation via `draft-adr`) → `compile-solution-doc` (skipping `investigate-per-area`; compile-findings-doc formalizes the provided findings)
 
-**What makes this distinct**: Investigation is skipped because the user already has findings. The spike starts from ADR drafting (evaluation included), demonstrating the "provide pre-existing findings" rule.
+**What makes this distinct**: Investigation is skipped because the user already has findings. The spike starts from ADR drafting (evaluation included), demonstrating **pre-existing-findings**.
 
 ---
 
@@ -30,7 +30,7 @@
 
 ## Investigate Per Area — SKIPPED
 
-*User provided pre-existing investigation findings. Skipping investigation per the "pre-existing findings" rule.*
+*User provided pre-existing investigation findings. Skipping investigation per **pre-existing-findings**.*
 
 ---
 
@@ -58,12 +58,6 @@
 - Any caching solution must not increase write latency (already acceptable at ~50ms)
 - No existing cache infrastructure — any solution requires new operational investment
 
-**Raw Data & Metrics**:
-- 10K reads/sec, 50 writes/sec (200:1 ratio)
-- DB CPU: 80%+ during peak
-- P99 latency: 450ms (target: <100ms for cache hits)
-- Write latency: ~50ms (acceptable)
-
 ### Findings Document: `docs/findings-cache-invalidation.md`
 
 *(write-solution-doc applied to current state — the invalidation-relevant facts; cross-references the topology doc for the shared baseline)*
@@ -90,7 +84,7 @@
 | **B: Redis (ElastiCache)** | Shared cache; persistence; rich data structures | Network hop; new infra cost; operational overhead |
 | **C: Two-tier (in-memory + Redis)** | Best latency for hot keys; resilience | Complexity; two sources of staleness; harder to debug |
 
-**Assumed Solution**: Option C (Two-tier) — in-memory Caffeine cache with 30s TTL for ultra-hot keys, backed by Redis cluster for shared cache with 5min TTL.
+**Chosen Option**: Option C (Two-tier) — in-memory Caffeine cache with 30s TTL for ultra-hot keys, backed by Redis cluster for shared cache with 5min TTL.
 
 ### Area 2: Cache Invalidation Strategy
 
@@ -100,7 +94,7 @@
 | **B: Write-through** | Always consistent; good for read-heavy workloads | Write latency penalty; cache must be available for writes |
 | **C: Cache-aside with CDC invalidation** | Eventual consistency; decoupled; no write penalty | Eventual consistency window; CDC pipeline complexity |
 
-**Assumed Solution**: Option C (Cache-aside with CDC) — services write to DB only; Debezium CDC captures changes and publishes invalidation events to Kafka; cache consumers listen and invalidate affected keys.
+**Chosen Option**: Option C (Cache-aside with CDC) — services write to DB only; Debezium CDC captures changes and publishes invalidation events to Kafka; cache consumers listen and invalidate affected keys.
 
 ---
 

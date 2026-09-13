@@ -111,4 +111,6 @@ The spike scope is likely too broad. Options:
 If there is no existing implementation to investigate, each area's `investigate-per-area` shifts to:
 - Researching industry approaches and open-source solutions
 - Studying similar systems in the organization
-- Prototyping proof-of-concepts instead of tracing code
+- Reviewing documented benchmarks and operational constraints instead of tracing code
+
+Never build proof-of-concept prototypes — any POC is delivered by `orchestrate-feature-delivery`, not the spike.
